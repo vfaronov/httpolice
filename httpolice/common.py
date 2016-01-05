@@ -5,7 +5,7 @@ class ProtocolString(unicode):
     __slots__ = ()
 
     def __repr__(self):
-        return u'%s(%r)' % (type(self).__name__, unicode(self))
+        return u'%s(%r)' % (self.__class__.__name__, unicode(self))
 
 
 class CaseInsensitive(ProtocolString):
