@@ -1,7 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from httpolice.common import AsteriskForm, Comment, OriginForm
-from httpolice.header import FieldName, HeaderField
+from httpolice.header import FieldName, HeaderEntry
 from httpolice.method import Method
 from httpolice.parse import (
     Parser,
@@ -106,6 +106,6 @@ field_content = wrap(str.rstrip,        # see errata to RFC 7230
                      join(field_vchar + string(sp_htab | field_vchar)))
 obs_fold = wrap(lambda _: ' ', ows + crlf + many1(sp_htab))
 field_value = string(field_content | obs_fold)
-header_field = wrap(lambda kv: HeaderField(*kv),
+header_field = wrap(lambda kv: HeaderEntry(*kv),
                     field_name + ignore(literal(':')) +
                     ignore(ows) + field_value + ignore(ows) + ignore(crlf))
