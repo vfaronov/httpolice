@@ -15,6 +15,9 @@ class CaseInsensitive(ProtocolString):
     def __eq__(self, other):
         return unicode(self).lower() == unicode(other).lower()
 
+    def __hash__(self):
+        return hash(unicode(self).lower())
+
 
 class Comment(ProtocolString):
 
