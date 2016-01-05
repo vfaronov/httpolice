@@ -24,3 +24,11 @@ class FieldName(httpolice.common.CaseInsensitive):
     __slots__ = ()
 
 
+class KnownHeaders(httpolice.common.Known):
+
+    pass
+
+
+known_headers = KnownHeaders([
+    {'name': FieldName('Content-Length')},
+])

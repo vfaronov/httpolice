@@ -51,6 +51,14 @@ class State(object):
         else:
             return False
 
+    def consume_anything(self, n=None):
+        if n is None:
+            s = self.data[self.pos:]
+        else:
+            s = self.data[self.pos : self.pos + n]
+        self.pos += len(s)
+        return s
+
     def peek(self, n=1):
         return self.data[self.pos : self.pos + n]
 
@@ -74,6 +82,30 @@ class NoOpParser(Parser):
 
     def parse(self, state):
         return ''
+
+
+class NBytesParser(Parser):
+
+    def __init__(self, min_n=None, max_n=None):
+        super(NBytesParser, self).__init__()
+        self.min_n = min_n
+        self.max_n = max_n
+
+    def __repr__(self):
+        return 'NBytesParser(%d, %d)' % (self.min_n, self.max_n)
+
+    def parse(self, state):
+        state.push()
+        s = state.consume_anything(self.max_n)
+        if (self.min_n is not None) and (len(s) < self.min_n):
+            state.pop()
+            raise ParseError(u'at byte position %d: '
+                             u'expected at least %d more bytes, '
+                             u'but only %d remaining' %
+                             (state.pos, self.min_n, len(s)))
+        else:
+            state.discard()
+            return s
 
 
 class NamedParser(Parser):
@@ -228,6 +260,8 @@ class WrapParser(Parser):
         return self.func(self.inner.parse(state))
 
 
+anything = lambda: NBytesParser(min_n=None, max_n=None)
+nbytes = NBytesParser
 wrap = WrapParser
 ignore = lambda inner: wrap(Ignore, inner)
 maybe = lambda inner: inner | NoOpParser()

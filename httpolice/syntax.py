@@ -5,6 +5,7 @@ from httpolice.header import FieldName, HeaderEntry
 from httpolice.method import Method
 from httpolice.parse import (
     Parser,
+    anything,
     char_class,
     char_range,
     decode_into,
@@ -109,3 +110,11 @@ field_value = string(field_content | obs_fold)
 header_field = wrap(lambda kv: HeaderEntry(*kv),
                     field_name + ignore(literal(':')) +
                     ignore(ows) + field_value + ignore(ows) + ignore(crlf))
+
+comma_list = lambda _: wrap(lambda s: [s], anything())              # FIXME
+comma_list1 = lambda _: wrap(lambda s: [s], anything())             # FIXME
+
+
+# Auxiliary
+
+integer = wrap(int, string1(digit))
