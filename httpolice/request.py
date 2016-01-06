@@ -40,7 +40,8 @@ def parse_stream(stream, report, was_tls=None):
         if req.headers.transfer_encoding:
             codings = list(req.headers.transfer_encoding)
             if codings.pop().item == tc.chunked:
-                message.parse_chunked(req, state)
+                if not message.parse_chunked(req, state):
+                    return reqs
             else:
                 req.body = Unparseable
                 return reqs

@@ -17,19 +17,20 @@ class Message(object):
 
 
 def parse_chunked(msg, state):
-    data = ''
+    data = []
     try:
         chunk = syntax.chunk.parse(state)
         while chunk:
-            data += chunk
+            data.append(chunk)
             chunk = syntax.chunk.parse(state)
         trailers = syntax.trailer_part.parse(state)
         syntax.crlf.parse(state)
     except parse.ParseError:
         msg.body = Unparseable
-        return
+        return False
     else:
-        msg.body = data
+        msg.body = ''.join(data)
         for i, entry in enumerate(trailers, 1):
             entry.position = -i
             msg.header_entries.append(entry)
+        return True
