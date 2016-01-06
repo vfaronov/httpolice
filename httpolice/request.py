@@ -34,6 +34,7 @@ def parse_stream(stream, report, was_tls=None):
             reqs.append(Unparseable)
             return reqs
         req = Request(report, meth, targ, ver, entries, stream, was_tls)
+        req.body = Unparseable
         reqs.append(req)
 
         # RFC 7230 section 3.3.3
@@ -43,16 +44,16 @@ def parse_stream(stream, report, was_tls=None):
                 if not message.parse_chunked(req, state):
                     return reqs
             else:
-                req.body = Unparseable
                 return reqs
             while codings and (req.body is not Unparseable):
                 req.body = transfer_coding.decode(req.body, codings.pop())
-        elif req.headers.content_length.is_parsed:
+        elif req.headers.content_length:
             n = req.headers.content_length.value
+            if n is Unparseable:
+                return reqs
             try:
                 req.body = parse.nbytes(n, n).parse(state)
             except parse.ParseError:
-                req.body = Unparseable
                 return reqs
         else:
             req.body = ''
