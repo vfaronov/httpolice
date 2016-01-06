@@ -25,8 +25,8 @@ def parse_stream(stream, report, was_tls=None):
     while not state.is_eof():
         try:
             (meth, targ, ver) = syntax.request_line.parse(state)
-            entries = parse.many(syntax.header_field +
-                                 parse.ignore(syntax.crlf)).parse(state)
+            entries = \
+                parse.many(syntax.header_field + ~syntax.crlf).parse(state)
             for i, entry in enumerate(entries):
                 entry.position = i
             syntax.crlf.parse(state)
