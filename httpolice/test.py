@@ -10,20 +10,22 @@ from httpolice.transfer_coding import known_codings as tc
 class TestSyntax(unittest.TestCase):
 
     def assertParse(self, parser, text, result):
-        self.assertEqual(parser.parse(parse.State(text)), result)
+        self.assertEqual(parser.parse_entire(parse.State(text)), result)
 
     def assertNoParse(self, parser, text):
-        self.assertRaises(parse.ParseError, parser.parse, parse.State(text))
+        self.assertRaises(parse.ParseError,
+                          parser.parse_entire, parse.State(text))
 
     def test_comma_list(self):
         p = syntax.comma_list(syntax.token)
         self.assertParse(p, '', [])
-        self.assertParse(p, '  \t ', [])
         self.assertParse(p, ' , ,, , ,', [])
         self.assertParse(p, 'foo', ['foo'])
         self.assertParse(p, 'foo,bar', ['foo', 'bar'])
-        self.assertParse(p, 'foo, bar, ', ['foo', 'bar'])
+        self.assertParse(p, 'foo, bar,', ['foo', 'bar'])
         self.assertParse(p, ', ,,,foo, ,bar, baz, ,, ,', ['foo', 'bar', 'baz'])
+        self.assertNoParse(p, 'foo,"bar"')
+        self.assertNoParse(p, 'foo;bar')
 
     def test_comma_list1(self):
         p = syntax.comma_list1(syntax.token)
@@ -32,8 +34,10 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, ' , ,, , ,')
         self.assertParse(p, 'foo', ['foo'])
         self.assertParse(p, 'foo,bar', ['foo', 'bar'])
-        self.assertParse(p, 'foo, bar, ', ['foo', 'bar'])
+        self.assertParse(p, 'foo, bar,', ['foo', 'bar'])
         self.assertParse(p, ', ,,,foo, ,bar, baz, ,, ,', ['foo', 'bar', 'baz'])
+        self.assertNoParse(p, 'foo,"bar"')
+        self.assertNoParse(p, 'foo;bar')
 
     def test_transfer_coding(self):
         p = syntax.transfer_coding
@@ -46,8 +50,8 @@ class TestSyntax(unittest.TestCase):
                                       [Parameter(u'bar', u'baz'),
                                        Parameter(u'qux', u'"xyzzy"')]))
         self.assertNoParse(p, '')
-        self.assertNoParse(p, '???')
-        self.assertNoParse(p, '"foo"')
+        self.assertNoParse(p, 'foo;???')
+        self.assertNoParse(p, 'foo;"bar"="baz"')
 
 
 class TestRequest(unittest.TestCase):
@@ -100,6 +104,15 @@ class TestRequest(unittest.TestCase):
         [req1] = request.parse_stream(stream, report=None)
         self.assertEqual(req1.method, u'POST')
         self.assertEqual(req1.headers.content_length.value, 90)
+        self.assert_(req1.body is Unparseable)
+
+    def test_unparseable_content_length(self):
+        stream = ('POST / HTTP/1.1\r\n'
+                  'Host: example.com\r\n'
+                  'Content-Length: 4 5 6\r\n'
+                  '\r\n'
+                  'quux')
+        [req1] = request.parse_stream(stream, report=None)
         self.assert_(req1.body is Unparseable)
 
     def test_unparseable_following_parseable(self):

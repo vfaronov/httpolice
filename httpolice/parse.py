@@ -72,6 +72,12 @@ class Parser(object):
     def parse(self, state):
         raise NotImplementedError
 
+    def parse_entire(self, state):
+        r = self.parse(state)
+        if not state.is_eof():
+            raise MismatchError(state.pos, 'end of data', state.peek(5))
+        return r
+
     def __or__(self, other):
         return AlternativeParser([self, other])
 

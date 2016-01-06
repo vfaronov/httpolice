@@ -82,7 +82,7 @@ class SingleHeaderView(HeaderView):
         for entry in entries:
             state = parse.State(entry.value)
             try:
-                r = parser.parse(state)
+                r = parser.parse_entire(state)
             except parse.ParseError:
                 r = Unparseable
         return r
@@ -106,7 +106,7 @@ class MultiHeaderView(HeaderView):
         for entry in entries:
             state = parse.State(entry.value)
             try:
-                rs.extend(self.container(inner_parser).parse(state))
+                rs.extend(self.container(inner_parser).parse_entire(state))
             except parse.ParseError:
                 rs.append(Unparseable)
         return rs
