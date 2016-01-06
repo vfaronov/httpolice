@@ -2,15 +2,61 @@
 
 import unittest
 
-from httpolice import request, version
-from httpolice.common import Unparseable
+from httpolice import parse, request, syntax, transfer_coding, version
+from httpolice.common import Parameter, Parametrized, Unparseable
+from httpolice.transfer_coding import known_codings as tc
 
 
-class Test(unittest.TestCase):
+class TestSyntax(unittest.TestCase):
+
+    def assertParse(self, parser, text, result):
+        self.assertEqual(parser.parse(parse.State(text)), result)
+
+    def assertNoParse(self, parser, text):
+        self.assertRaises(parse.ParseError, parser.parse, parse.State(text))
+
+    def test_comma_list(self):
+        p = syntax.comma_list(syntax.token)
+        self.assertParse(p, '', [])
+        self.assertParse(p, '  \t ', [])
+        self.assertParse(p, ' , ,, , ,', [])
+        self.assertParse(p, 'foo', ['foo'])
+        self.assertParse(p, 'foo,bar', ['foo', 'bar'])
+        self.assertParse(p, 'foo, bar, ', ['foo', 'bar'])
+        self.assertParse(p, ', ,,,foo, ,bar, baz, ,, ,', ['foo', 'bar', 'baz'])
+
+    def test_comma_list1(self):
+        p = syntax.comma_list1(syntax.token)
+        self.assertNoParse(p, '')
+        self.assertNoParse(p, '  \t ')
+        self.assertNoParse(p, ' , ,, , ,')
+        self.assertParse(p, 'foo', ['foo'])
+        self.assertParse(p, 'foo,bar', ['foo', 'bar'])
+        self.assertParse(p, 'foo, bar, ', ['foo', 'bar'])
+        self.assertParse(p, ', ,,,foo, ,bar, baz, ,, ,', ['foo', 'bar', 'baz'])
+
+    def test_transfer_coding(self):
+        p = syntax.transfer_coding
+        self.assertParse(p, 'chunked', Parametrized(tc.chunked, []))
+        self.assertParse(p, 'foo',
+                         Parametrized(transfer_coding.TransferCoding(u'foo'),
+                                      []))
+        self.assertParse(p, 'foo ; bar = baz ; qux = "\\"xyzzy\\""',
+                         Parametrized(transfer_coding.TransferCoding(u'foo'),
+                                      [Parameter(u'bar', u'baz'),
+                                       Parameter(u'qux', u'"xyzzy"')]))
+        self.assertNoParse(p, '')
+        self.assertNoParse(p, '???')
+        self.assertNoParse(p, '"foo"')
+
+
+class TestRequest(unittest.TestCase):
 
     def test_parse_requests(self):
         stream = ('GET /foo/bar/baz?qux=xyzzy HTTP/1.1\r\n'
                   'Host: example.com\r\n'
+                  'X-Foo: bar,\r\n'
+                  '\t\tbaz\r\n'
                   '\r\n'
                   'POST /foo/bar/ HTTP/1.1\r\n'
                   'Host: example.com\r\n'
@@ -28,6 +74,8 @@ class Test(unittest.TestCase):
         self.assertEquals(req1.version, version.http11)
         self.assertEquals(req1.header_entries[0].name, u'Host')
         self.assertEquals(req1.header_entries[0].value, 'example.com')
+        self.assertEquals(req1.header_entries[1].name, u'X-Foo')
+        self.assertEquals(req1.header_entries[1].value, 'bar, baz')
 
         self.assertEquals(req2.method, u'POST')
         self.assertEquals(req2.target, u'/foo/bar/')
@@ -45,6 +93,7 @@ class Test(unittest.TestCase):
 
     def test_unparseable_body(self):
         stream = ('POST / HTTP/1.1\r\n'
+                  'Host: example.com\r\n'
                   'Content-Length: 90\r\n'
                   '\r\n'
                   'wololo')
@@ -53,13 +102,41 @@ class Test(unittest.TestCase):
         self.assertEqual(req1.headers.content_length.value, 90)
         self.assert_(req1.body is Unparseable)
 
+    def test_unparseable_following_parseable(self):
+        stream = ('GET / HTTP/1.1\r\n'
+                  'Host: example.com\r\n'
+                  '\r\n'
+                  'GET /\r\n'
+                  'Host: example.com\r\n')
+        [req1, req2] = request.parse_stream(stream, report=None)
+        self.assertEqual(req1.method, u'GET')
+        self.assertEqual(req1.body, '')
+        self.assert_(req2 is Unparseable)
+
+    def test_transfer_codings(self):
+        stream = ('POST / HTTP/1.1\r\n'
+                  'Host: example.com\r\n'
+                  'Transfer-Encoding: foo\r\n'
+                  'Transfer-Encoding:   ,\r\n'
+                  'Transfer-Encoding: gzip, chunked\r\n'
+                  '\r\n'
+                  '0\r\n'
+                  '\r\n')
+        [req] = request.parse_stream(stream, report=None)
+        self.assert_(req.body is Unparseable)
+        self.assertEqual(list(req.headers.transfer_encoding),
+                         [Parametrized(u'foo', []),
+                          Unparseable,
+                          Parametrized(u'gzip', []),
+                          Parametrized(u'chunked', [])])
+
     def test_parse_chunked(self):
         stream = ('POST / HTTP/1.1\r\n'
                   'Transfer-Encoding: ,, chunked,\r\n'
                   '\r\n'
                   '1c\r\n'
                   'foo bar foo bar foo bar baz \r\n'
-                  '5\r\n'
+                  '5;ext1=value1;ext2="value2 value3"\r\n'
                   'xyzzy\r\n'
                   '0\r\n'
                   'X-Result: okay\r\n'
@@ -73,3 +150,28 @@ class Test(unittest.TestCase):
         self.assertEqual(req1.header_entries[-1].position, -1)
         self.assertEqual(req1.header_entries[-1].name, u'x-result')
         self.assertEqual(req1.header_entries[-1].value, 'okay')
+
+    def test_parse_chunked_empty(self):
+        stream = ('POST / HTTP/1.1\r\n'
+                  'Host: example.com\r\n'
+                  'Transfer-encoding:  chunked\r\n'
+                  '\r\n'
+                  '0\r\n'
+                  '\r\n')
+        [req] = request.parse_stream(stream, report=None)
+        self.assertEqual(req.body, '')
+
+    def test_parse_chunked_no_chunks(self):
+        stream = ('POST / HTTP/1.1\r\n'
+                  'Host: example.com\r\n'
+                  'Transfer-encoding:  chunked\r\n'
+                  '\r\n'
+                  'GET / HTTP/1.1\r\n'
+                  'Host: example.com\r\n'
+                  '\r\n')
+        [req] = request.parse_stream(stream, report=None)
+        self.assert_(req.body is Unparseable)
+
+
+if __name__ == '__main__':
+    unittest.main()
