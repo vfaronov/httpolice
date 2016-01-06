@@ -26,7 +26,7 @@ class Test(unittest.TestCase):
         self.assertEquals(req1.method, u'GET')
         self.assertEquals(req1.target, u'/foo/bar/baz?qux=xyzzy')
         self.assertEquals(req1.version, version.http11)
-        self.assertEquals(req1.header_entries[0].name, 'Host')
+        self.assertEquals(req1.header_entries[0].name, u'Host')
         self.assertEquals(req1.header_entries[0].value, 'example.com')
 
         self.assertEquals(req2.method, u'POST')
