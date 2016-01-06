@@ -1,5 +1,8 @@
 # -*- coding: utf-8; -*-
 
+from collections import namedtuple
+
+
 class _Unparseable(object):
 
     __slots__ = ()
@@ -27,6 +30,10 @@ class CaseInsensitive(ProtocolString):
 
     def __hash__(self):
         return hash(unicode(self).lower())
+
+
+Parametrized = namedtuple('Parametrized', ('item', 'params'))
+Parameter = namedtuple('Parameter', ('name', 'value'))
 
 
 class Comment(ProtocolString):

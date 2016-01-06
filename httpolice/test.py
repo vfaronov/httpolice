@@ -52,3 +52,24 @@ class Test(unittest.TestCase):
         self.assertEqual(req1.method, u'POST')
         self.assertEqual(req1.headers.content_length.value, 90)
         self.assert_(req1.body is Unparseable)
+
+    def test_parse_chunked(self):
+        stream = ('POST / HTTP/1.1\r\n'
+                  'Transfer-Encoding: ,, chunked,\r\n'
+                  '\r\n'
+                  '1c\r\n'
+                  'foo bar foo bar foo bar baz \r\n'
+                  '5\r\n'
+                  'xyzzy\r\n'
+                  '0\r\n'
+                  'X-Result: okay\r\n'
+                  '\r\n')
+        [req1] = request.parse_stream(stream, report=None)
+        self.assertEqual(req1.method, u'POST')
+        self.assertEqual(len(req1.headers.transfer_encoding), 1)
+        self.assertEqual(req1.headers.transfer_encoding[0].item, u'chunked')
+        self.assertEqual(req1.body, 'foo bar foo bar foo bar baz xyzzy')
+        self.assertEqual(len(req1.header_entries), 2)
+        self.assertEqual(req1.header_entries[-1].position, -1)
+        self.assertEqual(req1.header_entries[-1].name, u'x-result')
+        self.assertEqual(req1.header_entries[-1].value, 'okay')

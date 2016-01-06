@@ -31,4 +31,5 @@ class KnownHeaders(httpolice.common.Known):
 
 known_headers = KnownHeaders([
     {'name': FieldName('Content-Length')},
+    {'name': FieldName('Transfer-Encoding')},
 ])

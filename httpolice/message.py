@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
-import httpolice.header_view
+from httpolice import header_view, parse, syntax
+from httpolice.common import Unparseable
 
 
 class Message(object):
@@ -12,4 +13,23 @@ class Message(object):
         self.header_entries = header_entries
         self.stream = stream
         self.body = body
-        self.headers = httpolice.header_view.HeadersView(self)
+        self.headers = header_view.HeadersView(self)
+
+
+def parse_chunked(msg, state):
+    data = ''
+    try:
+        chunk = syntax.chunk.parse(state)
+        while chunk:
+            data += chunk
+            chunk = syntax.chunk.parse(state)
+        trailers = syntax.trailer_part.parse(state)
+        syntax.crlf.parse(state)
+    except parse.ParseError:
+        msg.body = Unparseable
+        return
+    else:
+        msg.body = data
+        for i, entry in enumerate(trailers, 1):
+            entry.position = -i
+            msg.header_entries.append(entry)

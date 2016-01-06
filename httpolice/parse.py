@@ -1,5 +1,8 @@
 # -*- coding: utf-8; -*-
 
+from httpolice.common import CaseInsensitive
+
+
 class Ignore(object):
 
     def __init__(self, value):
@@ -44,12 +47,13 @@ class State(object):
     def is_eof(self):
         return self.pos >= len(self.data)
 
-    def consume(self, s):
-        if self.data[self.pos : self.pos + len(s)] == s:
-            self.pos += len(s)
-            return True
-        else:
-            return False
+    def consume(self, s, case_insensitive=False):
+        present = self.data[self.pos : self.pos + len(s)]
+        if (present == s) or \
+                (case_insensitive and present.lower() == s.lower()):
+            self.pos += len(present)
+            return present
+        return None
 
     def consume_anything(self, n=None):
         if n is None:
@@ -77,11 +81,15 @@ class Parser(object):
 
 class NoOpParser(Parser):
 
+    def __init__(self, empty=None):
+        super(NoOpParser, self).__init__()
+        self.empty = empty
+
     def __repr__(self):
-        return 'NoOpParser()'
+        return 'NoOpParser(%r)' % self.empty
 
     def parse(self, state):
-        return ''
+        return self.empty
 
 
 class NBytesParser(Parser):
@@ -128,16 +136,18 @@ class NamedParser(Parser):
 
 class LiteralParser(Parser):
 
-    def __init__(self, s):
+    def __init__(self, s, case_insensitive=False):
         super(LiteralParser, self).__init__()
         self.literal = s
+        self.case_insensitive = case_insensitive
 
     def __repr__(self):
-        return 'LiteralParser(%r)' % self.literal
+        return 'LiteralParser(%r, %r)' % (self.literal, self.case_insensitive)
 
     def parse(self, state):
-        if state.consume(self.literal):
-            return self.literal
+        s = state.consume(self.literal, self.case_insensitive)
+        if s:
+            return s
         else:
             raise MismatchError(state.pos, u'%r' % self.literal,
                                 state.peek(len(self.literal)))
@@ -155,8 +165,7 @@ class CharClassParser(Parser):
     def parse(self, state):
         c = state.peek()
         if c and (c in self.chars):
-            state.consume(c)
-            return c
+            return state.consume(c)
         else:
             raise MismatchError(state.pos, u'one of %r' % self.chars, c)
 
@@ -263,8 +272,10 @@ class WrapParser(Parser):
 anything = lambda: NBytesParser(min_n=None, max_n=None)
 nbytes = NBytesParser
 wrap = WrapParser
+subst = lambda s, inner: wrap(lambda _: s, inner)
+uwrap = lambda func, inner: wrap(lambda x: func(*x), inner)
 ignore = lambda inner: wrap(Ignore, inner)
-maybe = lambda inner: inner | NoOpParser()
+maybe = lambda inner, empty=None: inner | NoOpParser(empty)
 literal = LiteralParser
 char_class = CharClassParser
 times = lambda min_, max_, inner: TimesParser(inner, min_, max_)
@@ -277,5 +288,6 @@ named = NamedParser
 rfc = lambda n, name, inner: named(u'<%s> (RFC %d)' % (name, n), inner)
 decode = lambda inner: wrap(lambda s: s.decode('utf-8', 'replace'), inner)
 decode_into = lambda con, inner: wrap(con, decode(inner))
+ci = lambda s: decode_into(CaseInsensitive, literal(s, case_insensitive=True))
 
 char_range = lambda min_, max_: ''.join(chr(x) for x in range(min_, max_ + 1))

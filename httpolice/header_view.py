@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import common, parse, syntax
+from httpolice import parse, syntax
+from httpolice.common import Unparseable
 from httpolice.header import known_headers as h
 
 
@@ -66,6 +67,10 @@ class HeaderView(object):
     def is_absent(self):
         return not self.is_present
 
+    @property
+    def is_parsed(self):
+        return self.is_present and (self.value is not Unparseable)
+
     def __nonzero__(self):
         return bool(self.value)
 
@@ -79,13 +84,22 @@ class SingleHeaderView(HeaderView):
             try:
                 r = parser.parse(state)
             except parse.ParseError:
-                r = common.Unparseable
+                r = Unparseable
         return r
 
 
 class MultiHeaderView(HeaderView):
 
-    container = syntax.comma_list
+    container = staticmethod(syntax.comma_list)
+
+    def __iter__(self):
+        return iter(self.value)
+
+    def __len__(self):
+        return len(self.value)
+
+    def __getitem__(self, i):
+        return self.value[i]
 
     def _parse(self, entries, inner_parser):
         rs = []
@@ -94,17 +108,18 @@ class MultiHeaderView(HeaderView):
             try:
                 rs.extend(self.container(inner_parser).parse(state))
             except parse.ParseError:
-                rs.append(common.Unparseable)
+                rs.append(Unparseable)
         return rs
 
 
 class Multi1HeaderView(MultiHeaderView):
 
-    container = syntax.comma_list1
+    container = staticmethod(syntax.comma_list1)
 
 
 _parse_rules = {
     h.content_length: (SingleHeaderView, syntax.integer),
+    h.transfer_encoding: (Multi1HeaderView, syntax.transfer_coding),
 }
 
 def _cls_for(name):
