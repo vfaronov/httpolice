@@ -224,13 +224,12 @@ class AlternativeParser(Parser):
             else:
                 state.discard()
                 return r
-        else:
-            max_pos = max(e.pos for e in errors)
-            best_errors = sorted((e for e in errors if e.pos == max_pos),
-                                 key=lambda e: len(e.found), reverse=True)
-            raise MismatchError(max_pos,
-                                u' or '.join(e.expected for e in best_errors),
-                                best_errors[0].found)
+        max_pos = max(e.pos for e in errors)
+        best_errors = sorted((e for e in errors if e.pos == max_pos),
+                             key=lambda e: len(e.found), reverse=True)
+        raise MismatchError(max_pos,
+                            u' or '.join(e.expected for e in best_errors),
+                            best_errors[0].found)
 
     def __or__(self, other):
         return AlternativeParser(self.inners + [other])
