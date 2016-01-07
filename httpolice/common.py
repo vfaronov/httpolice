@@ -20,25 +20,16 @@ class ProtocolString(unicode):
     def __repr__(self):
         return u'%s(%r)' % (self.__class__.__name__, unicode(self))
 
-    def __eq__(self, other):
-        if (type(other) is not self.__class__) and \
-                (type(other) is not unicode):
-            return False
-        return unicode(self) == unicode(other)
-
 
 class CaseInsensitive(ProtocolString):
 
     __slots__ = ()
 
     def __eq__(self, other):
-        if (type(other) is not self.__class__) and \
-                (type(other) is not unicode):
-            return False
         return unicode.lower(self) == unicode.lower(other)
 
     def __hash__(self):
-        return hash(unicode(self).lower())
+        return hash(unicode.lower(self))
 
 
 Parametrized = namedtuple('Parametrized', ('item', 'params'))
