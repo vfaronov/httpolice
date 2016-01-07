@@ -13,6 +13,10 @@ class _Unparseable(object):
 Unparseable = _Unparseable()
 
 
+def okay(x):
+    return (x is not None) and (x is not Unparseable)
+
+
 class ProtocolString(unicode):
 
     __slots__ = ()

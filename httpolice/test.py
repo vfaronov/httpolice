@@ -2,8 +2,16 @@
 
 import unittest
 
-from httpolice import parse, request, syntax, transfer_coding, version
+from httpolice import (
+    parse,
+    request,
+    response,
+    syntax,
+    transfer_coding,
+    version,
+)
 from httpolice.common import CaseInsensitive, Parametrized, Unparseable
+from httpolice.method import known_methods as m
 from httpolice.transfer_coding import known_codings as tc
 
 
@@ -209,6 +217,102 @@ class TestRequest(unittest.TestCase):
                   '\r\n')
         [req] = request.parse_stream(stream)
         self.assert_(req.body is Unparseable)
+
+
+class TestResponse(unittest.TestCase):
+
+    @staticmethod
+    def req(method_):
+        return request.Request(method_, u'/', version.http11, [])
+
+    def test_parse_responses(self):
+        reqs = [self.req(m.HEAD), self.req(m.POST), self.req(m.POST)]
+        stream = ('HTTP/1.1 200 OK\r\n'
+                  'Content-Length: 16\r\n'
+                  '\r\n'
+                  'HTTP/1.1 100 Continue\r\n'
+                  '\r\n'
+                  'HTTP/1.1 100 Continue\r\n'
+                  '\r\n'
+                  'HTTP/1.1 200 OK\r\n'
+                  'Content-Length: 16\r\n'
+                  '\r\n'
+                  'Hello world!\r\n'
+                  '\r\n'
+                  'HTTP/1.1 101 Switching Protocols\r\n'
+                  'Upgrade: wololo\r\n'
+                  '\r\n')
+        [exch1, exch2, exch3] = response.parse_stream(stream, reqs)
+
+        self.assert_(exch1.request is reqs[0])
+        [resp1_1] = exch1.responses
+        self.assertEquals(resp1_1.status, 200)
+        self.assertEquals(resp1_1.headers.content_length.value, 16)
+        self.assert_(resp1_1.body is None)
+
+        self.assert_(exch2.request is reqs[1])
+        [resp2_1, resp2_2, resp2_3] = exch2.responses
+        self.assertEquals(resp2_1.status, 100)
+        self.assertEquals(resp2_2.status, 100)
+        self.assertEquals(resp2_3.status, 200)
+        self.assertEquals(resp2_3.headers.content_length.value, 16)
+        self.assertEquals(resp2_3.body, 'Hello world!\r\n\r\n')
+
+        self.assert_(exch3.request is reqs[2])
+        [resp3_1] = exch3.responses
+        self.assertEquals(resp3_1.status, 101)
+        self.assertEquals(resp3_1.header_entries[0].value, 'wololo')
+        self.assert_(resp3_1.body is None)
+
+    def test_parse_responses_without_requests(self):
+        stream = ('HTTP/1.1 200 OK\r\n'
+                  'Transfer-Encoding: chunked\r\n'
+                  '\r\n'
+                  'e\r\n'
+                  'Hello world!\r\n\r\n'
+                  '0\r\n'
+                  '\r\n'
+                  'HTTP/1.1 100 Continue\r\n'
+                  '\r\n'
+                  'HTTP/1.1 204 No Content\r\n'
+                  '\r\n')
+        [exch1, exch2] = response.parse_stream(stream, None)
+        self.assert_(exch1.request is None)
+        self.assertEquals(exch1.responses[0].status, 200)
+        self.assertEquals(exch1.responses[0].body, 'Hello world!\r\n')
+        self.assert_(exch2.request is None)
+        self.assertEquals(exch2.responses[0].status, 100)
+        self.assert_(exch2.responses[0].body is None)
+        self.assertEquals(exch2.responses[1].status, 204)
+        self.assert_(exch2.responses[1].body is None)
+
+    def test_parse_responses_not_enough_requests(self):
+        reqs = [self.req(m.POST)]
+        stream = ('HTTP/1.1 200 OK\r\n'
+                  'Content-Length: 16\r\n'
+                  '\r\n'
+                  'Hello world!\r\n'
+                  '\r\n'
+                  'HTTP/1.1 101 Switching Protocols\r\n'
+                  '\r\n')
+        [exch1, exch2] = response.parse_stream(stream, reqs)
+        self.assert_(exch1.request is reqs[0])
+        self.assert_(exch2.request is None)
+        self.assert_(exch2.responses[0] is Unparseable)
+
+    def test_parse_responses_bad_framing(self):
+        [exch1] = response.parse_stream('HTTP/1.1 ...', [self.req(m.POST)])
+        self.assertEqual(exch1.request.method, m.POST)
+        self.assertEqual(exch1.responses, [Unparseable])
+
+    def test_parse_responses_implicit_framing(self):
+        reqs = [self.req(m.POST)]
+        stream = ('HTTP/1.1 200 OK\r\n'
+                  '\r\n'
+                  'Hello world!\r\n')
+        [exch1] = response.parse_stream(stream, reqs)
+        [resp] = exch1.responses
+        self.assertEqual(resp.body, 'Hello world!\r\n')
 
 
 if __name__ == '__main__':

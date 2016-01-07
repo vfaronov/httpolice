@@ -24,8 +24,10 @@ from httpolice.parse import (
     string,
     string1,
     subst,
+    times,
     wrap,
 )
+from httpolice.status_code import StatusCode
 from httpolice.transfer_coding import TransferCoding
 from httpolice.version import HTTPVersion
 
@@ -112,7 +114,13 @@ request_target = origin_form | asterisk_form
 http_version = decode_into(HTTPVersion, join('HTTP/' + digit + '.' + digit)) \
     // rfc(7230, u'HTTP-version')
 
-request_line = (method + ~sp + request_target + ~sp + http_version + ~crlf)
+status_code = wrap(StatusCode, join(times(3, 3, digit))) \
+    // rfc(7230, u'status-code')
+reason_phrase = string(char_class(HTAB + SP + VCHAR) | obs_text) \
+    // rfc(7230, u'reason-phrase')
+
+request_line = method + ~sp + request_target + ~sp + http_version + ~crlf
+status_line = http_version + ~sp + status_code + ~sp + ~reason_phrase + ~crlf
 
 field_name = decode_into(FieldName, token)   // rfc(7230, u'field-name')
 field_vchar = char_class(VCHAR) | obs_text

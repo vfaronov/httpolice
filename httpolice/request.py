@@ -1,6 +1,6 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import message, parse, syntax, transfer_coding
+from httpolice import message, parse, syntax
 from httpolice.common import Unparseable
 from httpolice.transfer_coding import known_codings as tc
 
@@ -44,7 +44,7 @@ def parse_stream(stream, was_tls=None):
             else:
                 return reqs
             while codings and (req.body is not Unparseable):
-                req.body = transfer_coding.decode(req.body, codings.pop())
+                message.decode_transfer_coding(req, codings.pop())
         elif req.headers.content_length:
             n = req.headers.content_length.value
             if n is Unparseable:

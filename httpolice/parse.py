@@ -237,11 +237,11 @@ class AlternativeParser(Parser):
 
 class TimesParser(Parser):
 
-    def __init__(self, inner, min_=None, max_=None):
+    def __init__(self, min_, max_, inner):
         super(TimesParser, self).__init__()
-        self.inner = parsify(inner)
         self.min_ = min_
         self.max_ = max_
+        self.inner = parsify(inner)
 
     def parse(self, state):
         r = []
@@ -282,8 +282,9 @@ subst = lambda s, inner: wrap(lambda _: s, inner)
 maybe = lambda inner, empty=None: inner | function(lambda _: empty)
 literal = LiteralParser
 char_class = CharClassParser
-many = lambda inner: TimesParser(inner, min_=0)
-many1 = lambda inner: TimesParser(inner, min_=1)
+times = TimesParser
+many = lambda inner: times(0, None, inner)
+many1 = lambda inner: times(1, None, inner)
 join = lambda inner: wrap(''.join, inner)
 string = lambda inner: join(many(inner))
 string1 = lambda inner: join(many1(inner))
