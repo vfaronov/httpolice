@@ -8,7 +8,7 @@ from httpolice.transfer_coding import known_codings as tc
 class Request(message.Message):
 
     def __repr__(self):
-        return '<Request>'
+        return '<Request %s>' % self.method
 
     def __init__(self, method_, target, version_, header_entries,
                  was_tls=None, body=None, trailer_entries=None, raw=None):

@@ -1,8 +1,8 @@
 # -*- coding: utf-8; -*-
 
-import httpolice.common
+from httpolice import common
 
 
-class Method(httpolice.common.ProtocolString):
+class Method(common.ProtocolString):
 
     __slots__ = ()

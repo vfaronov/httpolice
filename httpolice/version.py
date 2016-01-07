@@ -1,12 +1,12 @@
 # -*- coding: utf-8; -*-
 
-import httpolice.common
+from httpolice import common
 
 
-class HTTPVersion(httpolice.common.ProtocolString):
+class HTTPVersion(common.ProtocolString):
 
     __slots__ = ()
 
 
-http10 = HTTPVersion('HTTP/1.0')
-http11 = HTTPVersion('HTTP/1.1')
+http10 = HTTPVersion(u'HTTP/1.0')
+http11 = HTTPVersion(u'HTTP/1.1')

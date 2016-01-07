@@ -1,6 +1,6 @@
 # -*- coding: utf-8; -*-
 
-import httpolice.common
+from httpolice import common
 
 
 class HeaderEntry(object):
@@ -14,7 +14,7 @@ class HeaderEntry(object):
         return '<HeaderEntry %s>' % self.name
 
 
-class FieldName(httpolice.common.CaseInsensitive):
+class FieldName(common.CaseInsensitive):
 
     __slots__ = ()
 
@@ -23,7 +23,7 @@ def is_bad_for_trailer(name):
     return known_headers.get_info(name).get('bad_for_trailer')
 
 
-known_headers = httpolice.common.Known([
+known_headers = common.Known([
     {
         'name': FieldName('Content-Length'),
         'bad_for_trailer': True,
