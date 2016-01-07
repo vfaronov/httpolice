@@ -6,13 +6,13 @@ from httpolice.common import Unparseable
 
 class Message(object):
 
-    def __init__(self, report, version, header_entries,
-                 stream=None, body=None):
-        self.report = report
+    def __init__(self, version, header_entries,
+                 body=None, trailer_entries=None, raw=None):
         self.version = version
         self.header_entries = header_entries
-        self.stream = stream
         self.body = body
+        self.trailer_entries = trailer_entries
+        self.raw = raw
         self.headers = header_view.HeadersView(self)
 
 
@@ -30,7 +30,5 @@ def parse_chunked(msg, state):
         return False
     else:
         msg.body = ''.join(data)
-        for i, entry in enumerate(trailers, 1):
-            entry.position = -i
-            msg.header_entries.append(entry)
+        msg.trailer_entries = trailers
         return True

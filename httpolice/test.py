@@ -70,7 +70,7 @@ class TestRequest(unittest.TestCase):
                   'Host: example.com\r\n'
                   'Content-Length: 0\r\n'
                   '\r\n')
-        [req1, req2, req3] = request.parse_stream(stream, report=None)
+        [req1, req2, req3] = request.parse_stream(stream)
 
         self.assertEquals(req1.method, u'GET')
         self.assertEquals(req1.target, u'/foo/bar/baz?qux=xyzzy')
@@ -91,7 +91,7 @@ class TestRequest(unittest.TestCase):
         self.assertEquals(req3.target, u'*')
 
     def test_unparseable_framing(self):
-        [req1] = request.parse_stream('GET ...', report=None)
+        [req1] = request.parse_stream('GET ...')
         self.assert_(req1 is Unparseable)
 
     def test_unparseable_body(self):
@@ -100,7 +100,7 @@ class TestRequest(unittest.TestCase):
                   'Content-Length: 90\r\n'
                   '\r\n'
                   'wololo')
-        [req1] = request.parse_stream(stream, report=None)
+        [req1] = request.parse_stream(stream)
         self.assertEqual(req1.method, u'POST')
         self.assertEqual(req1.headers.content_length.value, 90)
         self.assert_(req1.body is Unparseable)
@@ -111,7 +111,7 @@ class TestRequest(unittest.TestCase):
                   'Content-Length: 4 5 6\r\n'
                   '\r\n'
                   'quux')
-        [req1] = request.parse_stream(stream, report=None)
+        [req1] = request.parse_stream(stream)
         self.assert_(req1.body is Unparseable)
 
     def test_unparseable_following_parseable(self):
@@ -120,7 +120,7 @@ class TestRequest(unittest.TestCase):
                   '\r\n'
                   'GET /\r\n'
                   'Host: example.com\r\n')
-        [req1, req2] = request.parse_stream(stream, report=None)
+        [req1, req2] = request.parse_stream(stream)
         self.assertEqual(req1.method, u'GET')
         self.assertEqual(req1.body, '')
         self.assert_(req2 is Unparseable)
@@ -134,11 +134,10 @@ class TestRequest(unittest.TestCase):
                   '\r\n'
                   '0\r\n'
                   '\r\n')
-        [req] = request.parse_stream(stream, report=None)
+        [req] = request.parse_stream(stream)
         self.assert_(req.body is Unparseable)
         self.assertEqual(list(req.headers.transfer_encoding),
                          [Parametrized(u'foo', []),
-                          Unparseable,
                           Parametrized(u'gzip', []),
                           Parametrized(u'chunked', [])])
 
@@ -153,15 +152,16 @@ class TestRequest(unittest.TestCase):
                   '0\r\n'
                   'X-Result: okay\r\n'
                   '\r\n')
-        [req1] = request.parse_stream(stream, report=None)
+        [req1] = request.parse_stream(stream)
         self.assertEqual(req1.method, u'POST')
         self.assertEqual(len(req1.headers.transfer_encoding), 1)
         self.assertEqual(req1.headers.transfer_encoding[0].item, u'chunked')
         self.assertEqual(req1.body, 'foo bar foo bar foo bar baz xyzzy')
-        self.assertEqual(len(req1.header_entries), 2)
-        self.assertEqual(req1.header_entries[-1].position, -1)
-        self.assertEqual(req1.header_entries[-1].name, u'x-result')
-        self.assertEqual(req1.header_entries[-1].value, 'okay')
+        self.assertEqual(len(req1.header_entries), 1)
+        self.assertEqual(len(req1.trailer_entries), 1)
+        self.assertEqual(req1.trailer_entries[0].name, u'x-result')
+        self.assertEqual(req1.trailer_entries[0].value, 'okay')
+        self.assertEqual(req1.headers[u'X-Result'].value, 'okay')
 
     def test_parse_chunked_empty(self):
         stream = ('POST / HTTP/1.1\r\n'
@@ -170,7 +170,7 @@ class TestRequest(unittest.TestCase):
                   '\r\n'
                   '0\r\n'
                   '\r\n')
-        [req] = request.parse_stream(stream, report=None)
+        [req] = request.parse_stream(stream)
         self.assertEqual(req.body, '')
 
     def test_parse_chunked_no_chunks(self):
@@ -181,7 +181,7 @@ class TestRequest(unittest.TestCase):
                   'GET / HTTP/1.1\r\n'
                   'Host: example.com\r\n'
                   '\r\n')
-        [req] = request.parse_stream(stream, report=None)
+        [req] = request.parse_stream(stream)
         self.assert_(req.body is Unparseable)
 
 

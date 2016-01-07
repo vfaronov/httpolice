@@ -53,19 +53,26 @@ class AsteriskForm(ProtocolString):
 
 class Known(object):
 
-    key_field = 'name'
-    display_field = 'name'
-
     def __init__(self, items):
-        self.index = dict((self._translate(item[self.key_field]), item)
-                          for item in items)
+        self._by_key = dict((self._key_for(item), item) for item in items)
+        self._by_name = dict((self._name_for(item), item) for item in items)
 
-    def __getattr__(self, key):
-        return self.index[key][self.display_field]
+    def __getattr__(self, name):
+        return self._key_for(self._by_name[name])
 
-    def __getitem__(self, pre_key):
-        return self.index[self._translate(pre_key)]
+    def __getitem__(self, key):
+        return self._by_key[key]
 
-    @staticmethod
-    def _translate(key):
-        return key.replace(u'-', u' ').replace(u' ', u'_').lower()
+    def get_info(self, key):
+        return self._by_key.get(key, {})
+
+    def __iter__(self):
+        return iter(self._by_key)
+
+    @classmethod
+    def _key_for(cls, item):
+        return item['name']
+
+    @classmethod
+    def _name_for(cls, item):
+        return item['name'].replace(u'-', u' ').replace(u' ', u'_').lower()

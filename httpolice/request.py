@@ -10,30 +10,28 @@ class Request(message.Message):
     def __repr__(self):
         return '<Request>'
 
-    def __init__(self, report, meth, targ, ver, header_entries,
-                 stream=None, was_tls=None, body=None):
-        super(Request, self).__init__(report, ver, header_entries, stream,
-                                      body)
-        self.method = meth
-        self.target = targ
+    def __init__(self, method_, target, version_, header_entries,
+                 was_tls=None, body=None, trailer_entries=None, raw=None):
+        super(Request, self).__init__(version_, header_entries,
+                                      body, trailer_entries, raw)
+        self.method = method_
+        self.target = target
         self.was_tls = was_tls
 
 
-def parse_stream(stream, report, was_tls=None):
+def parse_stream(stream, was_tls=None):
     state = parse.State(stream)
     reqs = []
     while not state.is_eof():
         try:
-            (meth, targ, ver) = syntax.request_line.parse(state)
+            (method_, target, version_) = syntax.request_line.parse(state)
             entries = \
                 parse.many(syntax.header_field + ~syntax.crlf).parse(state)
-            for i, entry in enumerate(entries):
-                entry.position = i
             syntax.crlf.parse(state)
         except parse.ParseError:
             reqs.append(Unparseable)
             return reqs
-        req = Request(report, meth, targ, ver, entries, stream, was_tls)
+        req = Request(method_, target, version_, entries, was_tls)
         req.body = Unparseable
         reqs.append(req)
 
