@@ -12,7 +12,6 @@ from httpolice.parse import (
     argwrap,
     char_class,
     char_range,
-    ci,
     decode,
     decode_into,
     function,
@@ -125,9 +124,6 @@ field_value = string(field_content | obs_fold)
 header_field = argwrap(HeaderEntry,
                        field_name + ~(':' + ows) + field_value + ~ows)
 
-_std_transfer_coding = wrap(
-    lambda s: Parametrized(TransferCoding(s), []),
-    ci('chunked') | ci('compress') | ci('deflate') | ci('gzip'))
 transfer_parameter = argwrap(
     Parameter,
     decode(token) + ~(bws + '=' + bws) + decode(token | quoted_string)) \
@@ -137,7 +133,9 @@ transfer_extension = argwrap(
     decode_into(TransferCoding, token) +
     many(~(ows + ';' + ows) + transfer_parameter)) \
     // rfc(7230, u'transfer-extension')
-transfer_coding = _std_transfer_coding | transfer_extension
+# We don't special-case gzip/deflate/etc. here, as the ABNF doesn't preclude
+# parsing "gzip" as <transfer-extension> with an empty list of parameters.
+transfer_coding = transfer_extension
 
 chunk_size = hex_integer   // rfc(7230, u'chunk-size')
 chunk_ext_name = decode(token)   // rfc(7230, u'chunk-ext-name')
