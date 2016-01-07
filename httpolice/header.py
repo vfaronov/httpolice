@@ -11,7 +11,7 @@ class HeaderEntry(object):
         self.annotations = None
 
     def __repr__(self):
-        return u'<HeaderEntry %s>' % self.name
+        return '<HeaderEntry %s>' % self.name
 
 
 class FieldName(httpolice.common.CaseInsensitive):

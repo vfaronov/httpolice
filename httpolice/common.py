@@ -18,7 +18,7 @@ class ProtocolString(unicode):
     __slots__ = ()
 
     def __repr__(self):
-        return u'%s(%r)' % (self.__class__.__name__, unicode(self))
+        return '%s(%r)' % (self.__class__.__name__, self)
 
 
 class CaseInsensitive(ProtocolString):
@@ -27,6 +27,9 @@ class CaseInsensitive(ProtocolString):
 
     def __eq__(self, other):
         return unicode.lower(self) == unicode.lower(other)
+
+    def __ne__(self, other):
+        return not (self == other)
 
     def __hash__(self):
         return hash(unicode.lower(self))
@@ -58,7 +61,10 @@ class Known(object):
         self._by_name = dict((self._name_for(item), item) for item in items)
 
     def __getattr__(self, name):
-        return self._key_for(self._by_name[name])
+        if name in self._by_name:
+            return self._key_for(self._by_name[name])
+        else:
+            raise AttributeError(name)
 
     def __getitem__(self, key):
         return self._by_key[key]
@@ -68,6 +74,9 @@ class Known(object):
 
     def __iter__(self):
         return iter(self._by_key)
+
+    def __contains__(self, key):
+        return key in self._by_key
 
     @classmethod
     def _key_for(cls, item):

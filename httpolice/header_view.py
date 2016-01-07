@@ -38,7 +38,7 @@ class HeaderView(object):
         self._positions = self._value = None
 
     def __repr__(self):
-        return u'<%s %s>' % (self.__class__.__name__, self.name)
+        return '<%s %s>' % (self.__class__.__name__, self.name)
 
     def _pre_parse(self):
         positions = []
