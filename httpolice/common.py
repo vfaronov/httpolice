@@ -39,11 +39,6 @@ Parametrized = namedtuple('Parametrized', ('item', 'params'))
 Parameter = namedtuple('Parameter', ('name', 'value'))
 
 
-class Comment(ProtocolString):
-
-    __slots__ = ()
-
-
 class OriginForm(ProtocolString):
 
     __slots__ = ()

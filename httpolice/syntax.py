@@ -2,7 +2,6 @@
 
 from httpolice.common import (
     AsteriskForm,
-    Comment,
     OriginForm,
     Parameter,
     Parametrized,
@@ -82,10 +81,8 @@ ctext = char_class(HTAB + SP + char_range(0x21, 0x27) +
                    char_range(0x2A, 0x5B) + char_range(0x5D, 0x7E)) | obs_text
 
 def _parse_comment(state):            # recursive
-    inner = decode_into(
-        Comment,
-        ~literal('(') + string(ctext | quoted_pair | comment) + ~literal(')'))\
-        // rfc(7230, u'comment')
+    inner = decode(~literal('(') + string(ctext | quoted_pair | comment) +
+                   ~literal(')'))   // rfc(7230, u'comment')
     return inner.parse(state)
 
 comment = function(_parse_comment)
