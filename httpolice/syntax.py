@@ -3,7 +3,6 @@
 from httpolice.common import (
     AsteriskForm,
     OriginForm,
-    Parameter,
     Parametrized,
 )
 from httpolice.header import FieldName, HeaderEntry
@@ -124,9 +123,8 @@ field_value = string(field_content | obs_fold)
 header_field = argwrap(HeaderEntry,
                        field_name + ~(':' + ows) + field_value + ~ows)
 
-transfer_parameter = argwrap(
-    Parameter,
-    decode(token) + ~(bws + '=' + bws) + decode(token | quoted_string)) \
+transfer_parameter = \
+    (decode(token) + ~(bws + '=' + bws) + decode(token | quoted_string)) \
     // rfc(7230, u'transfer-parameter')
 transfer_extension = argwrap(
     Parametrized,
@@ -140,10 +138,9 @@ transfer_coding = transfer_extension
 chunk_size = hex_integer   // rfc(7230, u'chunk-size')
 chunk_ext_name = decode(token)   // rfc(7230, u'chunk-ext-name')
 chunk_ext_val = decode(token | quoted_string)
-chunk_ext = many(argwrap(
-    Parameter,
-    ~literal(';') + chunk_ext_name + maybe(~literal('=') + chunk_ext_val))) \
-    // rfc(7230, u'chunk-ext')
+chunk_ext = \
+    many(~literal(';') + chunk_ext_name +
+          maybe(~literal('=') + chunk_ext_val))   // rfc(7230, u'chunk-ext')
 
 def _parse_chunk(state):
     size = chunk_size.parse(state)

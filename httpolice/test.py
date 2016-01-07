@@ -3,8 +3,34 @@
 import unittest
 
 from httpolice import parse, request, syntax, transfer_coding, version
-from httpolice.common import Parameter, Parametrized, Unparseable
+from httpolice.common import CaseInsensitive, Parametrized, Unparseable
 from httpolice.transfer_coding import known_codings as tc
+
+
+class TestCommon(unittest.TestCase):
+
+    def test_data_structures(self):
+        self.assertEquals(CaseInsensitive(u'foo'), CaseInsensitive(u'Foo'))
+        self.assertNotEquals(CaseInsensitive(u'foo'), CaseInsensitive(u'bar'))
+        self.assertEquals(CaseInsensitive(u'foo'), u'Foo')
+        self.assertNotEquals(CaseInsensitive(u'foo'), u'bar')
+        self.assertEquals(Parametrized(CaseInsensitive(u'foo'), []),
+                          CaseInsensitive(u'Foo'))
+        self.assertEquals(
+            Parametrized(CaseInsensitive(u'foo'), [('bar', 'qux')]),
+            u'Foo')
+        self.assertNotEquals(
+            Parametrized(CaseInsensitive(u'foo'), [('bar', 'qux')]),
+            u'bar')
+        self.assertEquals(
+            Parametrized(CaseInsensitive(u'foo'), [('bar', 'qux')]),
+            Parametrized(CaseInsensitive(u'Foo'), [('bar', 'qux')]))
+        self.assertNotEquals(
+            Parametrized(CaseInsensitive(u'foo'), [('bar', 'qux')]),
+            Parametrized(CaseInsensitive(u'foo'), [('bar', 'xyzzy')]))
+        self.assertNotEquals(
+            Parametrized(CaseInsensitive(u'foo'), [('bar', 'qux')]),
+            Parametrized(CaseInsensitive(u'bar'), [('bar', 'qux')]))
 
 
 class TestSyntax(unittest.TestCase):
@@ -46,8 +72,8 @@ class TestSyntax(unittest.TestCase):
                                       []))
         self.assertParse(p, 'foo ; bar = baz ; qux = "\\"xyzzy\\""',
                          Parametrized(transfer_coding.TransferCoding(u'foo'),
-                                      [Parameter(u'bar', u'baz'),
-                                       Parameter(u'qux', u'"xyzzy"')]))
+                                      [(u'bar', u'baz'),
+                                       (u'qux', u'"xyzzy"')]))
         self.assertNoParse(p, '')
         self.assertNoParse(p, 'foo;???')
         self.assertNoParse(p, 'foo;"bar"="baz"')

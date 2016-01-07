@@ -38,7 +38,7 @@ def parse_stream(stream, was_tls=None):
         # RFC 7230 section 3.3.3
         if req.headers.transfer_encoding:
             codings = list(req.headers.transfer_encoding)
-            if codings.pop().item == tc.chunked:
+            if codings.pop() == tc.chunked:
                 if not message.parse_chunked(req, state):
                     return reqs
             else:

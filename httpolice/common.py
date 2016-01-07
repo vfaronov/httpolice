@@ -26,17 +26,27 @@ class CaseInsensitive(ProtocolString):
     __slots__ = ()
 
     def __eq__(self, other):
-        return unicode.lower(self) == unicode.lower(other)
+        if isinstance(other, basestring):
+            return self.lower() == other.lower()
+        else:
+            return False
 
     def __ne__(self, other):
         return not (self == other)
 
     def __hash__(self):
-        return hash(unicode.lower(self))
+        return hash(self.lower())
 
 
-Parametrized = namedtuple('Parametrized', ('item', 'params'))
-Parameter = namedtuple('Parameter', ('name', 'value'))
+class Parametrized(namedtuple('Parametrized', ('item', 'param'))):
+
+    __slots__ = ()
+
+    def __eq__(self, other):
+        return (self.item == other) or super(Parametrized, self).__eq__(other)
+
+    def __ne__(self, other):
+        return (self.item != other) and super(Parametrized, self).__ne__(other)
 
 
 class OriginForm(ProtocolString):
