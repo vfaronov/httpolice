@@ -31,13 +31,15 @@ class MismatchError(ParseError):
 
 class State(common.ReportNode):
 
-    def __init__(self, data):
+    def __init__(self, data, annotate_classes=None):
         super(State, self).__init__()
         self.data = data
         self.pos = 0
         self.sane = True
         self.stack = []
         self.last_cut = 0
+        self.annotate_classes = tuple(annotate_classes or ())
+        self.annotations = []
 
     def dump_complaints(self, target):
         for notice_ident, context in self.complaints or []:
@@ -64,6 +66,21 @@ class State(common.ReportNode):
 
     def is_eof(self):
         return not self.peek()
+
+    def annotate(self, obj, begin):
+        if isinstance(obj, self.annotate_classes):
+            self.annotations.append((obj, begin, self.pos))
+
+    def collect_annotations(self):
+        r = []
+        pos = 0
+        for (obj, begin, end) in self.annotations:
+            if begin >= pos:
+                r.append(self.data[pos:begin])
+                r.append(obj)
+                pos = end
+        r.append(self.data[pos:])
+        return [s for s in r if s != '']
 
     def consume(self, s, case_insensitive=False):
         present = self.data[self.pos : self.pos + len(s)]
@@ -286,8 +303,10 @@ class WrapParser(Parser):
         self.inner = parsify(inner)
 
     def parse(self, state):
-        r = self.inner.parse(state)
-        return self.func(r)
+        begin = state.pos
+        r = self.func(self.inner.parse(state))
+        state.annotate(r, begin)
+        return r
 
 
 eof = EOFParser()

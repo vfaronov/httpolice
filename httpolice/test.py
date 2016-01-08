@@ -183,6 +183,12 @@ class TestRequest(unittest.TestCase):
                          [Parametrized(u'foo', []),
                           Parametrized(u'gzip', []),
                           Parametrized(u'chunked', [])])
+        self.assertEqual(req.header_entries[1].annotated,
+                         [TransferCoding(u'foo')])
+        self.assert_(req.header_entries[2].annotated is None)
+        self.assertEqual(req.header_entries[3].annotated,
+                         [TransferCoding(u'gzip'), ', ',
+                          TransferCoding(u'chunked')])
 
     def test_parse_chunked(self):
         stream = ('POST / HTTP/1.1\r\n'

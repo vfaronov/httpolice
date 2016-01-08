@@ -1,6 +1,6 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import parse
+from httpolice import known, parse
 from httpolice.common import Unparseable
 from httpolice.known import h, header
 
@@ -53,12 +53,15 @@ class HeaderView(object):
             positions.append((from_trailer, i))
             parser = \
                 (header.parser_for(self.name) or parse.anything) + parse.eof
-            state = parse.State(entry.value)
+            state = parse.State(entry.value, annotate_classes=known.classes)
             try:
                 parsed = parser.parse(state)
             except parse.ParseError, e:
                 entry.complain(1000, error=e)
                 parsed = Unparseable
+            else:
+                entry.annotated = state.collect_annotations()
+                state.dump_complaints(entry)
             values.append(parsed)
         return positions, values
 
