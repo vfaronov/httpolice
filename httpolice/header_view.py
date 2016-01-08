@@ -1,8 +1,8 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import header, parse, syntax
+from httpolice import parse
 from httpolice.common import Unparseable
-from httpolice.header import known_headers as h
+from httpolice.known import h, header
 
 
 class HeadersView(object):
@@ -16,7 +16,10 @@ class HeadersView(object):
 
     def __getitem__(self, key):
         if key not in self._cache:
-            cls = MultiHeaderView if is_multi_header(key) else SingleHeaderView
+            if header.is_multi_header(key):
+                cls = MultiHeaderView
+            else:
+                cls = SingleHeaderView
             self._cache[key] = cls(self._message, key)
         return self._cache[key]
 
@@ -48,7 +51,8 @@ class HeaderView(object):
             if from_trailer and header.is_bad_for_trailer(self.name):
                 continue
             positions.append((from_trailer, i))
-            parser = (parser_for(self.name) or parse.anything) + parse.eof
+            parser = \
+                (header.parser_for(self.name) or parse.anything) + parse.eof
             state = parse.State(entry.value)
             try:
                 parsed = parser.parse(state)
@@ -113,17 +117,3 @@ class MultiHeaderView(HeaderView):
                        if sub_values is not Unparseable
                        for value in sub_values]
         self._positions = positions
-
-
-def is_multi_header(name):
-    outer, _ = _parse_rules.get(name, (None, None))
-    return (outer is syntax.comma_list) or (outer is syntax.comma_list1)
-
-def parser_for(name):
-    outer, inner = _parse_rules.get(name, (None, None))
-    return inner if outer is None else outer(inner)
-
-_parse_rules = {
-    h.content_length: (None, syntax.integer),
-    h.transfer_encoding: (syntax.comma_list1, syntax.transfer_coding),
-}

@@ -9,12 +9,15 @@ from httpolice import (
     request,
     response,
     syntax,
-    transfer_coding,
     version,
 )
-from httpolice.common import CaseInsensitive, Parametrized, Unparseable
-from httpolice.method import known_methods as m
-from httpolice.transfer_coding import known_codings as tc
+from httpolice.common import (
+    CaseInsensitive,
+    Parametrized,
+    TransferCoding,
+    Unparseable,
+)
+from httpolice.known import m, tc
 
 
 class TestCommon(unittest.TestCase):
@@ -78,10 +81,9 @@ class TestSyntax(unittest.TestCase):
         p = syntax.transfer_coding + parse.eof
         self.assertParse(p, 'chunked', Parametrized(tc.chunked, []))
         self.assertParse(p, 'foo',
-                         Parametrized(transfer_coding.TransferCoding(u'foo'),
-                                      []))
+                         Parametrized(TransferCoding(u'foo'), []))
         self.assertParse(p, 'foo ; bar = baz ; qux = "\\"xyzzy\\""',
-                         Parametrized(transfer_coding.TransferCoding(u'foo'),
+                         Parametrized(TransferCoding(u'foo'),
                                       [(u'bar', u'baz'),
                                        (u'qux', u'"xyzzy"')]))
         self.assertNoParse(p, '')

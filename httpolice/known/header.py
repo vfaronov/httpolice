@@ -1,32 +1,23 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import common
-from httpolice.common import Citation, RFC
-
-
-class HeaderEntry(common.ReportNode):
-
-    self_name = 'header'
-
-    def __init__(self, name, value):
-        super(HeaderEntry, self).__init__()
-        self.name = name
-        self.value = value
-
-    def __repr__(self):
-        return '<HeaderEntry %s>' % self.name
-
-
-class FieldName(common.CaseInsensitive):
-
-    __slots__ = ()
+from httpolice import syntax
+from httpolice.common import Citation, FieldName, RFC
+from httpolice.known.base import KnownDict
 
 
 def is_bad_for_trailer(name):
-    return known_headers.get_info(name).get('bad_for_trailer')
+    return known.get_info(name).get('bad_for_trailer')
+
+def is_multi_header(name):
+    outer, _ = known.get_info(name).get('syntax', (None, None))
+    return (outer is syntax.comma_list) or (outer is syntax.comma_list1)
+
+def parser_for(name):
+    outer, inner = known.get_info(name).get('syntax', (None, None))
+    return inner if outer is None else outer(inner)
 
 
-known_headers = common.KnownDict([
+known = KnownDict([
  {'_': FieldName(u'A-IM'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Accept'),
   '_citations': [RFC(7231, section=(5, 3, 2))],
@@ -99,7 +90,8 @@ known_headers = common.KnownDict([
  {'_': FieldName(u'Content-Length'),
   '_citations': [RFC(7230, section=(3, 3, 2))],
   'bad_for_trailer': True,
-  'iana_status': 'standard'},
+  'iana_status': 'standard',
+  'syntax': (None, syntax.integer)},
  {'_': FieldName(u'Content-Location'),
   '_citations': [RFC(7231, section=(3, 1, 4, 2))],
   'iana_status': 'standard'},
@@ -324,7 +316,8 @@ known_headers = common.KnownDict([
  {'_': FieldName(u'Transfer-Encoding'),
   '_citations': [RFC(7230, section=(3, 3, 1))],
   'bad_for_trailer': True,
-  'iana_status': 'standard'},
+  'iana_status': 'standard',
+  'syntax': (syntax.comma_list1, syntax.transfer_coding)},
  {'_': FieldName(u'URI'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Upgrade'),
   '_citations': [RFC(7230, section=(6, 7))],
@@ -420,5 +413,5 @@ known_headers = common.KnownDict([
   '_citations': [Citation('W3C Mobile Web Best Practices Working Group',
                           'http://www.w3.org/2005/MWI/BPWG/')]}
  ],
- extra_info=['bad_for_trailer', 'iana_status']
+ extra_info=['bad_for_trailer', 'iana_status', 'syntax']
 )

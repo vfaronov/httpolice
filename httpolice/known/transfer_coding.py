@@ -1,15 +1,10 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import common
-from httpolice.common import RFC
+from httpolice.common import RFC, TransferCoding
+from httpolice.known.base import KnownDict
 
 
-class TransferCoding(common.CaseInsensitive):
-
-    __slots__ = ()
-
-
-known_codings = common.KnownDict([
+known = KnownDict([
  {'_': TransferCoding(u'chunked'), '_citations': [RFC(7230)]},
  {'_': TransferCoding(u'compress'), '_citations': [RFC(7230)]},
  {'_': TransferCoding(u'deflate'), '_citations': [RFC(7230)]},

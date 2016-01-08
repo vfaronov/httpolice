@@ -2,11 +2,15 @@
 
 from httpolice.common import (
     AsteriskForm,
+    FieldName,
+    HeaderEntry,
+    HTTPVersion,
+    Method,
     OriginForm,
     Parametrized,
+    StatusCode,
+    TransferCoding,
 )
-from httpolice.header import FieldName, HeaderEntry
-from httpolice.method import Method
 from httpolice.parse import (
     argwrap,
     char_class,
@@ -27,9 +31,6 @@ from httpolice.parse import (
     times,
     wrap,
 )
-from httpolice.status_code import StatusCode
-from httpolice.transfer_coding import TransferCoding
-from httpolice.version import HTTPVersion
 
 
 # RFC 5234

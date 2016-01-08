@@ -4,16 +4,13 @@ import lxml.etree
 import pkg_resources
 
 from httpolice import common
-from httpolice.header import FieldName
-from httpolice.method import Method
-from httpolice.status_code import StatusCode
-from httpolice.transfer_coding import TransferCoding
+
 
 protocol_items = {
-    'h': FieldName,
-    'm': Method,
-    'st': StatusCode,
-    'tc': TransferCoding,
+    'h': common.FieldName,
+    'm': common.Method,
+    'st': common.StatusCode,
+    'tc': common.TransferCoding,
 }
 
 

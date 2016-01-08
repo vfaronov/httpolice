@@ -2,9 +2,7 @@
 
 from httpolice import common, message, parse, syntax
 from httpolice.common import Unparseable, okay
-from httpolice.method import known_methods as m
-from httpolice.status_code import known_codes as st
-from httpolice.transfer_coding import known_codings as tc
+from httpolice.known import m, st, tc
 
 
 class Response(message.Message):

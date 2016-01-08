@@ -2,7 +2,7 @@
 
 from httpolice import common, header_view, parse, syntax
 from httpolice.common import Unparseable
-from httpolice.transfer_coding import known_codings as tc
+from httpolice.known import tc
 
 
 class Message(common.ReportNode):

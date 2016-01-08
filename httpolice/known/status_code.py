@@ -1,28 +1,14 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import common
-from httpolice.common import RFC
+from httpolice.common import StatusCode, RFC
+from httpolice.known.base import KnownDict
 
 
-class StatusCode(int):
-
-    __slots__ = ()
-
-    def __repr__(self):
-        return 'StatusCode(%d)' % self
-
-    informational = property(lambda self: 100 <= self < 199)
-    successful = property(lambda self: 200 <= self < 299)
-    redirection = property(lambda self: 300 <= self < 399)
-    client_error = property(lambda self: 400 <= self < 499)
-    server_error = property(lambda self: 500 <= self < 599)
+def description(code):
+    return known.get_info(code).get('description')
 
 
-def reason(code):
-    return known_codes.get_info(code).get('description')
-
-
-class KnownStatusCodes(common.KnownDict):
+class KnownStatusCodes(KnownDict):
 
     @classmethod
     def _name_for(cls, item):
@@ -30,7 +16,7 @@ class KnownStatusCodes(common.KnownDict):
             replace(u'-', u' ').replace(u' ', u'_').lower()
 
 
-known_codes = KnownStatusCodes([
+known = KnownStatusCodes([
  {'_': StatusCode(100),
   '_citations': [RFC(7231, section=(6, 2, 1))],
   'description': 'Continue'},

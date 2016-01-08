@@ -2,8 +2,9 @@
 
 import re
 
-from httpolice import common, notice, status_code
+from httpolice import common, notice
 from httpolice.common import Unparseable
+from httpolice.known import status_code
 
 
 def notice_to_text(the_notice, ctx):
@@ -70,7 +71,7 @@ class TextReport(object):
                         (req.method, req.target, req.version))
 
     def render_status_line(self, resp):
-        reason = status_code.reason(resp.status) or u''
+        reason = status_code.description(resp.status) or u''
         self.write_more(u'<< %s %d %s\n' % (resp.version, resp.status, reason))
 
     def render_message(self, msg):

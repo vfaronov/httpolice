@@ -6,8 +6,15 @@ import urlparse
 
 import lxml.etree
 
-from httpolice import header, method, status_code, transfer_coding
-from httpolice.common import Citation, RFC
+from httpolice.common import (
+    Citation,
+    FieldName,
+    Method,
+    StatusCode,
+    RFC,
+    TransferCoding,
+)
+from httpolice.known import h, m, st, tc
 
 
 def yes_no(s):
@@ -58,14 +65,14 @@ class HeaderRegistry(Registry):
                 continue
             value = record.find('iana:value', self.xmlns)
             entry = {
-                '_': header.FieldName(value.text),
+                '_': FieldName(value.text),
                 '_citations': list(self.extract_citations(record)),
             }
             entries.append(entry)
             status = record.find('iana:status', self.xmlns)
             if (status is not None) and status.text:
                 entry['iana_status'] = status.text
-        return [('headers', entries, header.known_headers)]
+        return [('headers', entries, h)]
 
 
 class MethodRegistry(Registry):
@@ -75,13 +82,13 @@ class MethodRegistry(Registry):
         entries = []
         for record in tree.findall('//iana:record', self.xmlns):
             entries.append({
-                '_': method.Method(record.find('iana:value', self.xmlns).text),
+                '_': Method(record.find('iana:value', self.xmlns).text),
                 '_citations': list(self.extract_citations(record)),
                 'safe': yes_no(record.find('iana:safe', self.xmlns).text),
                 'idempotent':
                     yes_no(record.find('iana:idempotent', self.xmlns).text),
             })
-        return [('methods', entries, method.known_methods)]
+        return [('methods', entries, m)]
 
 
 class StatusCodeRegistry(Registry):
@@ -97,11 +104,11 @@ class StatusCodeRegistry(Registry):
             if description.lower() == 'unassigned':
                 continue
             entries.append({
-                '_': status_code.StatusCode(value),
+                '_': StatusCode(value),
                 '_citations': list(self.extract_citations(record)),
                 'description': description,
             })
-        return [('status codes', entries, status_code.known_codes)]
+        return [('status codes', entries, st)]
 
 
 class ParametersRegistry(Registry):
@@ -109,9 +116,7 @@ class ParametersRegistry(Registry):
     def get_all(self):
         tree = self._get_xml('http-parameters/http-parameters.xml')
         return [
-            ('transfer codings',
-             list(self._transfer_codings(tree)),
-             transfer_coding.known_codings),
+            ('transfer codings', list(self._transfer_codings(tree)), tc),
         ]
 
     def _transfer_codings(self, tree):
@@ -119,7 +124,7 @@ class ParametersRegistry(Registry):
             '//iana:registry[@id="transfer-coding"]/iana:record', self.xmlns)
         for record in records:
             yield {
-                '_': transfer_coding.TransferCoding(
+                '_': TransferCoding(
                     record.find('iana:name', self.xmlns).text),
                 '_citations': list(self.extract_citations(record)),
             }

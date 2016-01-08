@@ -1,22 +1,17 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import common
-from httpolice.common import RFC
+from httpolice.common import Method, RFC
+from httpolice.known.base import KnownDict
 
 
-class Method(common.ProtocolString):
-
-    __slots__ = ()
-
-
-class KnownMethods(common.KnownDict):
+class KnownMethods(KnownDict):
 
     @classmethod
     def _name_for(cls, item):
         return item['_'].replace('-', '_')
 
 
-known_methods = KnownMethods([
+known = KnownMethods([
  {'_': Method(u'ACL'),
   '_citations': [RFC(3744, section=(8, 1))],
   'idempotent': True,
