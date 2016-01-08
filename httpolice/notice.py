@@ -53,7 +53,7 @@ class Citation(Text):
     def info(self):
         num = int(self.get('num'))
         sect = tuple(int(n) for n in self.get('sect').split('.'))
-        return common.RFC(num, *sect)
+        return common.RFC(num, section=sect)
 
 
 class ProtocolItem(lxml.etree.ElementBase):
