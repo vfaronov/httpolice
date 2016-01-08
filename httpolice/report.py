@@ -83,10 +83,14 @@ class TextReport(object):
         elif msg.body:
             self.write(u'\n++ (%d bytes of payload body not shown)\n' %
                        len(msg.body))
+        for entry in msg.trailer_entries or []:
+            self.write(u'++ %s: %s\n' %
+                       (entry.name, entry.value.decode('ascii', 'ignore')))
 
         for entry in msg.header_entries:
             self.render_notices(entry)
-
+        for entry in msg.trailer_entries or []:
+            self.render_notices(entry)
         self.render_notices(msg)
 
     def render_connection(self, connection):
