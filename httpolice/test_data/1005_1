@@ -1,0 +1,18 @@
+1005 1007
+
+======== BEGIN INBOUND STREAM ========
+PUT / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: text/plain
+Transfer-Encoding: chunked
+
+"0"
+
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+
+Hello world!

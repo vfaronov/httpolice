@@ -1,0 +1,17 @@
+1012
+
+# This will need fixing once HTTPolice supports
+# the authority form of request-target.
+
+======== BEGIN INBOUND STREAM ========
+CONNECT / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 204 No Content
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+
+mlkqmelk
+qwlkfnlnlkf
+

@@ -1,0 +1,17 @@
+1011
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Upgrade: HTTP/3
+Connection: Upgrade
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 101 Switching Protocols
+Upgrade: HTTP/3
+Connection: Upgrade
+
+nkjqfnknrknwefne
+ewnwe
+djknwkjnkn

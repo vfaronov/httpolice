@@ -1,11 +1,13 @@
 # -*- coding: utf-8; -*-
 
 from cStringIO import StringIO
+import os
 import unittest
 
 from httpolice import (
     common,
     connection,
+    notice,
     parse,
     report,
     syntax,
@@ -336,6 +338,45 @@ class TestResponse(unittest.TestCase):
                   'Hello world!\r\n')
         [[resp1]] = self.parse(inbound, stream)
         self.assertEqual(resp1.body, 'Hello world!\r\n')
+
+
+class TestFromFiles(unittest.TestCase):
+
+    @staticmethod
+    def load_tests():
+        data_path = os.path.abspath(os.path.join(__file__, '..', 'test_data'))
+        if os.path.isdir(data_path):
+            for name in os.listdir(data_path):
+                TestFromFiles.make_test(os.path.join(data_path, name))
+        TestFromFiles.covered = set()
+
+    @staticmethod
+    def make_test(filename):
+        def test(self):
+            self._run_test(filename)
+        setattr(TestFromFiles, 'test_%s' % os.path.basename(filename), test)
+
+    def _run_test(self, filename):
+        with open(filename) as f:
+            data = f.read()
+        header, data = data.split('======== BEGIN INBOUND STREAM ========\r\n')
+        inb, outb = data.split('======== BEGIN OUTBOUND STREAM ========\r\n')
+        lines = [ln for ln in header.splitlines() if not ln.startswith('#')]
+        line = lines[0]
+        expected = set(int(n) for n in line.split())
+        conn = connection.parse_two_streams(inb, outb)
+        buffer = StringIO()
+        report.TextReport(buffer).render_connection(conn)
+        actual = set(int(ln[5:9]) for ln in buffer.getvalue().splitlines()
+                     if ln.startswith('**** '))
+        self.assertEquals(expected, actual)
+        report.HTMLReport(StringIO()).render_connection(conn)
+        self.covered.update(actual)
+
+    def test_all_notices_covered(self):
+        self.assertEquals(self.covered, set(notice.notices))
+
+TestFromFiles.load_tests()
 
 
 if __name__ == '__main__':
