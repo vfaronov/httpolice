@@ -3,6 +3,7 @@
 import lxml.etree
 import pkg_resources
 
+from httpolice import common
 from httpolice.header import FieldName
 from httpolice.method import Method
 from httpolice.status_code import StatusCode
@@ -54,13 +55,8 @@ class Citation(Text):
     @property
     def info(self):
         num = int(self.get('num'))
-        sect = self.get('sect')
-        title = u'RFC %d' % num
-        url = u'http://tools.ietf.org/html/rfc%d' % num
-        if sect:
-            title += u' section %s' % sect
-            url += u'#section-%s' % sect
-        return title, url
+        sect = tuple(int(n) for n in self.get('sect').split('.'))
+        return common.rfc(num, *sect)
 
 
 class ProtocolItem(lxml.etree.ElementBase):

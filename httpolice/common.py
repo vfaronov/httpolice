@@ -34,6 +34,26 @@ def okay(x):
     return (x is not None) and (x is not Unparseable)
 
 
+class Citation(namedtuple('Citation', ('title', 'url'))):
+
+    __slots__ = ()
+    __unicode__ = lambda self: self.title
+
+
+def rfc(num, *section):
+    title = u'RFC %d' % num
+    url = u'http://tools.ietf.org/html/rfc%d' % num
+    if section:
+        section_text = u'.'.join(unicode(n) for n in section)
+        if section_text[0].isalpha():
+            title += u' appendix %s' % section_text
+            url += u'#appendix-%s' % section_text
+        else:
+            title += u' § %s' % section_text
+            url += u'#section-%s' % section_text
+    return Citation(title, url)
+
+
 class ProtocolString(unicode):
 
     __slots__ = ()

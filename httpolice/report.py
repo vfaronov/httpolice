@@ -24,11 +24,10 @@ def piece_to_text(piece, ctx):
     elif isinstance(piece, notice.Citation):
         quote = pieces_to_text(piece.contents, ctx).strip()
         quote = re.sub(ur'\s+', u' ', quote)
-        title, _ = piece.info
         if quote:
-            return u'“%s” (%s)' % (quote, title)
+            return u'“%s” (%s)' % (quote, piece.info)
         else:
-            return u'See %s.' % title
+            return piece_to_text(piece.info, ctx)
     elif hasattr(piece, 'contents'):
         return pieces_to_text(piece.contents, ctx)
     elif isinstance(piece, common.Parametrized):
