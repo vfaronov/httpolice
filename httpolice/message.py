@@ -32,11 +32,10 @@ def parse_chunked(msg, state):
     except parse.ParseError, e:
         msg.complain(1005, error=e)
         msg.body = Unparseable
-        return False
+        state.sane = False
     else:
         msg.body = ''.join(data)
         msg.trailer_entries = trailers
-        return True
 
 
 def decode_transfer_coding(msg, coding):

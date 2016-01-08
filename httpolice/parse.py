@@ -1,5 +1,6 @@
 # -*- coding: utf-8; -*-
 
+from httpolice import common
 from httpolice.common import CaseInsensitive
 
 
@@ -28,12 +29,29 @@ class MismatchError(ParseError):
         self.found = found
 
 
-class State(object):
+class State(common.ReportNode):
 
     def __init__(self, data):
+        super(State, self).__init__()
         self.data = data
         self.pos = 0
+        self.sane = True
         self.stack = []
+        self.last_cut = 0
+
+    def dump_complaints(self, target):
+        for notice_ident, context in self.complaints or []:
+            context.pop(self.self_name)
+            target.complain(notice_ident, **context)
+        self.complaints = []
+
+    def cut(self):
+        was = self.last_cut
+        self.last_cut = self.pos
+        return self.data[was:self.pos]
+
+    def remaining(self):
+        return self.data[self.last_cut:]
 
     def push(self):
         self.stack.append(self.pos)

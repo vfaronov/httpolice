@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from httpolice import report, request, response
+from httpolice import connection, report
 
 
 def main():
@@ -13,11 +13,10 @@ def main():
     parser.add_argument('outbound')
     args = parser.parse_args()
     with open(args.inbound) as f:
-        req_stream = f.read()
+        inbound_stream = f.read()
     with open(args.outbound) as f:
-        resp_stream = f.read()
-    reqs = request.parse_stream(req_stream)
-    conn = response.Connection(response.parse_stream(resp_stream, reqs))
+        outbound_stream = f.read()
+    conn = connection.parse_two_streams(inbound_stream, outbound_stream)
     report.TextReport(sys.stdout).render_connection(conn)
 
 

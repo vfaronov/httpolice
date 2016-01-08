@@ -56,7 +56,7 @@ class TextReport(object):
 
     def render_unparseable(self, node):
         if node is Unparseable:
-            self.write_more('\n--- (unparseable)\n')
+            self.write_more('\n-- (unparseable)\n')
             return True
         else:
             return False
@@ -91,14 +91,22 @@ class TextReport(object):
 
     def render_connection(self, connection):
         for exch in connection.exchanges:
-            if exch.request is not None:
+            self.write_more(u'================================\n')
+            self.render_notices(exch)
+            if exch.request:
                 if not self.render_unparseable(exch.request):
                     self.render_request_line(exch.request)
                     self.render_message(exch.request)
-            if exch.responses is not None:
-                for resp in exch.responses:
-                    if not self.render_unparseable(resp):
-                        self.render_status_line(resp)
-                        self.render_message(resp)
-            self.render_notices(exch)
-        self.render_notices(connection)
+            for resp in exch.responses or []:
+                if not self.render_unparseable(resp):
+                    self.render_status_line(resp)
+                    self.render_message(resp)
+
+        if connection.unparsed_inbound:
+            self.write_more(
+                u'++ %d unparsed bytes remaining on the request stream\n' %
+                len(connection.unparsed_inbound))
+        if connection.unparsed_outbound:
+            self.write(
+                u'++ %d unparsed bytes remaining on the response stream\n' %
+                len(connection.unparsed_outbound))

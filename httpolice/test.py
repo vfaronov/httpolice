@@ -4,10 +4,9 @@ from cStringIO import StringIO
 import unittest
 
 from httpolice import (
+    connection,
     parse,
     report,
-    request,
-    response,
     syntax,
     version,
 )
@@ -93,6 +92,12 @@ class TestSyntax(unittest.TestCase):
 
 class TestRequest(unittest.TestCase):
 
+    @staticmethod
+    def parse(stream):
+        conn = connection.parse_inbound_stream(stream)
+        report.TextReport(StringIO()).render_connection(conn)
+        return [exch.request for exch in conn.exchanges]
+
     def test_parse_requests(self):
         stream = ('GET /foo/bar/baz?qux=xyzzy HTTP/1.1\r\n'
                   'Host: example.com\r\n'
@@ -108,7 +113,7 @@ class TestRequest(unittest.TestCase):
                   'Host: example.com\r\n'
                   'Content-Length: 0\r\n'
                   '\r\n')
-        [req1, req2, req3] = request.parse_stream(stream)
+        [req1, req2, req3] = self.parse(stream)
 
         self.assertEquals(req1.method, u'GET')
         self.assertEquals(req1.target, u'/foo/bar/baz?qux=xyzzy')
@@ -129,7 +134,7 @@ class TestRequest(unittest.TestCase):
         self.assertEquals(req3.target, u'*')
 
     def test_unparseable_framing(self):
-        [req1] = request.parse_stream('GET ...')
+        [req1] = self.parse('GET ...')
         self.assert_(req1 is Unparseable)
 
     def test_unparseable_body(self):
@@ -138,7 +143,7 @@ class TestRequest(unittest.TestCase):
                   'Content-Length: 90\r\n'
                   '\r\n'
                   'wololo')
-        [req1] = request.parse_stream(stream)
+        [req1] = self.parse(stream)
         self.assertEqual(req1.method, u'POST')
         self.assertEqual(req1.headers.content_length.value, 90)
         self.assert_(req1.body is Unparseable)
@@ -149,7 +154,7 @@ class TestRequest(unittest.TestCase):
                   'Content-Length: 4 5 6\r\n'
                   '\r\n'
                   'quux')
-        [req1] = request.parse_stream(stream)
+        [req1] = self.parse(stream)
         self.assert_(req1.body is Unparseable)
 
     def test_unparseable_following_parseable(self):
@@ -158,7 +163,7 @@ class TestRequest(unittest.TestCase):
                   '\r\n'
                   'GET /\r\n'
                   'Host: example.com\r\n')
-        [req1, req2] = request.parse_stream(stream)
+        [req1, req2] = self.parse(stream)
         self.assertEqual(req1.method, u'GET')
         self.assertEqual(req1.body, '')
         self.assert_(req2 is Unparseable)
@@ -172,7 +177,7 @@ class TestRequest(unittest.TestCase):
                   '\r\n'
                   '0\r\n'
                   '\r\n')
-        [req] = request.parse_stream(stream)
+        [req] = self.parse(stream)
         self.assert_(req.body is Unparseable)
         self.assertEqual(list(req.headers.transfer_encoding),
                          [Parametrized(u'foo', []),
@@ -190,7 +195,7 @@ class TestRequest(unittest.TestCase):
                   '0\r\n'
                   'X-Result: okay\r\n'
                   '\r\n')
-        [req1] = request.parse_stream(stream)
+        [req1] = self.parse(stream)
         self.assertEqual(req1.method, u'POST')
         self.assertEqual(len(req1.headers.transfer_encoding), 1)
         self.assertEqual(req1.headers.transfer_encoding[0].item, u'chunked')
@@ -208,7 +213,7 @@ class TestRequest(unittest.TestCase):
                   '\r\n'
                   '0\r\n'
                   '\r\n')
-        [req] = request.parse_stream(stream)
+        [req] = self.parse(stream)
         self.assertEqual(req.body, '')
 
     def test_parse_chunked_no_chunks(self):
@@ -219,7 +224,7 @@ class TestRequest(unittest.TestCase):
                   'GET / HTTP/1.1\r\n'
                   'Host: example.com\r\n'
                   '\r\n')
-        [req] = request.parse_stream(stream)
+        [req] = self.parse(stream)
         self.assert_(req.body is Unparseable)
 
 
@@ -227,14 +232,21 @@ class TestResponse(unittest.TestCase):
 
     @staticmethod
     def req(method_):
-        return request.Request(method_, u'/', version.http11, [])
+        return str(
+            '%s / HTTP/1.1\r\n'
+            'Host: example.com\r\n'
+            'Content-Length: 0\r\n'
+            '\r\n' % method_
+        )
 
-    def render(self, exchanges):
-        conn = response.Connection(exchanges)
+    @staticmethod
+    def parse(inbound, outbound):
+        conn = connection.parse_two_streams(inbound, outbound)
         report.TextReport(StringIO()).render_connection(conn)
+        return [exch.responses for exch in conn.exchanges]
 
     def test_parse_responses(self):
-        reqs = [self.req(m.HEAD), self.req(m.POST), self.req(m.POST)]
+        inbound = self.req(m.HEAD) + self.req(m.POST) + self.req(m.POST)
         stream = ('HTTP/1.1 200 OK\r\n'
                   'Content-Length: 16\r\n'
                   '\r\n'
@@ -250,25 +262,19 @@ class TestResponse(unittest.TestCase):
                   'HTTP/1.1 101 Switching Protocols\r\n'
                   'Upgrade: wololo\r\n'
                   '\r\n')
-        [exch1, exch2, exch3] = response.parse_stream(stream, reqs)
-        self.render([exch1, exch2, exch3])
+        [[resp1_1], [resp2_1, resp2_2, resp2_3], [resp3_1]] = \
+            self.parse(inbound, stream)
 
-        self.assert_(exch1.request is reqs[0])
-        [resp1_1] = exch1.responses
         self.assertEquals(resp1_1.status, 200)
         self.assertEquals(resp1_1.headers.content_length.value, 16)
         self.assert_(resp1_1.body is None)
 
-        self.assert_(exch2.request is reqs[1])
-        [resp2_1, resp2_2, resp2_3] = exch2.responses
         self.assertEquals(resp2_1.status, 100)
         self.assertEquals(resp2_2.status, 100)
         self.assertEquals(resp2_3.status, 200)
         self.assertEquals(resp2_3.headers.content_length.value, 16)
         self.assertEquals(resp2_3.body, 'Hello world!\r\n\r\n')
 
-        self.assert_(exch3.request is reqs[2])
-        [resp3_1] = exch3.responses
         self.assertEquals(resp3_1.status, 101)
         self.assertEquals(resp3_1.header_entries[0].value, 'wololo')
         self.assert_(resp3_1.body is None)
@@ -285,8 +291,9 @@ class TestResponse(unittest.TestCase):
                   '\r\n'
                   'HTTP/1.1 204 No Content\r\n'
                   '\r\n')
-        [exch1, exch2] = response.parse_stream(stream, None)
-        self.render([exch1, exch2])
+        conn = connection.parse_outbound_stream(stream)
+        report.TextReport(StringIO()).render_connection(conn)
+        [exch1, exch2] = conn.exchanges
         self.assert_(exch1.request is None)
         self.assertEquals(exch1.responses[0].status, 200)
         self.assertEquals(exch1.responses[0].body, 'Hello world!\r\n')
@@ -297,7 +304,7 @@ class TestResponse(unittest.TestCase):
         self.assert_(exch2.responses[1].body is None)
 
     def test_parse_responses_not_enough_requests(self):
-        reqs = [self.req(m.POST)]
+        inbound = self.req(m.POST)
         stream = ('HTTP/1.1 200 OK\r\n'
                   'Content-Length: 16\r\n'
                   '\r\n'
@@ -305,27 +312,21 @@ class TestResponse(unittest.TestCase):
                   '\r\n'
                   'HTTP/1.1 101 Switching Protocols\r\n'
                   '\r\n')
-        [exch1, exch2] = response.parse_stream(stream, reqs)
-        self.render([exch1, exch2])
-        self.assert_(exch1.request is reqs[0])
-        self.assert_(exch2.request is None)
-        self.assert_(exch2.responses[0] is Unparseable)
+        [[_], [resp2]] = self.parse(inbound, stream)
+        self.assert_(resp2.request is None)
+        self.assertEquals(resp2.status, 101)
 
     def test_parse_responses_bad_framing(self):
-        [exch1] = response.parse_stream('HTTP/1.1 ...', [self.req(m.POST)])
-        self.render([exch1])
-        self.assertEqual(exch1.request.method, m.POST)
-        self.assertEqual(exch1.responses, [Unparseable])
+        [[resp1]] = self.parse(self.req(m.POST), 'HTTP/1.1 ...')
+        self.assert_(resp1 is Unparseable)
 
     def test_parse_responses_implicit_framing(self):
-        reqs = [self.req(m.POST)]
+        inbound = self.req(m.POST)
         stream = ('HTTP/1.1 200 OK\r\n'
                   '\r\n'
                   'Hello world!\r\n')
-        [exch1] = response.parse_stream(stream, reqs)
-        self.render([exch1])
-        [resp] = exch1.responses
-        self.assertEqual(resp.body, 'Hello world!\r\n')
+        [[resp1]] = self.parse(inbound, stream)
+        self.assertEqual(resp1.body, 'Hello world!\r\n')
 
 
 if __name__ == '__main__':

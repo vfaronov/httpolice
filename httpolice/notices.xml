@@ -41,4 +41,39 @@
     <explain>Parse error: <ref to="error"/></explain>
   </error>
 
+  <error id="1006">
+    <title>Malformed request heading</title>
+    <explain>Parse error: <ref to="error"/></explain>
+  </error>
+
+  <internal id="1007">
+    <title>Stop parsing request stream due to errors</title>
+    <explain>Due to previous errors, the request stream is in an undefined state at this point, and HTTPolice will not try to parse the remaining bytes.</explain>
+  </internal>
+
+  <error id="1008">
+    <title>Not enough requests for this response</title>
+    <explain>If HTTPolice is parsing things correctly, it seems that there is no request corresponding to this response. HTTPolice will check this response in isolation.</explain>
+  </error>
+
+  <error id="1009">
+    <title>Malformed response heading</title>
+    <explain>Parse error: <ref to="error"/></explain>
+  </error>
+
+  <internal id="1010">
+    <title>Stop parsing response stream due to errors</title>
+    <explain>Due to previous errors, the response stream is in an undefined state at this point, and HTTPolice will not try to parse the remaining bytes.</explain>
+  </internal>
+
+  <internal id="1011">
+    <title>Stop parsing response stream after switching protocols</title>
+    <explain>The response status code <ref to="msg.status"/> indicates that the connection has switched to a different protocol. HTTPolice will not parse the remainder of the response stream.</explain>
+  </internal>
+
+  <internal id="1012">
+    <title>Stop parsing response stream after switching to a tunnel</title>
+    <explain>A successful (<ref to="msg.status"/>) response to a <ref to="msg.request.method"/> request indicates that the connection has switched to being a tunnel. HTTPolice will not parse the remainder of the response stream.</explain>
+  </internal>
+
 </notices>
