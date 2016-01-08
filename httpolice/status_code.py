@@ -15,6 +15,10 @@ class StatusCode(int):
     server_error = property(lambda self: 500 <= self < 599)
 
 
+def reason(code):
+    return known_codes.get_info(code).get('name')
+
+
 class KnownStatusCodes(common.Known):
 
     @classmethod

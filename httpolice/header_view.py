@@ -52,7 +52,8 @@ class HeaderView(object):
             state = parse.State(entry.value)
             try:
                 parsed = parser.parse(state)
-            except parse.ParseError:
+            except parse.ParseError, e:
+                entry.complain(1000, error=e)
                 parsed = Unparseable
             values.append(parsed)
         return positions, values

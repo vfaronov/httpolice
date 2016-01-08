@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<notices>
+
+  <error id="1000">
+    <title>Bad syntax in the <ref to="header"/> header</title>
+    <explain>Parse error: <ref to="error"/></explain>
+  </error>
+
+  <error id="1001">
+    <title>Final <ref to="msg.headers.transfer_encoding"/> is not <tc>chunked</tc></title>
+    <rfc num="7230" sect="3.3.1">
+      If any transfer coding
+   other than <tc>chunked</tc> is applied to a request payload body, the sender
+   MUST apply <tc>chunked</tc> as the final transfer coding to ensure that the
+   message is properly framed.
+    </rfc>
+  </error>
+
+  <error id="1002">
+    <title><ref to="msg.headers.transfer_encoding"/> contains <tc>chunked</tc> more than once</title>
+    <rfc num="7230" sect="3.3.1">
+      A sender MUST
+   NOT apply <tc>chunked</tc> more than once to a message body (i.e., chunking an
+   already chunked message is not allowed).
+    </rfc>
+  </error>
+
+  <internal id="1003">
+    <title>Not decoding <ref to="msg.headers.transfer_encoding"/>: <ref to="coding"/></title>
+    <explain>HTTPolice does not know how to decode the <ref to="coding"/> transfer coding. (This doesn’t mean that it’s wrong.)</explain>
+  </internal>
+
+  <error id="1004">
+    <title>Incomplete message according to <ref to="msg.headers.content_length"/></title>
+    <explain>This message’s <ref to="msg.headers.content_length"/> header indicates that the body is <ref to="msg.headers.content_length.value"/> bytes long, but there are fewer bytes remaining on the stream.</explain>
+  </error>
+
+  <error id="1005">
+    <title>Malformed <ref to="msg.headers.transfer_encoding"/>: <tc>chunked</tc></title>
+    <explain>Parse error: <ref to="error"/></explain>
+  </error>
+
+</notices>

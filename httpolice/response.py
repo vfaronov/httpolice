@@ -1,6 +1,6 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import message, parse, syntax
+from httpolice import common, message, parse, syntax
 from httpolice.common import Unparseable, okay
 from httpolice.method import known_methods as m
 from httpolice.status_code import known_codes as st
@@ -20,14 +20,26 @@ class Response(message.Message):
         self.status = status
 
 
-class Exchange(object):
+class Exchange(common.ReportNode):
+
+    self_name = 'exch'
 
     def __repr__(self):
         return 'Exchange(%r, %r)' % (self.request, self.responses)
 
     def __init__(self, request, responses):
+        super(Exchange, self).__init__()
         self.request = request
         self.responses = responses
+
+
+class Connection(common.ReportNode):
+
+    self_name = 'conn'
+
+    def __init__(self, exchanges):
+        super(Connection, self).__init__()
+        self.exchanges = exchanges
 
 
 def parse_stream(stream, requests=None):
@@ -101,6 +113,7 @@ def _parse_one(state, req):
         try:
             resp.body = parse.nbytes(n, n).parse(state)
         except parse.ParseError:
+            resp.complain(1004)
             return resp, False
     else:
         resp.body = parse.anything.parse(state)

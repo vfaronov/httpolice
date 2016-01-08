@@ -3,12 +3,14 @@
 from httpolice import common
 
 
-class HeaderEntry(object):
+class HeaderEntry(common.ReportNode):
+
+    self_name = 'header'
 
     def __init__(self, name, value):
+        super(HeaderEntry, self).__init__()
         self.name = name
         self.value = value
-        self.annotations = None
 
     def __repr__(self):
         return '<HeaderEntry %s>' % self.name

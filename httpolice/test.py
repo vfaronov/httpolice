@@ -1,9 +1,11 @@
 # -*- coding: utf-8; -*-
 
+from cStringIO import StringIO
 import unittest
 
 from httpolice import (
     parse,
+    report,
     request,
     response,
     syntax,
@@ -225,6 +227,10 @@ class TestResponse(unittest.TestCase):
     def req(method_):
         return request.Request(method_, u'/', version.http11, [])
 
+    def render(self, exchanges):
+        conn = response.Connection(exchanges)
+        report.TextReport(StringIO()).render_connection(conn)
+
     def test_parse_responses(self):
         reqs = [self.req(m.HEAD), self.req(m.POST), self.req(m.POST)]
         stream = ('HTTP/1.1 200 OK\r\n'
@@ -243,6 +249,7 @@ class TestResponse(unittest.TestCase):
                   'Upgrade: wololo\r\n'
                   '\r\n')
         [exch1, exch2, exch3] = response.parse_stream(stream, reqs)
+        self.render([exch1, exch2, exch3])
 
         self.assert_(exch1.request is reqs[0])
         [resp1_1] = exch1.responses
@@ -277,6 +284,7 @@ class TestResponse(unittest.TestCase):
                   'HTTP/1.1 204 No Content\r\n'
                   '\r\n')
         [exch1, exch2] = response.parse_stream(stream, None)
+        self.render([exch1, exch2])
         self.assert_(exch1.request is None)
         self.assertEquals(exch1.responses[0].status, 200)
         self.assertEquals(exch1.responses[0].body, 'Hello world!\r\n')
@@ -296,12 +304,14 @@ class TestResponse(unittest.TestCase):
                   'HTTP/1.1 101 Switching Protocols\r\n'
                   '\r\n')
         [exch1, exch2] = response.parse_stream(stream, reqs)
+        self.render([exch1, exch2])
         self.assert_(exch1.request is reqs[0])
         self.assert_(exch2.request is None)
         self.assert_(exch2.responses[0] is Unparseable)
 
     def test_parse_responses_bad_framing(self):
         [exch1] = response.parse_stream('HTTP/1.1 ...', [self.req(m.POST)])
+        self.render([exch1])
         self.assertEqual(exch1.request.method, m.POST)
         self.assertEqual(exch1.responses, [Unparseable])
 
@@ -311,6 +321,7 @@ class TestResponse(unittest.TestCase):
                   '\r\n'
                   'Hello world!\r\n')
         [exch1] = response.parse_stream(stream, reqs)
+        self.render([exch1])
         [resp] = exch1.responses
         self.assertEqual(resp.body, 'Hello world!\r\n')
 

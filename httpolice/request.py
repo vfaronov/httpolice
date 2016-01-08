@@ -42,6 +42,7 @@ def parse_stream(stream, was_tls=None):
                 if not message.parse_chunked(req, state):
                     return reqs
             else:
+                req.complain(1001)
                 return reqs
             while codings and (req.body is not Unparseable):
                 message.decode_transfer_coding(req, codings.pop())
@@ -52,6 +53,7 @@ def parse_stream(stream, was_tls=None):
             try:
                 req.body = parse.nbytes(n, n).parse(state)
             except parse.ParseError:
+                req.complain(1004)
                 return reqs
         else:
             req.body = ''

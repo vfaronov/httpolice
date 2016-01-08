@@ -1,13 +1,17 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import header_view, parse, syntax
+from httpolice import common, header_view, parse, syntax
 from httpolice.common import Unparseable
+from httpolice.transfer_coding import known_codings as tc
 
 
-class Message(object):
+class Message(common.ReportNode):
+
+    self_name = 'msg'
 
     def __init__(self, version, header_entries,
                  body=None, trailer_entries=None, raw=None):
+        super(Message, self).__init__()
         self.version = version
         self.header_entries = header_entries
         self.body = body
@@ -25,7 +29,8 @@ def parse_chunked(msg, state):
             chunk = syntax.chunk.parse(state)
         trailers = syntax.trailer_part.parse(state)
         syntax.crlf.parse(state)
-    except parse.ParseError:
+    except parse.ParseError, e:
+        msg.complain(1005, error=e)
         msg.body = Unparseable
         return False
     else:
@@ -35,4 +40,10 @@ def parse_chunked(msg, state):
 
 
 def decode_transfer_coding(msg, coding):
-    msg.body = Unparseable
+    if coding == tc.chunked:
+        # The outermost chunked has already been peeled off at this point.
+        msg.complain(1002)
+        msg.body = Unparseable
+    else:
+        msg.complain(1003, coding=coding)
+        msg.body = Unparseable
