@@ -34,24 +34,43 @@ def okay(x):
     return (x is not None) and (x is not Unparseable)
 
 
-class Citation(namedtuple('Citation', ('title', 'url'))):
+class Citation(object):
 
-    __slots__ = ()
+    __slots__ = ('title', 'url')
     __unicode__ = lambda self: self.title
+    __repr__ = lambda self: 'Citation(%r, %r)' % (self.title, self.url)
+
+    def __init__(self, title, url):
+        self.title = title
+        self.url = url
 
 
-def rfc(num, *section):
-    title = u'RFC %d' % num
-    url = u'http://tools.ietf.org/html/rfc%d' % num
-    if section:
-        section_text = u'.'.join(unicode(n) for n in section)
-        if section_text[0].isalpha():
-            title += u' appendix %s' % section_text
-            url += u'#appendix-%s' % section_text
+class RFC(Citation):
+
+    __slots__ = ('num', 'section', 'appendix')
+
+    def __repr__(self):
+        if self.section:
+            return 'RFC(%d, section=%r)' % (self.num, self.section)
+        elif self.appendix:
+            return 'RFC(%d, appendix=%r)' % (self.num, self.appendix)
         else:
-            title += u' § %s' % section_text
-            url += u'#section-%s' % section_text
-    return Citation(title, url)
+            return 'RFC(%d)' % self.num
+
+    def __init__(self, num, section=None, appendix=None):
+        assert not (section and appendix)
+        self.num = num
+        self.section = section
+        self.appendix = appendix
+        title = u'RFC %d' % num
+        url = u'http://tools.ietf.org/html/rfc%d' % num
+        if section or appendix:
+            section_text = u'.'.join(unicode(n) for n in section or appendix)
+            word1 = u'§' if section else u'appendix'
+            word2 = u'section' if section else u'appendix'
+            title += u' %s %s' % (word1, section_text)
+            url += u'#%s-%s' % (word2, section_text)
+        super(RFC, self).__init__(title, url)
 
 
 class ProtocolString(unicode):
@@ -100,15 +119,24 @@ class AsteriskForm(ProtocolString):
     __slots__ = ()
 
 
-class Known(object):
+class KnownDict(object):
 
-    def __init__(self, items):
-        self._by_key = dict((self._key_for(item), item) for item in items)
-        self._by_name = dict((self._name_for(item), item) for item in items)
+    def __init__(self, items, extra_info=None):
+        allowed_info = set(['_', '_citations'] + (extra_info or []))
+        self._by_key = {}
+        self._by_name = {}
+        for item in items:
+            assert set(item).issubset(allowed_info)
+            key = item['_']
+            assert key not in self._by_key
+            self._by_key[key] = item
+            name = self._name_for(item)
+            assert name not in self._by_name
+            self._by_name[name] = item
 
     def __getattr__(self, name):
         if name in self._by_name:
-            return self._key_for(self._by_name[name])
+            return self._by_name[name]['_']
         else:
             raise AttributeError(name)
 
@@ -125,9 +153,5 @@ class Known(object):
         return key in self._by_key
 
     @classmethod
-    def _key_for(cls, item):
-        return item['name']
-
-    @classmethod
     def _name_for(cls, item):
-        return item['name'].replace(u'-', u' ').replace(u' ', u'_').lower()
+        return item['_'].replace(u'-', u' ').replace(u' ', u'_').lower()
