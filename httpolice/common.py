@@ -126,6 +126,7 @@ class HeaderEntry(ReportNode):
         super(HeaderEntry, self).__init__()
         self.name = name
         self.value = value
+        self.annotated = None
 
     def __repr__(self):
         return '<HeaderEntry %s>' % self.name

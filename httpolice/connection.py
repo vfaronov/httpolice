@@ -154,6 +154,7 @@ def parse_responses(connection, stream):
             exch.responses.append(resp)
             if resp is Unparseable:
                 break
+            resp.request = exch.request
             _parse_response_body(resp, state, exch.request)
             state.dump_complaints(resp)
             resp.raw = state.cut()

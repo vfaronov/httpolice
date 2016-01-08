@@ -4,11 +4,11 @@ from cStringIO import StringIO
 import unittest
 
 from httpolice import (
+    common,
     connection,
     parse,
     report,
     syntax,
-    version,
 )
 from httpolice.common import (
     CaseInsensitive,
@@ -117,7 +117,7 @@ class TestRequest(unittest.TestCase):
 
         self.assertEquals(req1.method, u'GET')
         self.assertEquals(req1.target, u'/foo/bar/baz?qux=xyzzy')
-        self.assertEquals(req1.version, version.http11)
+        self.assertEquals(req1.version, common.http11)
         self.assertEquals(req1.header_entries[0].name, u'Host')
         self.assertEquals(req1.header_entries[0].value, 'example.com')
         self.assertEquals(req1.header_entries[1].name, u'X-Foo')
