@@ -25,10 +25,10 @@ class HeadersView(object):
 
     def enumerate(self, name=None):
         return [
-            (from_trailer, i, field)
+            (from_trailer, field)
             for from_trailer, fields in [(False, self._message.header_entries),
                                          (True, self._message.trailer_entries)]
-            for i, field in enumerate(fields or [])
+            for field in fields or []
             if (name is None) or (name == field.name)
         ]
 
@@ -38,19 +38,19 @@ class HeaderView(object):
     def __init__(self, message, name):
         self.message = message
         self.name = name
-        self._positions = self._value = None
+        self._entries = self._value = None
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, self.name)
 
     def _pre_parse(self):
-        positions = []
+        entries = []
         values = []
         items = self.message.headers.enumerate(self.name)
-        for from_trailer, i, entry in items:
+        for from_trailer, entry in items:
             if from_trailer and header.is_bad_for_trailer(self.name):
                 continue
-            positions.append((from_trailer, i))
+            entries.append(entry)
             parser = \
                 (header.parser_for(self.name) or parse.anything) + parse.eof
             state = parse.State(entry.value, annotate_classes=known.classes)
@@ -63,28 +63,28 @@ class HeaderView(object):
                 entry.annotated = state.collect_annotations()
                 state.dump_complaints(entry)
             values.append(parsed)
-        return positions, values
+        return entries, values
 
     def _parse(self):
         raise NotImplementedError()
 
     @property
-    def positions(self):
-        if self._positions is None:
+    def entries(self):
+        if self._entries is None:
             self._parse()
-        return self._positions
+        return self._entries
 
     @property
     def value(self):
-        if self._positions is None:
+        if self._entries is None:
             self._parse()
         return self._value
 
     @property
     def is_present(self):
-        if self._positions is None:
+        if self._entries is None:
             self._parse()
-        return len(self._positions) > 0
+        return len(self._entries) > 0
 
     def __nonzero__(self):
         return bool(self.value)
@@ -93,13 +93,13 @@ class HeaderView(object):
 class SingleHeaderView(HeaderView):
 
     def _parse(self):
-        positions, values = self._pre_parse()
-        if positions:
+        entries, values = self._pre_parse()
+        if entries:
             self._value = values[-1]
-            self._positions = [positions[-1]]
+            self._entries = [entries[-1]]
         else:
             self._value = None
-            self._positions = []
+            self._entries = []
 
 
 class MultiHeaderView(HeaderView):
@@ -114,9 +114,9 @@ class MultiHeaderView(HeaderView):
         return self.value[i]
 
     def _parse(self):
-        positions, values = self._pre_parse()
+        entries, values = self._pre_parse()
         self._value = [value            # Concatenate all that have been parsed
                        for sub_values in values
                        if sub_values is not Unparseable
                        for value in sub_values]
-        self._positions = positions
+        self._entries = entries

@@ -12,3 +12,14 @@ classes = {
     common.StatusCode: st,
     common.TransferCoding: tc,
 }
+
+
+def is_known(obj):
+    return any(isinstance(obj, cls) for cls in classes)
+
+
+def citation(obj):
+    for cls, known in classes.items():
+        if isinstance(obj, cls):
+            cites = known.get_info(obj).get('_citations')
+            return cites[0] if cites else None

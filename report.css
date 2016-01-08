@@ -1,0 +1,89 @@
+body {
+    color: #111111;
+    padding: 3em;
+    font-family: sans-serif;
+}
+
+h1, h2 {
+    margin-top: 0;
+}
+
+a:link, a:active, a:visited, a:hover {
+    color: #000000;
+}
+
+cite {
+    font-style: normal;
+}
+
+q {
+    font-style: italic;
+}
+
+.highlight {
+    background-color: #FFF0BF;
+}
+
+.Exchange, .Request, .Response {
+    clear: right;
+}
+
+.Request, .Response {
+    margin-bottom: 2em;
+}
+
+.request-line, .status-line, .HeaderEntry {
+    font-family: monospace;
+    padding: 0.2em 0;
+}
+
+.request-line, .status-line {
+    font-weight: bold;
+}
+
+.hint {
+    margin: 1em 0;
+    color: #444444;
+}
+
+.review {
+    float: left;
+    width: 57%;
+    padding-right: 1em;
+}
+
+.notices {
+    float: right;
+    width: 40%;
+    border-left: solid 1px #DDDDDD;
+    padding-left: 1em;
+}
+
+.notice:first-child .notice-heading {
+    margin-top: 0;
+}
+
+.notice:last-child .notice-heading, .notice:last-child p:last-child {
+    margin-bottom: 0;
+}
+
+.notice-info {
+    color: #BBBBBB;
+}
+
+.notice-error .notice-severity {
+    color: #FF0000;
+}
+
+.toggle-notice {
+    display: inline-block;
+    float: right;
+    margin-left: 1em;
+    cursor: pointer;
+    color: #BBBBBB;
+    border-bottom: dotted 1px;
+}
+
+br.clear {
+    clear: both;
+}

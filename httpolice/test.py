@@ -96,6 +96,7 @@ class TestRequest(unittest.TestCase):
     def parse(stream):
         conn = connection.parse_inbound_stream(stream)
         report.TextReport(StringIO()).render_connection(conn)
+        report.HTMLReport(StringIO()).render_connection(conn)
         return [exch.request for exch in conn.exchanges]
 
     def test_parse_requests(self):
@@ -249,6 +250,7 @@ class TestResponse(unittest.TestCase):
     def parse(inbound, outbound):
         conn = connection.parse_two_streams(inbound, outbound)
         report.TextReport(StringIO()).render_connection(conn)
+        report.HTMLReport(StringIO()).render_connection(conn)
         return [exch.responses for exch in conn.exchanges]
 
     def test_parse_responses(self):
@@ -299,6 +301,7 @@ class TestResponse(unittest.TestCase):
                   '\r\n')
         conn = connection.parse_outbound_stream(stream)
         report.TextReport(StringIO()).render_connection(conn)
+        report.HTMLReport(StringIO()).render_connection(conn)
         [exch1, exch2] = conn.exchanges
         self.assert_(exch1.request is None)
         self.assertEquals(exch1.responses[0].status, 200)
