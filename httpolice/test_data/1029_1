@@ -1,20 +1,15 @@
-1027
+1029
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
 Host: example.com
 User-Agent: demo
-TE: gzip
-Connection: TE
+TE: trailers
 
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
-Transfer-Encoding: gzip, chunked
+Content-Length: 14
 
-e
 Hello world!
-
-0
-

@@ -31,3 +31,6 @@ def check_request(req):
 
     if tc.chunked in req.headers.te:
         req.complain(1028)
+
+    if req.headers.te and u'TE' not in req.headers.connection:
+        req.complain(1029)

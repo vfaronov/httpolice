@@ -171,6 +171,11 @@ class TransferCoding(CaseInsensitive):
     __slots__ = ()
 
 
+class ConnectionOption(CaseInsensitive):
+
+    __slots__ = ()
+
+
 class OriginForm(ProtocolString):
 
     __slots__ = ()

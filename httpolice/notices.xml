@@ -211,4 +211,15 @@
     </rfc>
   </error>
 
+  <error id="1029">
+    <title><ref to="msg.headers.te"/> without “<ref to="msg.headers.connection"/>: TE”</title>
+    <rfc num="7230" sect="4.3">
+      Since the <h>TE</h> header field only applies to the immediate connection, a
+   sender of TE MUST also send a "TE" connection option within the
+   <h>Connection</h> header field (Section 6.1) in order to prevent the TE
+   field from being forwarded by intermediaries that do not support its
+   semantics.
+    </rfc>
+  </error>
+
 </notices>

@@ -4,6 +4,7 @@ import re
 
 from httpolice.common import (
     AsteriskForm,
+    ConnectionOption,
     FieldName,
     HeaderEntry,
     HTTPVersion,
@@ -214,6 +215,8 @@ def _parse_chunk(state):
 
 chunk = function(_parse_chunk)
 trailer_part = many(header_field + ~crlf)
+
+connection_option = wrap(ConnectionOption, token)
 
 
 # RFC 7231
