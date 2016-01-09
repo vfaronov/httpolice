@@ -44,6 +44,16 @@ class Citation(object):
         self.title = title
         self.url = url
 
+    def __eq__(self, other):
+        return isinstance(other, Citation) and \
+            self.title == other.title and self.url == other.url
+
+    def __ne__(self, other):
+        return self != other
+
+    def __hash__(self):
+        return hash((self.title, self.url))
+
 
 class RFC(Citation):
 
