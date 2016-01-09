@@ -116,4 +116,13 @@
     </rfc>
   </error>
 
+  <error id="1019">
+    <title><ref to="msg.headers.transfer_encoding"/> header in a <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request</title>
+    <rfc num="7230" sect="3.3.1">
+      A server MUST NOT send a <h>Transfer-Encoding</h> header field in
+   any 2xx (Successful) response to a <m>CONNECT</m> request (Section 4.3.6 of
+   [RFC7231]).
+    </rfc>
+  </error>
+
 </notices>

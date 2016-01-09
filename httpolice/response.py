@@ -2,7 +2,7 @@
 
 from httpolice import message
 from httpolice.common import okay
-from httpolice.known import st
+from httpolice.known import m, st
 
 
 class Response(message.Message):
@@ -42,7 +42,9 @@ def check_response_itself(resp):
 
 
 def check_response_in_context(resp, req):
-    pass
+    if resp.headers.transfer_encoding and req.method == m.CONNECT and \
+            resp.status.successful:
+        resp.complain(1019)
 
 
 def check_responses_flow(resps):

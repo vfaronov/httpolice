@@ -1,0 +1,14 @@
+1019 1012
+
+======== BEGIN INBOUND STREAM ========
+CONNECT / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Transfer-Encoding: foo
+
+wfrq3g35t3t;lj45ltj l45jt
+3rkl34klnlken
