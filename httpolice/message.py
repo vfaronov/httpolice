@@ -25,6 +25,9 @@ def check_message(msg):
     for entry in msg.header_entries + (msg.trailer_entries or []):
         _ = msg.headers[entry.name].value
 
+    if msg.headers.transfer_encoding and msg.headers.content_length.is_present:
+        msg.complain(1020)
+
 
 def parse_chunked(msg, state):
     data = []

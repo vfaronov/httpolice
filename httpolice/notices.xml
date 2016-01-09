@@ -125,4 +125,12 @@
     </rfc>
   </error>
 
+  <error id="1020">
+    <title>Message with both <ref to="msg.headers.transfer_encoding"/> and <ref to="msg.headers.content_length"/></title>
+    <rfc num="7230" sect="3.3.2">
+      A sender MUST NOT send a <h>Content-Length</h> header field in any message
+   that contains a <h>Transfer-Encoding</h> header field.
+    </rfc>
+  </error>
+
 </notices>
