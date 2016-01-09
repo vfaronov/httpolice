@@ -1,8 +1,8 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import message
-from httpolice.common import http11, okay
-from httpolice.known import m, st, tc
+from httpolice.common import Unparseable, http11, okay
+from httpolice.known import h, m, st, tc
 
 
 class Response(message.Message):
@@ -54,6 +54,12 @@ def check_response_in_context(resp, req):
                 tc.chunked not in resp.headers.transfer_encoding and \
                 resp.version == http11:
             resp.complain(1025)
+
+    if req.version == http11 and (req.headers.host.is_absent or
+                                  req.headers.host.value is Unparseable or
+                                  len(req.headers.enumerate(h.host)) > 1):
+        if resp.status.successful or resp.status.redirection:
+            resp.complain(1033)
 
 
 def check_responses_flow(resps):

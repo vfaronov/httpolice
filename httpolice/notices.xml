@@ -250,4 +250,14 @@
     </rfc>
   </comment>
 
+  <error id="1033">
+    <title><ref to="msg.status"/> response to a request with a bad <ref to="msg.request.headers.host"/> header</title>
+    <rfc num="7230" sect="5.4">
+      A server MUST respond with a <st>400</st> (Bad Request) status code to any
+   <ref to="msg.request.version">HTTP/1.1</ref> request message that lacks a <h>Host</h> header field and to any
+   request message that contains more than one Host header field or a
+   Host header field with an invalid field-value.
+    </rfc>
+  </error>
+
 </notices>
