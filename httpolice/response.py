@@ -1,8 +1,8 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import message
-from httpolice.common import okay
-from httpolice.known import m, st
+from httpolice.common import http11, okay
+from httpolice.known import m, st, tc
 
 
 class Response(message.Message):
@@ -49,6 +49,11 @@ def check_response_in_context(resp, req):
             resp.complain(1019)
         if resp.headers.content_length.is_present:
             resp.complain(1024)
+    elif not resp.status.informational and resp.status != st.no_content:
+        if resp.headers.content_length.is_absent and \
+                tc.chunked not in resp.headers.transfer_encoding and \
+                resp.version == http11:
+            resp.complain(1025)
 
 
 def check_responses_flow(resps):

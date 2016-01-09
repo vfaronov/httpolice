@@ -132,6 +132,14 @@ class MultiHeaderView(HeaderView):
     def __getitem__(self, i):
         return self.value[i]
 
+    def __contains__(self, other):
+        # Since multi-headers often contain `Parametrized` values,
+        # it's useful to be able to check membership by the item itself,
+        # ignoring its parameters.
+        # This is handled by :meth:`Parametrized.__eq__`,
+        # but it's only invoked when the `Parametrized` is on the left side.
+        return any(val == other for val in self.value)
+
     def _parse(self):
         entries, values = self._pre_parse()
         self._value = [value            # Concatenate all that have been parsed

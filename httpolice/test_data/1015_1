@@ -9,6 +9,10 @@ User-Agent: demo
 HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
-Transfer-Encoding: foo; bar = baz
+Transfer-Encoding: foo; bar = baz, chunked
 
+e
 Hello world!
+
+0
+

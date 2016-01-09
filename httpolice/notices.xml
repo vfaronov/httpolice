@@ -172,4 +172,16 @@
     </rfc>
   </error>
 
+  <comment id="1025">
+    <title>Response delimited only by closing the connection</title>
+    <explain>This response includes no <h>Content-Length</h> header and no “<h>Transfer-Encoding</h>: <tc>chunked</tc>” that would delimit its body. Therefore, the body is assumed to consist of everything the server sends until closing the connection.</explain>
+    <rfc num="7230" sect="3.3.3">
+      Since there is no way to distinguish a successfully completed,
+   close-delimited message from a partially received message interrupted
+   by network failure, a server SHOULD generate encoding or
+   length-delimited messages whenever possible.  The close-delimiting
+   feature exists primarily for backwards compatibility with HTTP/1.0.
+    </rfc>
+  </comment>
+
 </notices>
