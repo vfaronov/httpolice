@@ -133,4 +133,15 @@
     </rfc>
   </error>
 
+  <comment id="1021">
+    <title><ref to="msg.method"/> request with no <ref to="msg.headers.content_length"/></title>
+    <rfc num="7230" sect="3.3.2">
+      A user agent SHOULD send a <h>Content-Length</h> in a request message when
+   no <h>Transfer-Encoding</h> is sent and the request method defines a meaning
+   for an enclosed payload body.  For example, a Content-Length header
+   field is normally sent in a <m>POST</m> request even when the value is 0
+   (indicating an empty payload body).
+    </rfc>
+  </comment>
+
 </notices>

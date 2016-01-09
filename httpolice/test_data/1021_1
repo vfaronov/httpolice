@@ -1,0 +1,13 @@
+1021
+
+======== BEGIN INBOUND STREAM ========
+POST / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+
+Hello world!

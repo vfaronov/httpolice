@@ -89,6 +89,10 @@ class HeaderView(object):
             self._parse()
         return len(self._entries) > 0
 
+    @property
+    def is_absent(self):
+        return not self.is_present
+
     def __nonzero__(self):
         return bool(self.value)
 

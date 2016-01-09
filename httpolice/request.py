@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import message
+from httpolice.known import method
 
 
 class Request(message.Message):
@@ -18,3 +19,8 @@ class Request(message.Message):
 
 def check_request(req):
     message.check_message(req)
+
+    if (method.defines_body(req.method) and
+            req.headers.content_length.is_absent and
+            req.headers.transfer_encoding.is_absent):
+        req.complain(1021)

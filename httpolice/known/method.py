@@ -4,6 +4,10 @@ from httpolice.common import Method, RFC
 from httpolice.known.base import KnownDict
 
 
+def defines_body(name):
+    return known.get_info(name).get('defines_body')
+
+
 class KnownMethods(KnownDict):
 
     @classmethod
@@ -102,10 +106,12 @@ known = KnownMethods([
   'safe': False},
  {'_': Method(u'PATCH'),
   '_citations': [RFC(5789, section=(2,))],
+  'defines_body': True,
   'idempotent': False,
   'safe': False},
  {'_': Method(u'POST'),
   '_citations': [RFC(7231, section=(4, 3, 3))],
+  'defines_body': True,
   'idempotent': False,
   'safe': False},
  {'_': Method(u'PRI'),
@@ -114,6 +120,7 @@ known = KnownMethods([
   'safe': True},
  {'_': Method(u'PROPFIND'),
   '_citations': [RFC(4918, section=(9, 1))],
+  'defines_body': True,
   'idempotent': True,
   'safe': True},
  {'_': Method(u'PROPPATCH'),
@@ -122,6 +129,7 @@ known = KnownMethods([
   'safe': False},
  {'_': Method(u'PUT'),
   '_citations': [RFC(7231, section=(4, 3, 4))],
+  'defines_body': True,
   'idempotent': True,
   'safe': False},
  {'_': Method(u'REBIND'),
@@ -169,5 +177,5 @@ known = KnownMethods([
   'idempotent': True,
   'safe': False}
  ],
- extra_info=['idempotent', 'safe']
+ extra_info=['defines_body', 'idempotent', 'safe']
 )
