@@ -21,6 +21,9 @@ class Message(common.ReportNode):
         self.body = body
         self.trailer_entries = trailer_entries
         self.raw = raw
+        self.rebuild_headers()
+
+    def rebuild_headers(self):
         self.headers = header_view.HeadersView(self)
 
 
@@ -44,7 +47,7 @@ def parse_chunked(msg, state):
         while chunk:
             data.append(chunk)
             chunk = syntax.chunk.parse(state)
-        trailers = syntax.trailer_part.parse(state)
+        trailer = syntax.trailer_part.parse(state)
         syntax.crlf.parse(state)
     except parse.ParseError, e:
         msg.complain(1005, error=e)
@@ -52,7 +55,9 @@ def parse_chunked(msg, state):
         state.sane = False
     else:
         msg.body = ''.join(data)
-        msg.trailer_entries = trailers
+        msg.trailer_entries = trailer
+        if trailer:
+            msg.rebuild_headers()           # Rebuid the `HeadersView` cache
 
 
 def decode_transfer_coding(msg, coding):
