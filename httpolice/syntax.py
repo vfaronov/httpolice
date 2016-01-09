@@ -98,7 +98,12 @@ def _parse_rws(state):
     return r
 rws = function(_parse_rws)
 
-bws = subst('', ows)
+def _parse_bws(state):
+    r = ows.parse(state)
+    if r:
+        state.complain(1015)
+    return ''
+bws = function(_parse_bws)
 
 comma_list = lambda inner: maybe(empty=[], inner=argwrap(
     lambda x, xs: [elem for elem in [x] + xs if elem is not None],
