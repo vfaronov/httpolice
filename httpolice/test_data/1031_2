@@ -1,0 +1,13 @@
+# Since the request is HTTP/1.0, we don't require Host.
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.0
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!

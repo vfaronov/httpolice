@@ -233,4 +233,12 @@
     </rfc>
   </comment>
 
+  <error id="1031">
+    <title>Request without a <h>Host</h> header</title>
+    <rfc num="7230" sect="5.4">
+      A client MUST send a <h>Host</h> header field in all <ref to="msg.version">HTTP/1.1</ref> request
+   messages.
+    </rfc>
+  </error>
+
 </notices>

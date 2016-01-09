@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import message
+from httpolice.common import http11
 from httpolice.known import method, tc
 
 
@@ -34,3 +35,6 @@ def check_request(req):
 
     if req.headers.te and u'TE' not in req.headers.connection:
         req.complain(1029)
+
+    if req.version == http11 and req.headers.host.is_absent:
+        req.complain(1031)
