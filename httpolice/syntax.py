@@ -140,7 +140,13 @@ field_name = wrap(FieldName, token)   // rfc(7230, u'field-name')
 field_vchar = char_class(VCHAR) | obs_text
 field_content = wrap(str.rstrip,        # see errata to RFC 7230
                      join(field_vchar + string(sp_htab | field_vchar)))
-obs_fold = subst(' ', ows + crlf + many1(sp_htab))
+
+def _parse_obs_fold(state):
+    (ows + crlf + many1(sp_htab)).parse(state)
+    state.complain(1016)
+    return ' '
+obs_fold = function(_parse_obs_fold)
+
 field_value = string(field_content | obs_fold)
 header_field = argwrap(HeaderEntry,
                        field_name + ~(':' + ows) + field_value + ~ows)

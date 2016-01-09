@@ -96,4 +96,9 @@
     <explain>The specification for <ref to="place"/> includes the rule named BWS, which is whitespace allowed for historical reasons; current implementations must omit it. See <rfc num="7230" sect="3.2.3"/>.</explain>
   </warning>
 
+  <warning id="1016">
+    <title>Obsolete line folding in header fields</title>
+    <explain>This message uses line folding (the ‘obs-fold’ rule) to split one header field over several physical lines, but this is deprecated and prohibited in most contexts. See <rfc num="7230" sect="3.2.4"/>.</explain>
+  </warning>
+
 </notices>
