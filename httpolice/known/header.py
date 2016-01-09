@@ -10,6 +10,9 @@ MULTI = 2
 SET_COOKIE = 3
 
 
+def is_bad_for_connection(name):
+    return known.get_info(name).get('bad_for_connection')
+
 def is_bad_for_trailer(name):
     return known.get_info(name).get('bad_for_trailer')
 
@@ -69,6 +72,7 @@ known = KnownDict([
  {'_': FieldName(u'C-PEP-Info'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Cache-Control'),
   '_citations': [RFC(7234, section=(5, 2))],
+  'bad_for_connection': True,
   'bad_for_trailer': True,
   'iana_status': 'standard'},
  {'_': FieldName(u'CalDAV-Timezones'),
@@ -458,5 +462,6 @@ known = KnownDict([
   '_citations': [Citation('W3C Mobile Web Best Practices Working Group',
                           'http://www.w3.org/2005/MWI/BPWG/')]}
  ],
- extra_info=['bad_for_trailer', 'iana_status', 'parser', 'rule']
+ extra_info=['bad_for_connection', 'bad_for_trailer', 'iana_status',
+             'parser', 'rule']
 )

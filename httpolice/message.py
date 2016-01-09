@@ -5,8 +5,8 @@ import gzip
 import zlib
 
 from httpolice import common, header_view, parse, syntax
-from httpolice.common import Unparseable
-from httpolice.known import tc
+from httpolice.common import Unparseable, okay
+from httpolice.known import header, tc
 
 
 class Message(common.ReportNode):
@@ -38,6 +38,10 @@ def check_message(msg):
 
     if msg.headers.transfer_encoding and msg.headers.content_length.is_present:
         msg.complain(1020)
+
+    for opt in msg.headers.connection:
+        if okay(opt) and header.is_bad_for_connection(common.FieldName(opt)):
+            msg.complain(1034, header=msg.headers[common.FieldName(opt)])
 
 
 def parse_chunked(msg, state):

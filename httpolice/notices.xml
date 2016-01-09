@@ -260,4 +260,14 @@
     </rfc>
   </error>
 
+  <error id="1034">
+    <title><ref to="header"/> listed in the <ref to="msg.headers.connection"/> header</title>
+    <rfc num="7230" sect="5.4">
+      A sender MUST NOT send a connection option corresponding to a header
+   field that is intended for all recipients of the payload.  For
+   example, <h>Cache-Control</h> is never appropriate as a connection option
+   (Section 5.2 of [RFC7234]).
+    </rfc>
+  </error>
+
 </notices>
