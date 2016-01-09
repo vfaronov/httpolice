@@ -1,0 +1,13 @@
+1017
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo (text with \"unneeded\" escaping)
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+
+Hello world!

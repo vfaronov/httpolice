@@ -101,4 +101,10 @@
     <explain>This message uses line folding (the ‘obs-fold’ rule) to split one header field over several physical lines, but this is deprecated and prohibited in most contexts. See <rfc num="7230" sect="3.2.4"/>.</explain>
   </warning>
 
+  <comment id="1017">
+    <title>Superfluous escaping in <ref to="place"/></title>
+    <explain>This message uses the ‘quoted-pair’ rule to escape the character <ref to="char"/> in a context where this escaping is unnecessary and should not be used. See <rfc num="7230" sect="3.2.6"/>.</explain>
+    <explain>If a literal backslash \ was intended here, it should itself be escaped as \\.</explain>
+  </comment>
+
 </notices>

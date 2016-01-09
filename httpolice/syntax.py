@@ -74,16 +74,28 @@ obs_text = char_class(char_range(0x80, 0xFF))
 
 tchar = char_class("!#$%&'*+-.^_`|~" + DIGIT + ALPHA)
 token = decode(string1(tchar))   // rfc(7230, u'token')
-quoted_pair = (~literal('\\') + (char_class(HTAB + SP + VCHAR) | obs_text))
+
+def quoted_pair(sensible_for):
+    # In RFC 7230 ``quoted-pair`` is a single rule,
+    # but we parametrize it to report no. 1017 depending on the context.
+    def parser(state):
+        inner = (~literal('\\') + (char_class(HTAB + SP + VCHAR) | obs_text))
+        r = inner.parse(state)
+        if r not in sensible_for:
+            state.complain(1017, char=r.decode('ascii', 'replace'))
+        return r
+    return function(parser)
+
 qdtext = char_class(HTAB + SP + '\x21' +
                     char_range(0x23, 0x5B) + char_range(0x5D, 0x7E)) | obs_text
-quoted_string = (~dquote + string(qdtext | quoted_pair) + ~dquote) \
+quoted_string = (~dquote + string(qdtext | quoted_pair('"\\')) + ~dquote) \
     // rfc(7230, u'quoted-string')
 ctext = char_class(HTAB + SP + char_range(0x21, 0x27) +
                    char_range(0x2A, 0x5B) + char_range(0x5D, 0x7E)) | obs_text
 
 def _parse_comment(state):            # recursive
-    inner = decode(~literal('(') + string(ctext | quoted_pair | comment) +
+    inner = decode(~literal('(') +
+                    string(ctext | quoted_pair('()\\') | comment) +
                    ~literal(')'))   // rfc(7230, u'comment')
     return inner.parse(state)
 
