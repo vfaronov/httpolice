@@ -154,4 +154,22 @@
     </rfc>
   </comment>
 
+  <error id="1023">
+    <title><ref to="msg.headers.content_length"/> header in a <ref to="msg.status"/> response</title>
+    <rfc num="7230" sect="3.3.2">
+      A server MUST NOT send a <h>Content-Length</h> header field in any response
+   with a status code of 1xx (Informational) or <st>204</st> (No Content).
+    </rfc>
+  </error>
+
+  <error id="1024">
+    <title><ref to="msg.headers.content_length"/> header in a <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request</title>
+    <rfc num="7230" sect="3.3.2">
+      A
+   server MUST NOT send a <h>Content-Length</h> header field in any 2xx
+   (Successful) response to a <m>CONNECT</m> request (Section 4.3.6 of
+   [RFC7231]).
+    </rfc>
+  </error>
+
 </notices>

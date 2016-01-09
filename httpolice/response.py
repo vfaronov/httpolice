@@ -36,15 +36,19 @@ def check_response(resp):
 def check_response_itself(resp):
     message.check_message(resp)
 
-    if resp.headers.transfer_encoding and \
-            (resp.status.informational or resp.status == st.no_content):
-        resp.complain(1018)
+    if resp.status.informational or resp.status == st.no_content:
+        if resp.headers.transfer_encoding.is_present:
+            resp.complain(1018)
+        if resp.headers.content_length.is_present:
+            resp.complain(1023)
 
 
 def check_response_in_context(resp, req):
-    if resp.headers.transfer_encoding and req.method == m.CONNECT and \
-            resp.status.successful:
-        resp.complain(1019)
+    if req.method == m.CONNECT and resp.status.successful:
+        if resp.headers.transfer_encoding.is_present:
+            resp.complain(1019)
+        if resp.headers.content_length.is_present:
+            resp.complain(1024)
 
 
 def check_responses_flow(resps):
