@@ -72,12 +72,12 @@ def parse_requests(connection, stream):
         req = _parse_request_heading(state)
         exch = Exchange(req, None)
         exchanges.append(exch)
-        state.dump_complaints(exch)
+        state.dump_complaints(exch, u'request heading')
         if req is Unparseable:
             break
         _parse_request_body(req, state)
         req.raw = state.cut()
-        state.dump_complaints(req)
+        state.dump_complaints(req, u'request body framing')
         if not state.sane:
             req.complain(1007)
             break
@@ -165,13 +165,13 @@ def parse_responses(connection, stream):
         # RFC 7230 section 3.3.
         while state.sane:
             resp = _parse_response_heading(state)
-            state.dump_complaints(exch)
+            state.dump_complaints(exch, u'response heading')
             exch.responses.append(resp)
             if resp is Unparseable:
                 break
             resp.request = exch.request
             _parse_response_body(resp, state, exch.request)
-            state.dump_complaints(resp)
+            state.dump_complaints(resp, u'response body framing')
             resp.raw = state.cut()
             if not state.sane: 
                 break
@@ -195,7 +195,6 @@ def _parse_response_heading(state):
         return Unparseable
     else:
         resp = response.Response(version, status, entries, reason=reason)
-        state.dump_complaints(resp)
         return resp
 
 

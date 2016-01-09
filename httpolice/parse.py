@@ -41,10 +41,10 @@ class State(common.ReportNode):
         self.annotate_classes = tuple(annotate_classes or ())
         self.annotations = []
 
-    def dump_complaints(self, target, extra_context=None):
+    def dump_complaints(self, target, place=u'???'):
         for notice_ident, context in self.complaints or []:
             context.pop(self.self_name)
-            context.update(extra_context or {})
+            context['place'] = place
             target.complain(notice_ident, **context)
         self.complaints = []
 
