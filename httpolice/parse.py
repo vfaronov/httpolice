@@ -249,23 +249,32 @@ class AlternativeParser(Parser):
         self.inners = [parsify(inner) for inner in inners]
 
     def parse(self, state):
-        errors = []
+        mismatch_errors = []
+        other_errors = []
         for inner in self.inners:
             state.push()
             try:
                 r = inner.parse(state)
+            except MismatchError, e:
+                state.pop()
+                mismatch_errors.append(e)
             except ParseError, e:
                 state.pop()
-                errors.append(e)
+                other_errors.append(e)
             else:
                 state.discard()
                 return r
-        max_pos = max(e.pos for e in errors)
-        best_errors = sorted((e for e in errors if e.pos == max_pos),
-                             key=lambda e: len(e.found), reverse=True)
-        raise MismatchError(max_pos,
-                            u' or '.join(e.expected for e in best_errors),
-                            best_errors[0].found)
+
+        if mismatch_errors:
+            max_pos = max(e.pos for e in mismatch_errors)
+            best_errors = sorted(
+                (e for e in mismatch_errors if e.pos == max_pos),
+                key=lambda e: len(e.found), reverse=True)
+            raise MismatchError(max_pos,
+                                u' or '.join(e.expected for e in best_errors),
+                                best_errors[0].found)
+        else:
+            raise other_errors[-1]
 
     def __or__(self, other):
         return AlternativeParser(self.inners + [other])

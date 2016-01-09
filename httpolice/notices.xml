@@ -202,4 +202,13 @@
     <explain>Error: <ref to="error"/></explain>
   </error>
 
+  <error id="1028">
+    <title><ref to="msg.headers.te"/>: <tc>chunked</tc></title>
+    <rfc num="7230" sect="4.3">
+      A client MUST NOT send
+   the <tc>chunked</tc> transfer coding name in <h>TE</h>; chunked is always acceptable
+   for HTTP/1.1 recipients.
+    </rfc>
+  </error>
+
 </notices>

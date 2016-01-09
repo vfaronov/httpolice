@@ -1,7 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import message
-from httpolice.known import method
+from httpolice.known import method, tc
 
 
 class Request(message.Message):
@@ -28,3 +28,6 @@ def check_request(req):
     if (method.defines_body(req.method) == False) and (not req.body) and \
             req.headers.content_length.is_present:
         req.complain(1022)
+
+    if tc.chunked in req.headers.te:
+        req.complain(1028)

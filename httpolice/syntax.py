@@ -1,5 +1,7 @@
 # -*- coding: utf-8; -*-
 
+import re
+
 from httpolice.common import (
     AsteriskForm,
     FieldName,
@@ -12,9 +14,11 @@ from httpolice.common import (
     TransferCoding,
 )
 from httpolice.parse import (
+    ParseError,
     argwrap,
     char_class,
     char_range,
+    ci,
     decode,
     decode_into,
     function,
@@ -174,6 +178,21 @@ transfer_extension = argwrap(
 # We don't special-case gzip/deflate/etc. here, as the ABNF doesn't preclude
 # parsing "gzip" as <transfer-extension> with an empty list of parameters.
 transfer_coding = transfer_extension
+
+def _check_rank(coding):
+    # The <t-ranking> is parsed as part of the <transfer-extension>,
+    # so we need to check it manually.
+    if coding.param:
+        name, value = coding.param.pop()
+        if name.lower() == u'q':
+            if not re.match(ur'0(\.[0-9]{0,3})?', value) and \
+                    not re.match(ur'1(\.0{0,3})?', value):
+                raise ParseError(u'bad <rank> (RFC 7230): %r' % value)
+            value = float(value)
+        coding.param.append((name, value))
+    return coding
+
+t_codings = (ci('trailers') | wrap(_check_rank, transfer_coding))
 
 chunk_size = hex_integer   // rfc(7230, u'chunk-size')
 chunk_ext_name = token   // rfc(7230, u'chunk-ext-name')

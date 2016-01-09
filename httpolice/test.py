@@ -91,6 +91,13 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'foo;???')
         self.assertNoParse(p, 'foo;"bar"="baz"')
 
+        p = syntax.t_codings + parse.eof
+        self.assertParse(p, 'gzip;q=0.345', Parametrized(tc.gzip,
+                                                         [(u'q', 0.345)]))
+        self.assertParse(p, 'gzip; Q=1.0', Parametrized(tc.gzip, [(u'Q', 1)]))
+        self.assertParse(p, 'trailers', u'trailers')
+        self.assertNoParse(p, 'gzip;q=2.0')
+
 
 class TestRequest(unittest.TestCase):
 
