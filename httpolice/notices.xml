@@ -241,4 +241,13 @@
     </rfc>
   </error>
 
+  <comment id="1032">
+    <title><ref to="msg.headers.host"/> is not the first request header</title>
+    <rfc num="7230" sect="5.4">
+      Since the <h>Host</h> field-value is critical information for handling a
+   request, a user agent SHOULD generate Host as the first header field
+   following the request-line.
+    </rfc>
+  </comment>
+
 </notices>

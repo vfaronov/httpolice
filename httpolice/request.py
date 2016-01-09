@@ -2,7 +2,7 @@
 
 from httpolice import message
 from httpolice.common import http11
-from httpolice.known import method, tc
+from httpolice.known import h, method, tc
 
 
 class Request(message.Message):
@@ -36,5 +36,8 @@ def check_request(req):
     if req.headers.te and u'TE' not in req.headers.connection:
         req.complain(1029)
 
-    if req.version == http11 and req.headers.host.is_absent:
-        req.complain(1031)
+    if req.version == http11:
+        if req.headers.host.is_absent:
+            req.complain(1031)
+        elif req.header_entries[0].name != h.host:
+            req.complain(1032)
