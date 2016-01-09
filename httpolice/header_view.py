@@ -64,7 +64,7 @@ class HeaderView(object):
                 parsed = Unparseable
             else:
                 entry.annotated = state.collect_annotations()
-                state.dump_complaints(entry)
+                state.dump_complaints(entry, {'place': entry})
             values.append(parsed)
         return entries, values
 

@@ -41,9 +41,10 @@ class State(common.ReportNode):
         self.annotate_classes = tuple(annotate_classes or ())
         self.annotations = []
 
-    def dump_complaints(self, target):
+    def dump_complaints(self, target, extra_context=None):
         for notice_ident, context in self.complaints or []:
             context.pop(self.self_name)
+            context.update(extra_context or {})
             target.complain(notice_ident, **context)
         self.complaints = []
 
@@ -314,6 +315,7 @@ function = FuncParser
 nbytes = NBytesParser
 anything = nbytes(None, None)
 wrap = WrapParser
+group = lambda inner: wrap(lambda x: x, inner)
 argwrap = lambda func, inner: wrap(lambda args: func(*args), inner)
 subst = lambda s, inner: wrap(lambda _: s, inner)
 maybe = lambda inner, empty=None: inner | function(lambda _: empty)

@@ -37,6 +37,10 @@ q {
     padding: 0.2em 0;
 }
 
+.HeaderEntry {
+    white-space: pre;
+}
+
 .request-line, .status-line {
     font-weight: bold;
 }

@@ -18,6 +18,7 @@ from httpolice.parse import (
     decode,
     decode_into,
     function,
+    group,
     join,
     literal,
     many,
@@ -72,7 +73,7 @@ query = string(pchar | char_class('/?'))
 obs_text = char_class(char_range(0x80, 0xFF))
 
 tchar = char_class("!#$%&'*+-.^_`|~" + DIGIT + ALPHA)
-token = string1(tchar)   // rfc(7230, u'token')
+token = decode(string1(tchar))   // rfc(7230, u'token')
 quoted_pair = (~literal('\\') + (char_class(HTAB + SP + VCHAR) | obs_text))
 qdtext = char_class(HTAB + SP + '\x21' +
                     char_range(0x23, 0x5B) + char_range(0x5D, 0x7E)) | obs_text
@@ -89,7 +90,14 @@ def _parse_comment(state):            # recursive
 comment = function(_parse_comment)
 
 ows = string(sp_htab)
-rws = string1(sp_htab)
+
+def _parse_rws(state):
+    r = string1(sp_htab).parse(state)
+    if r != ' ':
+        state.complain(1014, num=len(r))
+    return r
+rws = function(_parse_rws)
+
 bws = subst('', ows)
 
 comma_list = lambda inner: maybe(empty=[], inner=argwrap(
@@ -100,7 +108,7 @@ comma_list1 = lambda inner: argwrap(
     ~many(',' + ows) + inner +
     many(~(ows + ',') + maybe(~ows + inner)))
 
-method = decode_into(Method, token)   // rfc(7230, u'method')
+method = wrap(Method, token)   // rfc(7230, u'method')
 
 absolute_path = string1(join('/' + segment))   // rfc(7230, u'absolute-path')
 
@@ -123,7 +131,7 @@ reason_phrase = string(char_class(HTAB + SP + VCHAR) | obs_text) \
 request_line = method + ~sp + request_target + ~sp + http_version + ~crlf
 status_line = http_version + ~sp + status_code + ~sp + reason_phrase + ~crlf
 
-field_name = decode_into(FieldName, token)   // rfc(7230, u'field-name')
+field_name = wrap(FieldName, token)   // rfc(7230, u'field-name')
 field_vchar = char_class(VCHAR) | obs_text
 field_content = wrap(str.rstrip,        # see errata to RFC 7230
                      join(field_vchar + string(sp_htab | field_vchar)))
@@ -133,11 +141,11 @@ header_field = argwrap(HeaderEntry,
                        field_name + ~(':' + ows) + field_value + ~ows)
 
 transfer_parameter = \
-    (decode(token) + ~(bws + '=' + bws) + decode(token | quoted_string)) \
+    (token + ~(bws + '=' + bws) + (token | decode(quoted_string))) \
     // rfc(7230, u'transfer-parameter')
 transfer_extension = argwrap(
     Parametrized,
-    decode_into(TransferCoding, token) +
+    wrap(TransferCoding, token) +
     many(~(ows + ';' + ows) + transfer_parameter)) \
     // rfc(7230, u'transfer-extension')
 # We don't special-case gzip/deflate/etc. here, as the ABNF doesn't preclude
@@ -145,8 +153,8 @@ transfer_extension = argwrap(
 transfer_coding = transfer_extension
 
 chunk_size = hex_integer   // rfc(7230, u'chunk-size')
-chunk_ext_name = decode(token)   // rfc(7230, u'chunk-ext-name')
-chunk_ext_val = decode(token | quoted_string)
+chunk_ext_name = token   // rfc(7230, u'chunk-ext-name')
+chunk_ext_val = token | decode(quoted_string)
 chunk_ext = \
     many(~literal(';') + chunk_ext_name +
           maybe(~literal('=') + chunk_ext_val))   // rfc(7230, u'chunk-ext')
@@ -164,3 +172,12 @@ def _parse_chunk(state):
 
 chunk = function(_parse_chunk)
 trailer_part = many(header_field + ~crlf)
+
+
+# RFC 7231
+
+product_version = token
+product = group(token + maybe(~literal('/') + product_version))
+user_agent = argwrap(
+    lambda p1, ps: [p1] + ps,
+    product + many(~rws + many(product | comment)))
