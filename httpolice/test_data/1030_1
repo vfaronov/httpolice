@@ -1,25 +1,21 @@
-
+1030
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
 Host: example.com
-Accept: text/html
-Accept: text/plain;q=0.5
 User-Agent: demo
 
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
-Set-Cookie: SID=31d4d96e407aad42
-Set-Cookie: region=54
 Content-Type: text/plain
-X-Some-Extension: foo
 Transfer-Encoding: chunked
-Trailer: x-some-extension
+Trailer: Server
 
 e
 Hello world!
 
 0
-X-Some-Extension: bar, baz
+Server: xnign/1.2.3
+X-Custom-Header: foo, bar
 

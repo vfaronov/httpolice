@@ -222,4 +222,15 @@
     </rfc>
   </error>
 
+  <comment id="1030">
+    <title><ref to="header"/> was not announced in the <ref to="msg.headers.trailer"/> header</title>
+    <rfc num="7230" sect="4.4">
+      When a message includes a message body encoded with the <tc>chunked</tc>
+   transfer coding and the sender desires to send metadata in the form
+   of trailer fields at the end of the message, the sender SHOULD
+   generate a <h>Trailer</h> header field before the message body to indicate
+   which fields will be present in the trailers.
+    </rfc>
+  </comment>
+
 </notices>

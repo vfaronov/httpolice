@@ -11,6 +11,7 @@ HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Transfer-Encoding: chunked
+Trailer: Content-Range
 
 b
 Hello world

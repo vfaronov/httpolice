@@ -29,6 +29,10 @@ def check_message(msg):
     for entry in msg.header_entries + (msg.trailer_entries or []):
         _ = msg.headers[entry.name].value
 
+    for entry in msg.trailer_entries or []:
+        if entry.name not in msg.headers.trailer:
+            msg.complain(1030, header=entry)
+
     if msg.headers.transfer_encoding and msg.headers.content_length.is_present:
         msg.complain(1020)
 
