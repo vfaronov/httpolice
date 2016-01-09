@@ -197,4 +197,9 @@
     </rfc>
   </error>
 
+  <error id="1027">
+    <title>Could not decode <ref to="msg.headers.transfer_encoding"/>: <ref to="coding"/></title>
+    <explain>Error: <ref to="error"/></explain>
+  </error>
+
 </notices>

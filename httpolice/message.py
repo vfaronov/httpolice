@@ -1,5 +1,9 @@
 # -*- coding: utf-8; -*-
 
+from cStringIO import StringIO
+import gzip
+import zlib
+
 from httpolice import common, header_view, parse, syntax
 from httpolice.common import Unparseable
 from httpolice.known import tc
@@ -52,6 +56,26 @@ def decode_transfer_coding(msg, coding):
         # The outermost chunked has already been peeled off at this point.
         msg.complain(1002)
         msg.body = Unparseable
+    elif coding in [tc.gzip, tc.x_gzip]:
+        try:
+            msg.body = decode_gzip(msg.body)
+        except Exception, e:
+            msg.complain(1027, coding=coding, error=e)
+            msg.body = Unparseable
+    elif coding == tc.deflate:
+        try:
+            msg.body = decode_deflate(msg.body)
+        except Exception, e:
+            msg.complain(1027, coding=coding, error=e)
+            msg.body = Unparseable
     else:
         msg.complain(1003, coding=coding)
         msg.body = Unparseable
+
+
+def decode_gzip(data):
+    return gzip.GzipFile(fileobj=StringIO(data)).read()
+
+
+def decode_deflate(data):
+    return zlib.decompress(data)
