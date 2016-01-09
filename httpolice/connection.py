@@ -171,7 +171,7 @@ def parse_responses(connection, stream):
 
 def _parse_response_heading(state):
     try:
-        (version, status) = syntax.status_line.parse(state)
+        (version, status, reason) = syntax.status_line.parse(state)
         entries = parse.many(syntax.header_field + ~syntax.crlf).parse(state)
         syntax.crlf.parse(state)
     except parse.ParseError, e:
@@ -179,7 +179,7 @@ def _parse_response_heading(state):
         state.sane = False
         return Unparseable
     else:
-        resp = response.Response(version, status, entries)
+        resp = response.Response(version, status, entries, reason=reason)
         state.dump_complaints(resp)
         return resp
 

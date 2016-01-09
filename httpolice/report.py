@@ -7,7 +7,6 @@ import dominate.tags as H
 
 from httpolice import common, header_view, known, notice
 from httpolice.common import Unparseable
-from httpolice.known import status_code
 
 
 def for_object(obj):
@@ -143,8 +142,9 @@ class TextReport(object):
                         (req.method, req.target, req.version))
 
     def render_status_line(self, resp):
-        reason = status_code.description(resp.status) or u''
-        self.write_more(u'<< %s %d %s\n' % (resp.version, resp.status, reason))
+        self.write_more(u'<< %s %d %s\n' % (
+            resp.version, resp.status,
+            resp.reason.decode('utf-8', 'replace')))
 
     def render_message(self, msg):
         for entry in msg.header_entries:
@@ -287,8 +287,8 @@ class HTMLReport(object):
                     with H.span(**for_object(resp.status)):
                         render_known(resp.status)
                         H.span(u' ')
-                        H.span(status_code.description(resp.status) or u'???',
-                               _class='reason')
+                        H.span(resp.reason.decode('utf-8', 'ignore'),
+                               **for_object(resp.reason))
                 self.render_message(resp)
             self.render_message_notices(resp)
             H.br(_class='clear')

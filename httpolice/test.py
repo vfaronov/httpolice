@@ -262,7 +262,7 @@ class TestResponse(unittest.TestCase):
                   '\r\n'
                   'HTTP/1.1 100 Continue\r\n'
                   '\r\n'
-                  'HTTP/1.1 100 Continue\r\n'
+                  "HTTP/1.1 100 Keep On Rollin' Baby\r\n"
                   '\r\n'
                   'HTTP/1.1 200 OK\r\n'
                   'Content-Length: 16\r\n'
@@ -280,7 +280,9 @@ class TestResponse(unittest.TestCase):
         self.assert_(resp1_1.body is None)
 
         self.assertEquals(resp2_1.status, 100)
+        self.assertEquals(resp2_1.reason, 'Continue')
         self.assertEquals(resp2_2.status, 100)
+        self.assertEquals(resp2_2.reason, "Keep On Rollin' Baby")
         self.assertEquals(resp2_3.status, 200)
         self.assertEquals(resp2_3.headers.content_length.value, 16)
         self.assertEquals(resp2_3.body, 'Hello world!\r\n\r\n')

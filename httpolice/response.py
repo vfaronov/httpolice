@@ -9,8 +9,9 @@ class Response(message.Message):
         return '<Response %d>' % self.status
 
     def __init__(self, version, status, header_entries,
-                 body=None, trailer_entries=None, raw=None):
+                 body=None, trailer_entries=None, reason=None, raw=None):
         super(Response, self).__init__(version, header_entries,
                                        body, trailer_entries, raw)
         self.status = status
+        self.reason = reason
         self.request = None

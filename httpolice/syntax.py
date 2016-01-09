@@ -121,7 +121,7 @@ reason_phrase = string(char_class(HTAB + SP + VCHAR) | obs_text) \
     // rfc(7230, u'reason-phrase')
 
 request_line = method + ~sp + request_target + ~sp + http_version + ~crlf
-status_line = http_version + ~sp + status_code + ~sp + ~reason_phrase + ~crlf
+status_line = http_version + ~sp + status_code + ~sp + reason_phrase + ~crlf
 
 field_name = decode_into(FieldName, token)   // rfc(7230, u'field-name')
 field_vchar = char_class(VCHAR) | obs_text
