@@ -168,7 +168,7 @@ class TestRequest(unittest.TestCase):
                   'Host: example.com\r\n')
         [req1, req2] = self.parse(stream)
         self.assertEqual(req1.method, u'GET')
-        self.assertEqual(req1.body, '')
+        self.assert_(req1.body is None)
         self.assert_(req2 is Unparseable)
 
     def test_transfer_codings(self):

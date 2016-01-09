@@ -128,7 +128,7 @@ def _parse_request_body(req, state):
                 state.sane = False
 
     else:
-        req.body = ''
+        req.body = None
 
 
 def parse_responses(connection, stream):
