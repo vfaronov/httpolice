@@ -8,7 +8,7 @@ $(document).ready(function() {
 
     function highlightReferences() {
         var ids = $(this).find('[data-ref-to]').map(function() {
-            return $(this).attr('data-ref-to');
+            return $(this).attr('data-ref-to') || '#nonexistent';
         }).get().join(', ');
         $(ids).addClass('highlight');
     }
