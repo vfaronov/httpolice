@@ -144,4 +144,14 @@
     </rfc>
   </comment>
 
+  <comment id="1022">
+    <title><ref to="msg.method"/> request with <ref to="msg.headers.content_length"/> but no body</title>
+    <rfc num="7230" sect="3.3.2">
+      A user agent SHOULD NOT send a
+   <h>Content-Length</h> header field when the request message does not contain
+   a payload body and the method semantics do not anticipate such a
+   body.
+    </rfc>
+  </comment>
+
 </notices>

@@ -24,3 +24,7 @@ def check_request(req):
             req.headers.content_length.is_absent and
             req.headers.transfer_encoding.is_absent):
         req.complain(1021)
+
+    if (method.defines_body(req.method) == False) and (not req.body) and \
+            req.headers.content_length.is_present:
+        req.complain(1022)
