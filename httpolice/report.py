@@ -19,6 +19,11 @@ def for_object(obj):
 def reference_targets(obj):
     if isinstance(obj, header_view.HeaderView):
         return [u'#' + unicode(id(entry)) for entry in obj.entries]
+    elif isinstance(obj, list):
+        # Support no. 1013, where we want to highlight all entries,
+        # not just the one which is ultimately selected by `SingleHeaderView`.
+        # Makes sense in general, so I'm inclined not to consider it a hack.
+        return [ref for item in obj for ref in reference_targets(item)]
     else:
         return [u'#' + unicode(id(obj))]
 

@@ -76,4 +76,14 @@
     <explain>A successful (<ref to="msg.status"/>) response to a <ref to="msg.request.method"/> request indicates that the connection has switched to being a tunnel. HTTPolice will not parse the remainder of the response stream.</explain>
   </internal>
 
+  <error id="1013">
+    <title><ref to="entries">Multiple</ref> <ref to="header"/> headers</title>
+    <rfc num="7230" sect="3.2.2">
+      A sender MUST NOT generate multiple header fields with the same field
+   name in a message unless either the entire field value for that
+   header field is defined as a comma-separated list [i.e., #(values)]
+   or the header field is a well-known exception (as noted below).
+    </rfc>
+  </error>
+
 </notices>

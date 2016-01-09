@@ -14,3 +14,7 @@ class Request(message.Message):
                                       body, trailer_entries, raw)
         self.method = method_
         self.target = target
+
+
+def check_request(req):
+    message.check_message(req)

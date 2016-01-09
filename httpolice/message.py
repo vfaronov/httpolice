@@ -20,6 +20,12 @@ class Message(common.ReportNode):
         self.headers = header_view.HeadersView(self)
 
 
+def check_message(msg):
+    # Force parsing every header present in the message according to its rules.
+    for entry in msg.header_entries + (msg.trailer_entries or []):
+        _ = msg.headers[entry.name].value
+
+
 def parse_chunked(msg, state):
     data = []
     try:

@@ -20,7 +20,9 @@ class Exchange(common.ReportNode):
             resp.request = self.request
 
 
-class Connection(object):
+class Connection(common.ReportNode):
+
+    self_name = 'conn'
 
     def __init__(self, exchanges=None, was_tls=None,
                  unparsed_inbound=None, unparsed_outbound=None):
@@ -29,6 +31,19 @@ class Connection(object):
         self.was_tls = was_tls
         self.unparsed_inbound = unparsed_inbound
         self.unparsed_outbound = unparsed_outbound
+
+
+def check_connection(conn):
+    for exch in conn.exchanges:
+        if okay(exch):
+            check_exchange(exch)
+
+
+def check_exchange(exch):
+    if okay(exch.request):
+        request.check_request(exch.request)
+    if exch.responses is not None:
+        response.check_responses(exch.responses)
 
 
 def parse_two_streams(inbound, outbound, was_tls=None):

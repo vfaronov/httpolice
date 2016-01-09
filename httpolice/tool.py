@@ -19,6 +19,7 @@ def main():
     with open(args.outbound) as f:
         outbound_stream = f.read()
     conn = connection.parse_two_streams(inbound_stream, outbound_stream)
+    connection.check_connection(conn)
     if args.html:
         report.HTMLReport(sys.stdout).render_connection(conn)
     else:

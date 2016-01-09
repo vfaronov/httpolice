@@ -21,7 +21,8 @@ class Notice(lxml.etree.ElementBase):
     title = property(lambda self: self.find('title').contents)
     explanation = property(lambda self: [
         [child] if child.tag == 'rfc' else child.contents
-        for child in self if child.tag != 'title'])
+        for child in self
+        if child.tag != 'title' and child.tag is not lxml.etree.Comment])
 
 
 class Text(lxml.etree.ElementBase):

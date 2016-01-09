@@ -367,6 +367,7 @@ class TestFromFiles(unittest.TestCase):
         line = lines[0]
         expected = set(int(n) for n in line.split())
         conn = connection.parse_two_streams(inb, outb)
+        connection.check_connection(conn)
         buffer = StringIO()
         report.TextReport(buffer).render_connection(conn)
         actual = set(int(ln[5:9]) for ln in buffer.getvalue().splitlines()

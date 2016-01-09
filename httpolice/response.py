@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import message
+from httpolice.common import okay
 
 
 class Response(message.Message):
@@ -15,3 +16,29 @@ class Response(message.Message):
         self.status = status
         self.reason = reason
         self.request = None
+
+
+def check_responses(resps):
+    for resp in resps:
+        if okay(resp):
+            check_response(resp)
+    if all(okay(resp) for resp in resps):
+        check_responses_flow(resps)
+
+
+def check_response(resp):
+    check_response_itself(resp)
+    if okay(resp.request):
+        check_response_in_context(resp, resp.request)
+
+
+def check_response_itself(resp):
+    message.check_message(resp)
+
+
+def check_response_in_context(resp, req):
+    pass
+
+
+def check_responses_flow(resps):
+    pass

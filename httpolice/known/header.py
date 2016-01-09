@@ -5,16 +5,19 @@ from httpolice.common import Citation, FieldName, RFC
 from httpolice.known.base import KnownDict
 
 
+SINGLE = 1
+MULTI = 2
+SET_COOKIE = 3
+
+
 def is_bad_for_trailer(name):
     return known.get_info(name).get('bad_for_trailer')
 
-def is_multi_header(name):
-    outer, _ = known.get_info(name).get('syntax', (None, None))
-    return (outer is syntax.comma_list) or (outer is syntax.comma_list1)
+def rule_for(name):
+    return known.get_info(name).get('rule')
 
 def parser_for(name):
-    outer, inner = known.get_info(name).get('syntax', (None, None))
-    return inner if outer is None else outer(inner)
+    return known.get_info(name).get('parser')
 
 
 known = KnownDict([
@@ -91,7 +94,8 @@ known = KnownDict([
   '_citations': [RFC(7230, section=(3, 3, 2))],
   'bad_for_trailer': True,
   'iana_status': 'standard',
-  'syntax': (None, syntax.integer)},
+  'parser': syntax.integer,
+  'rule': SINGLE},
  {'_': FieldName(u'Content-Location'),
   '_citations': [RFC(7231, section=(3, 1, 4, 2))],
   'iana_status': 'standard'},
@@ -181,7 +185,8 @@ known = KnownDict([
  {'_': FieldName(u'Label'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Last-Modified'),
   '_citations': [RFC(7232, section=(2, 2))],
-  'iana_status': 'standard'},
+  'iana_status': 'standard',
+  'rule': SINGLE},
  {'_': FieldName(u'Link'), '_citations': [RFC(5988)]},
  {'_': FieldName(u'Location'),
   '_citations': [RFC(7231, section=(7, 1, 2))],
@@ -256,7 +261,8 @@ known = KnownDict([
  {'_': FieldName(u'Redirect-Ref'), '_citations': [RFC(4437)]},
  {'_': FieldName(u'Referer'),
   '_citations': [RFC(7231, section=(5, 5, 2))],
-  'iana_status': 'standard'},
+  'iana_status': 'standard',
+  'rule': SINGLE},
  {'_': FieldName(u'Retry-After'),
   '_citations': [RFC(7231, section=(7, 1, 3))],
   'iana_status': 'standard'},
@@ -288,7 +294,8 @@ known = KnownDict([
   'iana_status': 'standard'},
  {'_': FieldName(u'Set-Cookie'),
   '_citations': [RFC(6265)],
-  'iana_status': 'standard'},
+  'iana_status': 'standard',
+  'rule': SET_COOKIE},
  {'_': FieldName(u'Set-Cookie2'),
   '_citations': [RFC(2965), RFC(6265)],
   'iana_status': 'obsoleted'},
@@ -317,7 +324,8 @@ known = KnownDict([
   '_citations': [RFC(7230, section=(3, 3, 1))],
   'bad_for_trailer': True,
   'iana_status': 'standard',
-  'syntax': (syntax.comma_list1, syntax.transfer_coding)},
+  'parser': syntax.comma_list1(syntax.transfer_coding),
+  'rule': MULTI},
  {'_': FieldName(u'URI'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Upgrade'),
   '_citations': [RFC(7230, section=(6, 7))],
@@ -413,5 +421,5 @@ known = KnownDict([
   '_citations': [Citation('W3C Mobile Web Best Practices Working Group',
                           'http://www.w3.org/2005/MWI/BPWG/')]}
  ],
- extra_info=['bad_for_trailer', 'iana_status', 'syntax']
+ extra_info=['bad_for_trailer', 'iana_status', 'parser', 'rule']
 )

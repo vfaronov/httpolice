@@ -16,10 +16,13 @@ class HeadersView(object):
 
     def __getitem__(self, key):
         if key not in self._cache:
-            if header.is_multi_header(key):
+            rule = header.rule_for(key)
+            if rule == header.SINGLE:
+                cls = SingleHeaderView
+            elif rule == header.MULTI:
                 cls = MultiHeaderView
             else:
-                cls = SingleHeaderView
+                cls = UnknownHeaderView
             self._cache[key] = cls(self._message, key)
         return self._cache[key]
 
@@ -90,11 +93,23 @@ class HeaderView(object):
         return bool(self.value)
 
 
+class UnknownHeaderView(HeaderView):
+
+    def _parse(self):
+        # RFC 7230 section 3.2.2 permits combining field-values with a comma
+        # even if we don't really know what the header is.
+        entries, values = self._pre_parse()
+        self._value = ','.join(values)
+        self._entries = entries
+
+
 class SingleHeaderView(HeaderView):
 
     def _parse(self):
         entries, values = self._pre_parse()
         if entries:
+            if len(entries) > 1:
+                self.message.complain(1013, header=self, entries=entries)
             self._value = values[-1]
             self._entries = [entries[-1]]
         else:
