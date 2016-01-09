@@ -184,4 +184,17 @@
     </rfc>
   </comment>
 
+  <error id="1026">
+    <title><ref to="header"/> in a trailer</title>
+    <rfc num="7230" sect="4.1.2">
+      A sender MUST NOT generate a trailer that contains a field necessary
+   for message framing (e.g., <h>Transfer-Encoding</h> and <h>Content-Length</h>),
+   routing (e.g., <h>Host</h>), request modifiers (e.g., controls and
+   conditionals in Section 5 of [RFC7231]), authentication (e.g., see
+   [RFC7235] and [RFC6265]), response control data (e.g., see Section
+   7.1 of [RFC7231]), or determining how to process the payload (e.g.,
+   <h>Content-Encoding</h>, <h>Content-Type</h>, <h>Content-Range</h>, and <h>Trailer</h>).
+    </rfc>
+  </error>
+
 </notices>

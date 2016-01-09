@@ -52,7 +52,7 @@ class HeaderView(object):
         items = self.message.headers.enumerate(self.name)
         for from_trailer, entry in items:
             if from_trailer and header.is_bad_for_trailer(self.name):
-                continue
+                entry.complain(1026)
             entries.append(entry)
             parser = \
                 (header.parser_for(self.name) or parse.anything) + parse.eof
