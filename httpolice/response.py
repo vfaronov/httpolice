@@ -2,6 +2,7 @@
 
 from httpolice import message
 from httpolice.common import okay
+from httpolice.known import st
 
 
 class Response(message.Message):
@@ -34,6 +35,10 @@ def check_response(resp):
 
 def check_response_itself(resp):
     message.check_message(resp)
+
+    if resp.headers.transfer_encoding and \
+            (resp.status.informational or resp.status == st.no_content):
+        resp.complain(1018)
 
 
 def check_response_in_context(resp, req):

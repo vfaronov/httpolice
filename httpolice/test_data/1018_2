@@ -1,0 +1,16 @@
+1018
+
+======== BEGIN INBOUND STREAM ========
+POST / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Length: 9
+Content-Type: text/plain
+
+hello
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 204 No Content
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Transfer-Encoding: chunked
+

@@ -107,4 +107,13 @@
     <explain>If a literal backslash \ was intended here, it should itself be escaped as \\.</explain>
   </comment>
 
+  <error id="1018">
+    <title><ref to="msg.headers.transfer_encoding"/> header in a <ref to="msg.status"/> response</title>
+    <rfc num="7230" sect="3.3.1">
+      A server MUST NOT send a <h>Transfer-Encoding</h> header field in any
+   response with a status code of 1xx (Informational) or 204 (No
+   Content).
+    </rfc>
+  </error>
+
 </notices>
