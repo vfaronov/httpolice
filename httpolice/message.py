@@ -116,6 +116,13 @@ def check_media(msg, type_, data):
                 break
 
 
+def body_charset(msg):
+    if msg.headers.content_type.is_okay:
+        for name, value in msg.headers.content_type.value.param:
+            if name == u'charset':
+                return value
+
+
 def parse_chunked(msg, state):
     data = []
     try:

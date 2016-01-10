@@ -1,12 +1,36 @@
 # -*- coding: utf-8; -*-
 
+import codecs
 import re
+import string
 
 import dominate
 import dominate.tags as H
 
-from httpolice import common, header_view, known, notice
-from httpolice.common import Unparseable
+from httpolice import common, header_view, known, message, notice
+from httpolice.common import Unparseable, okay
+
+
+def nicely_join(strings):
+    """
+    >>> nicely_join([u'foo'])
+    u'foo'
+    >>> nicely_join([u'foo', u'bar baz'])
+    u'foo and bar baz'
+    >>> nicely_join([u'foo', u'bar baz', u'qux'])
+    u'foo, bar baz, and qux'
+    """
+    joined = u''
+    for i, s in enumerate(strings):
+        if i == len(strings) - 1:
+            if len(strings) > 2:
+                joined += u'and '
+            elif len(strings) > 1:
+                joined += u' and '
+        joined += s
+        if len(strings) > 2 and i < len(strings) - 1:
+            joined += u', '
+    return joined
 
 
 def for_object(obj):
@@ -114,6 +138,48 @@ def render_known(obj):
                 H.attr(title=cite.title)
     else:
         H.span(unicode(obj), _class=cls)
+
+
+def displayable_body(msg):
+    r = msg.body
+    transforms = []
+    if not okay(r):
+        return r, transforms
+    if msg.headers.transfer_encoding:
+        transforms.append(u'removing Transfer-Encoding')
+
+    if okay(msg.decoded_body):
+        r = msg.decoded_body
+        if msg.headers.content_encoding:
+            transforms.append(u'removing Content-Encoding')
+        charset = message.body_charset(msg) or 'UTF-8'
+        try:
+            codec = codecs.lookup(charset)
+        except LookupError:
+            codec = codecs.lookup('utf-8')
+        r = r.decode(codec.name, 'replace')
+        if codec.name != 'utf-8':
+            transforms.append(u'decoding from %s' % charset)
+    else:
+        r = r.decode('utf-8', 'replace')
+
+    # See also http://stackoverflow.com/a/25829509/200445
+    nonprintable = set([chr(i) for i in range(128)]) - set(string.printable)
+    r1 = r.translate({ord(c): None for c in nonprintable})
+    if len(r1) != len(r):
+        # This tells us there actually were some unprintable characters.
+        transforms.append(u'replacing non-printable characters '
+                          u'with the \ufffd sign')
+        # But in the end we want to replace them
+        # with the Unicode replacement character.
+        r = r.translate({ord(c): u'\ufffd' for c in nonprintable})
+
+    limit = 5000
+    if len(r) > limit:
+        r = r[:limit]
+        transforms.append(u'taking the first %d characters' % limit)
+
+    return r, transforms
 
 
 class TextReport(object):
@@ -240,15 +306,21 @@ class HTMLReport(object):
     def render_message(self, msg):
         self.render_header_entries(msg.header_entries)
 
-        if msg.body is Unparseable:
-            H.p(u'payload body is unparseable', _class='hint')
-        elif msg.body:
-            H.p(u'%d bytes of payload body not shown' % len(msg.body),
-                _class='hint')
+        body, transforms = displayable_body(msg)
+        if body is Unparseable:
+            with H.div(_class='review-block'):
+                H.p(u'Payload body is unavailable.', _class='hint')
+        elif body:
+            with H.div(_class='review-block'):
+                if transforms:
+                    H.p(u'Payload body after %s:' % nicely_join(transforms),
+                        _class='hint')
+                H.div(body, _class='payload-body')
 
         if msg.trailer_entries:
-            H.p(u'header fields from the chunked trailer:', _class='hint')
-            self.render_header_entries(msg.trailer_entries)
+            with H.div(_class='review-block'):
+                H.p(u'Header fields from the chunked trailer:', _class='hint')
+                self.render_header_entries(msg.trailer_entries)
 
     def render_message_notices(self, msg):
         for entry in msg.header_entries:

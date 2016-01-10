@@ -48,9 +48,23 @@ q {
     font-weight: bold;
 }
 
+.review-block {
+    margin-top: 2em;
+}
+
 .hint {
-    margin: 1em 0;
+    margin: 0 0 1em 0;
     color: #444444;
+    display: inline-block;
+    padding: 0.3em;
+    border: dashed 1px #444444;
+}
+
+.payload-body {
+    font-family: monospace;
+    white-space: pre-wrap;
+    max-height: 20em;
+    overflow: auto;
 }
 
 .review {
