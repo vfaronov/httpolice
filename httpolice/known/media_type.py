@@ -7,6 +7,9 @@ from httpolice.known.base import KnownDict
 def deprecated(name):
     return known.get_info(name).get('deprecated')
 
+def is_json(name):
+    return known.get_info(name).get('is_json') or name.endswith(u'+json')
+
 
 known = KnownDict([
  {'_': MediaType(u'application/1d-interleaved-parityfec'),
@@ -108,7 +111,9 @@ known = KnownDict([
  {'_': MediaType(u'application/jose'), '_citations': [RFC(7515)]},
  {'_': MediaType(u'application/jose+json'), '_citations': [RFC(7515)]},
  {'_': MediaType(u'application/jrd+json'), '_citations': [RFC(7033)]},
- {'_': MediaType(u'application/json'), '_citations': [RFC(7158)]},
+ {'_': MediaType(u'application/json'),
+  '_citations': [RFC(7158)],
+  'is_json': True},
  {'_': MediaType(u'application/json-patch+json'), '_citations': [RFC(6902)]},
  {'_': MediaType(u'application/json-seq'), '_citations': [RFC(7464)]},
  {'_': MediaType(u'application/jwk+json'), '_citations': [RFC(7517)]},
@@ -570,4 +575,4 @@ known = KnownDict([
  {'_': MediaType(u'video/smpte292m'), '_citations': [RFC(3497)]},
  {'_': MediaType(u'video/ulpfec'), '_citations': [RFC(5109)]},
  {'_': MediaType(u'video/vc1'), '_citations': [RFC(4425)]}
-], extra_info=['deprecated'])
+], extra_info=['deprecated', 'is_json'])

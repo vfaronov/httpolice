@@ -2,6 +2,7 @@
 
 from cStringIO import StringIO
 import gzip
+import json
 import zlib
 
 from httpolice import common, header_view, parse, syntax
@@ -63,8 +64,9 @@ def check_message(msg):
     for entry in msg.header_entries + (msg.trailer_entries or []):
         _ = msg.headers[entry.name].value
 
-    # Force decoding the message body.
-    _ = msg.decoded_body
+    data = msg.decoded_body
+    if okay(data) and msg.headers.content_type.is_okay:
+        check_media(msg, msg.headers.content_type.value.item, data)
 
     for entry in msg.trailer_entries or []:
         if entry.name not in msg.headers.trailer:
@@ -80,6 +82,14 @@ def check_message(msg):
     if msg.headers.content_type.is_okay and \
             media_type.deprecated(msg.headers.content_type.value.item):
         msg.complain(1035)
+
+
+def check_media(msg, type_, data):
+    if media_type.is_json(type_):
+        try:
+            json.loads(data)
+        except Exception, e:
+            msg.complain(1038, error=e)
 
 
 def parse_chunked(msg, state):
