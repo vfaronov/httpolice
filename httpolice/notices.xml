@@ -3,7 +3,7 @@
 <notices>
 
   <error id="1000">
-    <title>Bad syntax in the <ref to="header"/> header</title>
+    <title>Malformed <ref to="header"/> header</title>
     <explain>Parse error: <ref to="error"/></explain>
   </error>
 
@@ -73,7 +73,7 @@
 
   <internal id="1012">
     <title>Stop parsing response stream after switching to a tunnel</title>
-    <explain>A successful (<ref to="msg.status"/>) response to a <ref to="msg.request.method"/> request indicates that the connection has switched to being a tunnel. HTTPolice will not parse the remainder of the response stream.</explain>
+    <explain>A <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request indicates that the connection has switched to being a tunnel. HTTPolice will not parse the remainder of the response stream.</explain>
   </internal>
 
   <error id="1013">
@@ -134,7 +134,7 @@
   </error>
 
   <comment id="1021">
-    <title><ref to="msg.method"/> request with no <ref to="msg.headers.content_length"/></title>
+    <title><ref to="msg.method"/> request with no <h>Content-Length</h></title>
     <rfc num="7230" sect="3.3.2">
       A user agent SHOULD send a <h>Content-Length</h> in a request message when
    no <h>Transfer-Encoding</h> is sent and the request method defines a meaning
@@ -286,18 +286,18 @@
   </error>
 
   <error id="1038">
-    <title>Bad JSON payload</title>
-    <explain>According to <ref to="msg.headers.content_type"/>, this message’s <ref to="msg.body">payload</ref> is JSON, but HTTPolice tried to parse it as JSON and got the following error: <ref to="error"/></explain>
+    <title>Bad JSON <ref to="msg.body">payload</ref></title>
+    <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is JSON, but HTTPolice tried to parse it as JSON and got the following error: <ref to="error"/></explain>
   </error>
 
   <error id="1039">
-    <title>Bad XML payload</title>
-    <explain>According to <ref to="msg.headers.content_type"/>, this message’s <ref to="msg.body">payload</ref> is XML, but HTTPolice tried to parse it as XML and got the following error: <ref to="error"/></explain>
+    <title>Bad XML <ref to="msg.body">payload</ref></title>
+    <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is XML, but HTTPolice tried to parse it as XML and got the following error: <ref to="error"/></explain>
   </error>
 
   <error id="1040">
-    <title>Bad URL-encoded payload</title>
-    <explain>According to <ref to="msg.headers.content_type"/>, this message’s <ref to="msg.body">payload</ref> is URL-encoded. But it doesn’t look like a proper URL-encoded string, as defined by <cite title="HTML5" url="http://www.w3.org/TR/html/forms.html#url-encoded-form-data"/>, because it contains a byte with the value <ref to="offending_value"/>.</explain>
+    <title>Bad URL-encoded <ref to="msg.body">payload</ref></title>
+    <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is URL-encoded. But it doesn’t look like a proper URL-encoded string, as defined by <cite title="HTML5" url="http://www.w3.org/TR/html/forms.html#url-encoded-form-data"/>, because it contains a byte with the value <ref to="offending_value"/>.</explain>
     <explain>More often than not, this means that the <ref to="msg.headers.content_type"/> header is wrong.</explain>
   </error>
 
