@@ -290,4 +290,9 @@
     <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is JSON, but HTTPolice tried to parse it as JSON and got the following error: <ref to="error"/></explain>
   </error>
 
+  <error id="1039">
+    <title>Bad XML payload</title>
+    <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is XML, but HTTPolice tried to parse it as XML and got the following error: <ref to="error"/></explain>
+  </error>
+
 </notices>

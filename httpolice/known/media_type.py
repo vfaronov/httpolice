@@ -10,6 +10,9 @@ def deprecated(name):
 def is_json(name):
     return known.get_info(name).get('is_json') or name.endswith(u'+json')
 
+def is_xml(name):
+    return known.get_info(name).get('is_xml') or name.endswith(u'+xml')
+
 
 known = KnownDict([
  {'_': MediaType(u'application/1d-interleaved-parityfec'),
@@ -310,7 +313,9 @@ known = KnownDict([
   '_citations': [Citation(None,
                           'http://www.w3.org/TR/'
                           'html/iana.html#application/xhtml+xml')]},
- {'_': MediaType(u'application/xml'), '_citations': [RFC(7303)]},
+ {'_': MediaType(u'application/xml'),
+  '_citations': [RFC(7303)],
+  'is_xml': True},
  {'_': MediaType(u'application/xml-dtd'), '_citations': [RFC(7303)]},
  {'_': MediaType(u'application/xml-external-parsed-entity'),
   '_citations': [RFC(7303)]},
@@ -531,7 +536,9 @@ known = KnownDict([
  {'_': MediaType(u'text/ulpfec'), '_citations': [RFC(5109)]},
  {'_': MediaType(u'text/uri-list'), '_citations': [RFC(2483)]},
  {'_': MediaType(u'text/vcard'), '_citations': [RFC(6350)]},
- {'_': MediaType(u'text/xml'), '_citations': [RFC(7303)]},
+ {'_': MediaType(u'text/xml'),
+  '_citations': [RFC(7303)],
+  'is_xml': True},
  {'_': MediaType(u'text/xml-external-parsed-entity'),
   '_citations': [RFC(7303)]},
  {'_': MediaType(u'video/1d-interleaved-parityfec'),
@@ -575,4 +582,4 @@ known = KnownDict([
  {'_': MediaType(u'video/smpte292m'), '_citations': [RFC(3497)]},
  {'_': MediaType(u'video/ulpfec'), '_citations': [RFC(5109)]},
  {'_': MediaType(u'video/vc1'), '_citations': [RFC(4425)]}
-], extra_info=['deprecated', 'is_json'])
+], extra_info=['deprecated', 'is_json', 'is_xml'])

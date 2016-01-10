@@ -5,6 +5,9 @@ import gzip
 import json
 import zlib
 
+import defusedxml
+import defusedxml.ElementTree
+
 from httpolice import common, header_view, parse, syntax
 from httpolice.common import Unparseable, okay
 from httpolice.known import cc, header, media_type, tc
@@ -90,6 +93,14 @@ def check_media(msg, type_, data):
             json.loads(data)
         except Exception, e:
             msg.complain(1038, error=e)
+
+    if media_type.is_xml(type_):
+        try:
+            defusedxml.ElementTree.fromstring(data)
+        except defusedxml.DefusedXmlException:
+            pass
+        except Exception, e:
+            msg.complain(1039, error=e)
 
 
 def parse_chunked(msg, state):
