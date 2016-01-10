@@ -6,6 +6,7 @@ from httpolice.common import (
     AsteriskForm,
     CaseInsensitive,
     ConnectionOption,
+    ContentCoding,
     FieldName,
     HeaderEntry,
     HTTPVersion,
@@ -231,6 +232,8 @@ media_type = argwrap(
     Parametrized,
     wrap(MediaType, join(type_ + '/' + subtype)) +
     many(~(ows + ';' + ows) + parameter))    // rfc(7231, u'media-type')
+
+content_coding = wrap(ContentCoding, token)    // rfc(7231, u'content-coding')
 
 product_version = token
 product = group(token + maybe(~literal('/') + product_version))

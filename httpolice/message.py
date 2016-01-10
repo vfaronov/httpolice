@@ -6,7 +6,7 @@ import zlib
 
 from httpolice import common, header_view, parse, syntax
 from httpolice.common import Unparseable, okay
-from httpolice.known import header, media_type, tc
+from httpolice.known import cc, header, media_type, tc
 
 
 class Message(common.ReportNode):
@@ -22,15 +22,49 @@ class Message(common.ReportNode):
         self.trailer_entries = trailer_entries
         self.raw = raw
         self.rebuild_headers()
+        self._decoded_body = None
 
     def rebuild_headers(self):
         self.headers = header_view.HeadersView(self)
+
+    @property
+    def decoded_body(self):
+        if self._decoded_body is None:
+            self._decode_body()
+        return self._decoded_body
+
+    def _decode_body(self):
+        r = self.body
+        codings = list(self.headers.content_encoding)
+        while codings and okay(r):
+            coding = codings.pop()
+            if coding in [cc.gzip, cc.x_gzip]:
+                try:
+                    r = decode_gzip(r)
+                except Exception, e:
+                    self.complain(1037, coding=coding, error=e)
+                    r = Unparseable
+            elif coding == cc.deflate:
+                try:
+                    r = decode_deflate(r)
+                except Exception, e:
+                    self.complain(1037, coding=coding, error=e)
+                    r = Unparseable
+            elif okay(coding):
+                self.complain(1036, coding=coding)
+                r = Unparseable
+            else:
+                r = Unparseable
+        self._decoded_body = r
 
 
 def check_message(msg):
     # Force parsing every header present in the message according to its rules.
     for entry in msg.header_entries + (msg.trailer_entries or []):
         _ = msg.headers[entry.name].value
+
+    # Force decoding the message body.
+    _ = msg.decoded_body
 
     for entry in msg.trailer_entries or []:
         if entry.name not in msg.headers.trailer:

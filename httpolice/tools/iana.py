@@ -8,6 +8,7 @@ import lxml.etree
 
 from httpolice.common import (
     Citation,
+    ContentCoding,
     FieldName,
     MediaType,
     Method,
@@ -117,8 +118,19 @@ class ParametersRegistry(Registry):
     def get_all(self):
         tree = self._get_xml('http-parameters/http-parameters.xml')
         return [
+            ('content codings', list(self._content_codings(tree)), tc),
             ('transfer codings', list(self._transfer_codings(tree)), tc),
         ]
+
+    def _content_codings(self, tree):
+        records = tree.findall(
+            '//iana:registry[@id="content-coding"]/iana:record', self.xmlns)
+        for record in records:
+            yield {
+                '_': ContentCoding(
+                    record.find('iana:name', self.xmlns).text),
+                '_citations': list(self.extract_citations(record)),
+            }
 
     def _transfer_codings(self, tree):
         records = tree.findall(

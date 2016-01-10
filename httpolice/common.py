@@ -171,6 +171,11 @@ class TransferCoding(CaseInsensitive):
     __slots__ = ()
 
 
+class ContentCoding(CaseInsensitive):
+
+    __slots__ = ()
+
+
 class ConnectionOption(CaseInsensitive):
 
     __slots__ = ()
