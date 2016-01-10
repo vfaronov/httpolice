@@ -9,12 +9,13 @@ import lxml.etree
 from httpolice.common import (
     Citation,
     FieldName,
+    MediaType,
     Method,
     StatusCode,
     RFC,
     TransferCoding,
 )
-from httpolice.known import h, m, st, tc
+from httpolice.known import h, m, media, st, tc
 
 
 def yes_no(s):
@@ -128,3 +129,29 @@ class ParametersRegistry(Registry):
                     record.find('iana:name', self.xmlns).text),
                 '_citations': list(self.extract_citations(record)),
             }
+
+
+class MediaTypeRegistry(Registry):
+
+    def get_all(self):
+        tree = self._get_xml('media-types/media-types.xml')
+        entries = []
+        for record in tree.findall('//iana:record', self.xmlns):
+            toplevel = record.getparent().get('id')
+            subtype = record.find('iana:name', self.xmlns).text.lower()
+            if subtype.startswith('vnd.') or subtype.startswith('prs.'):
+                continue
+            if len(subtype.split()) > 1:
+                if ('deprecated' in subtype) or ('obsoleted' in subtype):
+                    entry = {'deprecated': True}
+                    subtype = subtype.split()[0]
+                else:
+                    continue
+            else:
+                entry = {}
+            entry['_'] = MediaType(u'%s/%s' % (toplevel, subtype))
+            entry['_citations'] = list(self.extract_citations(record))
+            if not entry['_citations']:
+                continue
+            entries.append(entry)
+        return [('media types', entries, media)]

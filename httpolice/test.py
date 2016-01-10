@@ -14,11 +14,12 @@ from httpolice import (
 )
 from httpolice.common import (
     CaseInsensitive,
+    MediaType,
     Parametrized,
     TransferCoding,
     Unparseable,
 )
-from httpolice.known import m, tc
+from httpolice.known import m, media, tc
 
 
 class TestCommon(unittest.TestCase):
@@ -97,6 +98,15 @@ class TestSyntax(unittest.TestCase):
         self.assertParse(p, 'gzip; Q=1.0', Parametrized(tc.gzip, [(u'Q', 1)]))
         self.assertParse(p, 'trailers', u'trailers')
         self.assertNoParse(p, 'gzip;q=2.0')
+
+    def test_media_type(self):
+        p = syntax.media_type + parse.eof
+        self.assertParse(
+            p, 'Text/HTML; Charset="utf-8"',
+            Parametrized(media.text_html, [(u'charset', u'utf-8')]))
+        self.assertParse(
+            p, 'application/vnd.github.v3+json',
+            Parametrized(MediaType(u'application/vnd.github.v3+json'), []))
 
 
 class TestRequest(unittest.TestCase):

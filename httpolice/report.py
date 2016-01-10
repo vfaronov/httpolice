@@ -88,7 +88,7 @@ def piece_to_html(piece, ctx):
             pieces_to_html(piece.get_contents(ctx), ctx)
     elif isinstance(piece, notice.Citation):
         with H.cite():
-            H.a(piece.info.title, href=piece.info.url, target='_blank')
+            H.a(unicode(piece.info), href=piece.info.url, target='_blank')
         if piece.contents:
             H.span(u': ')
             with H.q(cite=piece.info.url):
@@ -109,8 +109,9 @@ def render_known(obj):
     cls = u'known known-%s' % type(obj).__name__
     cite = known.citation(obj)
     if cite:
-        H.a(unicode(obj), _class=cls,
-            href=cite.url, title=cite.title, target='_blank')
+        with H.a(unicode(obj), _class=cls, href=cite.url, target='_blank'):
+            if cite.title:
+                H.attr(title=cite.title)
     else:
         H.span(unicode(obj), _class=cls)
 

@@ -35,4 +35,7 @@ class KnownDict(object):
 
     @classmethod
     def _name_for(cls, item):
-        return item['_'].replace(u'-', u' ').replace(u' ', u'_').lower()
+        return (item['_'].
+                replace(u'-', u' ').replace(u' ', u'_').replace(u'/', u'_').
+                replace(u'+', u'_').replace(u'.', u'_').
+                lower())

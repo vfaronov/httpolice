@@ -4,10 +4,12 @@ import re
 
 from httpolice.common import (
     AsteriskForm,
+    CaseInsensitive,
     ConnectionOption,
     FieldName,
     HeaderEntry,
     HTTPVersion,
+    MediaType,
     Method,
     OriginForm,
     Parametrized,
@@ -220,6 +222,15 @@ connection_option = wrap(ConnectionOption, token)
 
 
 # RFC 7231
+
+parameter = (wrap(CaseInsensitive, token) + ~literal('=') +
+             (token | decode(quoted_string)))   // rfc(7231, u'parameter')
+type_ = token
+subtype = token
+media_type = argwrap(
+    Parametrized,
+    wrap(MediaType, join(type_ + '/' + subtype)) +
+    many(~(ows + ';' + ows) + parameter))    // rfc(7231, u'media-type')
 
 product_version = token
 product = group(token + maybe(~literal('/') + product_version))
