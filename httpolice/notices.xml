@@ -301,4 +301,14 @@
     <explain>More often than not, this means that the <ref to="msg.headers.content_type"/> header is wrong.</explain>
   </error>
 
+  <comment id="1041">
+    <title>Message with a <ref to="msg.body">payload</ref> but no <h>Content-Type</h></title>
+    <rfc num="7231" sect="3.1.1.5">
+      A sender that generates a message containing a payload body SHOULD
+   generate a <h>Content-Type</h> header field in that message unless the
+   intended media type of the enclosed representation is unknown to the
+   sender.
+    </rfc>
+  </comment>
+
 </notices>

@@ -86,6 +86,9 @@ def check_message(msg):
             media_type.deprecated(msg.headers.content_type.value.item):
         msg.complain(1035)
 
+    if okay(msg.body) and msg.body and msg.headers.content_type.is_absent:
+        msg.complain(1041)
+
 
 def check_media(msg, type_, data):
     if media_type.is_json(type_):
