@@ -1,7 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import known, parse
-from httpolice.common import Unparseable
+from httpolice.common import Unparseable, okay
 from httpolice.known import h, header
 
 
@@ -92,6 +92,10 @@ class HeaderView(object):
     @property
     def is_absent(self):
         return not self.is_present
+
+    @property
+    def is_okay(self):
+        return okay(self.value)
 
     def __nonzero__(self):
         return bool(self.value)

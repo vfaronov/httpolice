@@ -52,6 +52,13 @@ class Citation(Text):
 
     @property
     def info(self):
+        return common.Citation(self.get('title'), self.get('url'))
+
+
+class RFC(Citation):
+
+    @property
+    def info(self):
         num = int(self.get('num'))
         sect = tuple(int(n) for n in self.get('sect').split('.'))
         return common.RFC(num, section=sect)
@@ -71,7 +78,8 @@ def load_notices():
         ns[tag] = Notice
     ns['title'] = ns['explain'] = Text
     ns['ref'] = Ref
-    ns['rfc'] = Citation
+    ns['cite'] = Citation
+    ns['rfc'] = RFC
     for tag in protocol_items:
         ns[tag] = ProtocolItem
     notices_xml = pkg_resources.resource_stream('httpolice', 'notices.xml')

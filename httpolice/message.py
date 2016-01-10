@@ -6,7 +6,7 @@ import zlib
 
 from httpolice import common, header_view, parse, syntax
 from httpolice.common import Unparseable, okay
-from httpolice.known import header, tc
+from httpolice.known import header, media_type, tc
 
 
 class Message(common.ReportNode):
@@ -42,6 +42,10 @@ def check_message(msg):
     for opt in msg.headers.connection:
         if okay(opt) and header.is_bad_for_connection(common.FieldName(opt)):
             msg.complain(1034, header=msg.headers[common.FieldName(opt)])
+
+    if msg.headers.content_type.is_okay and \
+            media_type.deprecated(msg.headers.content_type.value.item):
+        msg.complain(1035)
 
 
 def parse_chunked(msg, state):

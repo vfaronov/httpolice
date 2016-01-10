@@ -270,4 +270,9 @@
     </rfc>
   </error>
 
+  <comment id="1035">
+    <title>Using deprecated media type <ref to="msg.headers.content_type.value"/></title>
+    <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload body is of type <ref to="msg.headers.content_type.value"/>, which is listed as “deprecated” or “obsoleted” in the <cite title="IANA media types registry" url="http://www.iana.org/assignments/media-types/media-types.xml"/>.</explain>
+  </comment>
+
 </notices>
