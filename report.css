@@ -10,6 +10,8 @@ h1, h2 {
 
 a:link, a:active, a:visited, a:hover {
     color: #000000;
+    text-decoration: none;
+    border-bottom: dotted 1px;
 }
 
 cite {
@@ -34,11 +36,12 @@ q {
 
 .request-line, .status-line, .HeaderEntry {
     font-family: monospace;
-    padding: 0.2em 0;
+    padding: 0.3em 0;
 }
 
 .HeaderEntry {
-    white-space: pre;
+    white-space: pre-wrap;
+    overflow: auto;
 }
 
 .request-line, .status-line {
