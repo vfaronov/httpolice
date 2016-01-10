@@ -33,11 +33,14 @@ def nicely_join(strings):
     return joined
 
 
-def for_object(obj):
+def for_object(obj, extra_class=u''):
     if obj in [None, Unparseable]:
         return {}
     else:
-        return {'class': type(obj).__name__, 'id': unicode(id(obj))}
+        return {
+            'class': u'%s %s' % (type(obj).__name__, extra_class),
+            'id': unicode(id(obj)),
+        }
 
 
 def reference_targets(obj):
@@ -311,7 +314,7 @@ class HTMLReport(object):
             with H.div(_class='review-block'):
                 H.p(u'Payload body is unavailable.', _class='hint')
         elif body:
-            with H.div(_class='review-block'):
+            with H.div(**for_object(msg.body, extra_class='review-block')):
                 if transforms:
                     H.p(u'Payload body after %s:' % nicely_join(transforms),
                         _class='hint')
