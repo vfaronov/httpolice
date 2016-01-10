@@ -295,4 +295,10 @@
     <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is XML, but HTTPolice tried to parse it as XML and got the following error: <ref to="error"/></explain>
   </error>
 
+  <error id="1040">
+    <title>Bad URL-encoded payload</title>
+    <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is URL-encoded. But it doesn’t look like a proper URL-encoded string, as defined by <cite title="HTML5" url="http://www.w3.org/TR/html/forms.html#url-encoded-form-data"/>, because it contains a byte with the value <ref to="offending_value"/>.</explain>
+    <explain>More often than not, this means that the <ref to="msg.headers.content_type"/> header is wrong.</explain>
+  </error>
+
 </notices>

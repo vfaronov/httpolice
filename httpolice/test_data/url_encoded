@@ -1,0 +1,20 @@
+# The absence of no. 1040 means that this is a correct URL-encoded body.
+
+======== BEGIN INBOUND STREAM ========
+POST / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: application/x-www-form-urlencoded
+Transfer-Encoding: chunked
+
+68
+hello=world&%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82=%D0%B4%D0%B8%D0%B2%D0%BD%D1%8B%D0%B9+%D0%BC%D0%B8%D1%80
+0
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!

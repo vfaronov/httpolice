@@ -10,7 +10,7 @@ import defusedxml.ElementTree
 
 from httpolice import common, header_view, parse, syntax
 from httpolice.common import Unparseable, okay
-from httpolice.known import cc, header, media_type, tc
+from httpolice.known import cc, header, media, media_type, tc
 
 
 class Message(common.ReportNode):
@@ -101,6 +101,19 @@ def check_media(msg, type_, data):
             pass
         except Exception, e:
             msg.complain(1039, error=e)
+
+    if type_ == media.application_x_www_form_urlencoded:
+        # This list is taken from the HTML specification --
+        # http://www.w3.org/TR/html/forms.html#url-encoded-form-data --
+        # as the exhaustive list of bytes that can be output
+        # by a "conformant" URL encoder.
+        good_bytes = ([0x25, 0x26, 0x2A, 0x2B, 0x2D, 0x2E, 0x5F] +
+                      range(0x30, 0x40) + range(0x41, 0x5B) +
+                      range(0x61, 0x7B))
+        for byte in data:
+            if ord(byte) not in good_bytes:
+                msg.complain(1040, offending_value=hex(ord(byte)))
+                break
 
 
 def parse_chunked(msg, state):
