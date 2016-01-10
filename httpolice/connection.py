@@ -1,8 +1,10 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import common, message, parse, request, response, syntax
+from httpolice import common, message, parse, request, response
 from httpolice.common import Unparseable, okay
 from httpolice.known import m, st, tc
+from httpolice.syntax import rfc7230
+from httpolice.syntax.common import crlf
 
 
 class Exchange(common.ReportNode):
@@ -87,10 +89,10 @@ def parse_requests(connection, stream):
 
 def _parse_request_heading(state):
     try:
-        (method_, target, version_) = syntax.request_line.parse(state)
+        (method_, target, version_) = rfc7230.request_line.parse(state)
         entries = \
-            parse.many(syntax.header_field + ~syntax.crlf).parse(state)
-        syntax.crlf.parse(state)
+            parse.many(rfc7230.header_field + ~crlf).parse(state)
+        crlf.parse(state)
     except parse.ParseError, e:
         state.complain(1006, error=e)
         state.sane = False
@@ -186,9 +188,9 @@ def parse_responses(connection, stream):
 
 def _parse_response_heading(state):
     try:
-        (version, status, reason) = syntax.status_line.parse(state)
-        entries = parse.many(syntax.header_field + ~syntax.crlf).parse(state)
-        syntax.crlf.parse(state)
+        (version, status, reason) = rfc7230.status_line.parse(state)
+        entries = parse.many(rfc7230.header_field + ~crlf).parse(state)
+        crlf.parse(state)
     except parse.ParseError, e:
         state.complain(1009, error=e)
         state.sane = False

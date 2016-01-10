@@ -4,13 +4,10 @@ import re
 
 from httpolice.common import (
     AsteriskForm,
-    CaseInsensitive,
     ConnectionOption,
-    ContentCoding,
     FieldName,
     HeaderEntry,
     HTTPVersion,
-    MediaType,
     Method,
     OriginForm,
     Parametrized,
@@ -26,7 +23,6 @@ from httpolice.parse import (
     decode,
     decode_into,
     function,
-    group,
     join,
     literal,
     many,
@@ -36,47 +32,24 @@ from httpolice.parse import (
     rfc,
     string,
     string1,
-    subst,
     times,
     wrap,
 )
+from httpolice.syntax import rfc3986
+from httpolice.syntax.common import (
+    ALPHA,
+    crlf,
+    digit,
+    DIGIT,
+    dquote,
+    hex_integer,
+    HTAB,
+    SP,
+    sp,
+    sp_htab,
+    VCHAR,
+)
 
-
-# RFC 5234
-
-ALPHA = char_range(0x41, 0x5A) + char_range(0x61, 0x7A)
-alpha = char_class(ALPHA)
-crlf = (~maybe('\r') + '\n')   // u'newline'
-DIGIT = char_range(0x30, 0x39)
-digit = char_class(DIGIT)
-HEXDIG = DIGIT + 'ABCDEFabcdef'
-hexdig = char_class(HEXDIG)
-HTAB = '\t'
-SP = ' '
-sp = literal(SP)
-sp_htab = char_class(SP + HTAB)
-VCHAR = char_range(0x21, 0x7E)
-DQUOTE = '"'
-dquote = literal(DQUOTE)
-
-
-# Auxiliary
-
-integer = wrap(int, string1(digit))
-hex_integer = wrap(lambda s: int(s, 16), string1(hexdig))
-
-
-# RFC 3986
-
-pct_encoded = join('%' + char_class(HEXDIG) + char_class(HEXDIG))
-sub_delims = char_class("!$&'()*+,;=")
-unreserved = char_class(ALPHA + DIGIT + "-._~")
-pchar = unreserved | pct_encoded | sub_delims | char_class(':@')
-segment = string(pchar)
-query = string(pchar | char_class('/?'))
-
-
-# RFC 7230
 
 obs_text = char_class(char_range(0x80, 0xFF))
 
@@ -135,11 +108,12 @@ comma_list1 = lambda inner: argwrap(
 
 method = wrap(Method, token)   // rfc(7230, u'method')
 
-absolute_path = string1(join('/' + segment))   // rfc(7230, u'absolute-path')
+absolute_path = string1(join('/' + rfc3986.segment)) \
+    // rfc(7230, u'absolute-path')
 
 origin_form = decode_into(
     OriginForm,
-    join(absolute_path + maybe(join('?' + query), empty='')))
+    join(absolute_path + maybe(join('?' + rfc3986.query), empty='')))
 asterisk_form = decode_into(AsteriskForm, '*')
 
 # FIXME: absolute-form, authority-form
@@ -220,23 +194,3 @@ chunk = function(_parse_chunk)
 trailer_part = many(header_field + ~crlf)
 
 connection_option = wrap(ConnectionOption, token)
-
-
-# RFC 7231
-
-parameter = (wrap(CaseInsensitive, token) + ~literal('=') +
-             (token | decode(quoted_string)))   // rfc(7231, u'parameter')
-type_ = token
-subtype = token
-media_type = argwrap(
-    Parametrized,
-    wrap(MediaType, join(type_ + '/' + subtype)) +
-    many(~(ows + ';' + ows) + parameter))    // rfc(7231, u'media-type')
-
-content_coding = wrap(ContentCoding, token)    // rfc(7231, u'content-coding')
-
-product_version = token
-product = group(token + maybe(~literal('/') + product_version))
-user_agent = argwrap(
-    lambda p1, ps: [p1] + ps,
-    product + many(~rws + many(product | comment)))

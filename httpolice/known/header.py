@@ -1,8 +1,9 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import syntax
 from httpolice.common import Citation, FieldName, RFC
 from httpolice.known.base import KnownDict
+from httpolice.syntax import rfc7230, rfc7231
+from httpolice.syntax.common import integer
 
 
 SINGLE = 1
@@ -84,7 +85,7 @@ known = KnownDict([
  {'_': FieldName(u'Connection'),
   '_citations': [RFC(7230, section=(6, 1))],
   'iana_status': 'standard',
-  'parser': syntax.comma_list1(syntax.connection_option),
+  'parser': rfc7230.comma_list1(rfc7230.connection_option),
   'rule': MULTI},
  {'_': FieldName(u'Content-Base'),
   '_citations': [RFC(2068), RFC(2616)],
@@ -96,7 +97,7 @@ known = KnownDict([
   '_citations': [RFC(7231, section=(3, 1, 2, 2))],
   'bad_for_trailer': True,
   'iana_status': 'standard',
-  'parser': syntax.comma_list1(syntax.content_coding),
+  'parser': rfc7230.comma_list1(rfc7231.content_coding),
   'rule': MULTI},
  {'_': FieldName(u'Content-ID'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Content-Language'),
@@ -106,7 +107,7 @@ known = KnownDict([
   '_citations': [RFC(7230, section=(3, 3, 2))],
   'bad_for_trailer': True,
   'iana_status': 'standard',
-  'parser': syntax.integer,
+  'parser': integer,
   'rule': SINGLE},
  {'_': FieldName(u'Content-Location'),
   '_citations': [RFC(7231, section=(3, 1, 4, 2))],
@@ -122,7 +123,7 @@ known = KnownDict([
   '_citations': [RFC(7231, section=(3, 1, 1, 5))],
   'bad_for_trailer': True,
   'iana_status': 'standard',
-  'parser': syntax.media_type,
+  'parser': rfc7231.media_type,
   'rule': SINGLE},
  {'_': FieldName(u'Content-Version'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Cookie'),
@@ -350,7 +351,7 @@ known = KnownDict([
   '_citations': [RFC(7230, section=(4, 3))],
   'bad_for_trailer': True,
   'iana_status': 'standard',
-  'parser': syntax.comma_list(syntax.t_codings),
+  'parser': rfc7230.comma_list(rfc7230.t_codings),
   'rule': MULTI},
  {'_': FieldName(u'Timeout'),
   '_citations': [RFC(4918)],
@@ -359,13 +360,13 @@ known = KnownDict([
   '_citations': [RFC(7230, section=(4, 4))],
   'bad_for_trailer': True,
   'iana_status': 'standard',
-  'parser': syntax.comma_list1(syntax.field_name),
+  'parser': rfc7230.comma_list1(rfc7230.field_name),
   'rule': MULTI},
  {'_': FieldName(u'Transfer-Encoding'),
   '_citations': [RFC(7230, section=(3, 3, 1))],
   'bad_for_trailer': True,
   'iana_status': 'standard',
-  'parser': syntax.comma_list1(syntax.transfer_coding),
+  'parser': rfc7230.comma_list1(rfc7230.transfer_coding),
   'rule': MULTI},
  {'_': FieldName(u'URI'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Upgrade'),
@@ -375,7 +376,7 @@ known = KnownDict([
   '_citations': [RFC(7231, section=(5, 5, 3))],
   'iana_status': 'standard',
   'rule': SINGLE,
-  'parser': syntax.user_agent},
+  'parser': rfc7231.user_agent},
  {'_': FieldName(u'Variant-Vary'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Vary'),
   '_citations': [RFC(7231, section=(7, 1, 4))],

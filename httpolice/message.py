@@ -8,9 +8,11 @@ import zlib
 import defusedxml
 import defusedxml.ElementTree
 
-from httpolice import common, header_view, parse, syntax
+from httpolice import common, header_view, parse
 from httpolice.common import Unparseable, okay
 from httpolice.known import cc, header, media, media_type, tc
+from httpolice.syntax import rfc7230
+from httpolice.syntax.common import crlf
 
 
 class Message(common.ReportNode):
@@ -129,12 +131,12 @@ def body_charset(msg):
 def parse_chunked(msg, state):
     data = []
     try:
-        chunk = syntax.chunk.parse(state)
+        chunk = rfc7230.chunk.parse(state)
         while chunk:
             data.append(chunk)
-            chunk = syntax.chunk.parse(state)
-        trailer = syntax.trailer_part.parse(state)
-        syntax.crlf.parse(state)
+            chunk = rfc7230.chunk.parse(state)
+        trailer = rfc7230.trailer_part.parse(state)
+        crlf.parse(state)
     except parse.ParseError, e:
         msg.complain(1005, error=e)
         msg.body = Unparseable

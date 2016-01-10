@@ -10,7 +10,6 @@ from httpolice import (
     notice,
     parse,
     report,
-    syntax,
 )
 from httpolice.common import (
     CaseInsensitive,
@@ -20,6 +19,7 @@ from httpolice.common import (
     Unparseable,
 )
 from httpolice.known import m, media, tc
+from httpolice.syntax import rfc7230, rfc7231
 
 
 class TestCommon(unittest.TestCase):
@@ -57,7 +57,7 @@ class TestSyntax(unittest.TestCase):
         self.assertRaises(parse.ParseError, parser.parse, parse.State(text))
 
     def test_comma_list(self):
-        p = syntax.comma_list(syntax.token) + parse.eof
+        p = rfc7230.comma_list(rfc7230.token) + parse.eof
         self.assertParse(p, '', [])
         self.assertParse(p, ' , ,, , ,', [])
         self.assertParse(p, 'foo', ['foo'])
@@ -68,7 +68,7 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'foo;bar')
 
     def test_comma_list1(self):
-        p = syntax.comma_list1(syntax.token) + parse.eof
+        p = rfc7230.comma_list1(rfc7230.token) + parse.eof
         self.assertNoParse(p, '')
         self.assertNoParse(p, '  \t ')
         self.assertNoParse(p, ' , ,, , ,')
@@ -80,7 +80,7 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'foo;bar')
 
     def test_transfer_coding(self):
-        p = syntax.transfer_coding + parse.eof
+        p = rfc7230.transfer_coding + parse.eof
         self.assertParse(p, 'chunked', Parametrized(tc.chunked, []))
         self.assertParse(p, 'foo',
                          Parametrized(TransferCoding(u'foo'), []))
@@ -92,7 +92,7 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'foo;???')
         self.assertNoParse(p, 'foo;"bar"="baz"')
 
-        p = syntax.t_codings + parse.eof
+        p = rfc7230.t_codings + parse.eof
         self.assertParse(p, 'gzip;q=0.345', Parametrized(tc.gzip,
                                                          [(u'q', 0.345)]))
         self.assertParse(p, 'gzip; Q=1.0', Parametrized(tc.gzip, [(u'Q', 1)]))
@@ -100,7 +100,7 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'gzip;q=2.0')
 
     def test_media_type(self):
-        p = syntax.media_type + parse.eof
+        p = rfc7231.media_type + parse.eof
         self.assertParse(
             p, 'Text/HTML; Charset="utf-8"',
             Parametrized(media.text_html, [(u'charset', u'utf-8')]))
