@@ -33,6 +33,13 @@ def nicely_join(strings):
     return joined
 
 
+# See also http://stackoverflow.com/a/25829509/200445
+nonprintable = set([chr(i) for i in range(128)]) - set(string.printable)
+printable = lambda s: s.translate({ord(c): u'\ufffd' for c in nonprintable})
+has_nonprintable = lambda s: \
+    len(s) != len(s.translate({ord(c): None for c in nonprintable}))
+
+
 def for_object(obj, extra_class=u''):
     if obj in [None, Unparseable]:
         return {}
@@ -166,16 +173,10 @@ def displayable_body(msg):
     else:
         r = r.decode('utf-8', 'replace')
 
-    # See also http://stackoverflow.com/a/25829509/200445
-    nonprintable = set([chr(i) for i in range(128)]) - set(string.printable)
-    r1 = r.translate({ord(c): None for c in nonprintable})
-    if len(r1) != len(r):
-        # This tells us there actually were some unprintable characters.
+    if has_nonprintable(r):
         transforms.append(u'replacing non-printable characters '
                           u'with the \ufffd sign')
-        # But in the end we want to replace them
-        # with the Unicode replacement character.
-        r = r.translate({ord(c): u'\ufffd' for c in nonprintable})
+        r = printable(r)
 
     limit = 5000
     if len(r) > limit:
@@ -290,7 +291,7 @@ class HTMLReport(object):
         for piece in pieces:
             with H.span(_class='annotated-piece', **for_object(piece)):
                 if isinstance(piece, str):
-                    H.span(piece.decode('ascii', 'ignore'))
+                    H.span(printable(piece.decode('utf-8', 'ignore')))
                 else:
                     render_known(piece)
 
@@ -304,7 +305,8 @@ class HTMLReport(object):
                     if entry.annotated:
                         self.render_annotated(entry.annotated)
                     else:
-                        H.span(entry.value.decode('ascii', 'ignore'))
+                        H.span(
+                            printable(entry.value.decode('utf-8', 'ignore')))
 
     def render_message(self, msg):
         self.render_header_entries(msg.header_entries)
@@ -368,8 +370,9 @@ class HTMLReport(object):
                     with H.span(**for_object(resp.status)):
                         render_known(resp.status)
                         H.span(u' ')
-                        H.span(resp.reason.decode('utf-8', 'ignore'),
-                               **for_object(resp.reason))
+                        H.span(
+                            printable(resp.reason.decode('utf-8', 'ignore')),
+                            **for_object(resp.reason))
                 self.render_message(resp)
             self.render_message_notices(resp)
             H.br(_class='clear')
