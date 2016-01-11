@@ -194,3 +194,15 @@ chunk = function(_parse_chunk)
 trailer_part = many(header_field + ~crlf)
 
 connection_option = wrap(ConnectionOption, token)
+
+protocol_name = token   // rfc(7230, u'protocol-name')
+protocol_version = token   // rfc(7230, u'protocol-version')
+
+received_protocol = (maybe(protocol_name + ~literal('/'), u'HTTP') +
+                     protocol_version)
+pseudonym = token   // rfc(7230, u'pseudonym')
+received_by = (
+    decode(join(rfc3986.host + maybe(join(':' + rfc3986.port), ''))) |
+    pseudonym)   // rfc(7230, u'received-by')
+via = comma_list1(received_protocol + ~rws + received_by +
+                  maybe(~rws + comment))

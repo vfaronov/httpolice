@@ -39,6 +39,8 @@ class Request(message.Message):
                 result = True
             setattr(self, 'is_%s_form' % form_name, result)
 
+        self.is_to_proxy = self.is_absolute_form and self.method != m.CONNECT
+
 
 def check_request(req):
     message.check_message(req)

@@ -45,8 +45,9 @@ ipvfuture = join(
     'v' + string1(hexdig) + '.' + string1(unreserved | sub_delims | ':'))
 ip_literal = join('[' + (ipv6address | ipvfuture) + ']') \
     // rfc(3986, u'IP-literal')
-reg_name = string(unreserved | pct_encoded | sub_delims) \
-    // rfc(3986, u'reg-name')
+# FIXME: I had to temporarily remove ``<sub-delims>`` from ``<reg-name>``
+# because it was messing up my naive parser in comma lists (e.g. in ``Via``).
+reg_name = string(unreserved | pct_encoded)   // rfc(3986, u'reg-name')
 host = ip_literal | ipv4address | reg_name
 port = string(digit)   // rfc(3986, u'port')
 authority = join(maybe(join(userinfo + '@'), '') +

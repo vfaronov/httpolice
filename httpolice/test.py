@@ -136,6 +136,21 @@ class TestSyntax(unittest.TestCase):
         self.assertParse(p,
                          'urn:oasis:names:specification:docbook:dtd:xml:4.1.2')
 
+    def test_via(self):
+        p = rfc7230.via + parse.eof
+        self.assertParse(p, '1.0 fred, 1.1 p.example.net',
+                         [(u'HTTP', u'1.0', u'fred', None),
+                          (u'HTTP', u'1.1', u'p.example.net', None)])
+        self.assertParse(
+            p,
+            r', FSTR/2 balancer4g-p1.example.com  '
+            r'(Acme Web Accelerator 4.1 \(Debian\)), '
+            r'1.1 proxy1,',
+            [(u'FSTR', u'2', u'balancer4g-p1.example.com',
+              'Acme Web Accelerator 4.1 (Debian)'),
+             (u'HTTP', u'1.1', u'proxy1', None)])
+        self.assertNoParse(p, 'proxy1, proxy2')
+
 
 class TestRequest(unittest.TestCase):
 
