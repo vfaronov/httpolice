@@ -77,7 +77,8 @@ def check_message(msg):
         if entry.name not in msg.headers.trailer:
             msg.complain(1030, header=entry)
 
-    if msg.headers.transfer_encoding and msg.headers.content_length.is_present:
+    if msg.headers.transfer_encoding.is_present and \
+            msg.headers.content_length.is_present:
         msg.complain(1020)
 
     for opt in msg.headers.connection:

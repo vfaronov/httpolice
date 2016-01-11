@@ -61,7 +61,7 @@ def check_response_in_context(resp, req):
         if resp.status.successful or resp.status.redirection:
             resp.complain(1033)
 
-    if req.is_to_proxy and not resp.headers.via and \
+    if req.is_to_proxy and resp.headers.via.is_absent and \
             not resp.status.informational and \
             resp.status != st.proxy_authentication_required:
         resp.complain(1046)
