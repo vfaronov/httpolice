@@ -12,8 +12,12 @@ from httpolice import (
     report,
 )
 from httpolice.common import (
+    AbsoluteForm,
+    AsteriskForm,
+    AuthorityForm,
     CaseInsensitive,
     MediaType,
+    OriginForm,
     Parametrized,
     TransferCoding,
     Unparseable,
@@ -107,6 +111,47 @@ class TestSyntax(unittest.TestCase):
         self.assertParse(
             p, 'application/vnd.github.v3+json',
             Parametrized(MediaType(u'application/vnd.github.v3+json'), []))
+
+    def test_request_target(self):
+        p = rfc7230.request_target + parse.eof
+        self.assertParse(p, '/where?q=now', OriginForm('/where?q=now'))
+        self.assertParse(p, 'http://www.example.com:80',
+                         AbsoluteForm('http://www.example.com:80'))
+        self.assertParse(
+            p, 'www.example.com:80', AuthorityForm('www.example.com:80'))
+        self.assertParse(p, '[::0]:8080', AuthorityForm('[::0]:8080'))
+        self.assertParse(p, '*', AsteriskForm('*'))
+
+        # Examples from RFC 3986.
+        # Not many of these make sense as an HTTP request target,
+        # but they do all match the ``<absolute-URI>`` production.
+        self.assertParse(
+            p, 'ftp://ftp.is.co.za/rfc/rfc1808.txt',
+            AbsoluteForm('ftp://ftp.is.co.za/rfc/rfc1808.txt'))
+        self.assertParse(
+            p, 'http://www.ietf.org/rfc/rfc2396.txt',
+            AbsoluteForm('http://www.ietf.org/rfc/rfc2396.txt'))
+        self.assertParse(
+            p, 'ldap://[2001:db8::7]/c=GB?objectClass?one',
+            AbsoluteForm('ldap://[2001:db8::7]/c=GB?objectClass?one'))
+        self.assertParse(
+            p, 'mailto:John.Doe@example.com',
+            AbsoluteForm('mailto:John.Doe@example.com'))
+        self.assertParse(
+            p, 'news:comp.infosystems.www.servers.unix',
+            AbsoluteForm('news:comp.infosystems.www.servers.unix'))
+        self.assertParse(
+            p, 'tel:+1-816-555-1212',
+            AbsoluteForm('tel:+1-816-555-1212'))
+        self.assertParse(
+            p, 'telnet://192.0.2.16:80/',
+            AbsoluteForm('telnet://192.0.2.16:80/'))
+        self.assertParse(
+            p, 'urn:oasis:names:specification:docbook:dtd:xml:4.1.2',
+            AbsoluteForm(
+                'urn:oasis:names:specification:docbook:dtd:xml:4.1.2'))
+
+        self.assertNoParse(p, '/hello world')
 
 
 class TestRequest(unittest.TestCase):

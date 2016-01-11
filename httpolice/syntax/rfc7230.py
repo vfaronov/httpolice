@@ -3,7 +3,9 @@
 import re
 
 from httpolice.common import (
+    AbsoluteForm,
     AsteriskForm,
+    AuthorityForm,
     ConnectionOption,
     FieldName,
     HeaderEntry,
@@ -110,14 +112,13 @@ method = wrap(Method, token)   // rfc(7230, u'method')
 
 absolute_path = string1(join('/' + rfc3986.segment)) \
     // rfc(7230, u'absolute-path')
-
-origin_form = decode_into(
+origin_form = wrap(
     OriginForm,
     join(absolute_path + maybe(join('?' + rfc3986.query), empty='')))
-asterisk_form = decode_into(AsteriskForm, '*')
-
-# FIXME: absolute-form, authority-form
-request_target = origin_form | asterisk_form
+absolute_form = wrap(AbsoluteForm, rfc3986.absolute_uri)
+authority_form = wrap(AuthorityForm, rfc3986.authority)
+asterisk_form = wrap(AsteriskForm, '*')
+request_target = origin_form | absolute_form | authority_form | asterisk_form
 
 http_version = decode_into(HTTPVersion, join('HTTP/' + digit + '.' + digit)) \
     // rfc(7230, u'HTTP-version')

@@ -181,12 +181,22 @@ class ConnectionOption(CaseInsensitive):
     __slots__ = ()
 
 
-class OriginForm(ProtocolString):
+class OriginForm(str):
 
     __slots__ = ()
 
 
-class AsteriskForm(ProtocolString):
+class AbsoluteForm(str):
+
+    __slots__ = ()
+
+
+class AuthorityForm(str):
+
+    __slots__ = ()
+
+
+class AsteriskForm(str):
 
     __slots__ = ()
 

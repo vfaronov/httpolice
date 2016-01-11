@@ -1,8 +1,8 @@
 1019 1012
 
 ======== BEGIN INBOUND STREAM ========
-CONNECT / HTTP/1.1
-Host: example.com
+CONNECT example.com:80 HTTP/1.1
+Host: example.com:80
 User-Agent: demo
 
 ======== BEGIN OUTBOUND STREAM ========
