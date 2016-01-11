@@ -53,13 +53,14 @@ def check_response_in_context(resp, req):
             resp.complain(1019)
         if resp.headers.content_length.is_present:
             resp.complain(1024)
-    elif not resp.status.informational and resp.status != st.no_content:
-        if resp.headers.content_length.is_absent and \
-                tc.chunked not in resp.headers.transfer_encoding and \
-                resp.version == http11:
-            resp.complain(1025)
-            if u'close' not in resp.headers.connection:
-                resp.complain(1047)
+    elif not resp.status.informational and \
+            resp.status not in [st.no_content, st.not_modified] and \
+            resp.headers.content_length.is_absent and \
+            tc.chunked not in resp.headers.transfer_encoding and \
+            resp.version == http11:
+        resp.complain(1025)
+        if u'close' not in resp.headers.connection:
+            resp.complain(1047)
 
     if req.version == http11 and (req.headers.host.is_absent or
                                   req.headers.host.value is Unparseable or
