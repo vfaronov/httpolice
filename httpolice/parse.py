@@ -36,10 +36,10 @@ class State(common.ReportNode):
         self.data = data
         self.pos = 0
         self.sane = True
-        self.stack = []
         self.last_cut = 0
         self.annotate_classes = tuple(annotate_classes or ())
         self.annotations = []
+        self.complaints = []
 
     def dump_complaints(self, target, place=u'???'):
         for notice_ident, context in self.complaints or []:
@@ -56,14 +56,11 @@ class State(common.ReportNode):
     def remaining(self):
         return self.data[self.last_cut:]
 
-    def push(self):
-        self.stack.append(self.pos)
+    def save(self):
+        return self.pos, list(self.annotations), list(self.complaints)
 
-    def pop(self):
-        self.pos = self.stack.pop()
-
-    def discard(self):
-        self.stack.pop()
+    def restore(self, saved):
+        self.pos, self.annotations, self.complaints = saved
 
     def is_eof(self):
         return not self.peek()
@@ -160,16 +157,15 @@ class NBytesParser(Parser):
         self.max_n = max_n
 
     def parse(self, state):
-        state.push()
+        saved = state.save()
         s = state.consume_anything(self.max_n)
         if (self.min_n is not None) and (len(s) < self.min_n):
-            state.pop()
+            state.restore(saved)
             raise ParseError(u'at byte position %d: '
                              u'expected at least %d more bytes, '
                              u'but only %d remaining' %
                              (state.pos, self.min_n, len(s)))
         else:
-            state.discard()
             return s
 
 
@@ -252,17 +248,16 @@ class AlternativeParser(Parser):
         mismatch_errors = []
         other_errors = []
         for inner in self.inners:
-            state.push()
+            saved = state.save()
             try:
                 r = inner.parse(state)
             except MismatchError, e:
-                state.pop()
+                state.restore(saved)
                 mismatch_errors.append(e)
             except ParseError, e:
-                state.pop()
+                state.restore(saved)
                 other_errors.append(e)
             else:
-                state.discard()
                 return r
 
         if mismatch_errors:
@@ -291,17 +286,15 @@ class TimesParser(Parser):
     def parse(self, state):
         r = []
         while (self.max_ is None) or (len(r) < self.max_):
-            state.push()
+            saved = state.save()
             try:
                 r.append(self.inner.parse(state))
             except ParseError:
-                state.pop()
+                state.restore(saved)
                 if (self.min_ is None) or (len(r) >= self.min_):
                     return r
                 else:
                     raise
-            else:
-                state.discard()
         return r
 
 
@@ -326,11 +319,11 @@ class LookaheadParser(Parser):
         self.inner = parsify(inner)
 
     def parse(self, state):
-        state.push()
+        saved = state.save()
         try:
             self.inner.parse(state)
         finally:
-            state.pop()
+            state.restore(saved)
 
 
 eof = EOFParser()
