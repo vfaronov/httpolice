@@ -34,7 +34,7 @@ def nicely_join(strings):
 
 
 # See also http://stackoverflow.com/a/25829509/200445
-nonprintable = set([chr(i) for i in range(128)]) - set(string.printable)
+nonprintable = set([chr(_i) for _i in range(128)]) - set(string.printable)
 printable = lambda s: s.translate({ord(c): u'\ufffd' for c in nonprintable})
 has_nonprintable = lambda s: \
     len(s) != len(s.translate({ord(c): None for c in nonprintable}))
@@ -265,6 +265,10 @@ class TextReport(object):
                 u'++ %d unparsed bytes remaining on the response stream\n' %
                 len(connection.unparsed_outbound))
 
+    def render_all(self, connections):
+        for conn in connections:
+            self.render_connection(conn)
+
 
 class HTMLReport(object):
 
@@ -380,22 +384,28 @@ class HTMLReport(object):
             H.br(_class='clear')
 
     def render_connection(self, conn):
+        for exch in conn.exchanges:
+            with H.div(**for_object(exch)):
+                self.render_notices(exch)
+                if exch.request:
+                    self.render_request(exch.request)
+                for resp in exch.responses or []:
+                    self.render_response(resp)
+
+        if conn.unparsed_inbound:
+            H.p('%d unparsed bytes remaining on the request stream' %
+                len(conn.unparsed_inbound),
+                _class=u'unparsed inbound')
+        if conn.unparsed_outbound:
+            H.p('%d unparsed bytes remaining on the response stream' %
+                len(conn.unparsed_outbound),
+                _class=u'unparsed outbound')
+
+    def render_all(self, connections):
         with self.document:
-            for exch in conn.exchanges:
-                with H.div(**for_object(exch)):
-                    self.render_notices(exch)
-                    if exch.request:
-                        self.render_request(exch.request)
-                    for resp in exch.responses or []:
-                        self.render_response(resp)
-
-            if conn.unparsed_inbound:
-                H.p('%d unparsed bytes remaining on the request stream' %
-                    len(conn.unparsed_inbound),
-                    _class=u'unparsed request')
-            if conn.unparsed_outbound:
-                H.p('%d unparsed bytes remaining on the response stream' %
-                    len(conn.unparsed_outbound),
-                    _class=u'unparsed outbound')
-
+            for i, conn in enumerate(connections):
+                with H.div(**for_object(conn)):
+                    if len(connections) > 1:
+                        H.h1(u'Connection %d' % (i + 1))
+                    self.render_connection(conn)
         self.dump()

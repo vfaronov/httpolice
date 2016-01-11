@@ -21,9 +21,10 @@ def main():
     conn = connection.parse_two_streams(inbound_stream, outbound_stream)
     connection.check_connection(conn)
     if args.html:
-        report.HTMLReport(sys.stdout).render_connection(conn)
+        rep = report.HTMLReport(sys.stdout)
     else:
-        report.TextReport(sys.stdout).render_connection(conn)
+        rep = report.TextReport(sys.stdout)
+    rep.render_all([conn])
 
 
 if __name__ == '__main__':

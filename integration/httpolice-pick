@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import argparse
+import os
+import sys
+
+import httpolice.connection
+import httpolice.report
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Run HTTPolice on streams collected by tcpick.')
+    parser.add_argument('-H', '--html', action='store_true',
+                        help='render HTML report instead of plain text')
+    parser.add_argument('streams_dir')
+    args = parser.parse_args()
+
+    inputs = []
+    for name in os.listdir(args.streams_dir):
+        if ('.serv.' not in name) or (not name.endswith('.dat')):
+            continue
+        inbound = os.path.join(args.streams_dir, name)
+        outbound = os.path.join(args.streams_dir,
+                                name.replace('.serv.', '.clnt.'))
+        if not os.path.exists(outbound):
+            sys.stderr.write('No outbound stream %s, skipping' %
+                             os.path.basename(outbound))
+            continue
+        inputs.append((inbound, outbound, os.stat(inbound).st_ctime))
+
+    inputs.sort(key=lambda entry: entry[2])
+
+    connections = []
+    for inbound, outbound, _ in inputs:
+        with open(inbound) as f:
+            inbound_stream = f.read()
+        with open(outbound) as f:
+            outbound_stream = f.read()
+        conn = httpolice.connection.parse_two_streams(inbound_stream,
+                                                      outbound_stream)
+        httpolice.connection.check_connection(conn)
+        connections.append(conn)
+
+    if args.html:
+        report = httpolice.report.HTMLReport(sys.stdout)
+    else:
+        report = httpolice.report.TextReport(sys.stdout)
+    report.render_all(connections)
+
+if __name__ == '__main__':
+    sys.exit(main())
