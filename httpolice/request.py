@@ -60,11 +60,10 @@ def check_request(req):
     if req.headers.te and u'TE' not in req.headers.connection:
         req.complain(1029)
 
-    if req.version == http11:
-        if req.headers.host.is_absent:
-            req.complain(1031)
-        elif req.header_entries[0].name != h.host:
-            req.complain(1032)
+    if req.version == http11 and req.headers.host.is_absent:
+        req.complain(1031)
+    if req.headers.host.is_present and req.header_entries[0].name != h.host:
+        req.complain(1032)
 
     if req.method == m.CONNECT:
         if not req.is_authority_form:
