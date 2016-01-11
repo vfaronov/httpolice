@@ -142,12 +142,14 @@ def piece_to_html(piece, ctx):
 def render_known(obj):
     cls = u'known known-%s' % type(obj).__name__
     cite = known.citation(obj)
+    title = known.title(obj, with_citation=True)
     if cite:
-        with H.a(unicode(obj), _class=cls, href=cite.url, target='_blank'):
-            if cite.title:
-                H.attr(title=cite.title)
+        elem = H.a(unicode(obj), _class=cls, href=cite.url, target='_blank')
     else:
-        H.span(unicode(obj), _class=cls)
+        elem = H.span(unicode(obj), _class=cls)
+    if title:
+        with elem:
+            H.attr(title=title)
 
 
 def displayable_body(msg):

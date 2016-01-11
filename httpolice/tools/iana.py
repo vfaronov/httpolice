@@ -15,8 +15,9 @@ from httpolice.common import (
     StatusCode,
     RFC,
     TransferCoding,
+    UpgradeToken,
 )
-from httpolice.known import h, m, media, st, tc
+from httpolice.known import h, m, media, st, tc, upgrade
 
 
 def yes_no(s):
@@ -167,3 +168,18 @@ class MediaTypeRegistry(Registry):
                 continue
             entries.append(entry)
         return [('media types', entries, media)]
+
+
+class UpgradeTokenRegistry(Registry):
+
+    def get_all(self):
+        tree = self._get_xml('http-upgrade-tokens/http-upgrade-tokens.xml')
+        entries = []
+        for record in tree.findall('//iana:record', self.xmlns):
+            entries.append({
+                '_': UpgradeToken(record.find('iana:value', self.xmlns).text),
+                '_citations': list(self.extract_citations(record)),
+                '_title':
+                    record.find('iana:description', self.xmlns).text,
+            })
+        return [('upgrade tokens', entries, upgrade)]

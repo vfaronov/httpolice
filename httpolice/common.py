@@ -195,3 +195,12 @@ class MediaType(CaseInsensitive):
     """
 
     __slots__ = ()
+
+
+class UpgradeToken(CaseInsensitive):
+
+    # RFC 7230 doesn't say that upgrade tokens are case-insensitive.
+    # But RFC 6455 does say that for the ``WebSocket`` token,
+    # and it would make a lot of sense in general.
+
+    __slots__ = ()

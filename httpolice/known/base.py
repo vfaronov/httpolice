@@ -3,7 +3,7 @@
 class KnownDict(object):
 
     def __init__(self, items, extra_info=None):
-        allowed_info = set(['_', '_citations'] + (extra_info or []))
+        allowed_info = set(['_', '_citations', '_title'] + (extra_info or []))
         self._by_key = {}
         self._by_name = {}
         for item in items:
