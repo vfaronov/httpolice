@@ -319,4 +319,25 @@
     </rfc>
   </error>
 
+  <error id="1043">
+    <title><ref to="msg.method"/> request with a wrong <ref to="msg.target">target</ref></title>
+    <rfc num="7231" sect="4.3.6">
+      A client sending a <m>CONNECT</m> request MUST send the authority form of
+   request-target (Section 5.3 of [RFC7230]); i.e., the request-target
+   consists of only the host name and port number of the tunnel
+   destination, separated by a colon.
+    </rfc>
+    <explain>See also <rfc num="7230" sect="5.3"/>.</explain>
+  </error>
+
+  <error id="1044">
+    <title><ref to="msg.method"/> request with a wrong <ref to="msg.target">target</ref></title>
+    <explain>The target of an <m>OPTIONS</m> request must be in the origin form (the usual path + query), the asterisk form (*), or the absolute form (beginning with http://, only when behind a proxy). See <rfc num="7230" sect="5.3"/> and <rfc num="7231" sect="4.3.7"/>.</explain>
+  </error>
+
+  <error id="1045">
+    <title><ref to="msg.method"/> request with <ref to="msg.target">target</ref> in a wrong form</title>
+    <explain>The target of a <ref to="msg.method"/> request must be in either the origin form (the usual path + query) or the absolute form (beginning with http://, only when behind a proxy). See <rfc num="7230" sect="5.3"/>.</explain>
+  </error>
+
 </notices>

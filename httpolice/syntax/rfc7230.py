@@ -3,15 +3,11 @@
 import re
 
 from httpolice.common import (
-    AbsoluteForm,
-    AsteriskForm,
-    AuthorityForm,
     ConnectionOption,
     FieldName,
     HeaderEntry,
     HTTPVersion,
     Method,
-    OriginForm,
     Parametrized,
     StatusCode,
     TransferCoding,
@@ -27,6 +23,7 @@ from httpolice.parse import (
     function,
     join,
     literal,
+    lookahead,
     many,
     many1,
     maybe,
@@ -112,13 +109,15 @@ method = wrap(Method, token)   // rfc(7230, u'method')
 
 absolute_path = string1(join('/' + rfc3986.segment)) \
     // rfc(7230, u'absolute-path')
-origin_form = wrap(
-    OriginForm,
-    join(absolute_path + maybe(join('?' + rfc3986.query), empty='')))
-absolute_form = wrap(AbsoluteForm, rfc3986.absolute_uri)
-authority_form = wrap(AuthorityForm, rfc3986.authority)
-asterisk_form = wrap(AsteriskForm, '*')
-request_target = origin_form | absolute_form | authority_form | asterisk_form
+origin_form = join(absolute_path + maybe(join('?' + rfc3986.query), empty=''))
+absolute_form = rfc3986.absolute_uri
+authority_form = rfc3986.authority
+asterisk_form = literal('*')
+request_target = (
+    (origin_form + ~lookahead(' ')) |
+    (authority_form + ~lookahead(' ')) |
+    (absolute_form + ~lookahead(' ')) |
+    (asterisk_form + ~lookahead(' ')))
 
 http_version = decode_into(HTTPVersion, join('HTTP/' + digit + '.' + digit)) \
     // rfc(7230, u'HTTP-version')

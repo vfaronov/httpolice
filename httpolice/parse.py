@@ -319,6 +319,20 @@ class WrapParser(Parser):
         return r
 
 
+class LookaheadParser(Parser):
+
+    def __init__(self, inner):
+        super(LookaheadParser, self).__init__()
+        self.inner = parsify(inner)
+
+    def parse(self, state):
+        state.push()
+        try:
+            self.inner.parse(state)
+        finally:
+            state.pop()
+
+
 eof = EOFParser()
 function = FuncParser
 nbytes = NBytesParser
@@ -340,6 +354,7 @@ stringx = lambda min_, max_, inner: join(times(min_, max_, inner))
 decode = lambda inner: wrap(lambda s: s.decode('utf-8', 'replace'), inner)
 decode_into = lambda con, inner: wrap(con, decode(inner))
 ci = lambda s: decode_into(CaseInsensitive, literal(s, case_insensitive=True))
+lookahead = LookaheadParser
 
 rfc = lambda num, rule: u'<%s> (RFC %d)' % (rule, num)
 char_range = lambda min_, max_: ''.join(chr(x) for x in range(min_, max_ + 1))

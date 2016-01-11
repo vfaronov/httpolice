@@ -1,8 +1,9 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import message
+from httpolice import message, parse
 from httpolice.common import http11
-from httpolice.known import h, method, tc
+from httpolice.known import h, m, method, tc
+from httpolice.syntax import rfc7230
 
 
 class Request(message.Message):
@@ -16,6 +17,27 @@ class Request(message.Message):
                                       body, trailer_entries, raw)
         self.method = method_
         self.target = target
+        self._parse_target()
+
+    def _parse_target(self):
+        # The ``<request-target>`` story is complicated by the fact
+        # that there is syntactic overlap between the 4 possible forms.
+        # For instance, ``example.com:80`` can be parsed as ``<absolute-URI>``
+        # with a ``<scheme>`` of ``example.com``
+        # and a ``<path-rootless>`` of ``80``.
+        # Similarly, ``*`` can be parsed as ``<authority>``.
+        # So we just compute and remember 4 separate flags.
+        for form_name, parser in [('origin', rfc7230.origin_form),
+                                  ('absolute', rfc7230.absolute_form),
+                                  ('authority', rfc7230.authority_form),
+                                  ('asterisk', rfc7230.asterisk_form)]:
+            try:
+                (parser + parse.eof).parse(parse.State(self.target))
+            except parse.ParseError:
+                result = False
+            else:
+                result = True
+            setattr(self, 'is_%s_form' % form_name, result)
 
 
 def check_request(req):
@@ -41,3 +63,14 @@ def check_request(req):
             req.complain(1031)
         elif req.header_entries[0].name != h.host:
             req.complain(1032)
+
+    if req.method == m.CONNECT:
+        if not req.is_authority_form:
+            req.complain(1043)
+    elif req.method == m.OPTIONS:
+        if not req.is_origin_form and not req.is_asterisk_form \
+                and not req.is_absolute_form:
+            req.complain(1044)
+    else:
+        if not req.is_origin_form and not req.is_absolute_form:
+            req.complain(1045)

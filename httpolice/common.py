@@ -181,26 +181,6 @@ class ConnectionOption(CaseInsensitive):
     __slots__ = ()
 
 
-class OriginForm(str):
-
-    __slots__ = ()
-
-
-class AbsoluteForm(str):
-
-    __slots__ = ()
-
-
-class AuthorityForm(str):
-
-    __slots__ = ()
-
-
-class AsteriskForm(str):
-
-    __slots__ = ()
-
-
 class MediaType(CaseInsensitive):
 
     """

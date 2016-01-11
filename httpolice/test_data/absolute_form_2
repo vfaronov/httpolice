@@ -1,0 +1,18 @@
+# This is a request to a proxy,
+# which will translate it into an ``OPTIONS *`` request to the origin server
+# (if not behind another proxy).
+
+======== BEGIN INBOUND STREAM ========
+OPTIONS http://example.com HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Length: 0
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+Via: 1.1 proxy.example.net
+
+Hello world!
