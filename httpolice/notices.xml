@@ -311,4 +311,12 @@
     </rfc>
   </comment>
 
+  <error id="1042">
+    <title>More than one ‘<ref to="param"/>’ parameter in <ref to="msg.headers.content_type"/></title>
+    <rfc num="6838" sect="4.3">
+      It is an error for a specific
+   parameter to be specified more than once.
+    </rfc>
+  </error>
+
 </notices>

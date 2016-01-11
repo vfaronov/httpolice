@@ -71,7 +71,7 @@ def check_message(msg):
 
     data = msg.decoded_body
     if okay(data) and msg.headers.content_type.is_okay:
-        check_media(msg, msg.headers.content_type.value.item, data)
+        check_media(msg, msg.headers.content_type.value, data)
 
     for entry in msg.trailer_entries or []:
         if entry.name not in msg.headers.trailer:
@@ -93,13 +93,22 @@ def check_message(msg):
 
 
 def check_media(msg, type_, data):
-    if media_type.is_json(type_):
+    the_type = type_.item
+    type_params = type_.param
+
+    seen_params = set()
+    for param_name, _ in type_params:
+        if param_name in seen_params:
+            msg.complain(1042, param=param_name)
+        seen_params.add(param_name)
+
+    if media_type.is_json(the_type):
         try:
             json.loads(data)
         except Exception, e:
             msg.complain(1038, error=e)
 
-    if media_type.is_xml(type_):
+    if media_type.is_xml(the_type):
         try:
             defusedxml.ElementTree.fromstring(data)
         except defusedxml.DefusedXmlException:
@@ -107,7 +116,7 @@ def check_media(msg, type_, data):
         except Exception, e:
             msg.complain(1039, error=e)
 
-    if type_ == media.application_x_www_form_urlencoded:
+    if the_type == media.application_x_www_form_urlencoded:
         # This list is taken from the HTML specification --
         # http://www.w3.org/TR/html/forms.html#url-encoded-form-data --
         # as the exhaustive list of bytes that can be output
