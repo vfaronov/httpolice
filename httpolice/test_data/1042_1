@@ -1,4 +1,4 @@
-1042
+1042 1004 1010
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
@@ -9,6 +9,6 @@ User-Agent: demo
 HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/x.my-strange-type; Charset=UTF-8; foo=bar;charset=utf-8
-Content-Length: 14
+Content-Length: 19
 
 Hello world!

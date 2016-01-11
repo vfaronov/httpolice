@@ -84,9 +84,14 @@ def check_message(msg):
         if okay(opt) and header.is_bad_for_connection(common.FieldName(opt)):
             msg.complain(1034, header=msg.headers[common.FieldName(opt)])
 
-    if msg.headers.content_type.is_okay and \
-            media_type.deprecated(msg.headers.content_type.value.item):
-        msg.complain(1035)
+    if msg.headers.content_type.is_okay:
+        if media_type.deprecated(msg.headers.content_type.value.item):
+            msg.complain(1035)
+        seen_params = set()
+        for param_name, _ in msg.headers.content_type.value.param:
+            if param_name in seen_params:
+                msg.complain(1042, param=param_name)
+            seen_params.add(param_name)
 
     if okay(msg.body) and msg.body and msg.headers.content_type.is_absent:
         msg.complain(1041)
@@ -94,13 +99,6 @@ def check_message(msg):
 
 def check_media(msg, type_, data):
     the_type = type_.item
-    type_params = type_.param
-
-    seen_params = set()
-    for param_name, _ in type_params:
-        if param_name in seen_params:
-            msg.complain(1042, param=param_name)
-        seen_params.add(param_name)
 
     if media_type.is_json(the_type):
         try:
