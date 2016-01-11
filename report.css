@@ -37,15 +37,16 @@ q {
 .request-line, .status-line, .HeaderEntry {
     font-family: monospace;
     padding: 0.3em 0;
-}
-
-.HeaderEntry {
-    white-space: pre-wrap;
     overflow: auto;
 }
 
 .request-line, .status-line {
+    white-space: pre;
     font-weight: bold;
+}
+
+.HeaderEntry {
+    white-space: pre-wrap;
 }
 
 .review-block {
