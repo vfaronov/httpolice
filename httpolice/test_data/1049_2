@@ -1,0 +1,15 @@
+1049 1011
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 101 Switching Protocols
+Connection: Upgrade
+Upgrade: FSTR/3
+
+nfwjne
+wfrkjnwekjfn
+welknlknfrwlen

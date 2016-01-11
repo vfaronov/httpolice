@@ -97,6 +97,10 @@ def check_message(msg):
     if okay(msg.body) and msg.body and msg.headers.content_type.is_absent:
         msg.complain(1041)
 
+    if msg.headers.upgrade.is_present and \
+            u'upgrade' not in msg.headers.connection:
+        msg.complain(1050)
+
 
 def check_media(msg, type_, data):
     the_type = type_.item

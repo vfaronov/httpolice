@@ -197,6 +197,7 @@ connection_option = wrap(ConnectionOption, token)
 
 protocol_name = token   // rfc(7230, u'protocol-name')
 protocol_version = token   // rfc(7230, u'protocol-version')
+protocol = protocol_name + maybe(~literal('/') + protocol_version)
 
 received_protocol = (maybe(protocol_name + ~literal('/'), u'HTTP') +
                      protocol_version)

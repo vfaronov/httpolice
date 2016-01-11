@@ -151,6 +151,12 @@ class TestSyntax(unittest.TestCase):
              (u'HTTP', u'1.1', u'proxy1', None)])
         self.assertNoParse(p, 'proxy1, proxy2')
 
+    def test_protocol(self):
+        p = rfc7230.protocol + parse.eof
+        self.assertParse(p, 'h2c', (u'h2c', None))
+        self.assertParse(p, 'FSTR/2', (u'FSTR', u'2'))
+        self.assertNoParse(p, '/2')
+
 
 class TestRequest(unittest.TestCase):
 

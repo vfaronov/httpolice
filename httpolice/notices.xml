@@ -352,4 +352,42 @@
     <explain>But the server neglected to send a ‘close’ option in the <h>Connection</h> header, as specified in <rfc num="7230" sect="6.3"/> and <rfc num="7230" sect="6.6"/>.</explain>
   </comment>
 
+  <error id="1048">
+    <title><ref to="msg.status"/> response without an <h>Upgrade</h> header</title>
+    <rfc num="7230" sect="6.7">
+      A server that sends a <st>101</st> (Switching Protocols) response MUST send an
+   <h>Upgrade</h> header field to indicate the new protocol(s) to which the
+   connection is being switched; if multiple protocol layers are being
+   switched, the sender MUST list the protocols in layer-ascending
+   order.
+    </rfc>
+  </error>
+
+  <error id="1049">
+    <title><ref to="msg.status">Switching</ref> to a <ref to="msg.headers.upgrade">protocol</ref> that was not <ref to="msg.request.headers.upgrade">requested</ref></title>
+    <rfc num="7230" sect="6.7">
+      A server MUST NOT switch to a protocol that was not indicated
+   by the client in the corresponding request's <h>Upgrade</h> header field.
+    </rfc>
+  </error>
+
+  <error id="1050">
+    <title><ref to="msg.headers.upgrade"/> header without “<ref to="msg.headers.connection"/>: upgrade”</title>
+    <rfc num="7230" sect="6.7">
+      When <h>Upgrade</h> is sent, the sender MUST also send a <h>Connection</h> header
+   field (Section 6.1) that contains an "upgrade" connection option, in
+   order to prevent Upgrade from being accidentally forwarded by
+   intermediaries that might not implement the listed protocols.
+    </rfc>
+  </error>
+
+  <error id="1051">
+    <title><ref to="msg.status"/> response to an <ref to="msg.request.version"/> request</title>
+    <rfc num="7230" sect="6.7">
+      A
+   server MUST ignore an <h>Upgrade</h> header field that is received in an
+   HTTP/1.0 request.
+    </rfc>
+  </error>
+
 </notices>

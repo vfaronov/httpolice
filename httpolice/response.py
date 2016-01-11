@@ -1,7 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import message
-from httpolice.common import Unparseable, http11, okay
+from httpolice.common import Unparseable, http10, http11, okay
 from httpolice.known import h, m, st, tc
 
 
@@ -42,6 +42,10 @@ def check_response_itself(resp):
         if resp.headers.content_length.is_present:
             resp.complain(1023)
 
+    if resp.status == st.switching_protocols and \
+            resp.headers.upgrade.is_absent:
+        resp.complain(1048)
+
 
 def check_response_in_context(resp, req):
     if req.method == m.CONNECT and resp.status.successful:
@@ -67,6 +71,13 @@ def check_response_in_context(resp, req):
             not resp.status.informational and \
             resp.status != st.proxy_authentication_required:
         resp.complain(1046)
+
+    if resp.status == st.switching_protocols:
+        if any(proto not in req.headers.upgrade
+               for proto in resp.headers.upgrade):
+            resp.complain(1049)
+        elif req.version == http10:
+            resp.complain(1051)
 
 
 def check_responses_flow(resps):
