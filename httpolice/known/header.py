@@ -205,7 +205,12 @@ known = KnownDict([
   'iana_status': 'standard'},
  {'_': FieldName(u'From'),
   '_citations': [RFC(7231, section=(5, 5, 1))],
-  'iana_status': 'standard'},
+  'for_request': True,
+  'for_response': False,
+  'iana_status': 'standard',
+  # I'm not parsing the full RFC 5322 ``<mailbox>``, not right now.
+  'parser': anything,
+  'rule': SINGLE},
  {'_': FieldName(u'GetProfile'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Hobareg'),
   '_citations': [RFC(7486, section=(6, 1, 1))],
