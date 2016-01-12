@@ -204,3 +204,8 @@ class UpgradeToken(CaseInsensitive):
     # and it would make a lot of sense in general.
 
     __slots__ = ()
+
+
+class LanguageTag(CaseInsensitive):
+
+    __slots__ = ()

@@ -2,7 +2,7 @@
 
 from httpolice.common import Citation, FieldName, RFC
 from httpolice.known.base import KnownDict
-from httpolice.syntax import rfc7230, rfc7231
+from httpolice.syntax import rfc3986, rfc5646, rfc7230, rfc7231
 from httpolice.syntax.common import integer
 
 
@@ -105,7 +105,9 @@ known = KnownDict([
  {'_': FieldName(u'Content-Language'),
   '_citations': [RFC(7231, section=(3, 1, 3, 2))],
   'bad_for_connection': True,
-  'iana_status': 'standard'},
+  'iana_status': 'standard',
+  'parser': rfc7230.comma_list1(rfc5646.language_tag),
+  'rule': MULTI},
  {'_': FieldName(u'Content-Length'),
   '_citations': [RFC(7230, section=(3, 3, 2))],
   'bad_for_trailer': True,
@@ -114,7 +116,9 @@ known = KnownDict([
   'rule': SINGLE},
  {'_': FieldName(u'Content-Location'),
   '_citations': [RFC(7231, section=(3, 1, 4, 2))],
-  'iana_status': 'standard'},
+  'iana_status': 'standard',
+  'parser': rfc3986.absolute_uri | rfc7230.partial_uri,
+  'rule': SINGLE},
  {'_': FieldName(u'Content-MD5'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Content-Range'),
   '_citations': [RFC(7233, section=(4, 2))],

@@ -136,6 +136,14 @@ class TestSyntax(unittest.TestCase):
         self.assertParse(p,
                          'urn:oasis:names:specification:docbook:dtd:xml:4.1.2')
 
+    def test_partial_uri(self):
+        p = rfc7230.partial_uri + parse.eof
+        self.assertParse(p, '/')
+        self.assertParse(p, '/foo/bar?baz=qux&xyzzy=123')
+        self.assertParse(p, 'foo/bar/')
+        self.assertParse(p, '//example.net/static/ui.js')
+        self.assertNoParse(p, '/foo#bar=baz')
+
     def test_via(self):
         p = rfc7230.via + parse.eof
         self.assertParse(p, '1.0 fred, 1.1 p.example.net',

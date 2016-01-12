@@ -110,6 +110,10 @@ method = wrap(Method, token)   // rfc(7230, u'method')
 
 absolute_path = string1(join('/' + rfc3986.segment)) \
     // rfc(7230, u'absolute-path')
+partial_uri = join(
+    rfc3986.relative_part +
+    maybe(join('?' + rfc3986.query), '')) \
+    // rfc(7230, u'partial-URI')
 origin_form = join(absolute_path + maybe(join('?' + rfc3986.query), empty=''))
 absolute_form = rfc3986.absolute_uri
 authority_form = rfc3986.authority

@@ -26,6 +26,7 @@ pchar = unreserved | pct_encoded | sub_delims | char_class(':@')
 
 segment = string(pchar)
 segment_nz = string1(pchar)
+segment_nz_nc = string1(unreserved | pct_encoded | sub_delims | '@')
 
 scheme = join(char_class(ALPHA) + string(char_class(ALPHA + DIGIT + '+-.'))) \
     // rfc(3986, u'scheme')
@@ -54,8 +55,12 @@ authority = join(maybe(join(userinfo + '@'), '') +
                  host + maybe(join(':' + port), ''))
 
 path_abempty = string(join('/' + segment))   // rfc(3986, u'path-abempty')
-path_absolute = join('/' + join(segment_nz + string(join('/' + segment)))) \
+path_absolute = join(
+    '/' +
+    maybe(join(segment_nz + string(join('/' + segment))), '')) \
     // rfc(3986, u'path-absolute')
+path_noscheme = join(segment_nz_nc + string(join('/' + segment))) \
+    // rfc(3986, u'path-noscheme')
 path_rootless = join(segment_nz + string(join('/' + segment))) \
     // rfc(3986, u'path-rootless')
 path_empty = literal('')   // rfc(3986, u'path-empty')
@@ -66,3 +71,6 @@ hier_part = (join('//' + authority + path_abempty) |
 query = string(pchar | char_class('/?'))
 
 absolute_uri = join(scheme + ':' + hier_part + maybe(join('?' + query), ''))
+
+relative_part = (join('//' + authority + path_abempty) |
+                 path_absolute | path_noscheme | path_empty)
