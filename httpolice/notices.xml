@@ -432,4 +432,15 @@
     </rfc>
   </warning>
 
+  <error id="1058">
+    <title><ref to="msg.status"/> response to a <ref to="msg.request.method"/> request with <ref to="msg.request.headers.content_range"/></title>
+    <rfc num="7231" sect="4.3.4">
+      An origin server that allows <m>PUT</m> on a given target resource MUST send
+   a <st>400</st> (Bad Request) response to a PUT request that contains a
+   <h>Content-Range</h> header field (Section 4.2 of [RFC7233]), since the
+   payload is likely to be partial content that has been mistakenly PUT
+   as a full representation.
+    </rfc>
+  </error>
+
 </notices>

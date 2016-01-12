@@ -98,6 +98,10 @@ def check_response_in_context(resp, req):
                     st.not_modified]:
                 resp.complain(1055)
 
+    if req.method == m.PUT and req.headers.content_range.is_present and \
+            resp.status.successful:
+        resp.complain(1058)
+
 
 def check_responses_flow(resps):
     pass
