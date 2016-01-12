@@ -63,7 +63,7 @@ def reference_targets(obj):
 
 
 def notice_to_text(the_notice, ctx):
-    info = u'%d %s' % (the_notice.ident, the_notice.severity)
+    info = u'%d %s' % (the_notice.ident, the_notice.severity_short)
     title = pieces_to_text(the_notice.title, ctx).strip()
     explanation = u'\n'.join(pieces_to_text(para, ctx).strip()
                              for para in the_notice.explanation)
@@ -94,15 +94,16 @@ def piece_to_text(piece, ctx):
         return unicode(piece)
 
 
-def notice_to_html(the_notice, ctx):
-    with H.div(_class='notice notice-%s' % the_notice.tag):
+def notice_to_html(the_notice, ctx, for_example=False):
+    with H.div(_class='notice notice-%s' % the_notice.severity):
         with H.p(_class='notice-heading', __inline=True):
-            with H.span(_class='notice-info'):
-                H.span(unicode(the_notice.ident), _class='notice-ident')
+            if not for_example:
+                with H.span(_class='notice-info'):
+                    H.span(unicode(the_notice.ident), _class='notice-ident')
+                    H.span(u' ')
+                    H.span(the_notice.severity_short, _class='notice-severity',
+                           title=the_notice.severity)
                 H.span(u' ')
-                H.span(the_notice.severity, _class='notice-severity',
-                       title=the_notice.tag)
-            H.span(u' ')
             with H.span(_class='notice-title'):
                 pieces_to_html(the_notice.title, ctx)
         for para in the_notice.explanation:
@@ -150,6 +151,35 @@ def render_known(obj):
     if title:
         with elem:
             H.attr(title=title)
+
+
+def _include_stylesheet():
+    H.link(rel='stylesheet', href='report.css', type='text/css')
+
+
+def _include_scripts():
+    H.script(src='https://code.jquery.com/jquery-1.11.3.js',
+             type='text/javascript')
+    H.script(src='report.js', type='text/javascript')
+
+
+def render_notice_examples(examples):
+    doc = dominate.document(title=u'HTTPolice notice examples')
+    with doc.head:
+        H.meta(http_equiv='Content-Type', content='text/html; charset=utf-8')
+        _include_stylesheet()
+    with doc:
+        H.h1(u'HTTPolice notice examples')
+        with H.table(_class='notice-examples'):
+            H.thead(H.tr(H.th(u'ID'), H.th(u'severity'), H.th(u'example')))
+            with H.tbody():
+                for the_notice, ctx in examples:
+                    with H.tr():
+                        H.td(unicode(the_notice.ident))
+                        H.td(the_notice.severity)
+                        with H.td():
+                            notice_to_html(the_notice, ctx, for_example=True)
+    return doc.render().encode('utf-8')
 
 
 def displayable_body(msg):
@@ -278,10 +308,8 @@ class HTMLReport(object):
         with self.document.head:
             H.meta(http_equiv='Content-Type',
                    content='text/html; charset=utf-8')
-            H.link(rel='stylesheet', href='report.css', type='text/css')
-            H.script(src='https://code.jquery.com/jquery-1.11.3.js',
-                     type='text/javascript')
-            H.script(src='report.js', type='text/javascript')
+            _include_stylesheet()
+            _include_scripts()
 
     def dump(self):
         self.outfile.write(self.document.render().encode('utf-8'))

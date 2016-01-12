@@ -448,19 +448,21 @@ class TestResponse(unittest.TestCase):
 
 class TestFromFiles(unittest.TestCase):
 
-    @staticmethod
-    def load_tests():
+    @classmethod
+    def load_tests(cls):
         data_path = os.path.abspath(os.path.join(__file__, '..', 'test_data'))
         if os.path.isdir(data_path):
             for name in os.listdir(data_path):
-                TestFromFiles.make_test(os.path.join(data_path, name))
-        TestFromFiles.covered = set()
+                cls.make_test(os.path.join(data_path, name))
+        cls.covered = set()
+        cls.examples_filename = os.environ.get('WRITE_EXAMPLES_TO')
+        cls.examples = {} if cls.examples_filename else None
 
-    @staticmethod
-    def make_test(filename):
+    @classmethod
+    def make_test(cls, filename):
         def test(self):
             self._run_test(filename)
-        setattr(TestFromFiles, 'test_%s' % os.path.basename(filename), test)
+        setattr(cls, 'test_%s' % os.path.basename(filename), test)
 
     def _run_test(self, filename):
         with open(filename) as f:
@@ -479,9 +481,19 @@ class TestFromFiles(unittest.TestCase):
         self.assertEquals(expected, actual)
         report.HTMLReport(StringIO()).render_connection(conn)
         self.covered.update(actual)
+        if self.examples is not None:
+            for ident, ctx in conn.collect_complaints():
+                self.examples.setdefault(ident, ctx)
 
     def test_all_notices_covered(self):
         self.assertEquals(self.covered, set(notice.notices))
+        if self.examples is not None:
+            self.assertEquals(self.covered, set(self.examples))
+            with open(self.examples_filename, 'w') as f:
+                f.write(report.render_notice_examples(
+                    (notice.notices[ident], ctx)
+                    for ident, ctx in sorted(self.examples.items())
+                ))
 
 TestFromFiles.load_tests()
 

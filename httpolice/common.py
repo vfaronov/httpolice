@@ -21,6 +21,17 @@ class ReportNode(object):
         if complaint not in self.complaints:
             self.complaints.append(complaint)
 
+    @property
+    def sub_nodes(self):
+        return []
+
+    def collect_complaints(self):
+        for c in self.complaints or []:
+            yield c
+        for node in self.sub_nodes:
+            for c in node.collect_complaints():
+                yield c
+
 
 class _Unparseable(object):
 

@@ -101,3 +101,24 @@ q {
 br.clear {
     clear: both;
 }
+
+.notice-examples {
+    margin-top: 2em;
+    max-width: 60em;
+    border-collapse: collapse;
+}
+
+.notice-examples td {
+    padding: 1em 1em 0 1em;
+    vertical-align: top;
+    border-top: solid 1px #BBBBBB;
+}
+
+.notice-examples th {
+    padding-bottom: 1em;
+}
+
+.notice-examples .notice-heading {
+    margin-top: 0;
+    font-weight: bold;
+}

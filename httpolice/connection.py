@@ -21,6 +21,14 @@ class Exchange(common.ReportNode):
         for resp in self.responses or []:
             resp.request = self.request
 
+    @property
+    def sub_nodes(self):
+        if okay(self.request):
+            yield self.request
+        for resp in self.responses:
+            if okay(resp):
+                yield resp
+
 
 class Connection(common.ReportNode):
 
@@ -32,6 +40,10 @@ class Connection(common.ReportNode):
         self.exchanges = exchanges or []
         self.unparsed_inbound = unparsed_inbound
         self.unparsed_outbound = unparsed_outbound
+
+    @property
+    def sub_nodes(self):
+        return self.exchanges
 
 
 def check_connection(conn):

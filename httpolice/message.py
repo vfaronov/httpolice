@@ -30,6 +30,10 @@ class Message(common.ReportNode):
         self.rebuild_headers()
         self._decoded_body = None
 
+    @property
+    def sub_nodes(self):
+        return self.header_entries + (self.trailer_entries or [])
+
     def rebuild_headers(self):
         self.headers = header_view.HeadersView(self)
 
