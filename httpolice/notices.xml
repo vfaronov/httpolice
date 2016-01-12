@@ -452,4 +452,9 @@
     </rfc>
   </warning>
 
+  <warning id="1060">
+    <title>Strange <ref to="msg.headers.content_location"/> in a response to a <ref to="msg.request.method"/> request</title>
+    <explain>This is an ostensibly successful (<ref to="msg.status"/>) response to a <ref to="msg.request.method"/> request. However, according to its <ref to="msg.headers.content_location"/> header, it carries a representation of the target resource—the one that should have been deleted. This probably means that either the <ref to="msg.headers.content_location"/> is wrong, or the request did not actually succeed.</explain>
+  </warning>
+
 </notices>
