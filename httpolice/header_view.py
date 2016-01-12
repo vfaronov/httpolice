@@ -114,6 +114,12 @@ class HeaderView(object):
     def __nonzero__(self):
         return bool(self.value)
 
+    def __eq__(self, other):
+        return self.value == other or super(HeaderView, self) == other
+
+    def __ne__(self, other):
+        return not (self == other)
+
 
 class UnknownHeaderView(HeaderView):
 

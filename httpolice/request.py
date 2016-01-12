@@ -116,3 +116,10 @@ def check_request(req):
     if req.method == m.OPTIONS and \
             okay(req.body) and req.body and req.headers.content_type.is_absent:
         req.complain(1062)
+
+    if req.headers.expect.is_present:
+        if req.headers.expect == '100-continue':
+            if req.body is None:
+                req.complain(1066)
+        else:
+            req.complain(1065)
