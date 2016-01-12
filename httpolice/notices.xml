@@ -475,4 +475,14 @@
     </rfc>
   </error>
 
+  <error id="1063">
+    <title><ref to="header"/> is a response header</title>
+    <explain>This request includes the <ref to="header"/> header, which is defined for responses, but not for requests.</explain>
+  </error>
+
+  <error id="1064">
+    <title><ref to="header"/> is a request header</title>
+    <explain>This response includes the <ref to="header"/> header, which is defined for requests, but not for responses.</explain>
+  </error>
+
 </notices>

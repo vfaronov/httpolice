@@ -17,6 +17,12 @@ def is_bad_for_connection(name):
 def is_bad_for_trailer(name):
     return known.get_info(name).get('bad_for_trailer')
 
+def is_for_request(name):
+    return known.get_info(name).get('for_request')
+
+def is_for_response(name):
+    return known.get_info(name).get('for_response')
+
 def is_representation_metadata(name):
     return known.get_info(name).get('representation_metadata')
 
@@ -49,6 +55,8 @@ known = KnownDict([
  {'_': FieldName(u'Accept-Patch'), '_citations': [RFC(5789)]},
  {'_': FieldName(u'Accept-Ranges'),
   '_citations': [RFC(7233, section=(2, 3))],
+  'for_request': False,
+  'for_response': True,
   'iana_status': 'standard'},
  {'_': FieldName(u'Age'),
   '_citations': [RFC(7234, section=(5, 1))],
@@ -88,6 +96,8 @@ known = KnownDict([
   'iana_status': 'reserved'},
  {'_': FieldName(u'Connection'),
   '_citations': [RFC(7230, section=(6, 1))],
+  'for_request': True,
+  'for_response': True,
   'iana_status': 'standard',
   'parser': rfc7230.comma_list1(rfc7230.connection_option),
   'rule': MULTI},
@@ -116,6 +126,8 @@ known = KnownDict([
  {'_': FieldName(u'Content-Length'),
   '_citations': [RFC(7230, section=(3, 3, 2))],
   'bad_for_trailer': True,
+  'for_request': True,
+  'for_response': True,
   'iana_status': 'standard',
   'parser': integer,
   'rule': SINGLE},
@@ -196,6 +208,8 @@ known = KnownDict([
  {'_': FieldName(u'Host'),
   '_citations': [RFC(7230, section=(5, 4))],
   'bad_for_trailer': True,
+  'for_request': True,
+  'for_response': False,
   'iana_status': 'standard',
   'parser': rfc7230.host,
   'rule': SINGLE},
@@ -372,6 +386,8 @@ known = KnownDict([
  {'_': FieldName(u'TE'),
   '_citations': [RFC(7230, section=(4, 3))],
   'bad_for_trailer': True,
+  'for_request': True,
+  'for_response': False,
   'iana_status': 'standard',
   'parser': rfc7230.comma_list(rfc7230.t_codings),
   'rule': MULTI},
@@ -387,12 +403,16 @@ known = KnownDict([
  {'_': FieldName(u'Transfer-Encoding'),
   '_citations': [RFC(7230, section=(3, 3, 1))],
   'bad_for_trailer': True,
+  'for_request': True,
+  'for_response': True,
   'iana_status': 'standard',
   'parser': rfc7230.comma_list1(rfc7230.transfer_coding),
   'rule': MULTI},
  {'_': FieldName(u'URI'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Upgrade'),
   '_citations': [RFC(7230, section=(6, 7))],
+  'for_request': True,
+  'for_response': True,
   'iana_status': 'standard',
   'parser': rfc7230.comma_list1(rfc7230.protocol),
   'rule': MULTI},
@@ -409,6 +429,8 @@ known = KnownDict([
   'iana_status': 'standard'},
  {'_': FieldName(u'Via'),
   '_citations': [RFC(7230, section=(5, 7, 1))],
+  'for_request': True,
+  'for_response': True,
   'iana_status': 'standard',
   'parser': rfc7230.via,
   'rule': MULTI},
@@ -495,6 +517,7 @@ known = KnownDict([
   '_citations': [Citation('W3C Mobile Web Best Practices Working Group',
                           'http://www.w3.org/2005/MWI/BPWG/')]}
  ],
- extra_info=['bad_for_connection', 'bad_for_trailer', 'iana_status',
+ extra_info=['bad_for_connection', 'bad_for_trailer',
+             'for_request', 'for_response', 'iana_status',
              'parser', 'representation_metadata', 'rule']
 )

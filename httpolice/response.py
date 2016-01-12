@@ -44,10 +44,12 @@ def check_response_itself(resp):
         if resp.headers.content_length.is_present:
             resp.complain(1023)
 
-    if resp.status.informational:
-        for hdr in resp.headers:
-            if header.is_representation_metadata(hdr.name):
-                resp.complain(1052, header=hdr)
+    for hdr in resp.headers:
+        if header.is_for_response(hdr.name) == False:
+            resp.complain(1064, header=hdr)
+        elif header.is_representation_metadata(hdr.name) and \
+                resp.status.informational:
+            resp.complain(1052, header=hdr)
 
     if resp.status == st.switching_protocols and \
             resp.headers.upgrade.is_absent:
