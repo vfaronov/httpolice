@@ -514,4 +514,13 @@
     <explain>The <ref to="msg.headers.max_forwards"/> header is only defined for <m>OPTIONS</m> and <m>TRACE</m> requests. <rfc num="7231" sect="5.1.2">A recipient MAY ignore a Max-Forwards header field received with any other request methods.</rfc></explain>
   </warning>
 
+  <error id="1068">
+    <title><ref to="msg.headers.referer"/> with an ‘https:’ scheme sent in an unsecured request</title>
+    <rfc num="7231" sect="5.5.2">
+      A user agent MUST NOT send a <h>Referer</h> header field in an
+   unsecured HTTP request if the referring page was received with a
+   secure protocol.
+    </rfc>
+  </error>
+
 </notices>

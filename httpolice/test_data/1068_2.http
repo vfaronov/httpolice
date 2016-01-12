@@ -1,0 +1,18 @@
+1068
+
+# This file specifically indicates that it is plain (unsecured) HTTP,
+# so we have a problem.
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Referer: https://example.org/
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!

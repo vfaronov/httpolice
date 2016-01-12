@@ -460,11 +460,16 @@ class TestFromFiles(unittest.TestCase):
 
     @classmethod
     def make_test(cls, filename):
+        if '.' in filename:
+            test_name, scheme = filename.split('.', 1)
+        else:
+            test_name = filename
+            scheme = None
         def test(self):
-            self._run_test(filename)
-        setattr(cls, 'test_%s' % os.path.basename(filename), test)
+            self._run_test(filename, scheme)
+        setattr(cls, 'test_%s' % test_name, test)
 
-    def _run_test(self, filename):
+    def _run_test(self, filename, scheme=None):
         with open(filename) as f:
             data = f.read()
         header, data = data.split('======== BEGIN INBOUND STREAM ========\r\n')
@@ -472,7 +477,7 @@ class TestFromFiles(unittest.TestCase):
         lines = [ln for ln in header.splitlines() if not ln.startswith('#')]
         line = lines[0]
         expected = set(int(n) for n in line.split())
-        conn = connection.parse_two_streams(inb, outb)
+        conn = connection.parse_two_streams(inb, outb, scheme=scheme)
         connection.check_connection(conn)
         buffer = StringIO()
         report.TextReport(buffer).render_connection(conn)

@@ -1,5 +1,7 @@
 # -*- coding: utf-8; -*-
 
+import urlparse
+
 from httpolice import message, parse
 from httpolice.common import http11, okay
 from httpolice.known import h, header, m, method, tc
@@ -127,3 +129,8 @@ def check_request(req):
     if req.headers.max_forwards.is_present and \
             req.method not in [m.OPTIONS, m.TRACE]:
         req.complain(1067)
+
+    if req.headers.referer.is_okay:
+        if req.scheme == 'http' and \
+                urlparse.urlparse(req.headers.referer.value).scheme == 'https':
+            req.complain(1068)
