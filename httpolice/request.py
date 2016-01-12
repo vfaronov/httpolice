@@ -106,3 +106,5 @@ def check_request(req):
             req.complain(1056)
         elif req.method == m.HEAD:
             req.complain(1057)
+        elif req.method == m.DELETE:
+            req.complain(1059)

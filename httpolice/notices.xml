@@ -443,4 +443,13 @@
     </rfc>
   </error>
 
+  <warning id="1059">
+    <title><ref to="msg.method"/> request with a <ref to="msg.body">payload</ref></title>
+    <rfc num="7231" sect="4.3.5">
+      A payload within a <m>DELETE</m> request message has no defined semantics;
+   sending a payload body on a DELETE request might cause some existing
+   implementations to reject the request.
+    </rfc>
+  </warning>
+
 </notices>

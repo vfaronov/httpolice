@@ -1,0 +1,18 @@
+1059
+
+======== BEGIN INBOUND STREAM ========
+DELETE /articles/123/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Length: 16
+Content-Type: text/plain
+
+Hello world!
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!
