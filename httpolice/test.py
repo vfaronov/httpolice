@@ -169,8 +169,8 @@ class TestSyntax(unittest.TestCase):
 class TestRequest(unittest.TestCase):
 
     @staticmethod
-    def parse(stream):
-        conn = connection.parse_inbound_stream(stream)
+    def parse(stream, scheme=None):
+        conn = connection.parse_inbound_stream(stream, scheme=scheme)
         report.TextReport(StringIO()).render_connection(conn)
         report.HTMLReport(StringIO()).render_connection(conn)
         return [exch.request for exch in conn.exchanges]
@@ -309,6 +309,36 @@ class TestRequest(unittest.TestCase):
                   '\r\n')
         [req] = self.parse(stream)
         self.assert_(req.body is Unparseable)
+
+    def test_effective_uri_1(self):
+        stream = ('GET /pub/WWW/TheProject.html HTTP/1.1\r\n'
+                  'Host: www.example.org:8080\r\n'
+                  '\r\n')
+        [req] = self.parse(stream)
+        self.assertEqual(
+            req.effective_uri,
+            'http://www.example.org:8080/pub/WWW/TheProject.html')
+
+    def test_effective_uri_2(self):
+        stream = ('GET /pub/WWW/TheProject.html HTTP/1.0\r\n'
+                  '\r\n')
+        [req] = self.parse(stream)
+        self.assert_(req.effective_uri is None)
+
+    def test_effective_uri_3(self):
+        stream = ('OPTIONS * HTTP/1.1\r\n'
+                  'Host: www.example.org\r\n'
+                  '\r\n')
+        [req] = self.parse(stream, scheme='https')
+        self.assertEqual(req.effective_uri, 'https://www.example.org')
+
+    def test_effective_uri_4(self):
+        stream = ('GET myproto://www.example.org/index.html HTTP/1.1\r\n'
+                  'Host: www.example.org\r\n'
+                  '\r\n')
+        [req] = self.parse(stream)
+        self.assertEqual(req.effective_uri,
+                         'myproto://www.example.org/index.html')
 
 
 class TestResponse(unittest.TestCase):

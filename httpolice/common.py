@@ -2,6 +2,8 @@
 
 from collections import namedtuple
 
+import urlnorm
+
 
 class ReportNode(object):
 
@@ -209,3 +211,10 @@ class UpgradeToken(CaseInsensitive):
 class LanguageTag(CaseInsensitive):
 
     __slots__ = ()
+
+
+def url_equals(url1, url2):
+    try:
+        return urlnorm.norm(url1) == urlnorm.norm(url2)
+    except urlnorm.InvalidUrl:
+        return False

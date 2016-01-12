@@ -408,4 +408,10 @@
     <!-- It would be more interesting to check that the header announced by ``Trailer`` is actually present there, but I don't think this is feasible, because many/most implementations (which are going to supply us with parsed messages) don't provide access to the trailer part at all. -->
   </error>
 
+  <comment id="1055">
+    <title>Unnecessary <ref to="msg.headers.content_location"/></title>
+    <explain>This is a <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request. By definition, its payload is a representation of the requested resource. But it also contains a <ref to="msg.headers.content_location"/> header that points to the same URI as the request URI. In this case, the header provides no additional information.</explain>
+    <explain>See also <rfc num="7231" sect="3.1.4.1"/>.</explain>
+  </comment>
+
 </notices>

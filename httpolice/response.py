@@ -1,8 +1,10 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import message
-from httpolice.common import Unparseable, http10, http11, okay
+from httpolice.common import Unparseable, http10, http11, okay, url_equals
 from httpolice.known import h, header, m, st, tc
+
+import urlparse
 
 
 class Response(message.Message):
@@ -73,7 +75,7 @@ def check_response_in_context(resp, req):
         if resp.status.successful or resp.status.redirection:
             resp.complain(1033)
 
-    if req.is_to_proxy and resp.headers.via.is_absent and \
+    if req.is_absolute_form and resp.headers.via.is_absent and \
             not resp.status.informational and \
             resp.status != st.proxy_authentication_required:
         resp.complain(1046)
@@ -84,6 +86,17 @@ def check_response_in_context(resp, req):
             resp.complain(1049)
         elif req.version == http10:
             resp.complain(1051)
+
+    if resp.headers.content_location.is_okay and \
+            req.effective_uri is not None:
+        absolute_content_location = urlparse.urljoin(
+            req.effective_uri, resp.headers.content_location.value)
+        if url_equals(req.effective_uri, absolute_content_location):
+            if req.method in [m.GET, m.HEAD] and resp.status in [
+                    st.ok, st.non_authoritative_information,
+                    st.no_content, st.partial_content,
+                    st.not_modified]:
+                resp.complain(1055)
 
 
 def check_responses_flow(resps):

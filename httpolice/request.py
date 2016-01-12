@@ -12,34 +12,54 @@ class Request(message.Message):
         return '<Request %s>' % self.method
 
     def __init__(self, method_, target, version_, header_entries,
-                 body=None, trailer_entries=None, raw=None):
+                 body=None, trailer_entries=None, scheme=None, raw=None):
         super(Request, self).__init__(version_, header_entries,
                                       body, trailer_entries, raw)
         self.method = method_
         self.target = target
         self._parse_target()
+        self.scheme = scheme
+        self.effective_uri = self._build_effective_uri()
 
     def _parse_target(self):
-        # The ``<request-target>`` story is complicated by the fact
-        # that there is syntactic overlap between the 4 possible forms.
-        # For instance, ``example.com:80`` can be parsed as ``<absolute-URI>``
-        # with a ``<scheme>`` of ``example.com``
-        # and a ``<path-rootless>`` of ``80``.
-        # Similarly, ``*`` can be parsed as ``<authority>``.
-        # So we just compute and remember 4 separate flags.
-        for form_name, parser in [('origin', rfc7230.origin_form),
-                                  ('absolute', rfc7230.absolute_form),
-                                  ('authority', rfc7230.authority_form),
-                                  ('asterisk', rfc7230.asterisk_form)]:
+        def _parses_as(parser):
             try:
                 (parser + parse.eof).parse(parse.State(self.target))
             except parse.ParseError:
-                result = False
+                return False
             else:
-                result = True
-            setattr(self, 'is_%s_form' % form_name, result)
+                return True
+        self.is_origin_form = _parses_as(rfc7230.origin_form)
+        self.is_asterisk_form = _parses_as(rfc7230.asterisk_form)
+        self.is_authority_form = (
+            _parses_as(rfc7230.authority_form)
+            # ``*`` can be parsed as an ``<authority>``.
+            and not self.is_asterisk_form)
+        self.is_absolute_form = (
+            _parses_as(rfc7230.absolute_form)
+            # ``example.com:80`` can be parsed as an ``<absolute-URI>``
+            # with a ``<scheme>`` of ``example.com``
+            # and a ``<path-rootless>`` of ``80``.
+            and not self.is_authority_form)
 
-        self.is_to_proxy = self.is_absolute_form and self.method != m.CONNECT
+    def _build_effective_uri(self):
+        # RFC 7230 section 5.5.
+        if self.is_absolute_form:
+            return self.target
+        scheme = self.scheme or 'http'
+        if self.is_authority_form:
+            authority = self.target
+        elif self.headers.host.is_okay:
+            authority = self.headers.host.value
+        else:
+            return None
+        if self.is_authority_form or self.is_asterisk_form:
+            path_and_query = ''
+        elif self.is_origin_form:
+            path_and_query = self.target
+        else:
+            return None
+        return scheme + '://' + authority + path_and_query
 
 
 def check_request(req):

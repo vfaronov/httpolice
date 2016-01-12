@@ -26,11 +26,10 @@ class Connection(common.ReportNode):
 
     self_name = 'conn'
 
-    def __init__(self, exchanges=None, was_tls=None,
+    def __init__(self, exchanges=None,
                  unparsed_inbound=None, unparsed_outbound=None):
         super(Connection, self).__init__()
         self.exchanges = exchanges or []
-        self.was_tls = was_tls
         self.unparsed_inbound = unparsed_inbound
         self.unparsed_outbound = unparsed_outbound
 
@@ -48,30 +47,30 @@ def check_exchange(exch):
         response.check_responses(exch.responses)
 
 
-def parse_two_streams(inbound, outbound, was_tls=None):
-    conn = Connection(was_tls=was_tls)
-    parse_requests(conn, inbound)
+def parse_two_streams(inbound, outbound, scheme=None):
+    conn = Connection()
+    parse_requests(conn, inbound, scheme=scheme)
     parse_responses(conn, outbound)
     return conn
 
 
-def parse_inbound_stream(stream, was_tls=None):
-    conn = Connection(was_tls=was_tls)
-    parse_requests(conn, stream)
+def parse_inbound_stream(stream, scheme=None):
+    conn = Connection()
+    parse_requests(conn, stream, scheme=scheme)
     return conn
 
 
-def parse_outbound_stream(stream, was_tls=None):
-    conn = Connection(was_tls=was_tls)
+def parse_outbound_stream(stream):
+    conn = Connection()
     parse_responses(conn, stream)
     return conn
 
 
-def parse_requests(connection, stream):
+def parse_requests(connection, stream, scheme=None):
     state = parse.State(stream)
     exchanges = []
     while state.sane and not state.is_eof():
-        req = _parse_request_heading(state)
+        req = _parse_request_heading(state, scheme)
         exch = Exchange(req, None)
         exchanges.append(exch)
         state.dump_complaints(exch, u'request heading')
@@ -87,7 +86,7 @@ def parse_requests(connection, stream):
     connection.unparsed_inbound = state.remaining()
 
 
-def _parse_request_heading(state):
+def _parse_request_heading(state, scheme=None):
     try:
         (method_, target, version_) = rfc7230.request_line.parse(state)
         entries = \
@@ -98,7 +97,8 @@ def _parse_request_heading(state):
         state.sane = False
         return Unparseable
     else:
-        req = request.Request(method_, target, version_, entries)
+        req = request.Request(method_, target, version_, entries,
+                              scheme=scheme)
         return req
 
 

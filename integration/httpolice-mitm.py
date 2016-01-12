@@ -20,6 +20,7 @@ def response(context, flow):
         [httpolice.common.HeaderEntry(httpolice.common.FieldName(k), v)
          for k, v in flow.request.headers.fields],
         flow.request.content or None,
+        scheme=flow.request.scheme,
     )
     resp = httpolice.response.Response(
         httpolice.common.HTTPVersion(flow.response.http_version),
