@@ -198,6 +198,8 @@ def _parse_chunk(state):
 chunk = function(_parse_chunk)
 trailer_part = many(header_field + ~crlf)
 
+host = join(rfc3986.host + maybe(join(':' + rfc3986.port), ''))
+
 connection_option = wrap(ConnectionOption, token)
 
 protocol_name = token   // rfc(7230, u'protocol-name')
