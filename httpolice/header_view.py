@@ -26,6 +26,20 @@ class HeadersView(object):
             self._cache[key] = cls(self._message, key)
         return self._cache[key]
 
+    @property
+    def names(self):
+        seen = set()
+        for entries in [self._message.header_entries,
+                        self._message.trailer_entries or []]:
+            for entry in entries:
+                if entry.name not in seen:
+                    yield entry.name
+                    seen.add(entry.name)
+
+    def __iter__(self):
+        for name in self.names:
+            yield self[name]
+
     def enumerate(self, name=None):
         return [
             (from_trailer, field)

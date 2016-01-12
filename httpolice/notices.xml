@@ -390,4 +390,9 @@
     </rfc>
   </error>
 
+  <error id="1052">
+    <title><ref to="header"/> in a <ref to="msg.status"/> response</title>
+    <explain>The <ref to="header"/> header provides representation metadata, but there can be no representation associated with a <ref to="msg.status"/> response. The header should probably be removed.</explain>
+  </error>
+
 </notices>

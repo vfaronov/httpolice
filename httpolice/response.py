@@ -2,7 +2,7 @@
 
 from httpolice import message
 from httpolice.common import Unparseable, http10, http11, okay
-from httpolice.known import h, m, st, tc
+from httpolice.known import h, header, m, st, tc
 
 
 class Response(message.Message):
@@ -41,6 +41,11 @@ def check_response_itself(resp):
             resp.complain(1018)
         if resp.headers.content_length.is_present:
             resp.complain(1023)
+
+    if resp.status.informational:
+        for hdr in resp.headers:
+            if header.is_representation_metadata(hdr.name):
+                resp.complain(1052, header=hdr)
 
     if resp.status == st.switching_protocols and \
             resp.headers.upgrade.is_absent:

@@ -66,8 +66,8 @@ class Message(common.ReportNode):
 
 def check_message(msg):
     # Force parsing every header present in the message according to its rules.
-    for entry in msg.header_entries + (msg.trailer_entries or []):
-        _ = msg.headers[entry.name].value
+    for hdr in msg.headers:
+        _ = hdr.value
 
     data = msg.decoded_body
     if okay(data) and msg.headers.content_type.is_okay:

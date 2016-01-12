@@ -17,6 +17,9 @@ def is_bad_for_connection(name):
 def is_bad_for_trailer(name):
     return known.get_info(name).get('bad_for_trailer')
 
+def is_representation_metadata(name):
+    return known.get_info(name).get('representation_metadata')
+
 def rule_for(name):
     return known.get_info(name).get('rule')
 
@@ -100,6 +103,7 @@ known = KnownDict([
   'bad_for_trailer': True,
   'iana_status': 'standard',
   'parser': rfc7230.comma_list1(rfc7231.content_coding),
+  'representation_metadata': True,
   'rule': MULTI},
  {'_': FieldName(u'Content-ID'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Content-Language'),
@@ -107,6 +111,7 @@ known = KnownDict([
   'bad_for_connection': True,
   'iana_status': 'standard',
   'parser': rfc7230.comma_list1(rfc5646.language_tag),
+  'representation_metadata': True,
   'rule': MULTI},
  {'_': FieldName(u'Content-Length'),
   '_citations': [RFC(7230, section=(3, 3, 2))],
@@ -118,6 +123,7 @@ known = KnownDict([
   '_citations': [RFC(7231, section=(3, 1, 4, 2))],
   'iana_status': 'standard',
   'parser': rfc3986.absolute_uri | rfc7230.partial_uri,
+  'representation_metadata': True,
   'rule': SINGLE},
  {'_': FieldName(u'Content-MD5'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Content-Range'),
@@ -132,6 +138,7 @@ known = KnownDict([
   'bad_for_trailer': True,
   'iana_status': 'standard',
   'parser': rfc7231.media_type,
+  'representation_metadata': True,
   'rule': SINGLE},
  {'_': FieldName(u'Content-Version'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Cookie'),
@@ -164,7 +171,8 @@ known = KnownDict([
  {'_': FieldName(u'ETag'),
   '_citations': [RFC(7232, section=(2, 3))],
   'bad_for_connection': True,
-  'iana_status': 'standard'},
+  'iana_status': 'standard',
+  'representation_metadata': True},
  {'_': FieldName(u'Expect'),
   '_citations': [RFC(7231, section=(5, 1, 1))],
   'bad_for_trailer': True,
@@ -227,6 +235,7 @@ known = KnownDict([
   '_citations': [RFC(7232, section=(2, 2))],
   'bad_for_connection': True,
   'iana_status': 'standard',
+  'representation_metadata': True,
   'rule': SINGLE},
  {'_': FieldName(u'Link'), '_citations': [RFC(5988)]},
  {'_': FieldName(u'Location'),
@@ -485,5 +494,5 @@ known = KnownDict([
                           'http://www.w3.org/2005/MWI/BPWG/')]}
  ],
  extra_info=['bad_for_connection', 'bad_for_trailer', 'iana_status',
-             'parser', 'rule']
+             'parser', 'representation_metadata', 'rule']
 )
