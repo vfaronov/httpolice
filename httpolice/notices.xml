@@ -423,4 +423,13 @@
     </rfc>
   </warning>
 
+  <warning id="1057">
+    <title><ref to="msg.method"/> request with a <ref to="msg.body">payload</ref></title>
+    <rfc num="7231" sect="4.3.2">
+      A payload within a <m>HEAD</m> request message has no defined semantics;
+   sending a payload body on a HEAD request might cause some existing
+   implementations to reject the request.
+    </rfc>
+  </warning>
+
 </notices>

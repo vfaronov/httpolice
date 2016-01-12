@@ -101,5 +101,8 @@ def check_request(req):
                 req.body is None:
             req.complain(1053, header=hdr)
 
-    if req.method == m.GET and okay(req.body) and req.body:
-        req.complain(1056)
+    if okay(req.body) and req.body:
+        if req.method == m.GET:
+            req.complain(1056)
+        elif req.method == m.HEAD:
+            req.complain(1057)
