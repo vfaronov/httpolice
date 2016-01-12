@@ -457,4 +457,13 @@
     <explain>This is an ostensibly successful (<ref to="msg.status"/>) response to a <ref to="msg.request.method"/> request. However, according to its <ref to="msg.headers.content_location"/> header, it carries a representation of the target resource—the one that should have been deleted. This probably means that either the <ref to="msg.headers.content_location"/> is wrong, or the request did not actually succeed.</explain>
   </warning>
 
+  <warning id="1061">
+    <title><ref to="msg.method"/> request with a <ref to="msg.body">payload</ref></title>
+    <rfc num="7231" sect="4.3.6">
+      A payload within a <m>CONNECT</m> request message has no defined semantics;
+   sending a payload body on a CONNECT request might cause some existing
+   implementations to reject the request.
+    </rfc>
+  </warning>
+
 </notices>
