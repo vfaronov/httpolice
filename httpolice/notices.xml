@@ -414,4 +414,13 @@
     <explain>See also <rfc num="7231" sect="3.1.4.1"/>.</explain>
   </comment>
 
+  <warning id="1056">
+    <title><ref to="msg.method"/> request with a <ref to="msg.body">payload</ref></title>
+    <rfc num="7231" sect="4.3.1">
+      A payload within a <m>GET</m> request message has no defined semantics;
+   sending a payload body on a GET request might cause some existing
+   implementations to reject the request.
+    </rfc>
+  </warning>
+
 </notices>

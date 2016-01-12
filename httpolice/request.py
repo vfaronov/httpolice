@@ -1,7 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import message, parse
-from httpolice.common import http11
+from httpolice.common import http11, okay
 from httpolice.known import h, header, m, method, tc
 from httpolice.syntax import rfc7230
 
@@ -100,3 +100,6 @@ def check_request(req):
         if header.is_representation_metadata(hdr.name) and \
                 req.body is None:
             req.complain(1053, header=hdr)
+
+    if req.method == m.GET and okay(req.body) and req.body:
+        req.complain(1056)
