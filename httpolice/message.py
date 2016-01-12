@@ -73,6 +73,10 @@ def check_message(msg):
     if okay(data) and msg.headers.content_type.is_okay:
         check_media(msg, msg.headers.content_type.value, data)
 
+    if msg.headers.trailer.is_present and \
+            tc.chunked not in msg.headers.transfer_encoding:
+        msg.complain(1054)
+
     for entry in msg.trailer_entries or []:
         if entry.name not in msg.headers.trailer:
             msg.complain(1030, header=entry)

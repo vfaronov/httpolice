@@ -401,4 +401,11 @@
     <explain>See also <rfc num="7231" sect="3.1"/>.</explain>
   </error>
 
+  <error id="1054">
+    <title><ref to="msg.headers.trailer"/> header in a message without a chunked body</title>
+    <explain>The <ref to="msg.headers.trailer"/> header announces what other headers will be sent in the trailer part of a <tc>chunked</tc> message. It doesn’t make sense for this message because it <ref to="msg.headers.transfer_encoding">does not use</ref> the chunked transfer coding.</explain>
+    <explain>See also <rfc num="7230" sect="4.1.2"/>.</explain>
+    <!-- It would be more interesting to check that the header announced by ``Trailer`` is actually present there, but I don't think this is feasible, because many/most implementations (which are going to supply us with parsed messages) don't provide access to the trailer part at all. -->
+  </error>
+
 </notices>
