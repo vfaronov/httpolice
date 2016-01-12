@@ -1,0 +1,22 @@
+1062 1041
+
+# It's unfortunate that we have to also generate no. 1041 here,
+# since no. 1062 is its strict subset.
+# Right now I can't think of a design that would avoid this.
+# Maybe later, if this situation proves common and annoying.
+
+======== BEGIN INBOUND STREAM ========
+OPTIONS / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Length: 16
+
+Hello world?
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!

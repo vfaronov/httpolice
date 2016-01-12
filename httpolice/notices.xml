@@ -466,4 +466,13 @@
     </rfc>
   </warning>
 
+  <error id="1062">
+    <title><ref to="msg.method"/> request with a payload but no <h>Content-Type</h></title>
+    <rfc num="7231" sect="4.3.7">
+      A client that generates an <m>OPTIONS</m> request containing a payload body
+   MUST send a valid <h>Content-Type</h> header field describing the
+   representation media type.
+    </rfc>
+  </error>
+
 </notices>

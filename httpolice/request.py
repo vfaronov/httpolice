@@ -110,3 +110,7 @@ def check_request(req):
             req.complain(1059)
         elif req.method == m.CONNECT:
             req.complain(1061)
+
+    if req.method == m.OPTIONS and \
+            okay(req.body) and req.body and req.headers.content_type.is_absent:
+        req.complain(1062)
