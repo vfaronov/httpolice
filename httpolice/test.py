@@ -15,6 +15,7 @@ from httpolice.common import (
     CaseInsensitive,
     MediaType,
     Parametrized,
+    Product,
     TransferCoding,
     Unparseable,
 )
@@ -164,6 +165,36 @@ class TestSyntax(unittest.TestCase):
         self.assertParse(p, 'h2c', (u'h2c', None))
         self.assertParse(p, 'FSTR/2', (u'FSTR', u'2'))
         self.assertNoParse(p, '/2')
+
+    def test_user_agent(self):
+        p = rfc7231.user_agent + parse.eof
+        self.assertParse(
+            p,
+            'Mozilla/5.0 '
+            '(compatible; Vanadium '
+            '\(a nice browser btw, check us out: '
+            'http://vanadium.example/?about_us\)) '
+            'libVanadium/0.11a-pre9',
+            [
+                Product(u'Mozilla', u'5.0'),
+                u'compatible; Vanadium '
+                u'(a nice browser btw, check us out: '
+                u'http://vanadium.example/?about_us)',
+                Product(u'libVanadium', u'0.11a-pre9')
+            ])
+        self.assertParse(
+            p,
+            'Mozilla/5.0 (X11; Linux x86_64) '
+            'AppleWebKit/537.36 (KHTML, like Gecko) '
+            'Chrome/37.0.2062.120 Safari/537.36',
+            [
+                Product(u'Mozilla', u'5.0'),
+                u'X11; Linux x86_64',
+                Product(u'AppleWebKit', u'537.36'),
+                u'KHTML, like Gecko',
+                Product(u'Chrome', u'37.0.2062.120'),
+                Product(u'Safari', u'537.36')
+            ])
 
 
 class TestRequest(unittest.TestCase):

@@ -1,9 +1,9 @@
-1014
+1069
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
 Host: example.com
-User-Agent: demo/0.4  Python-urllib/2.7
+User-Agent: My Example User-Agent 1.0
 
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 200 OK

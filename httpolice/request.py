@@ -3,7 +3,7 @@
 import urlparse
 
 from httpolice import message, parse
-from httpolice.common import http11, okay
+from httpolice.common import Product, http11, okay
 from httpolice.known import h, header, m, method, tc
 from httpolice.syntax import rfc7230
 
@@ -134,3 +134,11 @@ def check_request(req):
         if req.scheme == 'http' and \
                 urlparse.urlparse(req.headers.referer.value).scheme == 'https':
             req.complain(1068)
+
+    if req.headers.user_agent.is_absent:
+        req.complain(1070)
+    else:
+        items = req.headers.user_agent.value
+        if len(items) > 1 and all(isinstance(x, Product) and not x.version
+                                  for x in items):
+            req.complain(1069, header=req.headers.user_agent)
