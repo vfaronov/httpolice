@@ -509,4 +509,9 @@
     </rfc>
   </error>
 
+  <warning id="1067">
+    <title><ref to="msg.headers.max_forwards"/> header in a <ref to="msg.method"/> request</title>
+    <explain>The <ref to="msg.headers.max_forwards"/> header is only defined for <m>OPTIONS</m> and <m>TRACE</m> requests. <rfc num="7231" sect="5.1.2">A recipient MAY ignore a Max-Forwards header field received with any other request methods.</rfc></explain>
+  </warning>
+
 </notices>

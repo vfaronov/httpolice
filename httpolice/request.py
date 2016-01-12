@@ -123,3 +123,7 @@ def check_request(req):
                 req.complain(1066)
         else:
             req.complain(1065)
+
+    if req.headers.max_forwards.is_present and \
+            req.method not in [m.OPTIONS, m.TRACE]:
+        req.complain(1067)
