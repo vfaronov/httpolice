@@ -121,7 +121,7 @@ class UnknownHeaderView(HeaderView):
         # RFC 7230 section 3.2.2 permits combining field-values with a comma
         # even if we don't really know what the header is.
         entries, values = self._pre_parse()
-        self._value = ','.join(values)
+        self._value = ','.join(values) if values else None
         self._entries = entries
 
 
