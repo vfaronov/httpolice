@@ -2,7 +2,7 @@
 
 from httpolice import message, parse
 from httpolice.common import http11
-from httpolice.known import h, m, method, tc
+from httpolice.known import h, header, m, method, tc
 from httpolice.syntax import rfc7230
 
 
@@ -75,3 +75,8 @@ def check_request(req):
     else:
         if not req.is_origin_form and not req.is_absolute_form:
             req.complain(1045)
+
+    for hdr in req.headers:
+        if header.is_representation_metadata(hdr.name) and \
+                req.body is None:
+            req.complain(1053, header=hdr)

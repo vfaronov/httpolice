@@ -395,4 +395,10 @@
     <explain>The <ref to="header"/> header provides representation metadata, but there can be no representation associated with a <ref to="msg.status"/> response. The header should probably be removed.</explain>
   </error>
 
+  <error id="1053">
+    <title><ref to="header"/> in a request with no payload</title>
+    <explain>The <ref to="header"/> header provides representation metadata. It would make sense in a request with a payload, but this one has no payload.</explain>
+    <explain>See also <rfc num="7231" sect="3.1"/>.</explain>
+  </error>
+
 </notices>
