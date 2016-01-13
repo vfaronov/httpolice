@@ -625,4 +625,12 @@
     </rfc>
   </error>
 
+  <error id="1083">
+    <title>Using reserved status code <ref to="msg.status"/></title>
+    <rfc num="7231" sect="6.4.6">
+      The <st>306</st> status code was defined in a previous version of this
+   specification, is no longer used, and the code is reserved.
+    </rfc>
+  </error>
+
 </notices>

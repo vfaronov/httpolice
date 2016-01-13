@@ -70,6 +70,8 @@ def check_response_itself(resp):
 
     if resp.status == st.use_proxy:
         resp.complain(1082)
+    elif resp.status == 306:
+        resp.complain(1083)
 
 
 def check_response_in_context(resp, req):
