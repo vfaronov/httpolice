@@ -109,6 +109,8 @@ def check_response_in_context(resp, req):
     if method.is_safe(req.method):
         if resp.status == st.created:
             resp.complain(1072)
+        elif resp.status == st.accepted:
+            resp.complain(1074)
 
     if resp.status == st.created and req.method == m.POST and \
             resp.headers.location.is_absent:
