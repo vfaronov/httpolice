@@ -718,4 +718,13 @@
     <explain>The <st>409</st> status code means that the request conflicted with the current state of the resource. But a <ref to="msg.request.method"/> request is, by definition, safe (read-only): it must not affect the state in any way, so there can be no conflict. The 409 status code is probably wrong here.</explain>
   </error>
 
+  <comment id="1096">
+    <title><ref to="msg.status"/> response with no payload</title>
+    <rfc num="7231" sect="6.5.8">
+      The server
+   SHOULD generate a payload that includes enough information for a user
+   to recognize the source of the conflict.
+    </rfc>
+  </comment>
+
 </notices>
