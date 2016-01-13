@@ -2,7 +2,7 @@
 
 from httpolice import message
 from httpolice.common import Unparseable, http10, http11, okay, url_equals
-from httpolice.known import h, header, m, st, tc
+from httpolice.known import h, header, m, method, st, tc
 
 import urlparse
 
@@ -105,3 +105,7 @@ def check_response_in_context(resp, req):
     if req.method == m.PUT and req.headers.content_range.is_present and \
             resp.status.successful:
         resp.complain(1058)
+
+    if method.is_safe(req.method):
+        if resp.status == st.created:
+            resp.complain(1072)

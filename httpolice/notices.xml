@@ -544,4 +544,9 @@
     </rfc>
   </error>
 
+  <error id="1072">
+    <title><ref to="msg.status"/> response to an <ref to="msg.request.method"/> request</title>
+    <explain>The <ref to="msg.request.method"/> method is defined to be safe (read-only). But the <st>201</st> status code indicates that a new resource was created. Either one is wrong here.</explain>
+  </error>
+
 </notices>

@@ -7,6 +7,9 @@ from httpolice.known.base import KnownDict
 def defines_body(name):
     return known.get_info(name).get('defines_body')
 
+def is_safe(name):
+    return known.get_info(name).get('safe')
+
 
 class KnownMethods(KnownDict):
 
