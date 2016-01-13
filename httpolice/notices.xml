@@ -800,4 +800,14 @@
     </rfc>
   </error>
 
+  <comment id="1106">
+    <title><ref to="msg.status"/> response with no payload</title>
+    <rfc num="7231" sect="6.6.6">
+      The server SHOULD
+   generate a representation for the <st>505</st> response that describes why
+   that version is not supported and what other protocols are supported
+   by that server.
+    </rfc>
+  </comment>
+
 </notices>

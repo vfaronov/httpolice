@@ -170,6 +170,8 @@ def check_response_in_context(resp, req):
             resp.complain(1096)
         elif resp.status.client_error:
             resp.complain(1087)
+        elif resp.status == st.http_version_not_supported:
+            resp.complain(1106)
         elif resp.status.server_error:
             resp.complain(1104)
 
