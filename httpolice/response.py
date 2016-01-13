@@ -65,6 +65,8 @@ def check_response_itself(resp):
             resp.complain(1078)
         elif resp.status == st.found:
             resp.complain(1079)
+        elif resp.status == st.see_other:
+            resp.complain(1080)
 
 
 def check_response_in_context(resp, req):

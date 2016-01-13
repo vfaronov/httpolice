@@ -598,4 +598,14 @@
     </rfc>
   </comment>
 
+  <error id="1080">
+    <title><ref to="msg.status"/> response with no <h>Location</h> header</title>
+    <rfc num="7231" sect="6.4.4">
+      The <st>303</st> (See Other) status code indicates that the server is
+   redirecting the user agent to a different resource, as indicated by a
+   URI in the <h>Location</h> header field, which is intended to provide an
+   indirect response to the original request.
+    </rfc>
+  </error>
+
 </notices>
