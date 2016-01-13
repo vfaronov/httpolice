@@ -564,4 +564,12 @@
     <explain>The <ref to="msg.status"/> status code means that the response has been transformed by a proxy. But a proxy must also add a <h>Via</h> header to each forwarded response (<rfc num="7230" sect="5.7.1"/>), and there is no such header here.</explain>
   </error>
 
+  <error id="1076">
+    <title><ref to="msg.status"/> response with a <ref to="msg.body">payload</ref></title>
+    <rfc num="7231" sect="6.3.6">
+      Since the <st>205</st> status code implies that no additional content will be
+   provided, a server MUST NOT generate a payload in a 205 response.
+    </rfc>
+  </error>
+
 </notices>

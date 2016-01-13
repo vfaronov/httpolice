@@ -57,6 +57,9 @@ def check_response_itself(resp):
             resp.headers.via.is_absent:
         resp.complain(1075)
 
+    if resp.status == st.reset_content and resp.body:
+        resp.complain(1076)
+
 
 def check_response_in_context(resp, req):
     if req.method == m.CONNECT and resp.status.successful:
