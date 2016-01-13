@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from cStringIO import StringIO
+from datetime import datetime
 import os
 import unittest
 
@@ -207,6 +208,19 @@ class TestSyntax(unittest.TestCase):
                 Versioned(ProductName(u'Chrome'), u'37.0.2062.120'),
                 Versioned(ProductName(u'Safari'), u'537.36')
             ])
+
+    def test_http_date(self):
+        p = rfc7231.http_date + parse.eof
+        self.assertParse(p, 'Sun, 06 Nov 1994 08:49:37 GMT',
+                         datetime(1994, 11, 6, 8, 49, 37))
+        self.assertParse(p, 'Sunday, 06-Nov-94 08:49:37 GMT',
+                         datetime(1994, 11, 6, 8, 49, 37))
+        self.assertParse(p, 'Sun Nov  6 08:49:37 1994',
+                         datetime(1994, 11, 6, 8, 49, 37))
+        self.assertParse(p, 'Sun Nov 16 08:49:37 1994',
+                         datetime(1994, 11, 16, 8, 49, 37))
+        self.assertNoParse(p, 'Sun, 29 Feb 2015 14:11:06 GMT')
+        self.assertNoParse(p, 'Wed, 13 Jan 2016 24:09:06 GMT')
 
 
 class TestRequest(unittest.TestCase):

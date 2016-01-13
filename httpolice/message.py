@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from cStringIO import StringIO
+from datetime import datetime, timedelta
 import gzip
 import json
 import zlib
@@ -108,6 +109,10 @@ def check_message(msg):
     if msg.headers.upgrade.is_present and \
             u'upgrade' not in msg.headers.connection:
         msg.complain(1050)
+
+    if msg.headers.date.is_okay and \
+            msg.headers.date.value > datetime.utcnow() + timedelta(seconds=10):
+        msg.complain(1109)
 
 
 def check_media(msg, type_, data):

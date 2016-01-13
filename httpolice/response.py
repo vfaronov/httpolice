@@ -85,6 +85,11 @@ def check_response_itself(resp):
             u'close' not in resp.headers.connection:
         resp.complain(1094)
 
+    if resp.headers.date.is_absent and (
+            resp.status.successful or resp.status.redirection or
+            resp.status.client_error):
+        resp.complain(1110)
+
 
 def check_response_in_context(resp, req):
     if req.method == m.CONNECT and resp.status.successful:

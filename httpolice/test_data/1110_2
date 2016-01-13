@@ -1,0 +1,13 @@
+
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 500 Internal Server Error
+Content-Type: text/plain
+Content-Length: 7
+
+Oops.

@@ -235,7 +235,10 @@ class SequenceParser(Parser):
             return tuple(rs)
 
     def __add__(self, other):
-        return SequenceParser(self.inners + [other])
+        if isinstance(other, SequenceParser):
+            return SequenceParser(self.inners + other.inners)
+        else:
+            return SequenceParser(self.inners + [other])
 
 
 class AlternativeParser(Parser):
@@ -272,7 +275,10 @@ class AlternativeParser(Parser):
             raise other_errors[-1]
 
     def __or__(self, other):
-        return AlternativeParser(self.inners + [other])
+        if isinstance(other, AlternativeParser):
+            return AlternativeParser(self.inners + other.inners)
+        else:
+            return AlternativeParser(self.inners + [other])
 
 
 class TimesParser(Parser):

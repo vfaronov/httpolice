@@ -810,4 +810,30 @@
     </rfc>
   </comment>
 
+  <error id="1107">
+    <title>Obsolete date format in <ref to="place"/></title>
+    <rfc num="7231" sect="7.1.1.1">
+      When a sender generates a
+   header field that contains one or more timestamps defined as
+   HTTP-date, the sender MUST generate those timestamps in the
+   IMF-fixdate format.
+    </rfc>
+  </error>
+
+  <error id="1108">
+    <title>Wrong day of week in <ref to="place"/></title>
+    <explain>This message’s <ref to="place"/> claims that <ref to="date"/> is <ref to="claimed"/>, but in reality it’s <ref to="actual"/>.</explain>
+  </error>
+
+  <error id="1109">
+    <title><ref to="msg.headers.date"/> header is in the future</title>
+    <explain>The <h>Date</h> header contains the date and time at which the message was originated, but in this message it appears to be in the future.</explain>
+    <explain>This might be due to wrong timezone settings.</explain>
+  </error>
+
+  <comment id="1110">
+    <title><ref to="msg.status"/> response with no <h>Date</h> header</title>
+    <explain>According to <rfc num="7231" sect="7.1.1.2"/>, any <ref to="msg.status"/> response must include a <h>Date</h> header, unless the server has no usable clock.</explain>
+  </comment>
+
 </notices>
