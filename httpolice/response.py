@@ -86,6 +86,8 @@ def check_response_in_context(resp, req):
             resp.complain(1049)
         elif req.version == http10:
             resp.complain(1051)
+    elif resp.status.informational and req.version == http10:
+        resp.complain(1071)
 
     if resp.headers.content_location.is_okay and \
             req.effective_uri is not None:
