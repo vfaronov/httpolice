@@ -646,4 +646,10 @@
     <explain>This <ref to="msg.status"/> response includes a <ref to="msg.headers.location"/> header that points to the same URI as the <ref to="msg.request.target">request URI</ref>. So the resource redirects to itself.</explain>
   </error>
 
+  <error id="1086">
+    <title><ref to="msg.status"/> response to a <ref to="msg.request.target">server-wide</ref> <ref to="msg.request.method"/> request</title>
+    <explain>The <ref to="msg.status"/> status code means that the target resource can be found at a different URI. But this was an “<m>OPTIONS</m> *” request—it targets the entire server, not any particular resource. So the <ref to="msg.status"/> status code makes no sense here.</explain>
+    <explain>Perhaps the <st>303</st> status code would fit better.</explain>
+  </error>
+
 </notices>

@@ -152,3 +152,8 @@ def check_response_in_context(resp, req):
             resp.complain(1077)
         elif resp.status == st.see_other:
             resp.complain(1081)
+
+    if req.method == m.OPTIONS and req.is_asterisk_form and \
+            resp.status in [st.multiple_choices, st.moved_permanently,
+                            st.found, st.temporary_redirect]:
+        resp.complain(1086)
