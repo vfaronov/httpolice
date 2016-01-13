@@ -141,12 +141,7 @@ def check_request(req):
     if req.headers.user_agent.is_absent:
         req.complain(1070)
     else:
-        items = req.headers.user_agent.value
-        if len(items) > 1 and all(isinstance(x, Product) and not x.version
-                                  for x in items):
-            req.complain(1069, header=req.headers.user_agent)
-        elif all(product.is_library(x.name) for x in items
-                 if isinstance(x, Product)):
-            value = req.headers.user_agent.entries[0].value.decode('utf-8',
-                                                                   'replace')
-            req.complain(1093, value=value)
+        products = [p for p in req.headers.user_agent.value
+                    if isinstance(p, Product)]
+        if products and all(product.is_library(p.name) for p in products):
+            req.complain(1093, library=products[0].name)

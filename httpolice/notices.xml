@@ -523,11 +523,6 @@
     </rfc>
   </error>
 
-  <comment id="1069">
-    <title>Possibly malformed <ref to="header"/> header</title>
-    <explain>This message’s <ref to="header"/> header looks like it consists of several words separated by spaces. If the words together constitute the name of one product, that’s not how this header is supposed to be formatted. See <rfc num="7231" sect="5.5.3"/>.</explain>
-  </comment>
-
   <comment id="1070">
     <title>Request without a <h>User-Agent</h> header</title>
     <rfc num="7231" sect="5.5.3">
@@ -703,7 +698,7 @@
   <comment id="1093">
     <title><ref to="msg.headers.user_agent"/> contains no actual product</title>
     <explain>This request’s <h>User-Agent</h> header contains only the name of the underlying library, which isn’t very useful for identifying the request. It might be a good idea to include the name of the actual product.</explain>
-    <explain>For example: “My-Product/1.0 <ref to="value"/>”.</explain>
+    <explain>For example: “My-Product/1.0 <ref to="library"/>”.</explain>
     <explain>Or simply “My-Product/1.0” or “My-Product”.</explain>
     <explain>See <rfc num="7231" sect="5.5.3"/>.</explain>
   </comment>
