@@ -1,0 +1,18 @@
+
+
+======== BEGIN INBOUND STREAM ========
+PUT /articles/123/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: text/plain
+Content-Length: 16
+
+Hello world!
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 201 Created
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 12
+
+Created OK

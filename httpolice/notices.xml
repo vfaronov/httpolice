@@ -549,4 +549,9 @@
     <explain>The <ref to="msg.request.method"/> method is defined to be safe (read-only). But the <st>201</st> status code indicates that a new resource was created. Either one is wrong here.</explain>
   </error>
 
+  <comment id="1073">
+    <title>Possibly missing <h>Location</h> header</title>
+    <explain>This <ref to="msg.status"/> response indicates that a new resource was created. Because there is no <h>Location</h> header in the response, it is assumed that the created resource is the same as the request target (<rfc num="7231" sect="6.3.2"/>). But <ref to="msg.request.method"/> requests are usually intended to create a sub-resource of the target resource. Therefore, it’s likely that this response needs an explicit <h>Location</h>.</explain>
+  </comment>
+
 </notices>
