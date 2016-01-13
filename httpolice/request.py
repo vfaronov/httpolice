@@ -3,7 +3,7 @@
 import urlparse
 
 from httpolice import message, parse
-from httpolice.common import Product, http11, okay
+from httpolice.common import Versioned, http11, okay
 from httpolice.known import h, header, m, method, product, tc
 from httpolice.syntax import rfc7230
 
@@ -140,8 +140,8 @@ def check_request(req):
 
     if req.headers.user_agent.is_absent:
         req.complain(1070)
-    else:
+    elif req.headers.user_agent.is_okay:
         products = [p for p in req.headers.user_agent.value
-                    if isinstance(p, Product)]
-        if products and all(product.is_library(p.name) for p in products):
-            req.complain(1093, library=products[0].name)
+                    if isinstance(p, Versioned)]
+        if products and all(product.is_library(p.item) for p in products):
+            req.complain(1093, library=products[0])

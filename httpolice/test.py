@@ -15,10 +15,10 @@ from httpolice.common import (
     CaseInsensitive,
     MediaType,
     Parametrized,
-    Product,
     ProductName,
     TransferCoding,
     Unparseable,
+    Versioned,
 )
 from httpolice.known import m, media, tc
 from httpolice.syntax import rfc3986, rfc7230, rfc7231
@@ -149,16 +149,27 @@ class TestSyntax(unittest.TestCase):
     def test_via(self):
         p = rfc7230.via + parse.eof
         self.assertParse(p, '1.0 fred, 1.1 p.example.net',
-                         [(u'HTTP', u'1.0', u'fred', None),
-                          (u'HTTP', u'1.1', u'p.example.net', None)])
+                         [(Versioned(u'HTTP', u'1.0'), u'fred', None),
+                          (Versioned(u'HTTP', u'1.1'),
+                           u'p.example.net', None)])
         self.assertParse(
             p,
             r', FSTR/2 balancer4g-p1.example.com  '
             r'(Acme Web Accelerator 4.1 \(Debian\)), '
             r'1.1 proxy1,',
-            [(u'FSTR', u'2', u'balancer4g-p1.example.com',
-              'Acme Web Accelerator 4.1 (Debian)'),
-             (u'HTTP', u'1.1', u'proxy1', None)])
+            [
+                (
+                    Versioned(u'FSTR', u'2'),
+                    u'balancer4g-p1.example.com',
+                    'Acme Web Accelerator 4.1 (Debian)'
+                ),
+                (
+                    Versioned(u'HTTP', u'1.1'),
+                    u'proxy1',
+                    None
+                )
+            ]
+        )
         self.assertNoParse(p, 'proxy1, proxy2')
 
     def test_protocol(self):
@@ -177,11 +188,11 @@ class TestSyntax(unittest.TestCase):
             r'http://vanadium.example/?about_us\)) '
             'libVanadium/0.11a-pre9',
             [
-                Product(ProductName(u'Mozilla'), u'5.0'),
+                Versioned(ProductName(u'Mozilla'), u'5.0'),
                 u'compatible; Vanadium '
                 u'(a nice browser btw, check us out: '
                 u'http://vanadium.example/?about_us)',
-                Product(ProductName(u'libVanadium'), u'0.11a-pre9')
+                Versioned(ProductName(u'libVanadium'), u'0.11a-pre9')
             ])
         self.assertParse(
             p,
@@ -189,12 +200,12 @@ class TestSyntax(unittest.TestCase):
             'AppleWebKit/537.36 (KHTML, like Gecko) '
             'Chrome/37.0.2062.120 Safari/537.36',
             [
-                Product(ProductName(u'Mozilla'), u'5.0'),
+                Versioned(ProductName(u'Mozilla'), u'5.0'),
                 u'X11; Linux x86_64',
-                Product(ProductName(u'AppleWebKit'), u'537.36'),
+                Versioned(ProductName(u'AppleWebKit'), u'537.36'),
                 u'KHTML, like Gecko',
-                Product(ProductName(u'Chrome'), u'37.0.2062.120'),
-                Product(ProductName(u'Safari'), u'537.36')
+                Versioned(ProductName(u'Chrome'), u'37.0.2062.120'),
+                Versioned(ProductName(u'Safari'), u'537.36')
             ])
 
 

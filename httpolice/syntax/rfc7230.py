@@ -12,6 +12,7 @@ from httpolice.common import (
     StatusCode,
     TransferCoding,
     UpgradeToken,
+    Versioned,
 )
 from httpolice.parse import (
     ParseError,
@@ -204,11 +205,15 @@ connection_option = wrap(ConnectionOption, token)
 
 protocol_name = token   // rfc(7230, u'protocol-name')
 protocol_version = token   // rfc(7230, u'protocol-version')
-protocol = (wrap(UpgradeToken, protocol_name) +
-            maybe(~literal('/') + protocol_version))
+protocol = argwrap(
+    Versioned,
+    wrap(UpgradeToken, protocol_name) +
+    maybe(~literal('/') + protocol_version))
 
-received_protocol = (maybe(protocol_name + ~literal('/'), u'HTTP') +
-                     protocol_version)
+received_protocol = argwrap(
+    Versioned,
+    maybe(protocol_name + ~literal('/'), u'HTTP') +
+    protocol_version)
 pseudonym = token   // rfc(7230, u'pseudonym')
 received_by = (
     decode(join(rfc3986.host + maybe(join(':' + rfc3986.port), ''))) |

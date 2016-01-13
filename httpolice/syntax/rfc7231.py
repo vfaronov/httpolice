@@ -5,8 +5,8 @@ from httpolice.common import (
     ContentCoding,
     MediaType,
     Parametrized,
-    Product,
     ProductName,
+    Versioned,
 )
 from httpolice.parse import (
     argwrap,
@@ -34,7 +34,7 @@ content_coding = wrap(ContentCoding, token)    // rfc(7231, u'content-coding')
 
 product_version = token
 product = argwrap(
-    Product,
+    Versioned,
     wrap(ProductName, token) +
     maybe(~literal('/') + product_version))
 user_agent = argwrap(

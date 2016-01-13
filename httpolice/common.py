@@ -132,6 +132,17 @@ class Parametrized(namedtuple('Parametrized', ('item', 'param'))):
         return (self.item != other) and super(Parametrized, self).__ne__(other)
 
 
+class Versioned(namedtuple('Versioned', ('item', 'version'))):
+
+    __slots__ = ()
+
+    def __unicode__(self):
+        if self.version:
+            return u'%s/%s' % self
+        else:
+            return unicode(self.item)
+
+
 class HTTPVersion(ProtocolString):
 
     __slots__ = ()
@@ -220,11 +231,6 @@ class UpgradeToken(CaseInsensitive):
 
 
 class LanguageTag(CaseInsensitive):
-
-    __slots__ = ()
-
-
-class Product(namedtuple('Product', ('name', 'version'))):
 
     __slots__ = ()
 
