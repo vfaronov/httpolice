@@ -172,8 +172,8 @@ class TestSyntax(unittest.TestCase):
             p,
             'Mozilla/5.0 '
             '(compatible; Vanadium '
-            '\(a nice browser btw, check us out: '
-            'http://vanadium.example/?about_us\)) '
+            r'\(a nice browser btw, check us out: '
+            r'http://vanadium.example/?about_us\)) '
             'libVanadium/0.11a-pre9',
             [
                 Product(u'Mozilla', u'5.0'),
@@ -497,10 +497,10 @@ class TestFromFiles(unittest.TestCase):
             test_name = filename
             scheme = None
         def test(self):
-            self._run_test(filename, scheme)
+            self.run_test(filename, scheme)
         setattr(cls, 'test_%s' % test_name, test)
 
-    def _run_test(self, filename, scheme=None):
+    def run_test(self, filename, scheme=None):
         with open(filename) as f:
             data = f.read()
         header, data = data.split('======== BEGIN INBOUND STREAM ========\r\n')
@@ -510,13 +510,13 @@ class TestFromFiles(unittest.TestCase):
         expected = set(int(n) for n in line.split())
         conn = connection.parse_two_streams(inb, outb, scheme=scheme)
         connection.check_connection(conn)
-        buffer = StringIO()
-        report.TextReport(buffer).render_connection(conn)
-        actual = set(int(ln[5:9]) for ln in buffer.getvalue().splitlines()
+        buf = StringIO()
+        report.TextReport(buf).render_connection(conn)
+        actual = set(int(ln[5:9]) for ln in buf.getvalue().splitlines()
                      if ln.startswith('**** '))
+        self.covered.update(actual)
         self.assertEquals(expected, actual)
         report.HTMLReport(StringIO()).render_connection(conn)
-        self.covered.update(actual)
         if self.examples is not None:
             for ident, ctx in conn.collect_complaints():
                 self.examples.setdefault(ident, ctx)

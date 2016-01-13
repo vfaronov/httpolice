@@ -25,8 +25,6 @@ def check_responses(resps):
     for resp in resps:
         if okay(resp):
             check_response(resp)
-    if all(okay(resp) for resp in resps):
-        check_responses_flow(resps)
 
 
 def check_response(resp):
@@ -105,7 +103,3 @@ def check_response_in_context(resp, req):
     if req.method == m.PUT and req.headers.content_range.is_present and \
             resp.status.successful:
         resp.complain(1058)
-
-
-def check_responses_flow(resps):
-    pass

@@ -36,12 +36,12 @@ def citation(obj):
 
 
 def title(obj, with_citation=False):
-    title = get_info(obj).get('_title')
+    t = get_info(obj).get('_title')
     if with_citation:
         cite = citation(obj)
         if cite and cite.title:
-            if title:
-                title = u'%s (%s)' % (title, cite.title)
+            if t:
+                t = u'%s (%s)' % (t, cite.title)
             else:
-                title = cite.title
-    return title
+                t = cite.title
+    return t
