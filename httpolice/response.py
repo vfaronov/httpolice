@@ -152,6 +152,8 @@ def check_response_in_context(resp, req):
             resp.complain(1072)
         elif resp.status == st.accepted:
             resp.complain(1074)
+        elif resp.status == st.conflict:
+            resp.complain(1095)
 
     if resp.status == st.created and req.method == m.POST and \
             resp.headers.location.is_absent:

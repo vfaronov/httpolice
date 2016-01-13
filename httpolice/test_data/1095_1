@@ -1,0 +1,14 @@
+1095
+
+======== BEGIN INBOUND STREAM ========
+OPTIONS / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 409 Conflict
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 9
+
+No way!

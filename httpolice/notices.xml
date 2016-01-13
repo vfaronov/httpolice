@@ -713,4 +713,9 @@
     </rfc>
   </comment>
 
+  <error id="1095">
+    <title><ref to="msg.status"/> response to a <ref to="msg.request.method"/> request</title>
+    <explain>The <st>409</st> status code means that the request conflicted with the current state of the resource. But a <ref to="msg.request.method"/> request is, by definition, safe (read-only): it must not affect the state in any way, so there can be no conflict. The 409 status code is probably wrong here.</explain>
+  </error>
+
 </notices>
