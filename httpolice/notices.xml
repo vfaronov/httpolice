@@ -741,4 +741,13 @@
     </rfc>
   </error>
 
+  <error id="1099">
+    <title><ref to="msg.status"/> response to a request with no payload</title>
+    <rfc num="7231" sect="6.5.13">
+      The <st>415</st> (Unsupported Media Type) status code indicates that the
+   origin server is refusing to service the request because the payload
+   is in a format not supported by this method on the target resource.
+    </rfc>
+  </error>
+
 </notices>

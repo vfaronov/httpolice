@@ -188,5 +188,8 @@ def check_response_in_context(resp, req):
             req.headers.content_length.is_okay:
         resp.complain(1097)
 
-    if resp.status == st.payload_too_large and not req.body:
-        resp.complain(1098)
+    if not req.body:
+        if resp.status == st.payload_too_large:
+            resp.complain(1098)
+        elif resp.status == st.unsupported_media_type:
+            resp.complain(1099)
