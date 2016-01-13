@@ -165,3 +165,11 @@ def check_response_in_context(resp, req):
             resp.status in [st.multiple_choices, st.moved_permanently,
                             st.found, st.temporary_redirect]:
         resp.complain(1086)
+
+    if resp.status == st.not_acceptable:
+        if all(header.is_proactive_conneg(hdr.name) == False
+               for hdr in req.headers):
+            resp.complain(1090)
+        elif not any(header.is_proactive_conneg(hdr.name)
+                     for hdr in req.headers):
+            resp.complain(1091)

@@ -678,4 +678,16 @@
     </rfc>
   </error>
 
+  <error id="1090">
+    <title>Wrong use of status code <ref to="msg.status"/></title>
+    <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers, such as <h>Accept</h>. But this request has no such headers.</explain>
+    <explain>See also <rfc num="7231" sect="5.3"/>.</explain>
+  </error>
+
+  <comment id="1091">
+    <title>Probably wrong use of status code <ref to="msg.status"/></title>
+    <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers, such as <h>Accept</h>. But this request has no such headers, unless it’s an extension header not known to HTTPolice.</explain>
+    <explain>See also <rfc num="7231" sect="5.3"/>.</explain>
+  </comment>
+
 </notices>
