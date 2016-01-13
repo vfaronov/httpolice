@@ -77,6 +77,10 @@ def check_response_itself(resp):
     elif resp.status == st.payment_required:
         resp.complain(1088)
 
+    if resp.status == st.method_not_allowed:
+        if resp.headers.allow.is_absent:
+            resp.complain(1089)
+
 
 def check_response_in_context(resp, req):
     if req.method == m.CONNECT and resp.status.successful:

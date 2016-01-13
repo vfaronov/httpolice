@@ -669,4 +669,13 @@
     </rfc>
   </error>
 
+  <error id="1089">
+    <title><ref to="msg.status"/> response with no <h>Allow</h> header</title>
+    <rfc num="7231" sect="6.5.5">
+      The origin server MUST generate an
+   <h>Allow</h> header field in a <st>405</st> response containing a list of the target
+   resource's currently supported methods.
+    </rfc>
+  </error>
+
 </notices>
