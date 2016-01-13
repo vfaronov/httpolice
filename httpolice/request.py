@@ -48,7 +48,10 @@ class Request(message.Message):
         # RFC 7230 section 5.5.
         if self.is_absolute_form:
             return self.target
-        scheme = self.scheme or 'http'
+        if self.scheme:
+            scheme = self.scheme
+        else:           # Let's not annoy the user with wrong guesses.
+            return None
         if self.is_authority_form:
             authority = self.target
         elif self.headers.host.is_okay:

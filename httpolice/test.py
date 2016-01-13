@@ -345,7 +345,7 @@ class TestRequest(unittest.TestCase):
         stream = ('GET /pub/WWW/TheProject.html HTTP/1.1\r\n'
                   'Host: www.example.org:8080\r\n'
                   '\r\n')
-        [req] = self.parse(stream)
+        [req] = self.parse(stream, scheme='http')
         self.assertEqual(
             req.effective_uri,
             'http://www.example.org:8080/pub/WWW/TheProject.html')
@@ -353,7 +353,7 @@ class TestRequest(unittest.TestCase):
     def test_effective_uri_2(self):
         stream = ('GET /pub/WWW/TheProject.html HTTP/1.0\r\n'
                   '\r\n')
-        [req] = self.parse(stream)
+        [req] = self.parse(stream, scheme='http')
         self.assert_(req.effective_uri is None)
 
     def test_effective_uri_3(self):

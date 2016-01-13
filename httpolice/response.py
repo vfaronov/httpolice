@@ -111,8 +111,7 @@ def check_response_in_context(resp, req):
     elif resp.status.informational and req.version == http10:
         resp.complain(1071)
 
-    if resp.headers.content_location.is_okay and \
-            req.effective_uri is not None:
+    if resp.headers.content_location.is_okay and req.effective_uri:
         absolute_content_location = urlparse.urljoin(
             req.effective_uri, resp.headers.content_location.value)
         if url_equals(req.effective_uri, absolute_content_location):
