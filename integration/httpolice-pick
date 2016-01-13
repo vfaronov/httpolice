@@ -21,6 +21,11 @@ def main():
     for name in os.listdir(args.streams_dir):
         if ('.serv.' not in name) or (not name.endswith('.dat')):
             continue
+        _, n, _ = name.rsplit('.', 2)
+        if n.isdigit():
+            n = int(n)
+        else:
+            n = 0
         inbound = os.path.join(args.streams_dir, name)
         outbound = os.path.join(args.streams_dir,
                                 name.replace('.serv.', '.clnt.'))
@@ -28,7 +33,7 @@ def main():
             sys.stderr.write('No outbound stream %s, skipping' %
                              os.path.basename(outbound))
             continue
-        inputs.append((inbound, outbound, os.stat(inbound).st_ctime))
+        inputs.append((inbound, outbound, (os.stat(inbound).st_ctime, n)))
 
     inputs.sort(key=lambda entry: entry[2])
 
