@@ -750,4 +750,14 @@
     </rfc>
   </error>
 
+  <error id="1100">
+    <title><ref to="msg.status"/> response to a request with no <h>Expect</h></title>
+    <rfc num="7231" sect="6.5.14">
+      The <st>417</st> (Expectation Failed) status code indicates that the
+   expectation given in the request's <h>Expect</h> header field
+   (Section 5.1.1) could not be met by at least one of the inbound
+   servers.
+    </rfc>
+  </error>
+
 </notices>

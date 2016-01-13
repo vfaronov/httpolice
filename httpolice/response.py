@@ -193,3 +193,6 @@ def check_response_in_context(resp, req):
             resp.complain(1098)
         elif resp.status == st.unsupported_media_type:
             resp.complain(1099)
+
+    if resp.status == st.expectation_failed and req.headers.expect.is_absent:
+        resp.complain(1100)
