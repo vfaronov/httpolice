@@ -84,7 +84,7 @@ def check_response_in_context(resp, req):
         if any(proto not in req.headers.upgrade
                for proto in resp.headers.upgrade):
             resp.complain(1049)
-        elif req.version == http10:
+        if req.version == http10:
             resp.complain(1051)
     elif resp.status.informational and req.version == http10:
         resp.complain(1071)
