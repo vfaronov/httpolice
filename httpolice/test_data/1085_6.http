@@ -1,0 +1,19 @@
+1085
+
+# There's no method change for 307.
+
+======== BEGIN INBOUND STREAM ========
+POST /articles/123/comments/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Length: 16
+Content-Type: text/plain
+
+Hello world!
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 307 Temporary Redirect
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Location: /articles/123/comments/
+Content-Length: 0
+

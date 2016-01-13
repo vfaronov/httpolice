@@ -1,0 +1,13 @@
+# In this case we don't know the scheme of the request.
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 302 Found
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Location: http://example.com/
+Content-Length: 0
+

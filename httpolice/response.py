@@ -124,6 +124,16 @@ def check_response_in_context(resp, req):
             elif req.method == m.DELETE:
                 resp.complain(1060)
 
+    if resp.headers.location.is_okay and req.effective_uri and req.scheme:
+        location = urlparse.urljoin(req.effective_uri,
+                                    resp.headers.location.value)
+        if url_equals(req.effective_uri, location):
+            if resp.status in [st.multiple_choices, st.temporary_redirect]:
+                resp.complain(1085)
+            if resp.status in [st.moved_permanently, st.found, st.see_other] \
+                    and req.method != m.POST:
+                resp.complain(1085)
+
     if req.method == m.PUT and req.headers.content_range.is_present and \
             resp.status.successful:
         resp.complain(1058)

@@ -641,4 +641,9 @@
     </rfc>
   </comment>
 
+  <error id="1085">
+    <title>Redirection to the same URI</title>
+    <explain>This <ref to="msg.status"/> response includes a <ref to="msg.headers.location"/> header that points to the same URI as the <ref to="msg.request.target">request URI</ref>. So the resource redirects to itself.</explain>
+  </error>
+
 </notices>

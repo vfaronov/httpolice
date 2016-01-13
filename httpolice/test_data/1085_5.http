@@ -1,0 +1,17 @@
+# 301, 302, 303 are specified or implemented with a POST-to-GET method change.
+
+======== BEGIN INBOUND STREAM ========
+POST /articles/123/comments/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Length: 16
+Content-Type: text/plain
+
+Hello world!
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 302 Found
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Location: http://example.com:80/articles/123/comments/
+Content-Length: 0
+
