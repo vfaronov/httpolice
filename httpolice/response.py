@@ -158,6 +158,8 @@ def check_response_in_context(resp, req):
             resp.complain(1077)
         elif resp.status == st.see_other:
             resp.complain(1081)
+        elif resp.status == st.not_acceptable:
+            resp.complain(1092)
         elif resp.status.client_error:
             resp.complain(1087)
 

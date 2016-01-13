@@ -690,4 +690,14 @@
     <explain>See also <rfc num="7231" sect="5.3"/>.</explain>
   </comment>
 
+  <comment id="1092">
+    <title><ref to="msg.status"/> response with no payload</title>
+    <rfc num="7231" sect="6.5.6">
+      The server SHOULD generate a payload containing a list of available
+   representation characteristics and corresponding resource identifiers
+   from which the user or user agent can choose the one most
+   appropriate.
+    </rfc>
+  </comment>
+
 </notices>

@@ -1,0 +1,13 @@
+1092
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Accept: application/xml
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 406 Not Acceptable
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Length: 0
+
