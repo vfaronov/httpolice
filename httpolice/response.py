@@ -74,6 +74,8 @@ def check_response_itself(resp):
         resp.complain(1082)
     elif resp.status == 306:
         resp.complain(1083)
+    elif resp.status == st.payment_required:
+        resp.complain(1088)
 
 
 def check_response_in_context(resp, req):
