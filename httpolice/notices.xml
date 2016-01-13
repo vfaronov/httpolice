@@ -652,4 +652,14 @@
     <explain>Perhaps the <st>303</st> status code would fit better.</explain>
   </error>
 
+  <comment id="1087">
+    <title><ref to="msg.status"/> response with no payload</title>
+    <rfc num="7231" sect="6.5">
+      Except when responding to a <m>HEAD</m> request, the
+   server SHOULD send a representation containing an explanation of the
+   error situation, and whether it is a temporary or permanent
+   condition.
+    </rfc>
+  </comment>
+
 </notices>
