@@ -16,6 +16,7 @@ from httpolice.common import (
     MediaType,
     Parametrized,
     Product,
+    ProductName,
     TransferCoding,
     Unparseable,
 )
@@ -176,11 +177,11 @@ class TestSyntax(unittest.TestCase):
             r'http://vanadium.example/?about_us\)) '
             'libVanadium/0.11a-pre9',
             [
-                Product(u'Mozilla', u'5.0'),
+                Product(ProductName(u'Mozilla'), u'5.0'),
                 u'compatible; Vanadium '
                 u'(a nice browser btw, check us out: '
                 u'http://vanadium.example/?about_us)',
-                Product(u'libVanadium', u'0.11a-pre9')
+                Product(ProductName(u'libVanadium'), u'0.11a-pre9')
             ])
         self.assertParse(
             p,
@@ -188,12 +189,12 @@ class TestSyntax(unittest.TestCase):
             'AppleWebKit/537.36 (KHTML, like Gecko) '
             'Chrome/37.0.2062.120 Safari/537.36',
             [
-                Product(u'Mozilla', u'5.0'),
+                Product(ProductName(u'Mozilla'), u'5.0'),
                 u'X11; Linux x86_64',
-                Product(u'AppleWebKit', u'537.36'),
+                Product(ProductName(u'AppleWebKit'), u'537.36'),
                 u'KHTML, like Gecko',
-                Product(u'Chrome', u'37.0.2062.120'),
-                Product(u'Safari', u'537.36')
+                Product(ProductName(u'Chrome'), u'37.0.2062.120'),
+                Product(ProductName(u'Safari'), u'537.36')
             ])
 
 

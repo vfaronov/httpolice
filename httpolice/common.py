@@ -229,6 +229,11 @@ class Product(namedtuple('Product', ('name', 'version'))):
     __slots__ = ()
 
 
+class ProductName(ProtocolString):
+
+    __slots__ = ()
+
+
 def url_equals(url1, url2):
     try:
         return urlnorm.norm(url1) == urlnorm.norm(url2)

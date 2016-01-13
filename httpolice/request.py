@@ -4,7 +4,7 @@ import urlparse
 
 from httpolice import message, parse
 from httpolice.common import Product, http11, okay
-from httpolice.known import h, header, m, method, tc
+from httpolice.known import h, header, m, method, product, tc
 from httpolice.syntax import rfc7230
 
 
@@ -145,3 +145,8 @@ def check_request(req):
         if len(items) > 1 and all(isinstance(x, Product) and not x.version
                                   for x in items):
             req.complain(1069, header=req.headers.user_agent)
+        elif all(product.is_library(x.name) for x in items
+                 if isinstance(x, Product)):
+            value = req.headers.user_agent.entries[0].value.decode('utf-8',
+                                                                   'replace')
+            req.complain(1093, value=value)

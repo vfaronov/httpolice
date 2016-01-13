@@ -700,4 +700,12 @@
     </rfc>
   </comment>
 
+  <comment id="1093">
+    <title><ref to="msg.headers.user_agent"/> contains no actual product</title>
+    <explain>This request’s <h>User-Agent</h> header contains only the name of the underlying library, which isn’t very useful for identifying the request. It might be a good idea to include the name of the actual product.</explain>
+    <explain>For example: “My-Product/1.0 <ref to="value"/>”.</explain>
+    <explain>Or simply “My-Product/1.0” or “My-Product”.</explain>
+    <explain>See <rfc num="7231" sect="5.5.3"/>.</explain>
+  </comment>
+
 </notices>

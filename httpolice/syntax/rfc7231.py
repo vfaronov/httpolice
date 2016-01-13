@@ -6,6 +6,7 @@ from httpolice.common import (
     MediaType,
     Parametrized,
     Product,
+    ProductName,
 )
 from httpolice.parse import (
     argwrap,
@@ -32,7 +33,10 @@ media_type = argwrap(
 content_coding = wrap(ContentCoding, token)    // rfc(7231, u'content-coding')
 
 product_version = token
-product = argwrap(Product, token + maybe(~literal('/') + product_version))
+product = argwrap(
+    Product,
+    wrap(ProductName, token) +
+    maybe(~literal('/') + product_version))
 user_agent = argwrap(
     lambda p1, ps: [p1] + ps,
     product + many(~rws + (product | comment)))

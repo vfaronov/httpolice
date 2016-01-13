@@ -5,6 +5,7 @@ from httpolice.known.content_coding import known as cc
 from httpolice.known.header import known as h
 from httpolice.known.media_type import known as media
 from httpolice.known.method import known as m
+from httpolice.known.product import known as prod
 from httpolice.known.status_code import known as st
 from httpolice.known.transfer_coding import known as tc
 from httpolice.known.upgrade_token import known as upgrade
@@ -14,6 +15,7 @@ classes = {
     common.FieldName: h,
     common.MediaType: media,
     common.Method: m,
+    common.ProductName: prod,
     common.StatusCode: st,
     common.TransferCoding: tc,
     common.UpgradeToken: upgrade,
