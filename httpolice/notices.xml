@@ -703,4 +703,14 @@
     <explain>See <rfc num="7231" sect="5.5.3"/>.</explain>
   </comment>
 
+  <comment id="1094">
+    <title><ref to="msg.status"/> response without “<ref to="msg.headers.connection"/>: close”</title>
+    <rfc num="7231" sect="6.5.7">
+      A server SHOULD send the "close" connection option
+   (Section 6.1 of [RFC7230]) in the response, since <st>408</st> implies that
+   the server has decided to close the connection rather than continue
+   waiting.
+    </rfc>
+  </comment>
+
 </notices>

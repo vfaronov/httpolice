@@ -81,6 +81,10 @@ def check_response_itself(resp):
         if resp.headers.allow.is_absent:
             resp.complain(1089)
 
+    if resp.status == st.request_timeout and \
+            u'close' not in resp.headers.connection:
+        resp.complain(1094)
+
 
 def check_response_in_context(resp, req):
     if req.method == m.CONNECT and resp.status.successful:
