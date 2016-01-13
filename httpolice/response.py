@@ -67,6 +67,8 @@ def check_response_itself(resp):
             resp.complain(1079)
         elif resp.status == st.see_other:
             resp.complain(1080)
+        elif resp.status == st.temporary_redirect:
+            resp.complain(1084)
 
     if resp.status == st.use_proxy:
         resp.complain(1082)
