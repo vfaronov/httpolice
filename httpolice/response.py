@@ -196,3 +196,12 @@ def check_response_in_context(resp, req):
 
     if resp.status == st.expectation_failed and req.headers.expect.is_absent:
         resp.complain(1100)
+
+    if resp.status == st.upgrade_required:
+        if resp.headers.upgrade.is_absent:
+            resp.complain(1101)
+        else:
+            for proto in resp.headers.upgrade:
+                if proto in req.headers.upgrade:
+                    resp.complain(1102, protocol=proto)
+                    break

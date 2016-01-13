@@ -1,0 +1,19 @@
+1102
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Upgrade: SPDY/2
+Upgrade: FSTR/3, h2c
+Connection: upgrade
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 426 Upgrade Required
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Upgrade: SMTP, FSTR/3
+Content-Type: text/plain
+Content-Length: 23
+Connection: upgrade
+
+HTTP/1.1? How quaint.

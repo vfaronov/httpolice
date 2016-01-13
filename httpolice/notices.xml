@@ -760,4 +760,19 @@
     </rfc>
   </error>
 
+  <error id="1101">
+    <title><ref to="msg.status"/> response with no <h>Upgrade</h> header</title>
+    <rfc num="7231" sect="6.5.15">
+      The server MUST send an Upgrade header field in a <st>426</st>
+   response to indicate the required protocol(s) (Section 6.7 of
+   [RFC7230]).
+    </rfc>
+  </error>
+
+  <error id="1102">
+    <title>Unnecessary <ref to="msg.status"/> response</title>
+    <explain>In this response, the server <ref to="msg.headers.upgrade">demands</ref> that the client upgrade to <ref to="protocol"/>. But the client’s request is already offering that upgrade in its own <ref to="msg.request.headers.upgrade"/> header. The server can just send a <st>101</st> response and switch to <ref to="protocol"/> without sending an error.</explain>
+    <explain>See also <rfc num="7230" sect="6.7"/>.</explain>
+  </error>
+
 </notices>
