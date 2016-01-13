@@ -1,0 +1,13 @@
+
+
+======== BEGIN INBOUND STREAM ========
+HEAD / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 300 Multiple Choices
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Length: 205
+Location: http://example.com/index.html
+

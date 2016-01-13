@@ -122,3 +122,7 @@ def check_response_in_context(resp, req):
     if resp.status == st.created and req.method == m.POST and \
             resp.headers.location.is_absent:
         resp.complain(1073)
+
+    if req.method != m.HEAD and not resp.body:
+        if resp.status == st.multiple_choices:
+            resp.complain(1077)

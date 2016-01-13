@@ -572,4 +572,14 @@
     </rfc>
   </error>
 
+  <comment id="1077">
+    <title><ref to="msg.status"/> response with no payload</title>
+    <rfc num="7231" sect="6.4.1">
+      For request methods other than <m>HEAD</m>, the server SHOULD generate a
+   payload in the <st>300</st> response containing a list of representation
+   metadata and URI reference(s) from which the user or user agent can
+   choose the one most preferred.
+    </rfc>
+  </comment>
+
 </notices>
