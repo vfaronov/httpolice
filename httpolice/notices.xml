@@ -582,4 +582,12 @@
     </rfc>
   </comment>
 
+  <comment id="1078">
+    <title><ref to="msg.status"/> response with no <h>Location</h> header</title>
+    <rfc num="7231" sect="6.4.2">
+      The server SHOULD generate a <h>Location</h> header field in the response
+   containing a preferred URI reference for the new permanent URI.
+    </rfc>
+  </comment>
+
 </notices>

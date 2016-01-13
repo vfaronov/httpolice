@@ -60,6 +60,10 @@ def check_response_itself(resp):
     if resp.status == st.reset_content and resp.body:
         resp.complain(1076)
 
+    if resp.headers.location.is_absent:
+        if resp.status == st.moved_permanently:
+            resp.complain(1078)
+
 
 def check_response_in_context(resp, req):
     if req.method == m.CONNECT and resp.status.successful:
