@@ -134,3 +134,5 @@ def check_response_in_context(resp, req):
     if req.method != m.HEAD and not resp.body:
         if resp.status == st.multiple_choices:
             resp.complain(1077)
+        elif resp.status == st.see_other:
+            resp.complain(1081)
