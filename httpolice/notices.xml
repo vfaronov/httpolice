@@ -771,8 +771,14 @@
 
   <error id="1102">
     <title>Unnecessary <ref to="msg.status"/> response</title>
-    <explain>In this response, the server <ref to="msg.headers.upgrade">demands</ref> that the client upgrade to <ref to="protocol"/>. But the client’s request is already offering that upgrade in its own <ref to="msg.request.headers.upgrade"/> header. The server can just send a <st>101</st> response and switch to <ref to="protocol"/> without sending an error.</explain>
-    <explain>See also <rfc num="7230" sect="6.7"/>.</explain>
+    <explain>In this response, the server <ref to="msg.headers.upgrade">demands</ref> that the client upgrade to <ref to="protocol"/>. But the client’s request is already offering that same upgrade in its own <ref to="msg.request.headers.upgrade"/> header. The server can just send a <st>101</st> response and switch to <ref to="protocol"/> without sending an error.</explain>
+    <explain>See <rfc num="7230" sect="6.7"/>.</explain>
+  </error>
+
+  <error id="1103">
+    <title>Not proceeding with protocol upgrade</title>
+    <explain>This response’s <ref to="msg.headers.upgrade"/> header indicates that the server is ready to upgrade to <ref to="protocol"/>. But the client’s request is already offering that same upgrade in its own <ref to="msg.request.headers.upgrade"/> header. If the server actually wants to switch to <ref to="protocol"/>, it should go ahead, send a <st>101</st> response, and switch.</explain>
+    <explain>See <rfc num="7230" sect="6.7"/>.</explain>
   </error>
 
 </notices>
