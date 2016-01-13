@@ -53,6 +53,10 @@ def check_response_itself(resp):
             resp.headers.upgrade.is_absent:
         resp.complain(1048)
 
+    if resp.status == st.non_authoritative_information and \
+            resp.headers.via.is_absent:
+        resp.complain(1075)
+
 
 def check_response_in_context(resp, req):
     if req.method == m.CONNECT and resp.status.successful:

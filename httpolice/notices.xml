@@ -559,4 +559,9 @@
     <explain>The <ref to="msg.request.method"/> method is defined to be safe (read-only). But the <st>202</st> status code means that the server started some kind of processing operation. It’s likely that either one is wrong here.</explain>
   </warning>
 
+  <error id="1075">
+    <title><ref to="msg.status"/> response with no <h>Via</h> header</title>
+    <explain>The <ref to="msg.status"/> status code means that the response has been transformed by a proxy. But a proxy must also add a <h>Via</h> header to each forwarded response (<rfc num="7230" sect="5.7.1"/>), and there is no such header here.</explain>
+  </error>
+
 </notices>
