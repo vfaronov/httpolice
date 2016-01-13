@@ -1,0 +1,15 @@
+1098
+
+======== BEGIN INBOUND STREAM ========
+POST / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Length: 0
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 413 Payload Too Large
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 26
+
+That's too much, I quit.

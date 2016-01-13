@@ -732,4 +732,13 @@
     <explain>The <st>411</st> status code means that the server wants to see a <h>Content-Length</h> header in the request. But this request did, in fact, include a valid Content-Length of <ref to="msg.request.headers.content_length.value"/>.</explain>
   </error>
 
+  <error id="1098">
+    <title><ref to="msg.status"/> response to a request with no payload</title>
+    <rfc num="7231" sect="6.5.11">
+      The <st>413</st> (Payload Too Large) status code indicates that the server is
+   refusing to process a request because the request payload is larger
+   than the server is willing or able to process.
+    </rfc>
+  </error>
+
 </notices>

@@ -187,3 +187,6 @@ def check_response_in_context(resp, req):
     if resp.status == st.length_required and \
             req.headers.content_length.is_okay:
         resp.complain(1097)
+
+    if resp.status == st.payload_too_large and not req.body:
+        resp.complain(1098)
