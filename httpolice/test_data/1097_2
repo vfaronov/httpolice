@@ -1,0 +1,18 @@
+1000 1007
+
+======== BEGIN INBOUND STREAM ========
+POST /articles/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: text/plain
+Content-Length: 16.001
+
+Hello world!
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 411 Length Required
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 21
+
+Give me the number.

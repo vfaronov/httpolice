@@ -727,4 +727,9 @@
     </rfc>
   </comment>
 
+  <error id="1097">
+    <title><ref to="msg.status"/> response to a request with <ref to="msg.request.headers.content_length"/></title>
+    <explain>The <st>411</st> status code means that the server wants to see a <h>Content-Length</h> header in the request. But this request did, in fact, include a valid Content-Length of <ref to="msg.request.headers.content_length.value"/>.</explain>
+  </error>
+
 </notices>
