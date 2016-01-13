@@ -68,6 +68,9 @@ def check_response_itself(resp):
         elif resp.status == st.see_other:
             resp.complain(1080)
 
+    if resp.status == st.use_proxy:
+        resp.complain(1082)
+
 
 def check_response_in_context(resp, req):
     if req.method == m.CONNECT and resp.status.successful:

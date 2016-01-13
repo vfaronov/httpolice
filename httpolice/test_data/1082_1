@@ -1,0 +1,15 @@
+1082
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 305 Use Proxy
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Location: http://proxy.example.net/
+Content-Type: text/plain
+Content-Length: 35
+
+Use the example.net proxy please.
