@@ -157,7 +157,7 @@ def parse_responses(connection, stream):
 
     # We may also need to add new exchanges, though.
     # This happens either if there were more responses than requests
-    # (in which case it's an "internal" problem we need to report),
+    # (in which case we need to report a notice),
     # or if there were no requests at all
     # (in which case we're just working with responses and it's OK).
     not_pristine = bool(exchanges)

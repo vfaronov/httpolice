@@ -75,7 +75,7 @@ def load_notices():
     parser = lxml.etree.XMLParser()
     parser.set_element_class_lookup(lookup)
     ns = lookup.get_namespace(None)
-    for tag in ['internal', 'error', 'warning', 'comment', 'debug']:
+    for tag in ['error', 'comment', 'debug']:
         ns[tag] = Notice
     ns['title'] = ns['explain'] = Text
     ns['ref'] = Ref
