@@ -209,3 +209,7 @@ def check_response_in_context(resp, req):
 
     if resp.status == st.upgrade_required and not resp.headers.upgrade:
         resp.complain(1101)
+
+    if resp.status == st.http_version_not_supported and \
+            resp.version == req.version:
+        resp.complain(1105)

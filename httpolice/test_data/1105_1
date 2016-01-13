@@ -1,0 +1,14 @@
+1105
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.2
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.2 505 HTTP Version Not Supported
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 32
+
+Sorry, I don't speak HTTP/1.2.

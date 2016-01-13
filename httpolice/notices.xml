@@ -791,4 +791,13 @@
     </rfc>
   </comment>
 
+  <error id="1105">
+    <title><ref to="msg.status"/> response with the same version as the request</title>
+    <explain>The <st>505</st> status code means that the server does not support the HTTP version used in the request—which is <ref to="msg.request.version"/>—but the response itself <ref to="msg.version">is</ref> of that same version.</explain>
+    <rfc num="7230" sect="2.6">
+      A server MUST NOT send
+   a version to which it is not conformant.
+    </rfc>
+  </error>
+
 </notices>
