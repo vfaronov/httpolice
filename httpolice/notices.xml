@@ -590,4 +590,12 @@
     </rfc>
   </comment>
 
+  <comment id="1079">
+    <title><ref to="msg.status"/> response with no <h>Location</h> header</title>
+    <rfc num="7231" sect="6.4.3">
+      The server SHOULD generate a <h>Location</h> header field in the response
+   containing a URI reference for the different URI.
+    </rfc>
+  </comment>
+
 </notices>

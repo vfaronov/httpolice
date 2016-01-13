@@ -63,6 +63,8 @@ def check_response_itself(resp):
     if resp.headers.location.is_absent:
         if resp.status == st.moved_permanently:
             resp.complain(1078)
+        elif resp.status == st.found:
+            resp.complain(1079)
 
 
 def check_response_in_context(resp, req):
