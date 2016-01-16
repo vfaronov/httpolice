@@ -836,4 +836,19 @@
     <explain>According to <rfc num="7231" sect="7.1.1.2"/>, any <ref to="msg.status"/> response must include a <h>Date</h> header, unless the server has no usable clock.</explain>
   </comment>
 
+  <error id="1111">
+    <title><ref to="msg.headers.location"/> with a fragment (#) in a <ref to="msg.status"/> response</title>
+    <rfc num="7231" sect="7.1.2">
+      There are circumstances in which a fragment identifier in a <h>Location</h>
+   value would not be appropriate.  For example, the Location header
+   field in a <st>201</st> (Created) response is supposed to provide a URI that
+   is specific to the created resource.
+    </rfc>
+  </error>
+
+  <comment id="1112">
+    <title><ref to="msg.headers.location"/> header in a <ref to="msg.status"/> response</title>
+    <explain><rfc num="7231" sect="7.1.2"/> does not define what it means for a <ref to="msg.status"/> response to have a <ref to="msg.headers.location"/> header. Of course, other documents (unknown to HTTPolice) may do so.</explain>
+  </comment>
+
 </notices>

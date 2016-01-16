@@ -90,6 +90,14 @@ def check_response_itself(resp):
             resp.status.client_error):
         resp.complain(1110)
 
+    if resp.headers.location.is_present:
+        if resp.status == st.created:
+            if resp.headers.location.is_okay and \
+                    urlparse.urlparse(resp.headers.location.value).fragment:
+                resp.complain(1111)
+        elif not resp.status.redirection:
+            resp.complain(1112)
+
 
 def check_response_in_context(resp, req):
     if req.method == m.CONNECT and resp.status.successful:

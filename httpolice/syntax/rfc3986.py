@@ -69,8 +69,20 @@ hier_part = (join('//' + authority + path_abempty) |
              path_absolute | path_rootless | path_empty)
 
 query = string(pchar | char_class('/?'))
+fragment = string(pchar | char_class('/?'))
 
 absolute_uri = join(scheme + ':' + hier_part + maybe(join('?' + query), ''))
 
-relative_part = (join('//' + authority + path_abempty) |
-                 path_absolute | path_noscheme | path_empty)
+relative_part = (
+    join('//' + authority + path_abempty) |
+    path_absolute | path_noscheme | path_empty) \
+    // rfc(3986, u'relative-part')
+
+uri = join(scheme + ':' + hier_part + maybe(join('?' + query), '') +
+           maybe(join('#' + fragment), ''))
+
+relative_ref = join(relative_part +
+                    maybe(join('?' + query), '') +
+                    maybe(join('#' + fragment), ''))
+
+uri_reference = uri | relative_ref
