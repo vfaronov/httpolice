@@ -98,6 +98,11 @@ def check_response_itself(resp):
         elif not resp.status.redirection:
             resp.complain(1112)
 
+    if resp.headers.retry_after.is_present and \
+            resp.status != st.service_unavailable and \
+            not resp.status.redirection:
+        resp.complain(1113)
+
 
 def check_response_in_context(resp, req):
     if req.method == m.CONNECT and resp.status.successful:
