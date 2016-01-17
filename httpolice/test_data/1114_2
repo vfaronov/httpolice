@@ -1,0 +1,19 @@
+
+
+======== BEGIN INBOUND STREAM ========
+POST /articles/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: text/plain
+Content-Length: 16
+
+Hello world!
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 405 Method Not Allowed
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Allow: GET, HEAD, OPTIONS
+Content-Type: text/plain
+Content-Length: 21
+
+What are you doing?

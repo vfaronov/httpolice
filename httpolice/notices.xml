@@ -856,4 +856,14 @@
     <explain><rfc num="7231"/> defines the meaning of the <h>Retry-After</h> header for status codes 3xx, <st>413</st> and <st>503</st>, but not for <ref to="msg.status"/>. Other documents (unknown to HTTPolice) may add such meaning, though.</explain>
   </comment>
 
+  <error id="1114">
+    <title><ref to="msg.headers.allow"/> actually includes <ref to="msg.request.method"/></title>
+    <explain>The <ref to="msg.status"/> status code means that the request method, which is <ref to="msg.request.method"/>, is not allowed for this resource. But the response’s <h>Allow</h> header does include <ref to="msg.request.method"/>. Either the status code or the <h>Allow</h> header is wrong here.</explain>
+  </error>
+
+  <error id="1115">
+    <title><ref to="msg.headers.allow"/> does not include <ref to="msg.request.method"/></title>
+    <explain>The <ref to="msg.status"/> status code means that this <ref to="msg.request.method"/> request was handled successfully. But, according to the <h>Allow</h> header, it should have been disallowed (status code <st>405</st>). Either the status code or the <h>Allow</h> header is wrong here.</explain>
+  </error>
+
 </notices>

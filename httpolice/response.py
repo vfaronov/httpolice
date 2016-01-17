@@ -233,3 +233,11 @@ def check_response_in_context(resp, req):
     if resp.status == st.http_version_not_supported and \
             resp.version == req.version:
         resp.complain(1105)
+
+    if resp.status == st.method_not_allowed:
+        if req.method in resp.headers.allow:
+            resp.complain(1114)
+    elif resp.status.successful:
+        if resp.headers.allow.is_present and \
+                req.method not in resp.headers.allow:
+            resp.complain(1115)
