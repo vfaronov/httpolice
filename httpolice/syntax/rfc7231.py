@@ -14,8 +14,10 @@ from httpolice.common import (
 from httpolice.parse import (
     ParseError,
     argwrap,
+    ci,
     decode,
     function,
+    group,
     join,
     literal,
     many,
@@ -26,7 +28,14 @@ from httpolice.parse import (
     wrap,
 )
 from httpolice.syntax.common import digit, sp
-from httpolice.syntax.rfc7230 import comment, ows, quoted_string, rws, token
+from httpolice.syntax.rfc7230 import (
+    comma_list,
+    comment,
+    ows,
+    quoted_string,
+    rws,
+    token,
+)
 
 
 parameter = (wrap(CaseInsensitive, token) + ~literal('=') +
@@ -127,3 +136,38 @@ def _parse_http_date(state):
     return r
 
 http_date = function(_parse_http_date)
+
+def _parse_media_range_parameter(state):
+    k, v = parameter.parse(state)
+    if k == u'q':
+        raise ParseError()          # let `accept_params` handle from here on
+    return (k, v)
+
+_media_range_parameter = function(_parse_media_range_parameter)
+
+qvalue = wrap(
+    float,
+    join('0' + maybe(join('.' + stringx(0, 3, digit)), '')) |
+    join('1' + maybe(join('.' + stringx(0, 3, '0')), '')))
+weight = ~(ows + ';' + ows + ci('q') + '=') + qvalue
+
+media_range = argwrap(
+    Parametrized,
+    (
+        wrap(MediaType, '*/*') |
+        wrap(MediaType, join(type_ + '/*')) |
+        wrap(MediaType, join(type_ + '/' + subtype))
+    ) +
+    many(~(ows + ';' + ows) + _media_range_parameter))
+
+accept_ext = (
+    ~(ows + ';' + ows) +
+     wrap(CaseInsensitive, token) +
+     ~literal('=') +
+     (token | decode(quoted_string)))
+accept_params = argwrap(lambda w, exts: [(CaseInsensitive(u'q'), w)] + exts,
+                        weight + many(accept_ext))
+
+accept = comma_list(argwrap(
+    Parametrized,
+    media_range + maybe(accept_params, [])))

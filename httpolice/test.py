@@ -113,6 +113,78 @@ class TestSyntax(unittest.TestCase):
             p, 'application/vnd.github.v3+json',
             Parametrized(MediaType(u'application/vnd.github.v3+json'), []))
 
+    def test_accept(self):
+        p = rfc7231.accept + parse.eof
+        self.assertParse(
+            p,
+            'text/html;charset="utf-8";Q=1;profile="mobile", '
+            'text/plain;Q=0.2, text/*;Q=0.02, */*;Q=0.01',
+            [
+                Parametrized(
+                    Parametrized(media.text_html, [(u'charset', u'utf-8')]),
+                    [(u'q', 1), (u'profile', u'mobile')]
+                ),
+                Parametrized(
+                    Parametrized(media.text_plain, []),
+                    [(u'q', 0.2)]
+                ),
+                Parametrized(
+                    Parametrized(MediaType(u'text/*'), []),
+                    [(u'q', 0.02)]
+                ),
+                Parametrized(
+                    Parametrized(MediaType(u'*/*'), []),
+                    [(u'q', 0.01)]
+                ),
+            ]
+        )
+        self.assertParse(
+            p, '*/*',
+            [Parametrized(Parametrized(MediaType(u'*/*'), []), [])])
+        self.assertParse(
+            p, 'application/json',
+            [Parametrized(Parametrized(media.application_json, []), [])])
+        self.assertParse(
+            p, 'audio/*; q=0.2, audio/basic',
+            [
+                Parametrized(Parametrized(MediaType(u'audio/*'), []),
+                             [(u'q', 0.2)]),
+                Parametrized(Parametrized(media.audio_basic, []), []),
+            ])
+        self.assertParse(
+            p, 'text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c',
+            [
+                Parametrized(Parametrized(media.text_plain, []),
+                             [(u'q', 0.5)]),
+                Parametrized(Parametrized(media.text_html, []), []),
+                Parametrized(Parametrized(MediaType(u'text/x-dvi'), []),
+                             [(u'q', 0.8)]),
+                Parametrized(Parametrized(MediaType(u'text/x-c'), []), []),
+            ])
+        self.assertParse(
+            p, ', ,text/*, text/plain,,, text/plain;format=flowed, */*',
+            [
+                Parametrized(Parametrized(MediaType(u'text/*'), []), []),
+                Parametrized(Parametrized(media.text_plain, []), []),
+                Parametrized(
+                    Parametrized(media.text_plain, [(u'format', u'flowed')]),
+                    []
+                ),
+                Parametrized(Parametrized(MediaType(u'*/*'), []), []),
+            ])
+        self.assertParse(p, '', [])
+        self.assertParse(p, ',', [])
+        self.assertNoParse(p, 'text/html;q=foo-bar')
+        self.assertNoParse(p, 'text/html;q=0.12345')
+        self.assertNoParse(p, 'text/html;q=1.23456')
+        self.assertNoParse(p, 'text/html;foo=bar;q=1.23456')
+        self.assertNoParse(p, 'text/html=0.123')
+        self.assertNoParse(p, 'text/html,q=0.123')
+        self.assertNoParse(p, 'text/html q=0.123')
+        self.assertNoParse(p, 'text/html;text/plain')
+        self.assertNoParse(p, 'text/html;;q=0.123')
+        self.assertNoParse(p, 'text/html;q="0.123"')
+
     def test_request_target(self):
         p = rfc7230.origin_form + parse.eof
         self.assertParse(p, '/where?q=now')

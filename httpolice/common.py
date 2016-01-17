@@ -210,8 +210,11 @@ class MediaType(CaseInsensitive):
     """
     Although in RFC 7231 a ``<media-type>`` includes parameters,
     what's mainly interesting for HTTPolice is the media type itself,
-    i.e. the ``type/subtype`` pair.
-    We could represent it as a tuple, but that's a hopeless rabbit hole,
+    i.e. the ``type/subtype`` pair
+    (or ``type/*``, or ``*/*`` -- in the case of the ``Accept`` header,
+    although formally a ``*`` matches the production for ``<token>``).
+
+    We could represent this as a tuple, but that's a hopeless rabbit hole,
     because then we would branch out to structured suffixes (like ``+xml``),
     facet prefixes (like ``vnd.``), and so on.
     Instead we have a single string that can be picked apart
