@@ -45,7 +45,7 @@ product = argwrap(
     Versioned,
     wrap(ProductName, token) +
     maybe(~literal('/') + product_version))
-user_agent = argwrap(
+user_agent = server = argwrap(
     lambda p1, ps: [p1] + ps,
     product + many(~rws + (product | comment)))
 
