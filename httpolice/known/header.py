@@ -2,7 +2,7 @@
 
 from httpolice.common import Citation, FieldName, RFC
 from httpolice.known.base import KnownDict
-from httpolice.parse import anything
+from httpolice.parse import anything, literal
 from httpolice.syntax import rfc3986, rfc5646, rfc7230, rfc7231
 from httpolice.syntax.common import integer
 
@@ -489,7 +489,11 @@ known = KnownDict([
   '_citations': [RFC(7231, section=(7, 1, 4))],
   'bad_for_connection': True,
   'bad_for_trailer': True,
-  'iana_status': 'standard'},
+  'for_request': False,
+  'for_response': True,
+  'iana_status': 'standard',
+  'parser': literal('*') | rfc7230.comma_list1(rfc7230.field_name),
+  'rule': SINGLE},
  {'_': FieldName(u'Via'),
   '_citations': [RFC(7230, section=(5, 7, 1))],
   'for_request': True,

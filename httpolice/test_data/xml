@@ -10,6 +10,7 @@ HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/xml
 Content-Length: 56
+Vary: accept, accept-encoding
 
 <doc>
   <item type="text">Hello world!</item>
