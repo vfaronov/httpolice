@@ -99,8 +99,8 @@ def check_response_itself(resp):
             resp.complain(1112)
 
     if resp.headers.retry_after.is_present and \
-            resp.status != st.service_unavailable and \
-            not resp.status.redirection:
+            not resp.status.redirection and \
+            resp.status not in [st.payload_too_large, st.service_unavailable]:
         resp.complain(1113)
 
 

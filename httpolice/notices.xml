@@ -853,7 +853,7 @@
 
   <comment id="1113">
     <title><ref to="msg.headers.retry_after"/> header in a <ref to="msg.status"/> response</title>
-    <explain><rfc num="7231" sect="7.1.3"/> does not define what it means for a <ref to="msg.status"/> response to have a <ref to="msg.headers.retry_after"/> header. Of course, other documents (unknown to HTTPolice) may do so.</explain>
+    <explain><rfc num="7231"/> defines the meaning of the <h>Retry-After</h> header for status codes 3xx, <st>413</st> and <st>503</st>, but not for <ref to="msg.status"/>. Other documents (unknown to HTTPolice) may add such meaning, though.</explain>
   </comment>
 
 </notices>

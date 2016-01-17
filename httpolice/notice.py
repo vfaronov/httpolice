@@ -61,7 +61,10 @@ class RFC(Citation):
     @property
     def info(self):
         num = int(self.get('num'))
-        sect = tuple(int(n) for n in self.get('sect').split('.'))
+        if self.get('sect'):
+            sect = tuple(int(n) for n in self.get('sect').split('.'))
+        else:
+            sect = None
         return common.RFC(num, section=sect)
 
 
