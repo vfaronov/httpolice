@@ -7,6 +7,7 @@ from httpolice import common
 
 
 protocol_items = {
+    'cc': common.ContentCoding,
     'h': common.FieldName,
     'm': common.Method,
     'st': common.StatusCode,

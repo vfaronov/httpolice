@@ -179,3 +179,10 @@ charset = wrap(Charset, token)
 accept_charset = comma_list1(argwrap(
     Parametrized,
     (charset | wrap(Charset, '*')) + maybe(weight)))
+
+codings = (
+    content_coding |
+    wrap(ContentCoding, 'identity') |
+    wrap(ContentCoding, '*'))
+
+accept_encoding = comma_list(argwrap(Parametrized, codings + maybe(weight)))

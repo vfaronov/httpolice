@@ -14,6 +14,7 @@ from httpolice import (
 )
 from httpolice.common import (
     CaseInsensitive,
+    ContentCoding,
     MediaType,
     Parametrized,
     ProductName,
@@ -21,7 +22,7 @@ from httpolice.common import (
     Unparseable,
     Versioned,
 )
-from httpolice.known import m, media, tc
+from httpolice.known import cc, m, media, tc
 from httpolice.syntax import rfc3986, rfc7230, rfc7231
 
 
@@ -194,6 +195,27 @@ class TestSyntax(unittest.TestCase):
                 Parametrized(u'unicode-1-1', 0.8)
             ]
         )
+
+    def test_accept_encoding(self):
+        p = rfc7231.accept_encoding + parse.eof
+        self.assertParse(
+            p, 'compress, gzip',
+            [Parametrized(cc.compress, None), Parametrized(cc.gzip, None)])
+        self.assertParse(p, '', [])
+        self.assertParse(p, '*', [Parametrized(ContentCoding(u'*'), None)])
+        self.assertParse(
+            p, 'compress;q=0.5, gzip;q=1.0',
+            [Parametrized(cc.compress, 0.5), Parametrized(cc.gzip, 1)])
+        self.assertParse(
+            p, 'gzip;q=1.0, identity; q=0.5, *;q=0',
+            [
+                Parametrized(cc.gzip, 1),
+                Parametrized(ContentCoding(u'identity'), 0.5),
+                Parametrized(ContentCoding(u'*'), 0)
+            ]
+        )
+        self.assertNoParse(p, 'gzip; identity')
+        self.assertNoParse(p, 'gzip, q=1.0')
 
     def test_request_target(self):
         p = rfc7230.origin_form + parse.eof

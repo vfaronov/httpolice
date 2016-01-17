@@ -3,8 +3,8 @@
 import urlparse
 
 from httpolice import message, parse
-from httpolice.common import Versioned, http11, okay
-from httpolice.known import h, header, m, method, product, tc
+from httpolice.common import Parametrized, Versioned, http11, okay
+from httpolice.known import cc, h, header, m, method, product, tc
 from httpolice.syntax import rfc7230
 
 
@@ -145,3 +145,9 @@ def check_request(req):
                     if isinstance(p, Versioned)]
         if products and all(product.is_library(p.item) for p in products):
             req.complain(1093, library=products[0])
+
+    for x in req.headers.accept_encoding:
+        if isinstance(x, Parametrized) and \
+                x.item in [cc.x_gzip, cc.x_compress] and \
+                x.param is not None:
+            req.complain(1116, coding=x.item)
