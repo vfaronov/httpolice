@@ -5,6 +5,7 @@ from datetime import date, datetime, time
 
 from httpolice.common import (
     CaseInsensitive,
+    Charset,
     ContentCoding,
     MediaType,
     Parametrized,
@@ -30,6 +31,7 @@ from httpolice.parse import (
 from httpolice.syntax.common import digit, sp
 from httpolice.syntax.rfc7230 import (
     comma_list,
+    comma_list1,
     comment,
     ows,
     quoted_string,
@@ -171,3 +173,9 @@ accept_params = argwrap(lambda w, exts: [(CaseInsensitive(u'q'), w)] + exts,
 accept = comma_list(argwrap(
     Parametrized,
     media_range + maybe(accept_params, [])))
+
+charset = wrap(Charset, token)
+
+accept_charset = comma_list1(argwrap(
+    Parametrized,
+    (charset | wrap(Charset, '*')) + maybe(weight)))

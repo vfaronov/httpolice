@@ -185,6 +185,16 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'text/html;;q=0.123')
         self.assertNoParse(p, 'text/html;q="0.123"')
 
+    def test_accept_charset(self):
+        p = rfc7231.accept_charset + parse.eof
+        self.assertParse(
+            p, 'iso-8859-5, unicode-1-1 ; q=0.8',
+            [
+                Parametrized(u'iso-8859-5', None),
+                Parametrized(u'unicode-1-1', 0.8)
+            ]
+        )
+
     def test_request_target(self):
         p = rfc7230.origin_form + parse.eof
         self.assertParse(p, '/where?q=now')
