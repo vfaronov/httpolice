@@ -62,7 +62,7 @@ known = KnownDict([
  {'_': FieldName(u'Accept-Encoding'),
   '_citations': [RFC(7231, section=(5, 3, 4)), RFC(7694, section=(3,))],
   'for_request': True,
-  'for_response': False,
+  'for_response': True,         # RFC 7694
   'iana_status': 'standard',
   'parser': rfc7231.accept_encoding,
   'proactive_conneg': True,
