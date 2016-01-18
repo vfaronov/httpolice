@@ -909,4 +909,9 @@
     <explain>In other words, a conformant server will never consider two weak entity tags as equal for purposes of the <h>If-Match</h> header.</explain>
   </error>
 
+  <error id="1121">
+    <title><ref to="msg.request.headers.if_none_match"/> was ignored</title>
+    <explain>This is a <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request, but its <ref to="msg.headers.etag"/> header matches the <h>If-None-Match</h> header of the request. The server is supposed to send a <st>304</st> response in this situation. See <rfc num="7232" sect="3.2"/>.</explain>
+  </error>
+
 </notices>

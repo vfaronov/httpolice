@@ -250,3 +250,17 @@ def check_response_in_context(resp, req):
         if resp.headers.allow.is_present and \
                 req.method not in resp.headers.allow:
             resp.complain(1115)
+
+    if req.method in [m.GET, m.HEAD] and resp.status.successful:
+        if req.headers.if_none_match.is_okay and resp.headers.etag.is_okay:
+            if req.headers.if_none_match == u'*':
+                # In this case we could ignore the presence of ``ETag``,
+                # but then we would need a separate notice
+                # that would be pretty useless and too hard to explain.
+                resp.complain(1121)
+            elif resp.headers.etag.value.opaque_tag in \
+                    [t.opaque_tag for t in req.headers.if_none_match.value]:
+                # Here we ignore the `weak` attribute
+                # because this ("weak comparison function")
+                # is what RFC 7232 section 3.2 requires for ``If-None-Match``.
+                resp.complain(1121)
