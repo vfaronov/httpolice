@@ -18,7 +18,6 @@ from httpolice.parse import (
     ci,
     decode,
     function,
-    group,
     join,
     literal,
     many,
