@@ -151,3 +151,7 @@ def check_request(req):
                 x.item in [cc.x_gzip, cc.x_compress] and \
                 x.param is not None:
             req.complain(1116, coding=x.item)
+
+    if req.headers.if_match.is_okay and req.headers.if_match != u'*':
+        if any(tag.weak for tag in req.headers.if_match.value):
+            req.complain(1120)

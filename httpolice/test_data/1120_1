@@ -1,0 +1,19 @@
+1120
+
+======== BEGIN INBOUND STREAM ========
+PUT /articles/123/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+If-Match: "MStLasWX9", W/"Q6ZSf89"
+Content-Type: text/plain
+Content-Length: 16
+
+Hello world!
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 412 Precondition Failed
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 30
+
+The entity tags don't match.

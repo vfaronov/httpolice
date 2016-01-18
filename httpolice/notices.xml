@@ -898,4 +898,15 @@
     </rfc>
   </comment>
 
+  <error id="1120">
+    <title>Weak entity tag in <ref to="msg.headers.if_match"/></title>
+    <rfc num="7232" sect="3.1">
+      An origin server MUST use the strong comparison function when
+   comparing entity-tags for <h>If-Match</h> (Section 2.3.2), since the client
+   intends this precondition to prevent the method from being applied if
+   there have been any changes to the representation data.
+    </rfc>
+    <explain>In other words, a conformant server will never consider two weak entity tags as equal for purposes of the <h>If-Match</h> header.</explain>
+  </error>
+
 </notices>

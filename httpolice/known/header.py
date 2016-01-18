@@ -2,7 +2,7 @@
 
 from httpolice.common import Citation, FieldName, RFC
 from httpolice.known.base import KnownDict
-from httpolice.parse import anything, literal
+from httpolice.parse import anything, decode, literal
 from httpolice.syntax import rfc3986, rfc5646, rfc7230, rfc7231, rfc7232
 from httpolice.syntax.common import integer
 
@@ -280,8 +280,12 @@ known = KnownDict([
  {'_': FieldName(u'If-Match'),
   '_citations': [RFC(7232, section=(3, 1))],
   'bad_for_trailer': True,
+  'for_request': True,
+  'for_response': False,
   'iana_status': 'standard',
-  'proactive_conneg': False},
+  'parser': decode('*') | rfc7230.comma_list1(rfc7232.entity_tag),
+  'proactive_conneg': False,
+  'rule': SINGLE},
  {'_': FieldName(u'If-Modified-Since'),
   '_citations': [RFC(7232, section=(3, 3))],
   'bad_for_trailer': True,
