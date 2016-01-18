@@ -880,4 +880,12 @@
     <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers. The only such header (known to HTTPolice) in this request is <h>Accept-Language</h>. However, <rfc num="7231" sect="5.3.5"/> discourages sending a <st>406</st> response in this case: it’s better to send a representation in a different language, because the user may still be able to understand some of it.</explain>
   </comment>
 
+  <error id="1118">
+    <title><ref to="msg.headers.last_modified"/> later than <ref to="msg.headers.date"/></title>
+    <rfc num="7232" sect="2.2.1">
+      An origin server with a clock MUST NOT send a <h>Last-Modified</h> date that
+   is later than the server's time of message origination (<h>Date</h>).
+    </rfc>
+  </error>
+
 </notices>

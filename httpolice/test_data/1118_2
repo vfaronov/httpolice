@@ -1,4 +1,4 @@
-1013
+1110
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
@@ -7,15 +7,8 @@ User-Agent: demo
 
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 200 OK
-Date: Thu, 31 Dec 2015 18:26:56 GMT
-Last-Modified: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
-Transfer-Encoding: chunked
-Trailer: Last-Modified
+Content-Length: 14
+Last-Modified: Thu, 31 Dec 2015 18:29:30 GMT
 
-e
 Hello world!
-
-0
-Last-Modified: Thu, 31 Dec 2015 18:25:10 GMT
-

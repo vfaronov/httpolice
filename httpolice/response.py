@@ -103,6 +103,10 @@ def check_response_itself(resp):
             resp.status not in [st.payload_too_large, st.service_unavailable]:
         resp.complain(1113)
 
+    if resp.headers.date.is_okay and resp.headers.last_modified.is_okay and \
+            resp.headers.date.value < resp.headers.last_modified.value:
+        resp.complain(1118)
+
 
 def check_response_in_context(resp, req):
     if req.method == m.CONNECT and resp.status.successful:
