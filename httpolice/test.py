@@ -15,6 +15,7 @@ from httpolice import (
 from httpolice.common import (
     CaseInsensitive,
     ContentCoding,
+    LanguageTag,
     MediaType,
     Parametrized,
     ProductName,
@@ -216,6 +217,28 @@ class TestSyntax(unittest.TestCase):
         )
         self.assertNoParse(p, 'gzip; identity')
         self.assertNoParse(p, 'gzip, q=1.0')
+
+    def test_accept_language(self):
+        p = rfc7231.accept_language + parse.eof
+        self.assertParse(
+            p, 'da, en-gb;q=0.8, en;q=0.7',
+            [
+                Parametrized(LanguageTag(u'da'), None),
+                Parametrized(LanguageTag(u'en-GB'), 0.8),
+                Parametrized(LanguageTag(u'en'), 0.7),
+            ]
+        )
+        self.assertParse(
+            p, 'en, *; q=0',
+            [
+                Parametrized(LanguageTag(u'en'), None),
+                Parametrized(LanguageTag(u'*'), 0),
+            ]
+        )
+        self.assertParse(p, 'da', [Parametrized(LanguageTag(u'da'), None)])
+        self.assertNoParse(p, 'en_GB')
+        self.assertNoParse(p, 'x1, x2')
+        self.assertNoParse(p, 'en; q = 0.7')
 
     def test_request_target(self):
         p = rfc7230.origin_form + parse.eof

@@ -29,6 +29,7 @@ from httpolice.parse import (
     wrap,
 )
 from httpolice.syntax.common import digit, sp
+from httpolice.syntax.rfc4647 import language_range
 from httpolice.syntax.rfc7230 import (
     comma_list,
     comma_list1,
@@ -186,3 +187,7 @@ codings = (
     wrap(ContentCoding, '*'))
 
 accept_encoding = comma_list(argwrap(Parametrized, codings + maybe(weight)))
+
+accept_language = comma_list1(argwrap(
+    Parametrized,
+    language_range + maybe(weight)))

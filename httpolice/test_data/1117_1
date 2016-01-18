@@ -1,0 +1,15 @@
+1117
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Accept-Language: ru, uk, be;q=0.8
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 406 Not Acceptable
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 22
+
+We don't speak that.

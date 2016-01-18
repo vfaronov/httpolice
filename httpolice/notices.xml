@@ -875,4 +875,9 @@
     </rfc>
   </error>
 
+  <comment id="1117">
+    <title><ref to="msg.status"/> response when unable to satisfy <ref to="msg.request.headers.accept_language"/></title>
+    <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers. The only such header (known to HTTPolice) in this request is <h>Accept-Language</h>. However, <rfc num="7231" sect="5.3.5"/> discourages sending a <st>406</st> response in this case: it’s better to send a representation in a different language, because the user may still be able to understand some of it.</explain>
+  </comment>
+
 </notices>

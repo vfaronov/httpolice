@@ -199,12 +199,17 @@ def check_response_in_context(resp, req):
         resp.complain(1086)
 
     if resp.status == st.not_acceptable:
-        if all(header.is_proactive_conneg(hdr.name) == False
-               for hdr in req.headers):
+        all_headers = set(h.name for h in req.headers)
+        known_conneg = set(h.name for h in req.headers
+                           if header.is_proactive_conneg(h.name) == True)
+        known_not_conneg = set(h.name for h in req.headers
+                               if header.is_proactive_conneg(h.name) == False)
+        if known_not_conneg == all_headers:
             resp.complain(1090)
-        elif not any(header.is_proactive_conneg(hdr.name)
-                     for hdr in req.headers):
+        elif not known_conneg:
             resp.complain(1091)
+        elif known_conneg == set([h.accept_language]):
+            resp.complain(1117)
 
     if resp.status == st.length_required and \
             req.headers.content_length.is_okay:
