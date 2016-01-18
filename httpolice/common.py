@@ -248,6 +248,11 @@ class Charset(CaseInsensitive):
     __slots__ = ()
 
 
+class EntityTag(namedtuple('EntityTag', ('weak', 'opaque_tag'))):
+
+    __slots__ = ()
+
+
 def url_equals(url1, url2):
     try:
         return urlnorm.norm(url1) == urlnorm.norm(url2)

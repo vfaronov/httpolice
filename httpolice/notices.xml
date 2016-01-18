@@ -888,4 +888,14 @@
     </rfc>
   </error>
 
+  <comment id="1119">
+    <title>Backslash in <ref to="place"/></title>
+    <rfc num="7232" sect="2.3">
+      Previously, opaque-tag was defined to be a quoted-string
+      ([RFC2616], Section 3.11); thus, some recipients might perform
+      backslash unescaping.  Servers therefore ought to avoid backslash
+      characters in entity tags.
+    </rfc>
+  </comment>
+
 </notices>
