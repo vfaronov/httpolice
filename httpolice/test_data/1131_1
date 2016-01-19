@@ -1,0 +1,13 @@
+1131
+
+======== BEGIN INBOUND STREAM ========
+HEAD / HTTP/1.1
+Host: example.com
+User-Agent: demo
+If-None-Match: W/"pcWDgwEd"
+If-Modified-Since: Wed, 30 Dec 2015 23:05:57 GMT
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 304 Not Modified
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+

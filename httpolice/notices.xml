@@ -978,4 +978,16 @@
     </rfc>
   </error>
 
+  <comment id="1131">
+    <title><ref to="header"/> header in a <ref to="msg.method"/> request</title>
+    <rfc num="7232" sect="5">
+      Although conditional request header fields are defined as being
+   usable with the <m>HEAD</m> method (to keep HEAD's semantics consistent with
+   those of <m>GET</m>), there is no point in sending a conditional HEAD
+   because a successful response is around the same size as a <st>304</st> (Not
+   Modified) response and more useful than a <st>412</st> (Precondition Failed)
+   response.
+    </rfc>
+  </comment>
+
 </notices>

@@ -156,6 +156,11 @@ def check_request(req):
         if any(tag.weak for tag in req.headers.if_match.value):
             req.complain(1120)
 
+    if req.method == m.HEAD:
+        for hdr in req.headers:
+            if header.is_precondition(hdr.name):
+                req.complain(1131, header=hdr)
+
     if req.method in [m.CONNECT, m.OPTIONS, m.TRACE]:
         for hdr in req.headers:
             if hdr.name in [h.if_modified_since, h.if_unmodified_since,
