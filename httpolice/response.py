@@ -286,3 +286,6 @@ def check_response_in_context(resp, req):
             resp.complain(1125)
         elif not known_precond:
             resp.complain(1126)
+        elif known_precond == set([h.if_modified_since]):
+            if req.method not in [m.GET, m.HEAD]:
+                resp.complain(1128)

@@ -957,4 +957,9 @@
     </rfc>
   </comment>
 
+  <error id="1128">
+    <title><ref to="msg.request.headers.if_modified_since"/> was not ignored</title>
+    <explain>The <ref to="msg.status"/> status code means that the server could not satisfy a precondition included in the request. The only such precondition (known to HTTPolice) in this request is <ref to="msg.request.headers.if_modified_since"/>. But <rfc num="7232" sect="3.3"/> says that an <h>If-Modified-Since</h> header in a <ref to="msg.request.method"/> request must be ignored.</explain>
+  </error>
+
 </notices>
