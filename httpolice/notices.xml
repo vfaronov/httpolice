@@ -928,4 +928,9 @@
     <explain>This is a <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request, but its <ref to="msg.headers.last_modified"/> date is no later than the <h>If-Modified-Since</h> header of the request. The server should send a <st>304</st> response in this situation. See <rfc num="7232" sect="3.3"/>.</explain>
   </comment>
 
+  <error id="1124">
+    <title><ref to="msg.status"/> response to a <ref to="msg.request.method"/> request</title>
+    <explain>The <st>304</st> status code is only defined by <rfc num="7232" sect="4.1"/> for responses to <m>GET</m> and <m>HEAD</m> requests. With other methods, the <st>412</st> status code may be useful.</explain>
+  </error>
+
 </notices>

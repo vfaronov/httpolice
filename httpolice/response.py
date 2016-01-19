@@ -262,3 +262,6 @@ def check_response_in_context(resp, req):
 
         elif req.headers.if_modified_since >= resp.headers.last_modified:
             resp.complain(1123)
+
+    if resp.status == st.not_modified and req.method not in [m.GET, m.HEAD]:
+        resp.complain(1124)
