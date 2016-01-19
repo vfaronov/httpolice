@@ -1,0 +1,16 @@
+1122
+
+======== BEGIN INBOUND STREAM ========
+PUT /articles/123/ HTTP/1.1
+Host: example.com
+If-Modified-Since: Wed, 30 Dec 2015 14:19:06 GMT
+Content-Type: text/plain
+Content-Length: 16
+User-Agent: demo
+
+Hello world!
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 204 No Content
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+

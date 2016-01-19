@@ -155,3 +155,7 @@ def check_request(req):
     if req.headers.if_match.is_okay and req.headers.if_match != u'*':
         if any(tag.weak for tag in req.headers.if_match.value):
             req.complain(1120)
+
+    if req.headers.if_modified_since.is_present and \
+            req.method not in [m.GET, m.HEAD]:
+        req.complain(1122)

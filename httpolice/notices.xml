@@ -914,4 +914,18 @@
     <explain>This is a <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request, but its <ref to="msg.headers.etag"/> header matches the <h>If-None-Match</h> header of the request. The server is supposed to send a <st>304</st> response in this situation. See <rfc num="7232" sect="3.2"/>.</explain>
   </error>
 
+  <error id="1122">
+    <title><ref to="msg.headers.if_modified_since"/> in a <ref to="msg.method"/> request</title>
+    <rfc num="7232" sect="3.3">
+      A recipient MUST ignore the <h>If-Modified-Since</h> header field if the
+   received field-value is not a valid HTTP-date, or if the request
+   method is neither <m>GET</m> nor <m>HEAD</m>.
+    </rfc>
+  </error>
+
+  <comment id="1123">
+    <title><ref to="msg.request.headers.if_modified_since"/> was ignored</title>
+    <explain>This is a <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request, but its <ref to="msg.headers.last_modified"/> date is no later than the <h>If-Modified-Since</h> header of the request. The server should send a <st>304</st> response in this situation. See <rfc num="7232" sect="3.3"/>.</explain>
+  </comment>
+
 </notices>

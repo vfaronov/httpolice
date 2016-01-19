@@ -261,3 +261,9 @@ def check_response_in_context(resp, req):
             elif any(tag.weak_equiv(resp.headers.etag.value)
                      for tag in req.headers.if_none_match.value):
                 resp.complain(1121)
+
+        elif req.headers.if_modified_since.is_okay and \
+                resp.headers.last_modified.is_okay:
+            if req.headers.if_modified_since.value >= \
+                    resp.headers.last_modified.value:
+                resp.complain(1123)
