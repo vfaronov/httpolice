@@ -106,6 +106,16 @@ def check_response_itself(resp):
     if resp.headers.date < resp.headers.last_modified:
         resp.complain(1118)
 
+    if resp.status == st.not_modified:
+        for hdr in resp.headers:
+            if hdr.name == h.etag:
+                continue
+            elif hdr.name == h.last_modified:
+                if resp.headers.etag.is_present:
+                    resp.complain(1127, header=hdr)
+            elif header.is_representation_metadata(hdr.name):
+                resp.complain(1127, header=hdr)
+
 
 def check_response_in_context(resp, req):
     if req.method == m.CONNECT and resp.status.successful:
