@@ -265,3 +265,14 @@ def check_response_in_context(resp, req):
 
     if resp.status == st.not_modified and req.method not in [m.GET, m.HEAD]:
         resp.complain(1124)
+
+    if resp.status in [st.not_modified, st.precondition_failed]:
+        all_headers = set(h.name for h in req.headers)
+        known_precond = set(h.name for h in req.headers
+                            if header.is_precondition(h.name) == True)
+        known_not_precond = set(h.name for h in req.headers
+                                if header.is_precondition(h.name) == False)
+        if known_not_precond == all_headers:
+            resp.complain(1125)
+        elif not known_precond:
+            resp.complain(1126)

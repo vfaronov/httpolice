@@ -933,4 +933,16 @@
     <explain>The <st>304</st> status code is only defined by <rfc num="7232" sect="4.1"/> for responses to <m>GET</m> and <m>HEAD</m> requests. With other methods, the <st>412</st> status code may be useful.</explain>
   </error>
 
+  <error id="1125">
+    <title>Wrong use of status code <ref to="msg.status"/></title>
+    <explain>The <st>304</st> status code is only used when the request includes a precondition, such as <h>If-Modified-Since</h>. There are no such preconditions in this request.</explain>
+    <explain>See <rfc num="7232"/>.</explain>
+  </error>
+
+  <comment id="1126">
+    <title>Probably wrong use of status code <ref to="msg.status"/></title>
+    <explain>The <st>304</st> status code is only used when the request includes a precondition, such as <h>If-Modified-Since</h>. There are no such preconditions in this request, unless it’s an extension header unknown to HTTPolice.</explain>
+    <explain>See <rfc num="7232"/>.</explain>
+  </comment>
+
 </notices>

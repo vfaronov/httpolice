@@ -1,0 +1,12 @@
+1126
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+X-If-Something: foo/bar
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 304 Not Modified
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+
