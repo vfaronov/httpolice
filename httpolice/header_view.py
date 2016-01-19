@@ -1,5 +1,7 @@
 # -*- coding: utf-8; -*-
 
+import operator
+
 from httpolice import known, parse
 from httpolice.common import Unparseable, okay
 from httpolice.known import h, header
@@ -114,12 +116,6 @@ class HeaderView(object):
     def __nonzero__(self):
         return bool(self.value)
 
-    def __eq__(self, other):
-        return self.value == other or super(HeaderView, self) == other
-
-    def __ne__(self, other):
-        return not (self == other)
-
 
 class UnknownHeaderView(HeaderView):
 
@@ -143,6 +139,20 @@ class SingleHeaderView(HeaderView):
         else:
             self._value = None
             self._entries = []
+
+    def _compare(self, other, op):
+        if isinstance(other, SingleHeaderView):
+            return self.is_okay and other.is_okay and \
+                op(self.value, other.value)
+        else:
+            return self.is_okay and op(self.value, other)
+
+    __lt__ = lambda self, other: self._compare(other, operator.lt)
+    __le__ = lambda self, other: self._compare(other, operator.le)
+    __eq__ = lambda self, other: self._compare(other, operator.eq)
+    __ne__ = lambda self, other: self._compare(other, operator.ne)
+    __ge__ = lambda self, other: self._compare(other, operator.ge)
+    __gt__ = lambda self, other: self._compare(other, operator.gt)
 
 
 class MultiHeaderView(HeaderView):

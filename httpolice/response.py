@@ -103,8 +103,7 @@ def check_response_itself(resp):
             resp.status not in [st.payload_too_large, st.service_unavailable]:
         resp.complain(1113)
 
-    if resp.headers.date.is_okay and resp.headers.last_modified.is_okay and \
-            resp.headers.date.value < resp.headers.last_modified.value:
+    if resp.headers.date < resp.headers.last_modified:
         resp.complain(1118)
 
 
@@ -123,8 +122,7 @@ def check_response_in_context(resp, req):
         if u'close' not in resp.headers.connection:
             resp.complain(1047)
 
-    if req.version == http11 and (req.headers.host.is_absent or
-                                  req.headers.host.value is Unparseable or
+    if req.version == http11 and (not req.headers.host.is_okay or
                                   len(req.headers.enumerate(h.host)) > 1):
         if resp.status.successful or resp.status.redirection:
             resp.complain(1033)
@@ -262,8 +260,5 @@ def check_response_in_context(resp, req):
                      for tag in req.headers.if_none_match.value):
                 resp.complain(1121)
 
-        elif req.headers.if_modified_since.is_okay and \
-                resp.headers.last_modified.is_okay:
-            if req.headers.if_modified_since.value >= \
-                    resp.headers.last_modified.value:
-                resp.complain(1123)
+        elif req.headers.if_modified_since >= resp.headers.last_modified:
+            resp.complain(1123)

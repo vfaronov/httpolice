@@ -123,7 +123,7 @@ def check_request(req):
         req.complain(1062)
 
     if req.headers.expect.is_present:
-        if req.headers.expect == '100-continue':
+        if req.headers.expect == u'100-continue':
             if req.body is None:
                 req.complain(1066)
         else:
