@@ -273,19 +273,25 @@ def check_response_in_context(resp, req):
         elif req.headers.if_modified_since >= resp.headers.last_modified:
             resp.complain(1123)
 
-    if resp.status == st.not_modified and req.method not in [m.GET, m.HEAD]:
-        resp.complain(1124)
-
     if resp.status in [st.not_modified, st.precondition_failed]:
         all_headers = set(h.name for h in req.headers)
         known_precond = set(h.name for h in req.headers
                             if header.is_precondition(h.name) == True)
         known_not_precond = set(h.name for h in req.headers
                                 if header.is_precondition(h.name) == False)
-        if known_not_precond == all_headers:
+
+        if req.method not in [m.GET, m.HEAD] and \
+                resp.status == st.not_modified:
+            resp.complain(1124)
+        elif known_not_precond == all_headers:
             resp.complain(1125)
         elif not known_precond:
             resp.complain(1126)
         elif known_precond == set([h.if_modified_since]):
             if req.method not in [m.GET, m.HEAD]:
                 resp.complain(1128)
+        elif known_precond.issubset(set([h.if_match, h.if_none_match,
+                                         h.if_modified_since,
+                                         h.if_unmodified_since, h.if_range])):
+            if req.method in [m.CONNECT, m.OPTIONS, m.TRACE]:
+                resp.complain(1129)

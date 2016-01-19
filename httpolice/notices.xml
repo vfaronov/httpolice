@@ -962,4 +962,20 @@
     <explain>The <ref to="msg.status"/> status code means that the server could not satisfy a precondition included in the request. The only such precondition (known to HTTPolice) in this request is <ref to="msg.request.headers.if_modified_since"/>. But <rfc num="7232" sect="3.3"/> says that an <h>If-Modified-Since</h> header in a <ref to="msg.request.method"/> request must be ignored.</explain>
   </error>
 
+  <error id="1129">
+    <title>Wrong <ref to="msg.status"/> response</title>
+    <explain>The <ref to="msg.status"/> status code means that the server could not satisfy a precondition included in the request. But, as defined in <rfc num="7232" sect="5"/>, such preconditions must be ignored in a <ref to="msg.request.method"/> request.</explain>
+  </error>
+
+  <error id="1130">
+    <title><ref to="header"/> header in a <ref to="msg.method"/> request</title>
+    <rfc num="7232" sect="5">
+      Likewise, a server
+   MUST ignore the conditional request header fields defined by this
+   specification when received with a request method that does not
+   involve the selection or modification of a selected representation,
+   such as <m>CONNECT</m>, <m>OPTIONS</m>, or <m>TRACE</m>.
+    </rfc>
+  </error>
+
 </notices>

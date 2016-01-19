@@ -156,6 +156,11 @@ def check_request(req):
         if any(tag.weak for tag in req.headers.if_match.value):
             req.complain(1120)
 
-    if req.headers.if_modified_since.is_present and \
-            req.method not in [m.GET, m.HEAD]:
-        req.complain(1122)
+    if req.method in [m.CONNECT, m.OPTIONS, m.TRACE]:
+        for hdr in req.headers:
+            if hdr.name in [h.if_modified_since, h.if_unmodified_since,
+                            h.if_match, h.if_none_match, h.if_range]:
+                req.complain(1130, header=hdr)
+    elif req.method not in [m.GET, m.HEAD]:
+        if req.headers.if_modified_since.is_present:
+            req.complain(1122)
