@@ -252,6 +252,9 @@ class EntityTag(namedtuple('EntityTag', ('weak', 'opaque_tag'))):
 
     __slots__ = ()
 
+    def weak_equiv(self, other):
+        return self.opaque_tag == other.opaque_tag
+
 
 def url_equals(url1, url2):
     try:

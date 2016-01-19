@@ -258,9 +258,6 @@ def check_response_in_context(resp, req):
                 # but then we would need a separate notice
                 # that would be pretty useless and too hard to explain.
                 resp.complain(1121)
-            elif resp.headers.etag.value.opaque_tag in \
-                    [t.opaque_tag for t in req.headers.if_none_match.value]:
-                # Here we ignore the `weak` attribute
-                # because this ("weak comparison function")
-                # is what RFC 7232 section 3.2 requires for ``If-None-Match``.
+            elif any(tag.weak_equiv(resp.headers.etag.value)
+                     for tag in req.headers.if_none_match.value):
                 resp.complain(1121)
