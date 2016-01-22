@@ -24,6 +24,7 @@ SP = ' '
 sp = literal(SP)
 sp_htab = char_class(SP + HTAB)
 VCHAR = char_range(0x21, 0x7E)
+vchar = char_class(VCHAR)
 DQUOTE = '"'
 dquote = literal(DQUOTE)
 

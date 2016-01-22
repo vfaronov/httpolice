@@ -19,6 +19,7 @@ from httpolice.common import (
     MediaType,
     Parametrized,
     ProductName,
+    RangeSpecifier,
     RangeUnit,
     TransferCoding,
     Unparseable,
@@ -357,6 +358,34 @@ class TestSyntax(unittest.TestCase):
         self.assertParse(p, 'none,', [RangeUnit(u'none')])
         self.assertParse(p, ', ,Bytes, Pages',
                          [RangeUnit(u'bytes'), RangeUnit(u'pages')])
+
+    def test_range(self):
+        p = rfc7233.range + parse.eof
+        self.assertParse(
+            p, 'bytes=0-499',
+            RangeSpecifier(RangeUnit(u'bytes'), [(0, 499)]))
+        self.assertParse(
+            p, 'bytes=500-999',
+            RangeSpecifier(RangeUnit(u'bytes'), [(500, 999)]))
+        self.assertParse(
+            p, 'bytes=9500-',
+            RangeSpecifier(RangeUnit(u'bytes'), [(9500, None)]))
+        self.assertParse(
+            p, 'bytes=-500',
+            RangeSpecifier(RangeUnit(u'bytes'), [(None, 500)]))
+        self.assertParse(
+            p, 'BYTES=0-0, -1',
+            RangeSpecifier(RangeUnit(u'bytes'), [(0, 0), (None, 1)]))
+        self.assertParse(
+            p, 'Bytes=,500-700 ,601-999, ,',
+            RangeSpecifier(RangeUnit(u'bytes'), [(500, 700), (601, 999)]))
+        self.assertParse(
+            p, 'pages=1-5',
+            RangeSpecifier(RangeUnit(u'pages'), u'1-5'))
+
+        self.assertNoParse(p, 'bytes=1+2-3')
+        self.assertNoParse(p, 'pages=1-5, 6-7')
+        self.assertNoParse(p, '1-5')
 
 
 class TestRequest(unittest.TestCase):

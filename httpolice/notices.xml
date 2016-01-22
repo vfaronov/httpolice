@@ -990,4 +990,21 @@
     </rfc>
   </comment>
 
+  <error id="1132">
+    <title><ref to="msg.headers.range"/> header in a <ref to="msg.method"/> request</title>
+    <rfc num="7233" sect="3.1">
+      A server
+   MUST ignore a <h>Range</h> header field received with a request method other
+   than <m>GET</m>.
+    </rfc>
+  </error>
+
+  <error id="1133">
+    <title>Malformed byte range in <ref to="place"/></title>
+    <rfc num="7233" sect="2.1">
+      A byte-range-spec is invalid if the last-byte-pos value is present
+   and less than the first-byte-pos.
+    </rfc>
+  </error>
+
 </notices>

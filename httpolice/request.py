@@ -169,3 +169,6 @@ def check_request(req):
     elif req.method not in [m.GET, m.HEAD]:
         if req.headers.if_modified_since.is_present:
             req.complain(1122)
+
+    if req.headers.range.is_present and req.method != m.GET:
+        req.complain(1132)

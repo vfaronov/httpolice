@@ -261,6 +261,11 @@ class RangeUnit(CaseInsensitive):
     __slots__ = ()
 
 
+class RangeSpecifier(namedtuple('RangeSpecifier', ('unit', 'ranges'))):
+
+    __slots__ = ()
+
+
 def url_equals(url1, url2):
     try:
         return urlnorm.norm(url1) == urlnorm.norm(url2)
