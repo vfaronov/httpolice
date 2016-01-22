@@ -2,6 +2,8 @@
 
 from cStringIO import StringIO
 from datetime import datetime, timedelta
+import email
+import email.errors
 import gzip
 import json
 import zlib
@@ -77,7 +79,8 @@ def check_message(msg):
     data = msg.decoded_body
     if okay(data) and msg.headers.content_type.is_okay and \
             msg.headers.content_range.is_absent:
-        check_media(msg, msg.headers.content_type.value, data)
+        raw_type = msg.headers.content_type.entries[0].value
+        check_media(msg, msg.headers.content_type.value, raw_type, data)
 
     if msg.headers.trailer.is_present and \
             tc.chunked not in msg.headers.transfer_encoding:
@@ -116,7 +119,7 @@ def check_message(msg):
         msg.complain(1109)
 
 
-def check_media(msg, type_, data):
+def check_media(msg, type_, raw_type, data):
     the_type = type_.item
 
     if media_type.is_json(the_type):
@@ -133,6 +136,9 @@ def check_media(msg, type_, data):
         except Exception, e:
             msg.complain(1039, error=e)
 
+    if media_type.is_multipart(the_type):
+        check_multipart(msg, raw_type, data)
+
     if the_type == media.application_x_www_form_urlencoded:
         # This list is taken from the HTML specification --
         # http://www.w3.org/TR/html/forms.html#url-encoded-form-data --
@@ -145,6 +151,16 @@ def check_media(msg, type_, data):
             if ord(byte) not in good_bytes:
                 msg.complain(1040, offending_value=hex(ord(byte)))
                 break
+
+
+def check_multipart(msg, content_type, data):
+    parsed = email.message_from_string('Content-Type: ' + content_type +
+                                       '\r\n\r\n' + data)
+    for defect in parsed.defects:
+        if isinstance(defect, email.errors.NoBoundaryInMultipartDefect):
+            msg.complain(1139)
+        elif isinstance(defect, email.errors.StartBoundaryNotFoundDefect):
+            msg.complain(1140)
 
 
 def body_charset(msg):

@@ -1043,4 +1043,16 @@
     <explain>See <rfc num="7233" sect="4.1"/>.</explain>
   </error>
 
+  <error id="1139">
+    <title>Multipart boundary not declared</title>
+    <explain>According to the <ref to="msg.headers.content_type"/> header, this message contains a multipart payload, but the Content-Type has no ‘boundary’ parameter that is required for parsing such payload.</explain>
+    <explain>See <rfc num="2046" sect="5.1.1"/>.</explain>
+  </error>
+
+  <error id="1140">
+    <title>Multipart boundary not found</title>
+    <explain>The multipart boundary declared in this message’s <ref to="msg.headers.content_type"/> header was not found in the <ref to="msg.body">payload body</ref>.</explain>
+    <explain>See <rfc num="2046" sect="5.1.1"/>.</explain>
+  </error>
+
 </notices>

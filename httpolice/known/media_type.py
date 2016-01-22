@@ -13,6 +13,9 @@ def is_json(name):
 def is_xml(name):
     return known.get_info(name).get('is_xml') or name.endswith(u'+xml')
 
+def is_multipart(name):
+    return name.startswith(u'multipart/')
+
 
 known = KnownDict([
  {'_': MediaType(u'application/1d-interleaved-parityfec'),

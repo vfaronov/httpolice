@@ -1,0 +1,29 @@
+
+
+======== BEGIN INBOUND STREAM ========
+POST /articles/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: multipart/form-data;boundary="HereGoes"
+Content-Length: 837
+
+--HereGoes
+Content-Disposition: form-data; name="title"
+Content-Type: text/plain
+
+Hello world!
+--HereGoes
+Content-Disposition: form-data; name="text"
+Content-Type: text/plain
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et felis justo. Integer dui risus, cursus vitae facilisis a, facilisis nec orci. Mauris sed ex sit amet velit elementum rutrum ut nec metus. Mauris congue est sapien, ac porttitor nibh consequat sit amet. Donec luctus arcu ut felis accumsan, sed eleifend augue pellentesque. Etiam et laoreet enim. Sed gravida dolor ac ligula vulputate sagittis. Cras nec cursus risus. Etiam vel fringilla nibh. Cras ac fringilla lorem. Phasellus sed mollis dui. Vivamus ut justo eu lorem condimentum vestibulum vitae eu nunc. Aliquam in lectus ac lorem pretium tempus sit amet ut sapien.
+--HereGoes--
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 201 Created
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 47
+Location: /articles/123/
+
+Your article was posted under /articles/123/.
