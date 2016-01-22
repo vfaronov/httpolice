@@ -36,82 +36,82 @@ def check_response(resp):
 def check_response_itself(resp):
     message.check_message(resp)
 
-    if resp.status.informational or resp.status == st.no_content:
-        if resp.headers.transfer_encoding.is_present:
+    status = resp.status
+    headers = resp.headers
+    body = resp.body
+
+    if status.informational or status == st.no_content:
+        if headers.transfer_encoding.is_present:
             resp.complain(1018)
-        if resp.headers.content_length.is_present:
+        if headers.content_length.is_present:
             resp.complain(1023)
 
-    for hdr in resp.headers:
+    for hdr in headers:
         if header.is_for_response(hdr.name) == False:
             resp.complain(1064, header=hdr)
         elif header.is_representation_metadata(hdr.name) and \
-                resp.status.informational:
+                status.informational:
             resp.complain(1052, header=hdr)
 
-    if resp.status == st.switching_protocols and \
-            resp.headers.upgrade.is_absent:
+    if status == st.switching_protocols and headers.upgrade.is_absent:
         resp.complain(1048)
 
-    if resp.status == st.non_authoritative_information and \
-            resp.headers.via.is_absent:
+    if status == st.non_authoritative_information and headers.via.is_absent:
         resp.complain(1075)
 
-    if resp.status == st.reset_content and resp.body:
+    if status == st.reset_content and body:
         resp.complain(1076)
 
-    if resp.headers.location.is_absent:
-        if resp.status == st.moved_permanently:
+    if headers.location.is_absent:
+        if status == st.moved_permanently:
             resp.complain(1078)
-        elif resp.status == st.found:
+        elif status == st.found:
             resp.complain(1079)
-        elif resp.status == st.see_other:
+        elif status == st.see_other:
             resp.complain(1080)
-        elif resp.status == st.temporary_redirect:
+        elif status == st.temporary_redirect:
             resp.complain(1084)
 
-    if resp.status == st.use_proxy:
+    if status == st.use_proxy:
         resp.complain(1082)
-    elif resp.status == 306:
+    elif status == 306:
         resp.complain(1083)
-    elif resp.status == st.payment_required:
+    elif status == st.payment_required:
         resp.complain(1088)
 
-    if resp.status == st.method_not_allowed:
-        if resp.headers.allow.is_absent:
+    if status == st.method_not_allowed:
+        if headers.allow.is_absent:
             resp.complain(1089)
 
-    if resp.status == st.request_timeout and \
-            u'close' not in resp.headers.connection:
+    if status == st.request_timeout and u'close' not in headers.connection:
         resp.complain(1094)
 
-    if resp.headers.date.is_absent and (
-            resp.status.successful or resp.status.redirection or
-            resp.status.client_error):
+    if headers.date.is_absent and (status.successful or status.redirection or
+                                   status.client_error):
         resp.complain(1110)
 
-    if resp.headers.location.is_present:
-        if resp.status == st.created:
-            if resp.headers.location.is_okay and \
-                    urlparse.urlparse(resp.headers.location.value).fragment:
+    if headers.location.is_present:
+        if status == st.created:
+            if headers.location.is_okay and \
+                    urlparse.urlparse(headers.location.value).fragment:
                 resp.complain(1111)
-        elif not resp.status.redirection:
+        elif not status.redirection:
             resp.complain(1112)
 
-    if resp.headers.retry_after.is_present and \
-            not resp.status.redirection and \
-            resp.status not in [st.payload_too_large, st.service_unavailable]:
+    if headers.retry_after.is_present and \
+            not status.redirection and \
+            status not in [st.payload_too_large, st.service_unavailable]:
         resp.complain(1113)
 
-    if resp.headers.date < resp.headers.last_modified:
+    if headers.date < headers.last_modified:
         resp.complain(1118)
 
-    if resp.status == st.not_modified:
-        for hdr in resp.headers:
+    if status == st.not_modified:
+        for hdr in headers:
             if hdr.name == h.etag:
                 continue
             elif hdr.name == h.last_modified:
-                if resp.headers.etag.is_present:
+                if headers.etag.is_present:
                     resp.complain(1127, header=hdr)
             elif header.is_representation_metadata(hdr.name):
                 resp.complain(1127, header=hdr)
