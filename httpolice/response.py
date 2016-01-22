@@ -1,7 +1,14 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import message
-from httpolice.common import Unparseable, http10, http11, okay, url_equals
+from httpolice.common import (
+    EntityTag,
+    Unparseable,
+    http10,
+    http11,
+    okay,
+    url_equals,
+)
 from httpolice.known import h, header, m, media, method, st, tc
 
 import urlparse
@@ -318,3 +325,9 @@ def check_response_in_context(resp, req):
                 resp.complain(1144)
         elif resp.headers.content_range.is_absent:
             resp.complain(1138)
+
+        if isinstance(req.headers.if_range.value, EntityTag) and \
+                resp.headers.etag.is_okay and \
+                not resp.headers.etag.value. \
+                    strong_equiv(req.headers.if_range.value):
+            resp.complain(1145)

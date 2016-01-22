@@ -1093,4 +1093,10 @@
     </rfc>
   </error>
 
+  <error id="1145">
+    <title>Wrong <ref to="msg.status"/> response</title>
+    <explain>The request’s <ref to="msg.request.headers.if_range"/> header means that the server is expected to send a <st>206</st> response only if the representation’s <ref to="msg.headers.etag"/> matches the one specified in If-Range. In this case, it doesn’t, so the server is supposed to send a <st>200</st> response with the complete data.</explain>
+    <explain>See <rfc num="7233" sect="3.2"/>.</explain>
+  </error>
+
 </notices>

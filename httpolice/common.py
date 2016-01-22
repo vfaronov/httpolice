@@ -255,6 +255,10 @@ class EntityTag(namedtuple('EntityTag', ('weak', 'opaque_tag'))):
     def weak_equiv(self, other):
         return self.opaque_tag == other.opaque_tag
 
+    def strong_equiv(self, other):
+        return not self.weak and not other.weak and \
+            self.opaque_tag == other.opaque_tag
+
 
 class RangeUnit(CaseInsensitive):
 
