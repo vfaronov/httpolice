@@ -307,7 +307,9 @@ def check_response_in_context(resp, req):
                     media.multipart_byteranges:
             if resp.headers.content_range.is_present:
                 resp.complain(1143)
-        elif resp.headers.content_range.is_present:
-            pass
-        else:
+            if req.headers.range.is_okay and \
+                    req.headers.range.value.unit == u'bytes' and \
+                    len(req.headers.range.value.ranges) == 1:
+                resp.complain(1144)
+        elif resp.headers.content_range.is_absent:
             resp.complain(1138)

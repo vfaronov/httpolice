@@ -1084,4 +1084,13 @@
     </rfc>
   </error>
 
+  <error id="1144">
+    <title><ref to="msg.headers.content_type"><media>multipart/byteranges</media></ref> response to a request for a single <ref to="msg.request.headers.range"/></title>
+    <rfc num="7233" sect="4.1">
+      A server MUST NOT generate a multipart response to a request for a
+   single range, since a client that does not request multiple parts
+   might not support multipart responses.
+    </rfc>
+  </error>
+
 </notices>
