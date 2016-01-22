@@ -256,6 +256,11 @@ class EntityTag(namedtuple('EntityTag', ('weak', 'opaque_tag'))):
         return self.opaque_tag == other.opaque_tag
 
 
+class RangeUnit(CaseInsensitive):
+
+    __slots__ = ()
+
+
 def url_equals(url1, url2):
     try:
         return urlnorm.norm(url1) == urlnorm.norm(url2)

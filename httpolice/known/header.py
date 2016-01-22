@@ -3,7 +3,14 @@
 from httpolice.common import Citation, FieldName, RFC
 from httpolice.known.base import KnownDict
 from httpolice.parse import anything, decode
-from httpolice.syntax import rfc3986, rfc5646, rfc7230, rfc7231, rfc7232
+from httpolice.syntax import (
+    rfc3986,
+    rfc5646,
+    rfc7230,
+    rfc7231,
+    rfc7232,
+    rfc7233,
+)
 from httpolice.syntax.common import integer
 
 
@@ -88,7 +95,9 @@ known = KnownDict([
   '_citations': [RFC(7233, section=(2, 3))],
   'for_request': False,
   'for_response': True,
-  'iana_status': 'standard'},
+  'iana_status': 'standard',
+  'parser': rfc7233.acceptable_ranges,
+  'rule': SINGLE},
  {'_': FieldName(u'Age'),
   '_citations': [RFC(7234, section=(5, 1))],
   'bad_for_connection': True,

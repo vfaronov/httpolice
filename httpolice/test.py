@@ -19,12 +19,13 @@ from httpolice.common import (
     MediaType,
     Parametrized,
     ProductName,
+    RangeUnit,
     TransferCoding,
     Unparseable,
     Versioned,
 )
 from httpolice.known import cc, m, media, tc
-from httpolice.syntax import rfc3986, rfc7230, rfc7231
+from httpolice.syntax import rfc3986, rfc7230, rfc7231, rfc7233
 
 
 class TestCommon(unittest.TestCase):
@@ -348,6 +349,14 @@ class TestSyntax(unittest.TestCase):
                          datetime(1994, 11, 16, 8, 49, 37))
         self.assertNoParse(p, 'Sun, 29 Feb 2015 14:11:06 GMT')
         self.assertNoParse(p, 'Wed, 13 Jan 2016 24:09:06 GMT')
+
+    def test_acceptable_ranges(self):
+        p = rfc7233.acceptable_ranges + parse.eof
+        self.assertParse(p, 'none', [])
+        self.assertParse(p, 'NONE', [])
+        self.assertParse(p, 'none,', [RangeUnit(u'none')])
+        self.assertParse(p, ', ,Bytes, Pages',
+                         [RangeUnit(u'bytes'), RangeUnit(u'pages')])
 
 
 class TestRequest(unittest.TestCase):
