@@ -3,7 +3,7 @@
 import urlparse
 
 from httpolice import message, parse
-from httpolice.common import Parametrized, Versioned, http11, okay
+from httpolice.common import EntityTag, Parametrized, Versioned, http11, okay
 from httpolice.known import cc, h, header, m, method, product, tc
 from httpolice.syntax import rfc7230
 
@@ -172,3 +172,10 @@ def check_request(req):
 
     if req.headers.range.is_present and req.method != m.GET:
         req.complain(1132)
+
+    if req.headers.if_range.is_present and req.headers.range.is_absent:
+        req.complain(1134)
+
+    if isinstance(req.headers.if_range.value, EntityTag) and \
+            req.headers.if_range.value.weak:
+        req.complain(1135)

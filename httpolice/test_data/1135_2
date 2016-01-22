@@ -1,0 +1,17 @@
+
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Range: bytes=0-10
+If-Range: Thu, 31 Dec 2015 00:39:40 GMT
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Last-Modified: Thu, 31 Dec 2015 00:39:40 GMT
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!

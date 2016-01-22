@@ -1007,4 +1007,20 @@
     </rfc>
   </error>
 
+  <error id="1134">
+    <title><ref to="msg.headers.if_range"/> header without a <h>Range</h> header</title>
+    <rfc num="7233" sect="3.2">
+      A client MUST NOT generate an <h>If-Range</h> header field in a request that
+   does not contain a <h>Range</h> header field.
+    </rfc>
+  </error>
+
+  <error id="1135">
+    <title>Weak entity tag in the <ref to="msg.headers.if_range"/> header</title>
+    <rfc num="7233" sect="3.2">
+      A client MUST NOT generate an <h>If-Range</h> header field containing an
+   entity-tag that is marked as weak.
+    </rfc>
+  </error>
+
 </notices>
