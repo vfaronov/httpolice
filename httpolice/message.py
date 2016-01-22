@@ -75,7 +75,8 @@ def check_message(msg):
         _ = hdr.value
 
     data = msg.decoded_body
-    if okay(data) and msg.headers.content_type.is_okay:
+    if okay(data) and msg.headers.content_type.is_okay and \
+            msg.headers.content_range.is_absent:
         check_media(msg, msg.headers.content_type.value, data)
 
     if msg.headers.trailer.is_present and \
