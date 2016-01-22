@@ -1023,4 +1023,9 @@
     </rfc>
   </error>
 
+  <error id="1136">
+    <title><ref to="msg.status"/> response to a request with no <h>Range</h> header</title>
+    <explain>The <st>206</st> status code only makes sense in responses to partial requests—that is, requests containing a <h>Range</h> header. See <rfc num="7233" sect="4.1"/>.</explain>
+  </error>
+
 </notices>

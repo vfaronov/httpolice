@@ -295,3 +295,7 @@ def check_response_in_context(resp, req):
                                          h.if_unmodified_since, h.if_range])):
             if req.method in [m.CONNECT, m.OPTIONS, m.TRACE]:
                 resp.complain(1129)
+
+    if resp.status == st.partial_content:
+        if req.headers.range.is_absent:
+            resp.complain(1136)
