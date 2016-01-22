@@ -1070,7 +1070,7 @@
       If the selected
    representation would have had a <h>Content-Type</h> header field in a <st>200</st>
    (OK) response, the server SHOULD generate that same Content-Type
-   field in the header area of each body part.
+   field in the header area of each <ref to="msg.body">body</ref> <ref to="msg.headers.content_type">part</ref>.
     </rfc>
   </comment>
 
