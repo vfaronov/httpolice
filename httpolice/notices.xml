@@ -1055,4 +1055,23 @@
     <explain>See <rfc num="2046" sect="5.1.1"/>.</explain>
   </error>
 
+  <error id="1141">
+    <title>No <h>Content-Range</h> in part #<ref to="part_num"/></title>
+    <rfc num="7233" sect="4.1">
+      Within the header area of each body part in the <ref to="msg.headers.content_type">multipart</ref> <ref to="msg.body">payload</ref>,
+   the server MUST generate a <h>Content-Range</h> header field corresponding
+   to the range being enclosed in that body part.
+    </rfc>
+  </error>
+
+  <comment id="1142">
+    <title>No <h>Content-Type</h> in part #<ref to="part_num"/></title>
+    <rfc num="7233" sect="4.1">
+      If the selected
+   representation would have had a <h>Content-Type</h> header field in a <st>200</st>
+   (OK) response, the server SHOULD generate that same Content-Type
+   field in the header area of each body part.
+    </rfc>
+  </comment>
+
 </notices>

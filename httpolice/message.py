@@ -137,7 +137,7 @@ def check_media(msg, type_, raw_type, data):
             msg.complain(1039, error=e)
 
     if media_type.is_multipart(the_type):
-        check_multipart(msg, raw_type, data)
+        check_multipart(msg, the_type, raw_type, data)
 
     if the_type == media.application_x_www_form_urlencoded:
         # This list is taken from the HTML specification --
@@ -153,14 +153,22 @@ def check_media(msg, type_, raw_type, data):
                 break
 
 
-def check_multipart(msg, content_type, data):
-    parsed = email.message_from_string('Content-Type: ' + content_type +
+def check_multipart(msg, the_type, raw_type, data):
+    parsed = email.message_from_string('Content-Type: ' + raw_type +
                                        '\r\n\r\n' + data)
     for defect in parsed.defects:
         if isinstance(defect, email.errors.NoBoundaryInMultipartDefect):
             msg.complain(1139)
         elif isinstance(defect, email.errors.StartBoundaryNotFoundDefect):
             msg.complain(1140)
+
+    if parsed.is_multipart():      # Will be false in case of the above defects
+        if the_type == media.multipart_byteranges:
+            for i, part in enumerate(parsed.get_payload()):
+                if u'Content-Range' not in part:
+                    msg.complain(1141, part_num=(i + 1))
+                if u'Content-Type' not in part:
+                    msg.complain(1142, part_num=(i + 1))
 
 
 def body_charset(msg):

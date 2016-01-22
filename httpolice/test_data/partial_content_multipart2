@@ -1,0 +1,33 @@
+
+
+======== BEGIN INBOUND STREAM ========
+GET /news/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Range: pages=1,3
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 206 Partial Content
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: multipart/byteranges; boundary=HereGoes
+Content-Length: 280
+
+--HereGoes
+Content-type: application/json
+Content-range: pages 1
+
+[
+  {"title": "Hello world!"},
+  {"title": "Goodbye world!"}
+]
+
+--HereGoes
+Content-type: application/json
+Content-range: pages 3
+
+[
+  {"title": "Foo bar"},
+  {"title": "Baz qux"}
+]
+
+--HereGoes--

@@ -1,4 +1,4 @@
-
+1140
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
@@ -9,7 +9,7 @@ Range: bytes=2-6,9-
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 206 Partial Content
 Date: Thu, 31 Dec 2015 18:26:56 GMT
-Content-Type: multipart/byteranges; boundary=HereGoes
+Content-Type: multipart/byteranges; boundary=SomethingElse
 Content-Length: 165
 
 --HereGoes
