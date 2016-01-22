@@ -1099,4 +1099,15 @@
     <explain>See <rfc num="7233" sect="3.2"/>.</explain>
   </error>
 
+  <comment id="1146">
+    <title>Unnecessary <ref to="header"/> in a <ref to="msg.status"/> response</title>
+    <rfc num="7233" sect="4.1">
+      If a <st>206</st> is generated in response to a request with an <ref to="msg.request.headers.if_range"/>
+   header field, the sender SHOULD NOT generate other representation
+   header fields beyond those required above, because the client is
+   understood to already have a prior response containing those header
+   fields.
+    </rfc>
+  </comment>
+
 </notices>

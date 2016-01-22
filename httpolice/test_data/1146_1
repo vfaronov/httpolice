@@ -1,0 +1,17 @@
+1146
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Range: bytes=2-13
+If-Range:	Wed, 30 Dec 2015 23:01:21 GMT
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 206 Partial Content
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Range: bytes 2-13/14
+Content-Length: 12
+
+llo world!

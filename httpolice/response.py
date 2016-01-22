@@ -331,3 +331,9 @@ def check_response_in_context(resp, req):
                 not resp.headers.etag.value. \
                     strong_equiv(req.headers.if_range.value):
             resp.complain(1145)
+
+        if req.headers.if_range.is_present:
+            for hdr in resp.headers:
+                if header.is_representation_metadata(hdr.name) and \
+                        hdr.name not in [h.etag, h.content_location]:
+                    resp.complain(1146, header=hdr)
