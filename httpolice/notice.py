@@ -10,6 +10,7 @@ protocol_items = {
     'cc': common.ContentCoding,
     'h': common.FieldName,
     'm': common.Method,
+    'media': common.MediaType,
     'st': common.StatusCode,
     'tc': common.TransferCoding,
 }

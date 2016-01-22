@@ -2,7 +2,7 @@
 
 from httpolice import message
 from httpolice.common import Unparseable, http10, http11, okay, url_equals
-from httpolice.known import h, header, m, method, st, tc
+from httpolice.known import h, header, m, media, method, st, tc
 
 import urlparse
 
@@ -301,3 +301,12 @@ def check_response_in_context(resp, req):
             resp.complain(1136)
         elif req.method != m.GET:
             resp.complain(1137)
+
+        if resp.headers.content_type.is_okay and \
+                resp.headers.content_type.value.item == \
+                    media.multipart_byteranges:
+            pass
+        elif resp.headers.content_range.is_present:
+            pass
+        else:
+            resp.complain(1138)

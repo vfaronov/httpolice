@@ -1037,4 +1037,10 @@
     </rfc>
   </error>
 
+  <error id="1138">
+    <title><ref to="msg.status"/> response with no range specifiers</title>
+    <explain>The <st>206</st> status code means that the response contains one or more parts of the data. When it contains one part, the response must have a <h>Content-Range</h> header. When it contains several parts, the response must have a <ref to="msg.headers.content_type"/> of <media>multipart/byteranges</media>. This response has neither.</explain>
+    <explain>See <rfc num="7233" sect="4.1"/>.</explain>
+  </error>
+
 </notices>
