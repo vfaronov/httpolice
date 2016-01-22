@@ -1,0 +1,20 @@
+1137 1132
+
+======== BEGIN INBOUND STREAM ========
+POST /articles/query/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Range: pages=1
+Content-Type: application/json
+Content-Length: 36
+
+{"title": {"includes": "world"}}
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 206 Partial Content
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: application/json
+Content-Length: 29
+Content-Range: pages 1-1/1
+
+[{"title": "Hello world!"}]

@@ -1028,4 +1028,13 @@
     <explain>The <st>206</st> status code only makes sense in responses to partial requests—that is, requests containing a <h>Range</h> header. See <rfc num="7233" sect="4.1"/>.</explain>
   </error>
 
+  <error id="1137">
+    <title><ref to="msg.status"/> response to a <ref to="msg.request.method"/> request</title>
+    <rfc num="7233" sect="3.1">
+      A server
+   MUST ignore a <ref to="msg.request.headers.range"/> header field received with a request method other
+   than <m>GET</m>.
+    </rfc>
+  </error>
+
 </notices>

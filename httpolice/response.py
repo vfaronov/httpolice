@@ -299,3 +299,5 @@ def check_response_in_context(resp, req):
     if resp.status == st.partial_content:
         if req.headers.range.is_absent:
             resp.complain(1136)
+        elif req.method != m.GET:
+            resp.complain(1137)
