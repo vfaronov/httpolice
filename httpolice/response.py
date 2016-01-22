@@ -305,7 +305,8 @@ def check_response_in_context(resp, req):
         if resp.headers.content_type.is_okay and \
                 resp.headers.content_type.value.item == \
                     media.multipart_byteranges:
-            pass
+            if resp.headers.content_range.is_present:
+                resp.complain(1143)
         elif resp.headers.content_range.is_present:
             pass
         else:

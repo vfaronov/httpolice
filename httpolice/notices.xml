@@ -1074,4 +1074,14 @@
     </rfc>
   </comment>
 
+  <error id="1143">
+    <title><ref to="msg.headers.content_range"/> header in a <ref to="msg.headers.content_type"><media>multipart/byteranges</media></ref> response</title>
+    <rfc num="7233" sect="4.1">
+      To avoid confusion with single-part responses, a server MUST NOT
+   generate a <h>Content-Range</h> header field in the HTTP header section of a
+   multiple part response (this field will be sent in each part
+   instead).
+    </rfc>
+  </error>
+
 </notices>

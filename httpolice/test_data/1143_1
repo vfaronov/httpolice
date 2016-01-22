@@ -1,0 +1,27 @@
+1143
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Range: bytes=2-6,7-
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 206 Partial Content
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: multipart/byteranges; boundary=HereGoes
+Content-Length: 167
+Content-Range: bytes 2-13/14
+
+--HereGoes
+Content-Type: text/plain
+Content-Range: bytes 2-6/14
+
+llo wor
+--HereGoes
+Content-Type: text/plain
+Content-Range: bytes 7-13/14
+
+ld!
+
+--HereGoes--
