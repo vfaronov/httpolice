@@ -698,13 +698,13 @@ class TestFromFiles(unittest.TestCase):
         inb, outb = data.split('======== BEGIN OUTBOUND STREAM ========\r\n')
         lines = [ln for ln in header.splitlines() if not ln.startswith('#')]
         line = lines[0]
-        expected = set(int(n) for n in line.split())
+        expected = sorted(int(n) for n in line.split())
         conn = connection.parse_two_streams(inb, outb, scheme=scheme)
         connection.check_connection(conn)
         buf = StringIO()
         report.TextReport(buf).render_connection(conn)
-        actual = set(int(ln[5:9]) for ln in buf.getvalue().splitlines()
-                     if ln.startswith('**** '))
+        actual = sorted(int(ln[5:9]) for ln in buf.getvalue().splitlines()
+                        if ln.startswith('**** '))
         self.covered.update(actual)
         self.assertEquals(expected, actual)
         report.HTMLReport(StringIO()).render_connection(conn)
