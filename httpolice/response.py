@@ -341,3 +341,6 @@ def check_response_in_context(resp, req):
                 if header.is_representation_metadata(hdr.name) and \
                         hdr.name not in [h.etag, h.content_location]:
                     resp.complain(1146, header=hdr)
+
+    if resp.status == st.range_not_satisfiable and req.headers.range.is_absent:
+        resp.complain(1149)
