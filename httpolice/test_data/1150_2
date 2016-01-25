@@ -1,0 +1,15 @@
+# RFC 7233 section 4.4 only recommends this for byte-range requests.
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Range: pages=102-113
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 416 Range Not Satisfiable
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 27
+
+That's way out of bounds.

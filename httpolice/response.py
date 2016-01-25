@@ -3,6 +3,7 @@
 from httpolice import message
 from httpolice.common import (
     EntityTag,
+    RangeUnit,
     Unparseable,
     http10,
     http11,
@@ -342,5 +343,10 @@ def check_response_in_context(resp, req):
                         hdr.name not in [h.etag, h.content_location]:
                     resp.complain(1146, header=hdr)
 
-    if resp.status == st.range_not_satisfiable and req.headers.range.is_absent:
-        resp.complain(1149)
+    if resp.status == st.range_not_satisfiable:
+        if req.headers.range.is_absent:
+            resp.complain(1149)
+        elif req.headers.range.is_okay and \
+                req.headers.range.value.unit == RangeUnit(u'bytes'):
+            if resp.headers.content_range.is_absent:
+                resp.complain(1150)
