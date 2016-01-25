@@ -15,6 +15,7 @@ from httpolice import (
 from httpolice.common import (
     CaseInsensitive,
     ContentCoding,
+    ContentRange,
     LanguageTag,
     MediaType,
     Parametrized,
@@ -386,6 +387,26 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'bytes=1+2-3')
         self.assertNoParse(p, 'pages=1-5, 6-7')
         self.assertNoParse(p, '1-5')
+
+    def test_content_range(self):
+        p = rfc7233.content_range + parse.eof
+        self.assertParse(
+            p, 'bytes 42-1233/1234',
+            ContentRange(RangeUnit(u'bytes'), ((42, 1233), 1234)))
+        self.assertParse(
+            p, 'bytes 42-1233/*',
+            ContentRange(RangeUnit(u'bytes'), ((42, 1233), None)))
+        self.assertParse(
+            p, 'bytes */1234',
+            ContentRange(RangeUnit(u'bytes'), (None, 1234)))
+        self.assertParse(
+            p, 'pages 1, 3, 5-7',
+            ContentRange(RangeUnit(u'pages'), '1, 3, 5-7'))
+        self.assertNoParse(p, 'bytes 42-1233')
+        self.assertNoParse(p, 'bytes *')
+        self.assertNoParse(p, 'bytes */*')
+        self.assertNoParse(p, 'bytes 42/1233')
+        self.assertNoParse(p, 'bytes 42, 43, 44')
 
 
 class TestRequest(unittest.TestCase):

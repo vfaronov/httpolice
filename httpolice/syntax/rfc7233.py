@@ -1,6 +1,6 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.common import RangeSpecifier, RangeUnit
+from httpolice.common import ContentRange, RangeSpecifier, RangeUnit
 from httpolice.parse import (
     ParseError,
     argwrap,
@@ -8,14 +8,16 @@ from httpolice.parse import (
     decode,
     eof,
     function,
+    group,
     literal,
     lookahead,
     maybe,
+    string,
     string1,
     subst,
     wrap,
 )
-from httpolice.syntax.common import integer, vchar
+from httpolice.syntax.common import char, integer, vchar
 from httpolice.syntax.rfc7230 import comma_list1, token
 
 
@@ -53,3 +55,27 @@ other_ranges_specifier = argwrap(
     other_range_unit + ~literal('=') + other_range_set)
 
 range = other_ranges_specifier | byte_ranges_specifier
+
+byte_range = integer + ~literal('-') + integer
+byte_range_resp = (
+    group(byte_range) + ~literal('/') + (integer | subst(None, '*')))
+unsatisfied_range = subst(None, '*/') + integer
+
+def _parse_byte_content_range(state):
+    inner = bytes_unit + ~literal(' ') + (byte_range_resp | unsatisfied_range)
+    r = ContentRange(*inner.parse(state))
+    bounds, complete = r.range
+    if bounds is not None:
+        first, last = bounds
+        if (last < first) or ((complete is not None) and (complete <= last)):
+            state.complain(1148)
+    return r
+
+byte_content_range = function(_parse_byte_content_range)
+
+other_range_resp = string(char)
+other_content_range = argwrap(
+    ContentRange,
+    other_range_unit + ~literal(' ') + other_range_resp)
+
+content_range = other_content_range | byte_content_range

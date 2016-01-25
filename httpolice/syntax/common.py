@@ -14,6 +14,8 @@ from httpolice.parse import (
 
 ALPHA = char_range(0x41, 0x5A) + char_range(0x61, 0x7A)
 alpha = char_class(ALPHA)
+CHAR = char_range(0x01, 0x7F)
+char = char_class(CHAR)
 crlf = (~maybe('\r') + '\n')   // u'newline'
 DIGIT = char_range(0x30, 0x39)
 digit = char_class(DIGIT)

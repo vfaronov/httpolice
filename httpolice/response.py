@@ -123,6 +123,10 @@ def check_response_itself(resp):
             elif header.is_representation_metadata(hdr.name):
                 resp.complain(1127, header=hdr)
 
+    if headers.content_range.is_present and \
+            status not in [st.partial_content, st.range_not_satisfiable]:
+        resp.complain(1147)
+
 
 def check_response_in_context(resp, req):
     if okay(resp.body) and resp.body and resp.headers.content_type.is_absent \
