@@ -1110,10 +1110,10 @@
     </rfc>
   </comment>
 
-  <error id="1147">
+  <comment id="1147">
     <title><ref to="msg.headers.content_range"/> header in a <ref to="msg.status"/> response</title>
     <explain>The <h>Content-Range</h> header is defined by <rfc num="7233" sect="4.2"/> for responses with status codes <st>206</st> and <st>416</st>, but not <ref to="msg.status"/>.</explain>
-  </error>
+  </comment>
 
   <error id="1148">
     <title>Malformed byte range in <ref to="place"/></title>
