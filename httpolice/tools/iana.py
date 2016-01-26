@@ -17,7 +17,7 @@ from httpolice.common import (
     TransferCoding,
     UpgradeToken,
 )
-from httpolice.known import h, m, media, st, tc, upgrade
+from httpolice.known import cc, h, m, media, st, tc, upgrade
 
 
 def yes_no(s):
@@ -119,7 +119,7 @@ class ParametersRegistry(Registry):
     def get_all(self):
         tree = self._get_xml('http-parameters/http-parameters.xml')
         return [
-            ('content codings', list(self._content_codings(tree)), tc),
+            ('content codings', list(self._content_codings(tree)), cc),
             ('transfer codings', list(self._transfer_codings(tree)), tc),
         ]
 
