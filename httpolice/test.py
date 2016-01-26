@@ -13,6 +13,7 @@ from httpolice import (
     report,
 )
 from httpolice.common import (
+    CacheDirective,
     CaseInsensitive,
     ContentCoding,
     ContentRange,
@@ -26,7 +27,7 @@ from httpolice.common import (
     Unparseable,
     Versioned,
 )
-from httpolice.known import cc, m, media, tc, unit
+from httpolice.known import cache, cc, m, media, tc, unit
 from httpolice.syntax import rfc3986, rfc7230, rfc7231, rfc7233
 
 
@@ -583,6 +584,36 @@ class TestRequest(unittest.TestCase):
         [req] = self.parse(stream)
         self.assertEqual(req.effective_uri,
                          'myproto://www.example.org/index.html')
+
+    def test_cache_control(self):
+        stream = ('GET / HTTP/1.1\r\n'
+                  'Host: example.com\r\n'
+                  'Cache-Control: max-age="3600", max-stale=60,\r\n'
+                  'Cache-Control: "foo bar"\r\n'
+                  'Via: 1.1 baz\r\n'
+                  'Cache-Control: qux="xyzzy 123", ,no-transform, abcde\r\n'
+                  '\r\n')
+        [req] = self.parse(stream)
+        self.assertEqual(req.headers.cache_control.value,
+                         [Parametrized(cache.max_age, 3600),
+                          Parametrized(cache.max_stale, 60),
+                          Unparseable,
+                          Parametrized(CacheDirective(u'qux'), 'xyzzy 123'),
+                          Parametrized(cache.no_transform, None),
+                          Parametrized(CacheDirective(u'abcde'), None)])
+        self.assertEqual(req.headers.cache_control.max_age, 3600)
+        self.assertEqual(req.headers.cache_control.max_stale, 60)
+        self.assertEqual(req.headers.cache_control.no_transform, True)
+        self.assert_(req.headers.cache_control.no_cache is None)
+        self.assertEqual(
+            req.headers.cache_control[CacheDirective(u'qux')],
+            'xyzzy 123')
+        self.assertEqual(
+            req.headers.cache_control[CacheDirective(u'abcde')],
+            True)
+        self.assert_(cache.max_age in req.headers.cache_control)
+        self.assert_(cache.no_transform in req.headers.cache_control)
+        self.assert_(cache.no_store not in req.headers.cache_control)
 
 
 class TestResponse(unittest.TestCase):

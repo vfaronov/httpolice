@@ -3,8 +3,8 @@
 import operator
 
 from httpolice import known, parse
-from httpolice.common import Unparseable, okay
-from httpolice.known import h, header
+from httpolice.common import Parametrized, Unparseable, okay
+from httpolice.known import cache, cache_directive, h, header
 
 
 class HeadersView(object):
@@ -23,6 +23,8 @@ class HeadersView(object):
                 cls = SingleHeaderView
             elif rule == header.MULTI:
                 cls = MultiHeaderView
+            elif rule == header.CACHE_CONTROL:
+                cls = CacheControlView
             else:
                 cls = UnknownHeaderView
             self._cache[key] = cls(self._message, key)
@@ -62,6 +64,9 @@ class HeaderView(object):
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, self.name)
 
+    def _process_parsed(self, entry, value):
+        return value
+
     def _pre_parse(self):
         entries = []
         values = []
@@ -79,6 +84,7 @@ class HeaderView(object):
                 entry.complain(1000, error=e)
                 parsed = Unparseable
             else:
+                parsed = self._process_parsed(entry, parsed)
                 entry.annotated = state.collect_annotations()
                 state.dump_complaints(entry, entry)
             values.append(parsed)
@@ -187,3 +193,50 @@ class MultiHeaderView(HeaderView):
     @property
     def okay(self):
         return [v for v in self if okay(v)]
+
+
+class CacheControlView(MultiHeaderView):
+
+    def _process_parsed(self, entry, ds):
+        return [self._process_directive(entry, d) for d in ds]
+
+    @staticmethod
+    def _process_directive(entry, directive_with_argument):
+        directive, argument = directive_with_argument
+
+        # Here we make use of the fact that `rfc7230.token` returns `unicode`
+        # whereas `rfc7230.quoted_string` returns `str`
+        # (because a ``<quoted-string>`` may contain non-ASCII characters).
+        if isinstance(argument, unicode) and \
+                cache_directive.quoted_string_preferred(directive):
+            entry.complain(1154, directive=directive)
+        if isinstance(argument, str) and \
+                cache_directive.token_preferred(directive):
+            entry.complain(1155, directive=directive)
+
+        parser = cache_directive.parser_for(directive)
+        if argument is None:
+            if cache_directive.argument_required(directive):
+                entry.complain(1156, directive=directive)
+        else:
+            if cache_directive.no_argument(directive):
+                entry.complain(1157, directive=directive)
+            if parser is not None:
+                state = parse.State(str(argument))
+                try:
+                    argument = (parser + parse.eof).parse(state)
+                except parse.ParseError, e:
+                    entry.complain(1158, directive=directive, error=e)
+                else:
+                    state.dump_complaints(entry, entry)
+
+        return Parametrized(directive, argument)
+
+    def __getattr__(self, key):
+        return self[getattr(cache, key)]
+
+    def __getitem__(self, key):
+        for directive, argument in self.okay:
+            if directive == key:
+                return True if argument is None else argument
+        return None

@@ -1149,4 +1149,30 @@
     </rfc>
   </error>
 
+  <comment id="1154">
+    <title>Unquoted argument to the <ref to="directive"/> cache directive</title>
+    <explain>The specification for the <ref to="directive"/> directive recommends that its argument be wrapped in double quotes. But in this message’s <ref to="header"/> header, it was not quoted.</explain>
+  </comment>
+
+  <comment id="1155">
+    <title>Quoted argument to the <ref to="directive"/> cache directive</title>
+    <explain>In this message’s <ref to="header"/> header, the argument to the <ref to="directive"/> directive is wrapped in double quotes. But the specification for <ref to="directive"/> recommends that it be written as a plain token, without quotes.</explain>
+  </comment>
+
+  <error id="1156">
+    <title><ref to="directive"/> cache directive with no argument</title>
+    <explain>According to the specification, the <ref to="directive"/> directive must have an argument. But in this message’s <ref to="header"/> header, it has no argument.</explain>
+  </error>
+
+  <error id="1157">
+    <title><ref to="directive"/> cache directive with an argument</title>
+    <explain>In this message’s <ref to="header"/> header, the <ref to="directive"/> directive has an argument. But the specification for <ref to="directive"/> defines no argument.</explain>
+  </error>
+
+  <error id="1158">
+    <title>Malformed <ref to="directive"/> cache directive</title>
+    <explain>When parsing the argument to the <ref to="directive"/> directive in this message’s <ref to="header"/> header, the following error occurred:</explain>
+    <explain><ref to="error"/></explain>
+  </error>
+
 </notices>

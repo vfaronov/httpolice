@@ -10,6 +10,7 @@ from httpolice.syntax import (
     rfc7231,
     rfc7232,
     rfc7233,
+    rfc7234,
 )
 from httpolice.syntax.common import integer
 
@@ -17,6 +18,7 @@ from httpolice.syntax.common import integer
 SINGLE = 1
 MULTI = 2
 SET_COOKIE = 3
+CACHE_CONTROL = 4
 
 
 def is_bad_for_connection(name):
@@ -135,9 +137,13 @@ known = KnownDict([
   '_citations': [RFC(7234, section=(5, 2))],
   'bad_for_connection': True,
   'bad_for_trailer': True,
+  'for_request': True,
+  'for_response': True,
   'iana_status': 'standard',
+  'parser': rfc7230.comma_list1(rfc7234.cache_directive),
   'precondition': False,
-  'proactive_conneg': False},
+  'proactive_conneg': False,
+  'rule': CACHE_CONTROL},
  {'_': FieldName(u'CalDAV-Timezones'),
   '_citations': [],
   'iana_status': 'standard'},
