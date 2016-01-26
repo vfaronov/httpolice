@@ -99,13 +99,31 @@ def _parse_bws(state):
     return ''
 bws = function(_parse_bws)
 
-comma_list = lambda inner: maybe(empty=[], inner=argwrap(
-    lambda x, xs: [elem for elem in [x] + xs if elem is not None],
-    maybe(inner) + many(~(ows + ',') + maybe(~ows + inner))))
-comma_list1 = lambda inner: argwrap(
-    lambda x, xs: [elem for elem in [x] + xs if elem is not None],
-    ~many(',' + ows) + inner +
-    many(~(ows + ',') + maybe(~ows + inner)))
+def _collect_elements(state, raw):
+    r = []
+    for elem in [raw[0]] + raw[1]:
+        if elem is None:
+            state.complain(1151)
+        else:
+            r.append(elem)
+    return r
+
+def comma_list(inner):
+    def _parse_comma_list(state):
+        r = (maybe(inner) + many(~(ows + ',') + maybe(~ows + inner))). \
+            parse(state)
+        if r == (None, []):
+            return []
+        else:
+            return _collect_elements(state, r)
+    return function(_parse_comma_list)
+
+def comma_list1(inner):
+    def _parse_comma_list1(state):
+        r = (~many(',' + ows) + inner +
+              many(~(ows + ',') + maybe(~ows + inner))).parse(state)
+        return _collect_elements(state, r)
+    return function(_parse_comma_list1)
 
 method = wrap(Method, token)   // rfc(7230, u'method')
 

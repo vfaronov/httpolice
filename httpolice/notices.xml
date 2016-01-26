@@ -1140,4 +1140,12 @@
     </rfc>
   </comment>
 
+  <error id="1151">
+    <title>Empty list element in <ref to="place"/></title>
+    <rfc num="7230" sect="7">
+      In any production that uses the list construct, a sender MUST NOT
+   generate empty list elements.
+    </rfc>
+  </error>
+
 </notices>
