@@ -76,12 +76,6 @@ def check_message(msg):
     for hdr in msg.headers:
         _ = hdr.value
 
-    data = msg.decoded_body
-    if okay(data) and msg.headers.content_type.is_okay and \
-            msg.headers.content_range.is_absent:
-        raw_type = msg.headers.content_type.entries[0].value
-        check_media(msg, msg.headers.content_type.value, raw_type, data)
-
     if msg.headers.trailer.is_present and \
             tc.chunked not in msg.headers.transfer_encoding:
         msg.complain(1054)
@@ -114,6 +108,13 @@ def check_message(msg):
     if msg.headers.date.is_okay and \
             msg.headers.date.value > datetime.utcnow() + timedelta(seconds=10):
         msg.complain(1109)
+
+
+def check_payload_body(msg):
+    data = msg.decoded_body
+    if okay(data) and msg.headers.content_type.is_okay:
+        raw_type = msg.headers.content_type.entries[0].value
+        check_media(msg, msg.headers.content_type.value, raw_type, data)
 
 
 def check_media(msg, type_, raw_type, data):

@@ -46,6 +46,9 @@ def check_response_itself(resp):
     headers = resp.headers
     body = resp.body
 
+    if status != st.partial_content:
+        message.check_payload_body(resp)
+
     if status.informational or status == st.no_content:
         if headers.transfer_encoding.is_present:
             resp.complain(1018)
@@ -125,6 +128,15 @@ def check_response_itself(resp):
     if headers.content_range.is_present and \
             status not in [st.partial_content, st.range_not_satisfiable]:
         resp.complain(1147)
+
+    if status == st.partial_content:
+        if headers.content_type.is_okay and \
+                headers.content_type.value.item == media.multipart_byteranges:
+            message.check_payload_body(resp)
+            if headers.content_range.is_present:
+                resp.complain(1143)
+        elif headers.content_range.is_absent:
+            resp.complain(1138)
 
 
 def check_response_in_context(resp, req):
@@ -317,17 +329,13 @@ def check_response_in_context(resp, req):
         elif req.method != m.GET:
             resp.complain(1137)
 
-        if resp.headers.content_type.is_okay and \
-                resp.headers.content_type.value.item == \
-                    media.multipart_byteranges:
-            if resp.headers.content_range.is_present:
-                resp.complain(1143)
-            if req.headers.range.is_okay and \
-                    req.headers.range.value.unit == u'bytes' and \
-                    len(req.headers.range.value.ranges) == 1:
-                resp.complain(1144)
-        elif resp.headers.content_range.is_absent:
-            resp.complain(1138)
+        if (resp.headers.content_type.is_okay and
+                resp.headers.content_type.value.item ==
+                    media.multipart_byteranges and
+                req.headers.range.is_okay and
+                req.headers.range.value.unit == unit.bytes and
+                len(req.headers.range.value.ranges) == 1):
+            resp.complain(1144)
 
         if isinstance(req.headers.if_range.value, EntityTag) and \
                 resp.headers.etag.is_okay and \

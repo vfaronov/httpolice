@@ -69,6 +69,7 @@ class Request(message.Message):
 
 def check_request(req):
     message.check_message(req)
+    message.check_payload_body(req)
 
     if okay(req.body) and req.body and req.headers.content_type.is_absent:
         req.complain(1041)
