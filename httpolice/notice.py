@@ -7,6 +7,7 @@ from httpolice import common
 
 
 protocol_items = {
+    'cache': common.CacheDirective,
     'cc': common.ContentCoding,
     'h': common.FieldName,
     'm': common.Method,

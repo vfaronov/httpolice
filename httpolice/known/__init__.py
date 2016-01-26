@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import common
+from httpolice.known.cache_directive import known as cache
 from httpolice.known.content_coding import known as cc
 from httpolice.known.header import known as h
 from httpolice.known.media_type import known as media
@@ -12,6 +13,7 @@ from httpolice.known.transfer_coding import known as tc
 from httpolice.known.upgrade_token import known as upgrade
 
 classes = {
+    common.CacheDirective: cache,
     common.ContentCoding: cc,
     common.FieldName: h,
     common.MediaType: media,

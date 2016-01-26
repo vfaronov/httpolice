@@ -7,6 +7,7 @@ import urlparse
 import lxml.etree
 
 from httpolice.common import (
+    CacheDirective,
     Citation,
     ContentCoding,
     FieldName,
@@ -18,7 +19,7 @@ from httpolice.common import (
     TransferCoding,
     UpgradeToken,
 )
-from httpolice.known import cc, h, m, media, st, tc, unit, upgrade
+from httpolice.known import cache, cc, h, m, media, st, tc, unit, upgrade
 
 
 def yes_no(s):
@@ -195,3 +196,17 @@ class UpgradeTokenRegistry(Registry):
                     record.find('iana:description', self.xmlns).text,
             })
         return [('upgrade tokens', entries, upgrade)]
+
+
+class CacheDirectiveRegistry(Registry):
+
+    def get_all(self):
+        tree = self._get_xml('http-cache-directives/http-cache-directives.xml')
+        entries = []
+        for record in tree.findall('//iana:record', self.xmlns):
+            entries.append({
+                '_': CacheDirective(
+                        record.find('iana:value', self.xmlns).text),
+                '_citations': list(self.extract_citations(record)),
+            })
+        return [('cache directives', entries, cache)]
