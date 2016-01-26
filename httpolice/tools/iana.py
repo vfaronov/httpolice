@@ -12,12 +12,13 @@ from httpolice.common import (
     FieldName,
     MediaType,
     Method,
-    StatusCode,
+    RangeUnit,
     RFC,
+    StatusCode,
     TransferCoding,
     UpgradeToken,
 )
-from httpolice.known import cc, h, m, media, st, tc, upgrade
+from httpolice.known import cc, h, m, media, st, tc, unit, upgrade
 
 
 def yes_no(s):
@@ -120,6 +121,7 @@ class ParametersRegistry(Registry):
         tree = self._get_xml('http-parameters/http-parameters.xml')
         return [
             ('content codings', list(self._content_codings(tree)), cc),
+            ('range units', list(self._range_units(tree)), unit),
             ('transfer codings', list(self._transfer_codings(tree)), tc),
         ]
 
@@ -129,6 +131,16 @@ class ParametersRegistry(Registry):
         for record in records:
             yield {
                 '_': ContentCoding(
+                    record.find('iana:name', self.xmlns).text),
+                '_citations': list(self.extract_citations(record)),
+            }
+
+    def _range_units(self, tree):
+        records = tree.findall(
+            '//iana:registry[@id="range-units"]/iana:record', self.xmlns)
+        for record in records:
+            yield {
+                '_': RangeUnit(
                     record.find('iana:name', self.xmlns).text),
                 '_citations': list(self.extract_citations(record)),
             }

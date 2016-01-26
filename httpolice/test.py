@@ -26,7 +26,7 @@ from httpolice.common import (
     Unparseable,
     Versioned,
 )
-from httpolice.known import cc, m, media, tc
+from httpolice.known import cc, m, media, tc, unit
 from httpolice.syntax import rfc3986, rfc7230, rfc7231, rfc7233
 
 
@@ -358,28 +358,28 @@ class TestSyntax(unittest.TestCase):
         self.assertParse(p, 'NONE', [])
         self.assertParse(p, 'none,', [RangeUnit(u'none')])
         self.assertParse(p, ', ,Bytes, Pages',
-                         [RangeUnit(u'bytes'), RangeUnit(u'pages')])
+                         [unit.bytes, RangeUnit(u'pages')])
 
     def test_range(self):
         p = rfc7233.range + parse.eof
         self.assertParse(
             p, 'bytes=0-499',
-            RangeSpecifier(RangeUnit(u'bytes'), [(0, 499)]))
+            RangeSpecifier(unit.bytes, [(0, 499)]))
         self.assertParse(
             p, 'bytes=500-999',
-            RangeSpecifier(RangeUnit(u'bytes'), [(500, 999)]))
+            RangeSpecifier(unit.bytes, [(500, 999)]))
         self.assertParse(
             p, 'bytes=9500-',
-            RangeSpecifier(RangeUnit(u'bytes'), [(9500, None)]))
+            RangeSpecifier(unit.bytes, [(9500, None)]))
         self.assertParse(
             p, 'bytes=-500',
-            RangeSpecifier(RangeUnit(u'bytes'), [(None, 500)]))
+            RangeSpecifier(unit.bytes, [(None, 500)]))
         self.assertParse(
             p, 'BYTES=0-0, -1',
-            RangeSpecifier(RangeUnit(u'bytes'), [(0, 0), (None, 1)]))
+            RangeSpecifier(unit.bytes, [(0, 0), (None, 1)]))
         self.assertParse(
             p, 'Bytes=,500-700 ,601-999, ,',
-            RangeSpecifier(RangeUnit(u'bytes'), [(500, 700), (601, 999)]))
+            RangeSpecifier(unit.bytes, [(500, 700), (601, 999)]))
         self.assertParse(
             p, 'pages=1-5',
             RangeSpecifier(RangeUnit(u'pages'), u'1-5'))
@@ -392,13 +392,13 @@ class TestSyntax(unittest.TestCase):
         p = rfc7233.content_range + parse.eof
         self.assertParse(
             p, 'bytes 42-1233/1234',
-            ContentRange(RangeUnit(u'bytes'), ((42, 1233), 1234)))
+            ContentRange(unit.bytes, ((42, 1233), 1234)))
         self.assertParse(
             p, 'bytes 42-1233/*',
-            ContentRange(RangeUnit(u'bytes'), ((42, 1233), None)))
+            ContentRange(unit.bytes, ((42, 1233), None)))
         self.assertParse(
             p, 'bytes */1234',
-            ContentRange(RangeUnit(u'bytes'), (None, 1234)))
+            ContentRange(unit.bytes, (None, 1234)))
         self.assertParse(
             p, 'pages 1, 3, 5-7',
             ContentRange(RangeUnit(u'pages'), '1, 3, 5-7'))

@@ -3,14 +3,12 @@
 from httpolice import message
 from httpolice.common import (
     EntityTag,
-    RangeUnit,
-    Unparseable,
     http10,
     http11,
     okay,
     url_equals,
 )
-from httpolice.known import h, header, m, media, method, st, tc
+from httpolice.known import h, header, m, media, method, st, tc, unit
 
 import urlparse
 
@@ -347,6 +345,6 @@ def check_response_in_context(resp, req):
         if req.headers.range.is_absent:
             resp.complain(1149)
         elif req.headers.range.is_okay and \
-                req.headers.range.value.unit == RangeUnit(u'bytes'):
+                req.headers.range.value.unit == unit.bytes:
             if resp.headers.content_range.is_absent:
                 resp.complain(1150)
