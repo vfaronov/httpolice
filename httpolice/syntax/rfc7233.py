@@ -43,7 +43,7 @@ byte_ranges_specifier = argwrap(
     bytes_unit + ~literal('=') + byte_range_set)
 
 def _parse_other_range_unit(state):
-    r = RangeUnit(token.parse(state))
+    r = wrap(RangeUnit, token).parse(state)
     if r == RangeUnit(u'bytes'):
         raise ParseError()
     return r
