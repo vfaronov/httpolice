@@ -176,8 +176,14 @@ class MultiHeaderView(HeaderView):
 
     def _parse(self):
         entries, values = self._pre_parse()
-        self._value = [value            # Concatenate all that have been parsed
-                       for sub_values in values
-                       if sub_values is not Unparseable
-                       for value in sub_values]
+        self._value = []
+        for sub_values in values:
+            if sub_values is Unparseable:
+                self._value.append(Unparseable)
+            else:
+                self._value.extend(sub_values)
         self._entries = entries
+
+    @property
+    def okay(self):
+        return [v for v in self if okay(v)]

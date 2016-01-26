@@ -3,7 +3,7 @@
 import urlparse
 
 from httpolice import message, parse
-from httpolice.common import EntityTag, Parametrized, Versioned, http11, okay
+from httpolice.common import EntityTag, Versioned, http11, okay
 from httpolice.known import cc, h, header, m, method, product, tc
 from httpolice.syntax import rfc7230
 
@@ -127,7 +127,7 @@ def check_request(req):
         req.complain(1062)
 
     if req.headers.expect.is_present:
-        if req.headers.expect == u'100-continue':
+        if req.headers.expect == '100-continue':
             if req.body is None:
                 req.complain(1066)
         else:
@@ -150,10 +150,8 @@ def check_request(req):
         if products and all(product.is_library(p.item) for p in products):
             req.complain(1093, library=products[0])
 
-    for x in req.headers.accept_encoding:
-        if isinstance(x, Parametrized) and \
-                x.item in [cc.x_gzip, cc.x_compress] and \
-                x.param is not None:
+    for x in req.headers.accept_encoding.okay:
+        if x.item in [cc.x_gzip, cc.x_compress] and x.param is not None:
             req.complain(1116, coding=x.item)
 
     if req.headers.if_match.is_okay and req.headers.if_match != u'*':

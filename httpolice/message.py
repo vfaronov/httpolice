@@ -88,8 +88,8 @@ def check_message(msg):
             msg.headers.content_length.is_present:
         msg.complain(1020)
 
-    for opt in msg.headers.connection:
-        if okay(opt) and header.is_bad_for_connection(common.FieldName(opt)):
+    for opt in msg.headers.connection.okay:
+        if header.is_bad_for_connection(common.FieldName(opt)):
             msg.complain(1034, header=msg.headers[common.FieldName(opt)])
 
     if msg.headers.content_type.is_okay:
@@ -105,20 +105,16 @@ def check_message(msg):
             u'upgrade' not in msg.headers.connection:
         msg.complain(1050)
 
-    if msg.headers.date.is_okay and \
-            msg.headers.date.value > datetime.utcnow() + timedelta(seconds=10):
+    if msg.headers.date > datetime.utcnow() + timedelta(seconds=10):
         msg.complain(1109)
 
 
 def check_payload_body(msg):
+    if not okay(msg.decoded_body) or not msg.headers.content_type.is_okay:
+        return
+
     data = msg.decoded_body
-    if okay(data) and msg.headers.content_type.is_okay:
-        raw_type = msg.headers.content_type.entries[0].value
-        check_media(msg, msg.headers.content_type.value, raw_type, data)
-
-
-def check_media(msg, type_, raw_type, data):
-    the_type = type_.item
+    the_type = msg.headers.content_type.value.item
 
     if media_type.is_json(the_type):
         try:
@@ -135,7 +131,8 @@ def check_media(msg, type_, raw_type, data):
             msg.complain(1039, error=e)
 
     if media_type.is_multipart(the_type):
-        check_multipart(msg, the_type, raw_type, data)
+        check_multipart(msg, the_type,
+                        msg.headers.content_type.entries[0].value, data)
 
     if the_type == media.application_x_www_form_urlencoded:
         # This list is taken from the HTML specification --

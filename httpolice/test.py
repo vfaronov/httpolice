@@ -501,6 +501,7 @@ class TestRequest(unittest.TestCase):
         self.assert_(req.body is Unparseable)
         self.assertEqual(list(req.headers.transfer_encoding),
                          [Parametrized(u'foo', []),
+                          Unparseable,
                           Parametrized(u'gzip', []),
                           Parametrized(u'chunked', [])])
         self.assertEqual(req.header_entries[1].annotated,
