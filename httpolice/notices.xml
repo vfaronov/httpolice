@@ -311,13 +311,14 @@
     </rfc>
   </comment>
 
-  <error id="1042">
+  <comment id="1042">
     <title>More than one ‘<ref to="param"/>’ parameter in <ref to="msg.headers.content_type"/></title>
     <rfc num="6838" sect="4.3">
       It is an error for a specific
    parameter to be specified more than once.
     </rfc>
-  </error>
+    <!-- This is a comment, not an error, because I'm not even sure this is correct: RFC 6838 is merely a BCP, and the requirement is not stated in RFC 2045/2046, and it's not even clear to me that RFC 6838 refers to the actual usage of parameters rather than their definition. -->
+  </comment>
 
   <error id="1043">
     <title><ref to="msg.method"/> request with a wrong <ref to="msg.target">target</ref></title>
