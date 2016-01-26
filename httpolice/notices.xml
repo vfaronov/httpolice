@@ -1149,6 +1149,16 @@
     </rfc>
   </error>
 
+  <error id="1152">
+    <title><ref to="directive"/> cache directive in a request</title>
+    <explain>This request’s <ref to="msg.headers.cache_control"/> header includes the <ref to="directive"/> directive, which defined for responses, but not for requests.</explain>
+  </error>
+
+  <error id="1153">
+    <title><ref to="directive"/> cache directive in a response</title>
+    <explain>This response’s <ref to="msg.headers.cache_control"/> header includes the <ref to="directive"/> directive, which is defined for requests, but not for responses.</explain>
+  </error>
+
   <comment id="1154">
     <title>Unquoted argument to the <ref to="directive"/> cache directive</title>
     <explain>The specification for the <ref to="directive"/> directive recommends that its argument be wrapped in double quotes. But in this message’s <ref to="header"/> header, it was not quoted.</explain>
@@ -1173,6 +1183,11 @@
     <title>Malformed <ref to="directive"/> cache directive</title>
     <explain>When parsing the argument to the <ref to="directive"/> directive in this message’s <ref to="header"/> header, the following error occurred:</explain>
     <explain><ref to="error"/></explain>
+  </error>
+
+  <error id="1159">
+    <title><ref to="directive"/> cache directive with an argument</title>
+    <explain>In this request’s <ref to="msg.headers.cache_control"/> header, the <cache>no-cache</cache> directive has an argument. But the specification for <cache>no-cache</cache> only defines an argument when used in responses.</explain>
   </error>
 
 </notices>

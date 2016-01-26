@@ -8,7 +8,17 @@ from httpolice.common import (
     okay,
     url_equals,
 )
-from httpolice.known import h, header, m, media, method, st, tc, unit
+from httpolice.known import (
+    cache_directive,
+    h,
+    header,
+    m,
+    media,
+    method,
+    st,
+    tc,
+    unit,
+)
 
 import urlparse
 
@@ -137,6 +147,10 @@ def check_response_itself(resp):
                 resp.complain(1143)
         elif headers.content_range.is_absent:
             resp.complain(1138)
+
+    for d in headers.cache_control.okay:
+        if cache_directive.is_for_response(d.item) == False:
+            resp.complain(1153, directive=d.item)
 
 
 def check_response_in_context(resp, req):

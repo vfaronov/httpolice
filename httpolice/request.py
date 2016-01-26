@@ -4,7 +4,17 @@ import urlparse
 
 from httpolice import message, parse
 from httpolice.common import EntityTag, Versioned, http11, okay
-from httpolice.known import cc, h, header, m, method, product, tc
+from httpolice.known import (
+    cache,
+    cache_directive,
+    cc,
+    h,
+    header,
+    m,
+    method,
+    product,
+    tc,
+)
 from httpolice.syntax import rfc7230
 
 
@@ -181,3 +191,9 @@ def check_request(req):
     if isinstance(req.headers.if_range.value, EntityTag) and \
             req.headers.if_range.value.weak:
         req.complain(1135)
+
+    for d in req.headers.cache_control.okay:
+        if cache_directive.is_for_request(d.item) == False:
+            req.complain(1152, directive=d.item)
+        if d == cache.no_cache and d.param is not None:
+            req.complain(1159, directive=d.item)
