@@ -273,7 +273,7 @@ class RangeSpecifier(namedtuple('RangeSpecifier', ('unit', 'ranges'))):
     __slots__ = ()
 
 
-class ContentRange(namedtuple('RangeSpecifier', ('unit', 'range'))):
+class ContentRange(namedtuple('ContentRange', ('unit', 'range'))):
 
     __slots__ = ()
 
