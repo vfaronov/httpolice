@@ -592,6 +592,7 @@ class TestRequest(unittest.TestCase):
                   'Cache-Control: "foo bar"\r\n'
                   'Via: 1.1 baz\r\n'
                   'Cache-Control: qux="xyzzy 123", ,no-transform, abcde\r\n'
+                  'Cache-Control: min-fresh, no-store=yes\r\n'
                   '\r\n')
         [req] = self.parse(stream)
         self.assertEqual(req.headers.cache_control.value,
@@ -600,20 +601,36 @@ class TestRequest(unittest.TestCase):
                           Unparseable,
                           Parametrized(CacheDirective(u'qux'), 'xyzzy 123'),
                           Parametrized(cache.no_transform, None),
-                          Parametrized(CacheDirective(u'abcde'), None)])
+                          Parametrized(CacheDirective(u'abcde'), None),
+                          Parametrized(cache.min_fresh, Unparseable),
+                          Parametrized(cache.no_store, None)])
+
+        self.assert_(cache.max_age in req.headers.cache_control)
         self.assertEqual(req.headers.cache_control.max_age, 3600)
+
+        self.assert_(cache.max_stale in req.headers.cache_control)
         self.assertEqual(req.headers.cache_control.max_stale, 60)
-        self.assertEqual(req.headers.cache_control.no_transform, True)
-        self.assert_(req.headers.cache_control.no_cache is None)
+
         self.assertEqual(
             req.headers.cache_control[CacheDirective(u'qux')],
             'xyzzy 123')
+
+        self.assert_(cache.no_transform in req.headers.cache_control)
+        self.assertEqual(req.headers.cache_control.no_transform, True)
+
         self.assertEqual(
             req.headers.cache_control[CacheDirective(u'abcde')],
             True)
-        self.assert_(cache.max_age in req.headers.cache_control)
-        self.assert_(cache.no_transform in req.headers.cache_control)
-        self.assert_(cache.no_store not in req.headers.cache_control)
+
+        self.assert_(req.headers.cache_control.no_cache is None)
+
+        self.assert_(cache.min_fresh in req.headers.cache_control)
+        self.assert_(req.headers.cache_control.min_fresh is Unparseable)
+
+        self.assert_(cache.no_store in req.headers.cache_control)
+        self.assertEqual(req.headers.cache_control.no_store, True)
+
+        self.assert_(cache.only_if_cached not in req.headers.cache_control)
 
 
 class TestResponse(unittest.TestCase):

@@ -218,15 +218,18 @@ class CacheControlView(MultiHeaderView):
         if argument is None:
             if cache_directive.argument_required(directive):
                 entry.complain(1156, directive=directive)
+                argument = Unparseable
         else:
             if cache_directive.no_argument(directive):
                 entry.complain(1157, directive=directive)
-            if parser is not None:
+                argument = None
+            elif parser is not None:
                 state = parse.State(str(argument))
                 try:
                     argument = (parser + parse.eof).parse(state)
                 except parse.ParseError, e:
                     entry.complain(1158, directive=directive, error=e)
+                    argument = Unparseable
                 else:
                     state.dump_complaints(entry, entry)
 
