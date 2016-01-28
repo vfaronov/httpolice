@@ -201,3 +201,7 @@ def check_request(req):
     if req.headers.cache_control.no_cache and \
             u'no-cache' not in req.headers.pragma:
         req.complain(1161)
+
+    for warning in req.headers.warning.okay:
+        if 100 <= warning.code < 200:
+            req.complain(1165, code=warning.code)

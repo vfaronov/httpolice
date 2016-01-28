@@ -1229,4 +1229,9 @@
     <!-- This probably cannot be considered an error in the response itself, as the retaining behavior would be natural for an HTTP/1.0 cache oblivious to the semantics of the warning. We could look for a 1.0 entry in the Via header, but that's too complicated for such a useless check. -->
   </comment>
 
+  <error id="1165">
+    <title>Warn code <ref to="code"/> in a request</title>
+    <explain>This request’s <ref to="msg.headers.warning"/> header contains the <ref to="code"/> warn code. But, according to <rfc num="7234" sect="5.5"/>, 1xx warn codes can only be applied to responses.</explain>
+  </error>
+
 </notices>
