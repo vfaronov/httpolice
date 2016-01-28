@@ -111,7 +111,7 @@ class StatusCodeRegistry(Registry):
             entries.append({
                 '_': StatusCode(value),
                 '_citations': list(self.extract_citations(record)),
-                'description': description,
+                '_title': description,
             })
         return [('status codes', entries, st)]
 
