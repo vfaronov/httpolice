@@ -1234,4 +1234,10 @@
     <explain>This request’s <ref to="msg.headers.warning"/> header contains the <ref to="code"/> warn code. But, according to <rfc num="7234" sect="5.5"/>, 1xx warn codes can only be applied to responses.</explain>
   </error>
 
+  <error id="1166">
+    <title>Warn code <ref to="code"/> with no <h>Age</h> header</title>
+    <explain>This response’s <ref to="msg.headers.warning"/> header contains the <ref to="code"/> warn code, which implies that the response was served from a cache without validation. According to <rfc num="7234" sect="4"/>, the cache must add an <h>Age</h> header to the response in this situation. But this response has no such header.</explain>
+    <explain>See also <rfc num="7234" sect="5.5"/>.</explain>
+  </error>
+
 </notices>

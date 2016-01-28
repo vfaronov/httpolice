@@ -155,6 +155,11 @@ def check_response_itself(resp):
     if u'no-cache' in headers.pragma:
         resp.complain(1162)
 
+    for warning in headers.warning.okay:
+        if 100 <= warning.code < 200:
+            if headers.age.is_absent:
+                resp.complain(1166, code=warning.code)
+
 
 def check_response_in_context(resp, req):
     if okay(resp.body) and resp.body and resp.headers.content_type.is_absent \

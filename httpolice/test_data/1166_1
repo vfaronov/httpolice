@@ -1,4 +1,4 @@
-1164
+1166
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
@@ -10,10 +10,6 @@ HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 14
-Warning: 214 - "Transformation Applied"
-Warning: 110 - "Response is Stale" "Thu, 31 Dec 2015 14:10:27 GMT"
-Warning: 199 - "Something Else Happened" "Thu, 31 Dec 2015 18:26:56 GMT"
-Age: 930
-Via: 1.1 proxy.example.net:8080
+Warning: 110 - "Response is Stale"
 
 Hello world!
