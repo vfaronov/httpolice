@@ -2,8 +2,6 @@
 
 from collections import namedtuple
 
-import urlnorm
-
 
 class ReportNode(object):
 
@@ -305,10 +303,3 @@ class WarnCode(int):
 
     def __repr__(self):
         return 'WarnCode(%d)' % self
-
-
-def url_equals(url1, url2):
-    try:
-        return urlnorm.norm(url1) == urlnorm.norm(url2)
-    except urlnorm.InvalidUrl:
-        return False

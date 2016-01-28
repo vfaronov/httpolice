@@ -9,9 +9,6 @@ class Ignore(object):
     def __init__(self, value):
         self.value = value
 
-    def __repr__(self):
-        return 'Ignore(%r)' % self.value
-
 
 class ParseError(Exception):
 

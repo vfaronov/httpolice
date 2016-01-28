@@ -22,17 +22,8 @@ class KnownDict(object):
         else:
             raise AttributeError(name)
 
-    def __getitem__(self, key):
-        return self._by_key[key]
-
     def get_info(self, key):
         return self._by_key.get(key, {})
-
-    def __iter__(self):
-        return iter(self._by_key)
-
-    def __contains__(self, key):
-        return key in self._by_key
 
     def _name_for(self, item):
         name = item['_title'] if self._name_from_title else item['_']

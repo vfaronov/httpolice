@@ -6,7 +6,6 @@ from httpolice.common import (
     http10,
     http11,
     okay,
-    url_equals,
 )
 from httpolice.known import (
     cache_directive,
@@ -19,6 +18,7 @@ from httpolice.known import (
     tc,
     unit,
 )
+from httpolice.util.uri import url_equals
 
 import urlparse
 

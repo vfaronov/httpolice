@@ -417,8 +417,8 @@ class TestRequest(unittest.TestCase):
     @staticmethod
     def parse(stream, scheme=None):
         conn = connection.parse_inbound_stream(stream, scheme=scheme)
-        report.TextReport(StringIO()).render_connection(conn)
-        report.HTMLReport(StringIO()).render_connection(conn)
+        report.TextReport(StringIO()).render_all([conn])
+        report.HTMLReport(StringIO()).render_all([conn])
         return [exch.request for exch in conn.exchanges]
 
     def test_parse_requests(self):
@@ -439,18 +439,23 @@ class TestRequest(unittest.TestCase):
         [req1, req2, req3] = self.parse(stream)
 
         self.assertEquals(req1.method, u'GET')
+        self.assertEquals(repr(req1.method), "Method(u'GET')")
         self.assertEquals(req1.target, u'/foo/bar/baz?qux=xyzzy')
         self.assertEquals(req1.version, common.http11)
         self.assertEquals(req1.header_entries[0].name, u'Host')
         self.assertEquals(req1.header_entries[0].value, 'example.com')
         self.assertEquals(req1.header_entries[1].name, u'X-Foo')
         self.assertEquals(req1.header_entries[1].value, 'bar, baz')
+        self.assertEquals(repr(req1.header_entries[1]), '<HeaderEntry X-Foo>')
+        self.assertEquals(repr(req1), '<Request GET>')
 
         self.assertEquals(req2.method, u'POST')
         self.assertEquals(req2.target, u'/foo/bar/')
         self.assertEquals(req2.header_entries[1].name, u'content-length')
         self.assertEquals(req2.headers.content_length.value, 21)
         self.assertEquals(req2.headers.content_length.is_present, True)
+        self.assertEquals(repr(req2.headers.content_length),
+                          '<SingleHeaderView Content-Length>')
         self.assertEquals(req2.body, 'Привет мир!\n')
 
         self.assertEquals(req3.method, u'OPTIONS')
@@ -657,8 +662,8 @@ class TestResponse(unittest.TestCase):
     @staticmethod
     def parse(inbound, outbound):
         conn = connection.parse_two_streams(inbound, outbound)
-        report.TextReport(StringIO()).render_connection(conn)
-        report.HTMLReport(StringIO()).render_connection(conn)
+        report.TextReport(StringIO()).render_all([conn])
+        report.HTMLReport(StringIO()).render_all([conn])
         return [exch.responses for exch in conn.exchanges]
 
     def test_parse_responses(self):
@@ -682,6 +687,7 @@ class TestResponse(unittest.TestCase):
             self.parse(inbound, stream)
 
         self.assertEquals(resp1_1.status, 200)
+        self.assertEquals(repr(resp1_1.status), 'StatusCode(200)')
         self.assertEquals(resp1_1.headers.content_length.value, 16)
         self.assert_(resp1_1.body is None)
 
@@ -710,12 +716,13 @@ class TestResponse(unittest.TestCase):
                   'HTTP/1.1 204 No Content\r\n'
                   '\r\n')
         conn = connection.parse_outbound_stream(stream)
-        report.TextReport(StringIO()).render_connection(conn)
-        report.HTMLReport(StringIO()).render_connection(conn)
+        report.TextReport(StringIO()).render_all([conn])
+        report.HTMLReport(StringIO()).render_all([conn])
         [exch1, exch2] = conn.exchanges
         self.assert_(exch1.request is None)
         self.assertEquals(exch1.responses[0].status, 200)
         self.assertEquals(exch1.responses[0].body, 'Hello world!\r\n')
+        self.assertEquals(repr(exch1), 'Exchange(None, [<Response 200>])')
         self.assert_(exch2.request is None)
         self.assertEquals(exch2.responses[0].status, 100)
         self.assert_(exch2.responses[0].body is None)
@@ -767,6 +774,8 @@ class TestResponse(unittest.TestCase):
              Unparseable,
              WarningValue(WarnCode(456), u'baz', 'qux', None),
              WarningValue(WarnCode(567), u'-', 'xyzzy', None)])
+        self.assertEqual(repr(resp1.headers.warning.value[0].code),
+                         'WarnCode(123)')
         self.assert_(WarnCode(123) in resp1.headers.warning)
         self.assert_(WarnCode(567) in resp1.headers.warning)
         self.assert_(WarnCode(199) not in resp1.headers.warning)
@@ -806,12 +815,12 @@ class TestFromFiles(unittest.TestCase):
         conn = connection.parse_two_streams(inb, outb, scheme=scheme)
         connection.check_connection(conn)
         buf = StringIO()
-        report.TextReport(buf).render_connection(conn)
+        report.TextReport(buf).render_all([conn])
         actual = sorted(int(ln[5:9]) for ln in buf.getvalue().splitlines()
                         if ln.startswith('**** '))
         self.covered.update(actual)
         self.assertEquals(expected, actual)
-        report.HTMLReport(StringIO()).render_connection(conn)
+        report.HTMLReport(StringIO()).render_all([conn])
         if self.examples is not None:
             for ident, ctx in conn.collect_complaints():
                 self.examples.setdefault(ident, ctx)
