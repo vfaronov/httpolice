@@ -2,8 +2,9 @@
 
 class KnownDict(object):
 
-    def __init__(self, items, extra_info=None):
+    def __init__(self, items, extra_info=None, name_from_title=False):
         allowed_info = set(['_', '_citations', '_title'] + (extra_info or []))
+        self._name_from_title = name_from_title
         self._by_key = {}
         self._by_name = {}
         for item in items:
@@ -33,9 +34,9 @@ class KnownDict(object):
     def __contains__(self, key):
         return key in self._by_key
 
-    @classmethod
-    def _name_for(cls, item):
-        return (item['_'].
+    def _name_for(self, item):
+        name = item['_title'] if self._name_from_title else item['_']
+        return (name.
                 replace(u'-', u' ').replace(u' ', u'_').replace(u'/', u'_').
                 replace(u'+', u'_').replace(u'.', u'_').
                 lower())

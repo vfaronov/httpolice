@@ -11,6 +11,7 @@ from httpolice.known.range_unit import known as unit
 from httpolice.known.status_code import known as st
 from httpolice.known.transfer_coding import known as tc
 from httpolice.known.upgrade_token import known as upgrade
+from httpolice.known.warn_code import known as warn
 
 classes = {
     common.CacheDirective: cache,
@@ -23,6 +24,7 @@ classes = {
     common.StatusCode: st,
     common.TransferCoding: tc,
     common.UpgradeToken: upgrade,
+    common.WarnCode: warn,
 }
 
 

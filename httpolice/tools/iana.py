@@ -18,8 +18,9 @@ from httpolice.common import (
     StatusCode,
     TransferCoding,
     UpgradeToken,
+    WarnCode,
 )
-from httpolice.known import cache, cc, h, m, media, st, tc, unit, upgrade
+from httpolice.known import cache, cc, h, m, media, st, tc, unit, upgrade, warn
 
 
 def yes_no(s):
@@ -210,3 +211,17 @@ class CacheDirectiveRegistry(Registry):
                 '_citations': list(self.extract_citations(record)),
             })
         return [('cache directives', entries, cache)]
+
+
+class WarnCodeRegistry(Registry):
+
+    def get_all(self):
+        tree = self._get_xml('http-warn-codes/http-warn-codes.xml')
+        entries = []
+        for record in tree.findall('//iana:record', self.xmlns):
+            entries.append({
+                '_': WarnCode(record.find('iana:value', self.xmlns).text),
+                '_citations': list(self.extract_citations(record)),
+                '_title': record.find('iana:description', self.xmlns).text,
+            })
+        return [('warn codes', entries, warn)]

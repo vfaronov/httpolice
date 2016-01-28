@@ -4,15 +4,7 @@ from httpolice.common import StatusCode, RFC
 from httpolice.known.base import KnownDict
 
 
-class KnownStatusCodes(KnownDict):
-
-    @classmethod
-    def _name_for(cls, item):
-        return item['_title']. \
-            replace(u'-', u' ').replace(u' ', u'_').lower()
-
-
-known = KnownStatusCodes([
+known = KnownDict([
  {'_': StatusCode(100),
   '_citations': [RFC(7231, section=(6, 2, 1))],
   '_title': 'Continue'},
@@ -190,5 +182,5 @@ known = KnownStatusCodes([
   '_citations': [RFC(6585)],
   '_title': 'Network Authentication Required'}
  ],
- extra_info=[]
+ name_from_title=True
 )
