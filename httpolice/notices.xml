@@ -1210,4 +1210,23 @@
     <explain>This response contains the ‘no-cache’ pragma directive, which is defined by <rfc num="7234" sect="5.4"/> for requests, but not for responses.</explain>
   </error>
 
+  <comment id="1163">
+    <title>Strange warning code <ref to="code"/></title>
+    <explain><rfc num="7234" sect="5.5"/> defines two classes of warning codes—1xx and 2xx—but this message’s <ref to="msg.headers.warning"/> header contains a <ref to="code"/> warning code.</explain>
+  </comment>
+
+  <comment id="1164">
+    <title>Warning date does not match the <ref to="msg.headers.date"/> header</title>
+    <explain>This message’s <ref to="msg.headers.warning"/> header contains a warning (code <ref to="code"/>) with a date that is different from the <h>Date</h> header.</explain>
+    <rfc num="7234" sect="5.5">
+      If a recipient that uses, evaluates, or displays <h>Warning</h> header
+   fields receives a warn-date that is different from the <h>Date</h> value in
+   the same message, the recipient MUST exclude the warning-value
+   containing that warn-date before storing, forwarding, or using the
+   message.  This allows recipients to exclude warning-values that were
+   improperly retained after a cache validation.
+    </rfc>
+    <!-- This probably cannot be considered an error in the response itself, as the retaining behavior would be natural for an HTTP/1.0 cache oblivious to the semantics of the warning. We could look for a 1.0 entry in the Via header, but that's too complicated for such a useless check. -->
+  </comment>
+
 </notices>

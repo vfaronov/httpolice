@@ -108,6 +108,12 @@ def check_message(msg):
     if msg.headers.date > datetime.utcnow() + timedelta(seconds=10):
         msg.complain(1109)
 
+    for warning in msg.headers.warning.okay:
+        if warning.code < 100 or warning.code > 299:
+            msg.complain(1163, code=warning.code)
+        if warning.date and msg.headers.date != warning.date:
+            msg.complain(1164, code=warning.code)
+
 
 def check_payload_body(msg):
     if not okay(msg.decoded_body) or not msg.headers.content_type.is_okay:

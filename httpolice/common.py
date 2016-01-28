@@ -283,6 +283,30 @@ class CacheDirective(CaseInsensitive):
     __slots__ = ()
 
 
+class WarningValue(namedtuple('WarningValue',
+                              ('code', 'agent', 'text', 'date'))):
+
+    __slots__ = ()
+
+    # Allow comparing directly to warning codes
+    # so that we can do stuff like ``299 in msg.headers.warning``
+    # (like with :class:`Parametrized`).
+
+    def __eq__(self, other):
+        return self.code == other or super(WarningValue, self).__eq__(other)
+
+    def __ne__(self, other):
+        return self.code != other and super(WarningValue, self).__ne__(other)
+
+
+class WarnCode(int):
+
+    __slots__ = ()
+
+    def __repr__(self):
+        return 'WarnCode(%d)' % self
+
+
 def url_equals(url1, url2):
     try:
         return urlnorm.norm(url1) == urlnorm.norm(url2)

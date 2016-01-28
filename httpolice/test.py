@@ -26,6 +26,8 @@ from httpolice.common import (
     TransferCoding,
     Unparseable,
     Versioned,
+    WarnCode,
+    WarningValue,
 )
 from httpolice.known import cache, cc, m, media, tc, unit
 from httpolice.syntax import rfc3986, rfc7230, rfc7231, rfc7233
@@ -744,6 +746,30 @@ class TestResponse(unittest.TestCase):
                   'Hello world!\r\n')
         [[resp1]] = self.parse(inbound, stream)
         self.assertEqual(resp1.body, 'Hello world!\r\n')
+
+    def test_warning(self):
+        inbound = self.req(m.GET)
+        stream = ('HTTP/1.1 200 0K\r\n'
+                  'Content-Type: text/plain\r\n'
+                  'Warning: 123 - "something"\r\n'
+                  'Warning: 234 [::0]:8080 "something else"\r\n'
+                  '    "Thu, 28 Jan 2016 08:22:04 GMT" \r\n'
+                  'Warning: 345 - forgot to quote this one\r\n'
+                  'Warning: 456 baz "qux", 567 - "xyzzy"\r\n'
+                  '\r\n'
+                  'Hello world!\r\n')
+        [[resp1]] = self.parse(inbound, stream)
+        self.assertEqual(
+            resp1.headers.warning.value,
+            [WarningValue(WarnCode(123), u'-', 'something', None),
+             WarningValue(WarnCode(234), u'[::0]:8080', 'something else',
+                          datetime(2016, 1, 28, 8, 22, 4)),
+             Unparseable,
+             WarningValue(WarnCode(456), u'baz', 'qux', None),
+             WarningValue(WarnCode(567), u'-', 'xyzzy', None)])
+        self.assert_(WarnCode(123) in resp1.headers.warning)
+        self.assert_(WarnCode(567) in resp1.headers.warning)
+        self.assert_(WarnCode(199) not in resp1.headers.warning)
 
 
 class TestFromFiles(unittest.TestCase):
