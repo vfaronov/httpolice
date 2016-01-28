@@ -24,11 +24,11 @@ class ReportNode(object):
         return []
 
     def collect_complaints(self):
-        for c in self.complaints or []:
-            yield c
         for node in self.sub_nodes:
             for c in node.collect_complaints():
                 yield c
+        for c in self.complaints or []:
+            yield c
 
 
 class _Unparseable(object):

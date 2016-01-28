@@ -283,10 +283,11 @@ class HTMLReport(object):
     def dump(self):
         self.outfile.write(self.document.render().encode('utf-8'))
 
-    def render_notices(self, node):
-        if node.complaints:
+    def render_notices(self, complaints):
+        complaints = list(complaints or [])
+        if complaints:
             with H.div(_class='notices'):
-                for notice_ident, context in node.complaints:
+                for notice_ident, context in complaints:
                     n = notice.notices[notice_ident]
                     notice_to_html(n, context)
 
@@ -330,13 +331,6 @@ class HTMLReport(object):
                 H.p(u'Header fields from the chunked trailer:', _class='hint')
                 self.render_header_entries(msg.trailer_entries)
 
-    def render_message_notices(self, msg):
-        for entry in msg.header_entries:
-            self.render_notices(entry)
-        for entry in msg.trailer_entries or []:
-            self.render_notices(entry)
-        self.render_notices(msg)
-
     def render_request(self, req):
         if req is Unparseable:
             H.p(u'unparseable request', _class='hint')
@@ -353,7 +347,7 @@ class HTMLReport(object):
                     H.span(u' ')
                     H.span(req.version, **for_object(req.version))
                 self.render_message(req)
-            self.render_message_notices(req)
+            self.render_notices(req.collect_complaints())
             H.br(_class='clear')
 
     def render_response(self, resp):
@@ -373,13 +367,13 @@ class HTMLReport(object):
                             printable(resp.reason.decode('utf-8', 'ignore')),
                             **for_object(resp.reason))
                 self.render_message(resp)
-            self.render_message_notices(resp)
+            self.render_notices(resp.collect_complaints())
             H.br(_class='clear')
 
     def render_connection(self, conn):
         for exch in conn.exchanges:
             with H.div(**for_object(exch)):
-                self.render_notices(exch)
+                self.render_notices(exch.complaints)
                 if exch.request:
                     self.render_request(exch.request)
                 for resp in exch.responses or []:
