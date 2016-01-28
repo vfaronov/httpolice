@@ -6,7 +6,11 @@ import re
 import dominate
 import dominate.tags as H
 
-from httpolice import header_view, known, message, notice
+from httpolice import known, message, notice
+from httpolice.connection import Connection, Exchange
+from httpolice.header import HeaderView
+from httpolice.request import RequestView
+from httpolice.response import ResponseView
 from httpolice.structure import Parametrized, Unparseable, okay
 from httpolice.util.text import has_nonprintable, nicely_join, printable
 
@@ -20,7 +24,7 @@ def for_object(obj, extra_class=u''):
 
 
 def reference_targets(obj):
-    if isinstance(obj, header_view.HeaderView):
+    if isinstance(obj, HeaderView):
         return [u'#' + unicode(id(entry)) for entry in obj.entries]
     elif isinstance(obj, list):
         # Support no. 1013, where we want to highlight all entries,
@@ -187,88 +191,126 @@ def displayable_body(msg):
     return r, transforms
 
 
-class TextReport(object):
+class Report(object):
+
+    @classmethod
+    def render(cls, items, outfile):
+        report = cls(outfile)
+        for item in items:
+            report._render_item(item)
+        report._close()
 
     def __init__(self, outfile):
         self.outfile = outfile
+
+    def _render_item(self, item):
+        if isinstance(item, Connection):
+            self._render_connection(item)
+        elif isinstance(item, Exchange):
+            self._render_exchange(item)
+        elif isinstance(item, RequestView):
+            self._render_request(item)
+        elif isinstance(item, ResponseView):
+            self._render_response(item)
+        else:
+            raise TypeError("don't know how to render a %s object" %
+                            type(item).__name__)
+
+    def _render_connection(self, conn):
+        raise NotImplementedError()
+
+    def _render_exchange(self, exch):
+        raise NotImplementedError()
+
+    def _render_request(self, req):
+        raise NotImplementedError()
+
+    def _render_response(self, resp):
+        raise NotImplementedError()
+
+    def _close(self):
+        pass
+
+
+class TextReport(Report):
+
+    def __init__(self, outfile):
+        super(TextReport, self).__init__(outfile)
         self.written = False
 
-    def write(self, s):
+    def _render_item(self, item):
+        self._write_more(u'================================\n')
+        super(TextReport, self)._render_item(item)
+
+    def _write(self, s):
         self.written = True
         self.outfile.write(s.encode('utf-8'))
 
-    def write_more(self, s):
+    def _write_more(self, s):
         if self.written:
-            self.write(u'\n')
-        self.write(s)
+            self._write(u'\n')
+        self._write(s)
 
-    def render_unparseable(self, node):
-        if node is Unparseable:
-            self.write_more('\n-- (unparseable)\n')
-            return True
-        else:
-            return False
-
-    def render_notices(self, node):
+    def _render_notices(self, node):
         for notice_id, context in node.complaints or []:
             the_notice = notice.notices[notice_id]
-            self.write_more(notice_to_text(the_notice, context))
+            self._write_more(notice_to_text(the_notice, context))
 
-    def render_request_line(self, req):
-        self.write_more(u'>> %s %s %s\n' %
-                        (req.method, req.target, req.version))
+    def _render_request_line(self, req):
+        self._write_more(u'>> %s %s %s\n' %
+                         (req.method, req.target, req.version))
 
-    def render_status_line(self, resp):
-        self.write_more(u'<< %s %d %s\n' % (
+    def _render_status_line(self, resp):
+        self._write_more(u'<< %s %d %s\n' % (
             resp.version, resp.status,
             resp.reason.decode('utf-8', 'replace')))
 
-    def render_message(self, msg):
+    def _render_message(self, msg):
         for entry in msg.header_entries:
-            self.write(u'++ %s: %s\n' %
-                       (entry.name, entry.value.decode('ascii', 'ignore')))
+            self._write(u'++ %s: %s\n' %
+                        (entry.name, entry.value.decode('ascii', 'ignore')))
         if msg.body is Unparseable:
-            self.write(u'\n++ (body is unparseable)\n')
+            self._write(u'\n++ (body is unparseable)\n')
         elif msg.body:
-            self.write(u'\n++ (%d bytes of payload body not shown)\n' %
+            self._write(u'\n++ (%d bytes of payload body not shown)\n' %
                        len(msg.body))
-        for entry in msg.trailer_entries or []:
-            self.write(u'++ %s: %s\n' %
-                       (entry.name, entry.value.decode('ascii', 'ignore')))
+        for entry in msg.trailer_entries:
+            self._write(u'++ %s: %s\n' %
+                        (entry.name, entry.value.decode('ascii', 'ignore')))
+        self._render_notices(msg)
 
-        self.render_notices(msg)
+    def _render_request(self, req):
+        self._render_request_line(req)
+        self._render_message(req)
 
-    def render_connection(self, connection):
-        for exch in connection.exchanges:
-            self.write_more(u'================================\n')
-            self.render_notices(exch)
-            if exch.request:
-                if not self.render_unparseable(exch.request):
-                    self.render_request_line(exch.request)
-                    self.render_message(exch.request)
-            for resp in exch.responses or []:
-                if not self.render_unparseable(resp):
-                    self.render_status_line(resp)
-                    self.render_message(resp)
+    def _render_response(self, resp):
+        self._render_status_line(resp)
+        self._render_message(resp)
 
-        if connection.unparsed_inbound:
-            self.write_more(
+    def _render_exchange(self, exch):
+        self._render_request(exch.request)
+        for resp in exch.responses:
+            self._render_response(resp)
+        self._render_notices(exch)
+
+    def _render_connection(self, conn):
+        for exch in conn.exchanges:
+            self._render_exchange(exch)
+        self._render_notices(conn)
+        if conn.unparsed_inbound:
+            self._write_more(
                 u'++ %d unparsed bytes remaining on the request stream\n' %
-                len(connection.unparsed_inbound))
-        if connection.unparsed_outbound:
-            self.write(
+                len(conn.unparsed_inbound))
+        if conn.unparsed_outbound:
+            self._write_more(
                 u'++ %d unparsed bytes remaining on the response stream\n' %
-                len(connection.unparsed_outbound))
-
-    def render_all(self, connections):
-        for conn in connections:
-            self.render_connection(conn)
+                len(conn.unparsed_outbound))
 
 
-class HTMLReport(object):
+class HTMLReport(Report):
 
     def __init__(self, outfile):
-        self.outfile = outfile
+        super(HTMLReport, self).__init__(outfile)
         self.document = dominate.document(title=u'HTTPolice report')
         with self.document.head:
             H.meta(http_equiv='Content-Type',
@@ -276,41 +318,50 @@ class HTMLReport(object):
             _include_stylesheet()
             _include_scripts()
 
-    def dump(self):
+    def _close(self):
         self.outfile.write(self.document.render().encode('utf-8'))
 
-    def render_notices(self, complaints):
-        complaints = list(complaints or [])
-        if complaints:
-            with H.div(_class='notices'):
-                for notice_ident, context in complaints:
-                    n = notice.notices[notice_ident]
-                    notice_to_html(n, context)
+    def _render_item(self, item):
+        with self.document:
+            self._render_next_item(item)
 
-    def render_annotated(self, pieces):
+    def _render_next_item(self, item):
+        with H.div(**for_object(item)):
+            super(HTMLReport, self)._render_item(item)
+            self._render_notices(item)
+            H.br(_class='item-separator')
+
+    def _render_notices(self, item):
+        if item.complaints:
+            with H.div(_class='notices'):
+                for notice_ident, context in item.complaints:
+                    notice_data = notice.notices[notice_ident]
+                    notice_to_html(notice_data, context)
+
+    def _render_annotated(self, pieces):
         for piece in pieces:
             with H.span(_class='annotated-piece', **for_object(piece)):
                 if isinstance(piece, str):
-                    H.span(printable(piece.decode('utf-8', 'ignore')))
+                    H.span(printable(piece.decode('utf-8', 'replace')))
                 else:
                     render_known(piece)
 
-    def render_header_entries(self, message, entries, from_trailer):
+    def _render_header_entries(self, msg, entries, from_trailer):
         for i, entry in enumerate(entries):
             with H.div(__inline=True, **for_object(entry)):
                 with H.span(**for_object(entry.name)):
                     render_known(entry.name)
                 H.span(u': ')
                 with H.span(**for_object(entry.value)):
-                    annotated = message.annotations.get((from_trailer, i))
+                    annotated = msg.annotations.get((from_trailer, i))
                     if annotated is not None:
-                        self.render_annotated(annotated)
+                        self._render_annotated(annotated)
                     else:
                         H.span(
-                            printable(entry.value.decode('utf-8', 'ignore')))
+                            printable(entry.value.decode('utf-8', 'replace')))
 
-    def render_message(self, msg):
-        self.render_header_entries(msg, msg.header_entries, False)
+    def _render_message(self, msg):
+        self._render_header_entries(msg, msg.header_entries, False)
 
         body, transforms = displayable_body(msg)
         if body is Unparseable:
@@ -326,70 +377,47 @@ class HTMLReport(object):
         if msg.trailer_entries:
             with H.div(_class='review-block'):
                 H.p(u'Header fields from the chunked trailer:', _class='hint')
-                self.render_header_entries(msg, msg.trailer_entries, True)
+                self._render_header_entries(msg, msg.trailer_entries, True)
 
-    def render_request(self, req):
-        if req is Unparseable:
-            H.p(u'unparseable request', _class='hint')
-            return
-        with H.div(**for_object(req)):
-            with H.div(_class='review'):
-                H.h2(u'Request')
-                with H.div(_class='request-line', __inline=True):
-                    with H.span(**for_object(req.method)):
-                        render_known(req.method)
-                    H.span(u' ')
-                    H.span(req.target, _class='request-target',
-                           **for_object(req.target))
-                    H.span(u' ')
-                    H.span(req.version, **for_object(req.version))
-                self.render_message(req)
-            self.render_notices(req.collect_complaints())
-            H.br(_class='clear')
+    def _render_request(self, req):
+        with H.div(_class='review'):
+            with H.div(_class='request-line', __inline=True):
+                with H.span(**for_object(req.method)):
+                    render_known(req.method)
+                H.span(u' ')
+                H.span(req.target, _class='request-target',
+                       **for_object(req.target))
+                H.span(u' ')
+                H.span(req.version, **for_object(req.version))
+            self._render_message(req)
 
-    def render_response(self, resp):
-        if resp is Unparseable:
-            H.p(u'unparseable response', _class='hint')
-            return
-        with H.div(**for_object(resp)):
-            with H.div(_class='review'):
-                H.h2(u'Response')
-                with H.div(_class='status-line', __inline=True):
-                    H.span(resp.version, **for_object(resp.version))
+    def _render_response(self, resp):
+        with H.div(_class='review'):
+            with H.div(_class='status-line', __inline=True):
+                H.span(resp.version, **for_object(resp.version))
+                H.span(u' ')
+                with H.span(**for_object(resp.status)):
+                    render_known(resp.status)
                     H.span(u' ')
-                    with H.span(**for_object(resp.status)):
-                        render_known(resp.status)
-                        H.span(u' ')
-                        H.span(
-                            printable(resp.reason.decode('utf-8', 'ignore')),
-                            **for_object(resp.reason))
-                self.render_message(resp)
-            self.render_notices(resp.collect_complaints())
-            H.br(_class='clear')
+                    H.span(
+                        printable(resp.reason.decode('utf-8', 'replace')),
+                        **for_object(resp.reason))
+            self._render_message(resp)
 
-    def render_connection(self, conn):
+    def _render_exchange(self, exch):
+        self._render_next_item(exch.request)
+        for resp in exch.responses:
+            self._render_next_item(resp)
+
+    def _render_connection(self, conn):
         for exch in conn.exchanges:
-            with H.div(**for_object(exch)):
-                self.render_notices(exch.complaints)
-                if exch.request:
-                    self.render_request(exch.request)
-                for resp in exch.responses or []:
-                    self.render_response(resp)
-
-        if conn.unparsed_inbound:
-            H.p('%d unparsed bytes remaining on the request stream' %
-                len(conn.unparsed_inbound),
-                _class=u'unparsed inbound')
-        if conn.unparsed_outbound:
-            H.p('%d unparsed bytes remaining on the response stream' %
-                len(conn.unparsed_outbound),
-                _class=u'unparsed outbound')
-
-    def render_all(self, connections):
-        with self.document:
-            for i, conn in enumerate(connections):
-                with H.div(**for_object(conn)):
-                    if len(connections) > 1:
-                        H.h1(u'Connection %d' % (i + 1))
-                    self.render_connection(conn)
-        self.dump()
+            self._render_next_item(exch)
+        with H.div(_class='review'):
+            if conn.unparsed_inbound:
+                H.p('%d unparsed bytes remaining on the request stream' %
+                    len(conn.unparsed_inbound),
+                    _class=u'unparsed inbound')
+            if conn.unparsed_outbound:
+                H.p('%d unparsed bytes remaining on the response stream' %
+                    len(conn.unparsed_outbound),
+                    _class=u'unparsed outbound')

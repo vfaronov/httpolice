@@ -1,0 +1,62 @@
+1011 1010 1006 1007
+
+======== BEGIN INBOUND STREAM ========
+POST /articles/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: text/plain
+Content-Length: 16
+Expect: 100-continue
+
+Hello world!
+
+HEAD /articles/123/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+OPTIONS * HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Length: 0
+
+GET /articles/123/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Upgrade: h2c
+HTTP2-Settings: 9MfPrprXFGY8c
+Connection: upgrade, http2-settings
+
+kjwbkljhqb lu
+'eqnf;ljner
+fre;/nqejfrn w;ejnf;er
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 100 Continue
+
+HTTP/1.1 201 Created
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 49
+Location: /articles/123/
+
+Your article was posted under /articles/123/.
+
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+Upgrade: h2c
+Connection: upgrade
+
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Length: 0
+Upgrade: h2c
+Connection: upgrade
+
+HTTP/1.1 101 Switching Protocols
+Upgrade: h2c
+Connection: upgrade
+
+lqj3;irhj;il2her3
+wnkgjbkwjhvbrg
+wnfekbnwkjbfklwjefg

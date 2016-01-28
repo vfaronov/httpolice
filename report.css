@@ -26,11 +26,7 @@ q {
     background-color: #FFF0BF;
 }
 
-.Exchange, .Request, .Response {
-    clear: right;
-}
-
-.Request, .Response {
+.RequestView, .ResponseView {
     margin-bottom: 2em;
 }
 
@@ -98,7 +94,7 @@ q {
     border-bottom: dotted 1px;
 }
 
-br.clear {
+br.item-separator {
     clear: both;
 }
 

@@ -3,12 +3,15 @@
 import argparse
 import sys
 
-from httpolice import connection, report
+from httpolice import HTMLReport, TextReport, analyze_streams
 
 
 def main():
     parser = argparse.ArgumentParser(
         description='Run HTTPolice on two streams (inbound and outbound).')
+    parser.add_argument('-s', '--scheme', default='http',
+                        help='URI scheme of the protocol used on the streams, '
+                             'such as "http" (default) or "https"')
     parser.add_argument('-H', '--html', action='store_true',
                         help='render HTML report instead of plain text')
     parser.add_argument('inbound')
@@ -18,13 +21,12 @@ def main():
         inbound_stream = f.read()
     with open(args.outbound) as f:
         outbound_stream = f.read()
-    conn = connection.parse_two_streams(inbound_stream, outbound_stream)
-    connection.check_connection(conn)
+    result = analyze_streams(inbound_stream, outbound_stream, args.scheme)
     if args.html:
-        rep = report.HTMLReport(sys.stdout)
+        report_cls = HTMLReport
     else:
-        rep = report.TextReport(sys.stdout)
-    rep.render_all([conn])
+        report_cls = TextReport
+    report_cls.render([result], sys.stdout)
 
 
 if __name__ == '__main__':

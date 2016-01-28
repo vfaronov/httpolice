@@ -1,44 +1,29 @@
 # -*- coding: utf-8; -*-
 
-import httpolice.connection
-import httpolice.report
-import httpolice.request
-import httpolice.response
-import httpolice.structure
+import httpolice
 
 
 def start(context, argv):
     context.out_filename = argv[1]
-    context.conns = []
+    context.pairs = []
 
 
 def response(context, flow):
-    req = httpolice.request.Request(
-        httpolice.structure.Method(flow.request.method),
-        flow.request.path,
-        httpolice.structure.HTTPVersion(flow.request.http_version),
-        [httpolice.structure.HeaderEntry(k, v)
-         for k, v in flow.request.headers.fields],
-        flow.request.content or None,
-        scheme=flow.request.scheme,
-    )
-    resp = httpolice.response.Response(
-        httpolice.structure.HTTPVersion(flow.response.http_version),
-        httpolice.structure.StatusCode(flow.response.status_code),
-        reason=flow.response.reason,
-        header_entries=[
-            httpolice.structure.HeaderEntry(k, v)
-            for k, v in flow.response.headers.fields
-        ],
-        body=flow.response.content,
-    )
-    exch = httpolice.connection.Exchange(req, [resp])
-    conn = httpolice.connection.Connection([exch])
-    context.conns.append(conn)
+    req = httpolice.Request(flow.request.scheme,
+                            flow.request.method, flow.request.path,
+                            flow.request.http_version,
+                            flow.request.headers.fields,
+                            flow.request.content or None)
+    resp = httpolice.Response(req,
+                              flow.response.http_version,
+                              flow.response.status_code, flow.response.reason,
+                              flow.response.headers.fields,
+                              flow.response.content)
+    context.pairs.append((req, resp))
 
 
 def done(context):
-    for conn in context.conns:
-        httpolice.connection.check_connection(conn)
+    result = [httpolice.analyze_exchange(req, [resp])
+              for req, resp in context.pairs]
     with open(context.out_filename, 'w') as outf:
-        httpolice.report.HTMLReport(outf).render_all(context.conns)
+        httpolice.HTMLReport.render(result, outf)

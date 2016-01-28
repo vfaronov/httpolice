@@ -5,24 +5,28 @@ from datetime import datetime
 import os
 import unittest
 
-from httpolice import (
-    connection,
-    notice,
-    parse,
-    report,
-)
+from httpolice import HTMLReport, TextReport, analyze_exchange, analyze_streams
+from httpolice import parse
 from httpolice.known import cache, cc, m, media, tc, unit
+from httpolice.notice import notices
+from httpolice.report import render_notice_examples
 from httpolice.structure import (
     CacheDirective,
     CaseInsensitive,
     ContentCoding,
     ContentRange,
+    HTTPVersion,
+    FieldName,
     LanguageTag,
+    Method,
     MediaType,
     Parametrized,
     ProductName,
     RangeSpecifier,
     RangeUnit,
+    Request,
+    Response,
+    StatusCode,
     TransferCoding,
     Unparseable,
     Versioned,
@@ -415,10 +419,14 @@ class TestSyntax(unittest.TestCase):
 class TestRequest(unittest.TestCase):
 
     @staticmethod
-    def parse(stream, scheme=None):
-        conn = connection.parse_inbound_stream(stream, scheme=scheme)
-        report.TextReport(StringIO()).render_all([conn])
-        report.HTMLReport(StringIO()).render_all([conn])
+    def parse(inbound, scheme='http'):
+        outbound = ('HTTP/1.1 400 Bad Request\r\n'
+                    'Date: Thu, 28 Jan 2016 19:30:21 GMT\r\n'
+                    'Content-Length: 0\r\n'
+                    '\r\n') * 10        # Enough to cover all requests
+        conn = analyze_streams(inbound, outbound, scheme=scheme)
+        TextReport.render([conn], StringIO())
+        HTMLReport.render([conn], StringIO())
         return [exch.request for exch in conn.exchanges]
 
     def test_parse_requests(self):
@@ -447,7 +455,8 @@ class TestRequest(unittest.TestCase):
         self.assertEquals(req1.header_entries[1].name, u'X-Foo')
         self.assertEquals(req1.header_entries[1].value, 'bar, baz')
         self.assertEquals(repr(req1.header_entries[1]), '<HeaderEntry X-Foo>')
-        self.assertEquals(repr(req1), '<Request GET>')
+        self.assertEquals(repr(req1), '<RequestView GET>')
+        self.assertEquals(repr(req1.inner), '<Request GET>')
 
         self.assertEquals(req2.method, u'POST')
         self.assertEquals(req2.target, u'/foo/bar/')
@@ -462,8 +471,7 @@ class TestRequest(unittest.TestCase):
         self.assertEquals(req3.target, u'*')
 
     def test_unparseable_framing(self):
-        [req1] = self.parse('GET ...')
-        self.assert_(req1 is Unparseable)
+        self.assertEquals(self.parse('GET ...'), [])
 
     def test_unparseable_body(self):
         stream = ('POST / HTTP/1.1\r\n'
@@ -491,10 +499,9 @@ class TestRequest(unittest.TestCase):
                   '\r\n'
                   'GET /\r\n'
                   'Host: example.com\r\n')
-        [req1, req2] = self.parse(stream)
+        [req1] = self.parse(stream)
         self.assertEqual(req1.method, u'GET')
         self.assert_(req1.body is None)
-        self.assert_(req2 is Unparseable)
 
     def test_transfer_codings(self):
         stream = ('POST / HTTP/1.1\r\n'
@@ -566,7 +573,7 @@ class TestRequest(unittest.TestCase):
         stream = ('GET /pub/WWW/TheProject.html HTTP/1.1\r\n'
                   'Host: www.example.org:8080\r\n'
                   '\r\n')
-        [req] = self.parse(stream, scheme='http')
+        [req] = self.parse(stream)
         self.assertEqual(
             req.effective_uri,
             'http://www.example.org:8080/pub/WWW/TheProject.html')
@@ -574,7 +581,7 @@ class TestRequest(unittest.TestCase):
     def test_effective_uri_2(self):
         stream = ('GET /pub/WWW/TheProject.html HTTP/1.0\r\n'
                   '\r\n')
-        [req] = self.parse(stream, scheme='http')
+        [req] = self.parse(stream)
         self.assert_(req.effective_uri is None)
 
     def test_effective_uri_3(self):
@@ -660,11 +667,36 @@ class TestResponse(unittest.TestCase):
         )
 
     @staticmethod
-    def parse(inbound, outbound):
-        conn = connection.parse_two_streams(inbound, outbound)
-        report.TextReport(StringIO()).render_all([conn])
-        report.HTMLReport(StringIO()).render_all([conn])
+    def parse(inbound, outbound, scheme='http'):
+        conn = analyze_streams(inbound, outbound, scheme)
+        TextReport.render([conn], StringIO())
+        HTMLReport.render([conn], StringIO())
         return [exch.responses for exch in conn.exchanges]
+
+    def test_analyze_exchange(self):
+        req = Request('http',
+                      'GET', '/', 'HTTP/1.1',
+                      [('Host', 'example.com')])
+        self.assertEqual(repr(req), '<Request GET>')
+        resp1 = Response(req,
+                         'HTTP/1.1', 123, 'Please wait', [])
+        self.assertEqual(repr(resp1), '<Response 123>')
+        resp2 = Response(req,
+                         'HTTP/1.1', 200, 'OK',
+                         [('Content-Length', 14)],
+                         'Hello world!\r\n')
+        exch = analyze_exchange(req, [resp1, resp2])
+        self.assertEquals(repr(exch),
+                          'Exchange(<RequestView GET>, '
+                          '[<ResponseView 123>, <ResponseView 200>])')
+        self.assert_(isinstance(exch.request.method, Method))
+        self.assert_(isinstance(exch.request.version, HTTPVersion))
+        self.assert_(isinstance(exch.request.header_entries[0].name,
+                                FieldName))
+        self.assert_(isinstance(exch.responses[0].version, HTTPVersion))
+        self.assert_(isinstance(exch.responses[0].status, StatusCode))
+        self.assert_(isinstance(exch.responses[1].header_entries[0].name,
+                                FieldName))
 
     def test_parse_responses(self):
         inbound = self.req(m.HEAD) + self.req(m.POST) + self.req(m.POST)
@@ -703,32 +735,6 @@ class TestResponse(unittest.TestCase):
         self.assertEquals(resp3_1.header_entries[0].value, 'wololo')
         self.assert_(resp3_1.body is None)
 
-    def test_parse_responses_without_requests(self):
-        stream = ('HTTP/1.1 200 OK\r\n'
-                  'Transfer-Encoding: chunked\r\n'
-                  '\r\n'
-                  'e\r\n'
-                  'Hello world!\r\n\r\n'
-                  '0\r\n'
-                  '\r\n'
-                  'HTTP/1.1 100 Continue\r\n'
-                  '\r\n'
-                  'HTTP/1.1 204 No Content\r\n'
-                  '\r\n')
-        conn = connection.parse_outbound_stream(stream)
-        report.TextReport(StringIO()).render_all([conn])
-        report.HTMLReport(StringIO()).render_all([conn])
-        [exch1, exch2] = conn.exchanges
-        self.assert_(exch1.request is None)
-        self.assertEquals(exch1.responses[0].status, 200)
-        self.assertEquals(exch1.responses[0].body, 'Hello world!\r\n')
-        self.assertEquals(repr(exch1), 'Exchange(None, [<Response 200>])')
-        self.assert_(exch2.request is None)
-        self.assertEquals(exch2.responses[0].status, 100)
-        self.assert_(exch2.responses[0].body is None)
-        self.assertEquals(exch2.responses[1].status, 204)
-        self.assert_(exch2.responses[1].body is None)
-
     def test_parse_responses_not_enough_requests(self):
         inbound = self.req(m.POST)
         stream = ('HTTP/1.1 200 OK\r\n'
@@ -738,13 +744,11 @@ class TestResponse(unittest.TestCase):
                   '\r\n'
                   'HTTP/1.1 101 Switching Protocols\r\n'
                   '\r\n')
-        [[_], [resp2]] = self.parse(inbound, stream)
-        self.assert_(resp2.request is None)
-        self.assertEquals(resp2.status, 101)
+        [[resp]] = self.parse(inbound, stream)
+        self.assertEquals(resp.body, 'Hello world!\r\n\r\n')
 
     def test_parse_responses_bad_framing(self):
-        [[resp1]] = self.parse(self.req(m.POST), 'HTTP/1.1 ...')
-        self.assert_(resp1 is Unparseable)
+        self.assertEquals(self.parse(self.req(m.POST), 'HTTP/1.1 ...'), [])
 
     def test_parse_responses_implicit_framing(self):
         inbound = self.req(m.POST)
@@ -788,14 +792,15 @@ class TestFromFiles(unittest.TestCase):
         data_path = os.path.abspath(os.path.join(__file__, '..', 'test_data'))
         if os.path.isdir(data_path):
             for name in os.listdir(data_path):
-                cls.make_test(os.path.join(data_path, name))
+                cls.make_test(data_path, name)
         cls.covered = set()
         cls.examples_filename = os.environ.get('WRITE_EXAMPLES_TO')
         cls.examples = {} if cls.examples_filename else None
 
     @classmethod
-    def make_test(cls, filename):
-        test_name = filename.split('.')[0]
+    def make_test(cls, data_path, name):
+        filename = os.path.join(data_path, name)
+        test_name = name.split('.')[0]
         def test(self):
             self.run_test(filename)
         setattr(cls, 'test_%s' % test_name, test)
@@ -816,28 +821,27 @@ class TestFromFiles(unittest.TestCase):
         line = lines[0]
         expected = sorted(int(n) for n in line.split())
 
-        conn = connection.parse_two_streams(inb, outb, scheme=scheme)
-        connection.check_connection(conn)
+        conn = analyze_streams(inb, outb, scheme=scheme)
         buf = StringIO()
-        report.TextReport(buf).render_all([conn])
-
+        TextReport.render([conn], buf)
         actual = sorted(int(ln[5:9]) for ln in buf.getvalue().splitlines()
                         if ln.startswith('**** '))
         self.covered.update(actual)
         self.assertEquals(expected, actual)
-        report.HTMLReport(StringIO()).render_all([conn])
+
+        HTMLReport.render([conn], StringIO())
 
         if self.examples is not None:
             for ident, ctx in conn.collect_complaints():
                 self.examples.setdefault(ident, ctx)
 
     def test_all_notices_covered(self):
-        self.assertEquals(self.covered, set(notice.notices))
+        self.assertEquals(self.covered, set(notices))
         if self.examples is not None:
             self.assertEquals(self.covered, set(self.examples))
             with open(self.examples_filename, 'w') as f:
-                f.write(report.render_notice_examples(
-                    (notice.notices[ident], ctx)
+                f.write(render_notice_examples(
+                    (notices[ident], ctx)
                     for ident, ctx in sorted(self.examples.items())
                 ))
 

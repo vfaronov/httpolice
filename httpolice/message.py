@@ -11,31 +11,34 @@ import zlib
 import defusedxml
 import defusedxml.ElementTree
 
-from httpolice import blackboard, header_view, parse
+from httpolice import parse
+from httpolice.blackboard import Blackboard
+from httpolice.header import HeadersView
 from httpolice.known import cc, header, media, media_type, tc
 from httpolice.structure import FieldName, Unparseable, okay
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import crlf
 
 
-class Message(blackboard.ReportNode):
+class MessageView(Blackboard):
 
     self_name = 'msg'
 
-    def __init__(self, version, header_entries,
-                 body=None, trailer_entries=None, raw=None):
-        super(Message, self).__init__()
-        self.version = version
-        self.header_entries = header_entries
-        self.body = body
-        self.trailer_entries = trailer_entries
-        self.raw = raw
+    def __init__(self, inner):
+        super(MessageView, self).__init__()
+        self.inner = inner
         self.rebuild_headers()
         self._decoded_body = None
         self.annotations = {}
 
+    version = property(lambda self: self.inner.version)
+    header_entries = property(lambda self: self.inner.header_entries)
+    body = property(lambda self: self.inner.body)
+    trailer_entries = property(lambda self: self.inner.trailer_entries)
+    raw = property(lambda self: self.inner.raw)
+
     def rebuild_headers(self):
-        self.headers = header_view.HeadersView(self)
+        self.headers = HeadersView(self)
 
     @property
     def decoded_body(self):
@@ -179,6 +182,7 @@ def body_charset(msg):
 def parse_chunked(msg, state):
     data = []
     try:
+        saved = state.save()
         chunk = rfc7230.chunk.parse(state)
         while chunk:
             data.append(chunk)
@@ -186,12 +190,14 @@ def parse_chunked(msg, state):
         trailer = rfc7230.trailer_part.parse(state)
         crlf.parse(state)
     except parse.ParseError, e:
-        msg.complain(1005, error=e)
-        msg.body = Unparseable
+        state.restore(saved)
         state.sane = False
+        msg.complain(1005, error=e)
+        msg.inner.body = Unparseable
     else:
-        msg.body = ''.join(data)
-        msg.trailer_entries = trailer
+        state.dump_complaints(msg, u'chunked framing')
+        msg.inner.body = ''.join(data)
+        msg.inner.trailer_entries = trailer
         if trailer:
             msg.rebuild_headers()           # Rebuid the `HeadersView` cache
 
@@ -200,22 +206,22 @@ def decode_transfer_coding(msg, coding):
     if coding == tc.chunked:
         # The outermost chunked has already been peeled off at this point.
         msg.complain(1002)
-        msg.body = Unparseable
+        msg.inner.body = Unparseable
     elif coding in [tc.gzip, tc.x_gzip]:
         try:
-            msg.body = decode_gzip(msg.body)
+            msg.inner.body = decode_gzip(msg.body)
         except Exception, e:
             msg.complain(1027, coding=coding, error=e)
-            msg.body = Unparseable
+            msg.inner.body = Unparseable
     elif coding == tc.deflate:
         try:
-            msg.body = decode_deflate(msg.body)
+            msg.inner.body = decode_deflate(msg.body)
         except Exception, e:
             msg.complain(1027, coding=coding, error=e)
-            msg.body = Unparseable
+            msg.inner.body = Unparseable
     else:
         msg.complain(1003, coding=coding)
-        msg.body = Unparseable
+        msg.inner.body = Unparseable
 
 
 def decode_gzip(data):

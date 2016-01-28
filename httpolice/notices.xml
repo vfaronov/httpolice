@@ -47,13 +47,13 @@
   </error>
 
   <debug id="1007">
-    <title>Stop parsing request stream due to errors</title>
-    <explain>Due to previous errors, the request stream is in an undefined state at this point, and HTTPolice will not try to parse the remaining bytes.</explain>
+    <title>Stop parsing request stream</title>
+    <explain>Due to previous notices, the request stream is in an undefined state at this point, and HTTPolice will not try to parse the remaining bytes.</explain>
   </debug>
 
   <debug id="1008">
-    <title>Not enough requests for this response</title>
-    <explain>If HTTPolice is parsing things correctly, it seems that there is no request corresponding to this response. HTTPolice will check this response in isolation.</explain>
+    <title>Not enough requests</title>
+    <explain>There are unparsed bytes remaining on the response stream, but no requests that would correspond to them. HTTPolice will not try to parse the remaining bytes.</explain>
   </debug>
 
   <error id="1009">
@@ -62,17 +62,17 @@
   </error>
 
   <debug id="1010">
-    <title>Stop parsing response stream due to errors</title>
-    <explain>Due to previous errors, the response stream is in an undefined state at this point, and HTTPolice will not try to parse the remaining bytes.</explain>
+    <title>Stop parsing response stream</title>
+    <explain>Due to previous notices, the response stream is in an undefined state at this point, and HTTPolice will not try to parse the remaining bytes.</explain>
   </debug>
 
   <debug id="1011">
-    <title>Stop parsing response stream after switching protocols</title>
-    <explain>Status code <ref to="msg.status"/> means that the connection is switching to a different protocol. HTTPolice will not parse the remainder of the response stream.</explain>
+    <title>Switching protocols</title>
+    <explain>The <ref to="msg.status"/> status code means that the connection is switching to a different protocol. HTTPolice will not parse the remainder of the response stream.</explain>
   </debug>
 
   <debug id="1012">
-    <title>Stop parsing response stream after switching to a tunnel</title>
+    <title>Switching to a tunnel</title>
     <explain>A <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request means that the connection is becoming a tunnel. HTTPolice will not parse the remainder of the response stream.</explain>
   </debug>
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import blackboard
+from httpolice.blackboard import Blackboard
 from httpolice.structure import CaseInsensitive
 
 
@@ -26,7 +26,7 @@ class MismatchError(ParseError):
         self.found = found
 
 
-class State(blackboard.ReportNode):
+class State(Blackboard):
 
     def __init__(self, data, annotate_classes=None):
         super(State, self).__init__()
@@ -39,7 +39,7 @@ class State(blackboard.ReportNode):
         self.complaints = []
 
     def dump_complaints(self, target, place=u'???'):
-        for notice_ident, context in self.complaints or []:
+        for notice_ident, context in self.complaints:
             context.pop(self.self_name)
             context['place'] = place
             target.complain(notice_ident, **context)

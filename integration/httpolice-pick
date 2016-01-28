@@ -5,8 +5,7 @@ import argparse
 import os
 import sys
 
-import httpolice.connection
-import httpolice.report
+import httpolice
 
 
 def main():
@@ -37,22 +36,22 @@ def main():
 
     inputs.sort(key=lambda entry: entry[2])
 
-    connections = []
+    result = []
     for inbound, outbound, _ in inputs:
         with open(inbound) as f:
             inbound_stream = f.read()
         with open(outbound) as f:
             outbound_stream = f.read()
-        conn = httpolice.connection.parse_two_streams(inbound_stream,
-                                                      outbound_stream)
-        httpolice.connection.check_connection(conn)
-        connections.append(conn)
+        result.append(
+            httpolice.analyze_streams(inbound_stream, outbound_stream,
+                                      scheme='http')
+        )
 
     if args.html:
-        report = httpolice.report.HTMLReport(sys.stdout)
+        report_cls = httpolice.HTMLReport
     else:
-        report = httpolice.report.TextReport(sys.stdout)
-    report.render_all(connections)
+        report_cls = httpolice.TextReport
+    report_cls.render(result, sys.stdout)
 
 if __name__ == '__main__':
     sys.exit(main())

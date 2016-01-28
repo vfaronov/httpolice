@@ -76,6 +76,53 @@ class CaseInsensitive(ProtocolString):
 # Representations of specific protocol elements
 
 
+class Message(object):
+
+    __slots__ = ('version', 'header_entries', 'body', 'trailer_entries', 'raw')
+
+    def __init__(self, version, header_entries,
+                 body=None, trailer_entries=None, raw=None):
+        self.version = HTTPVersion(version)
+        self.header_entries = [HeaderEntry(k, v)
+                               for k, v in header_entries]
+        self.body = body if body is None else str(body)
+        self.trailer_entries = [HeaderEntry(k, v)
+                                for k, v in trailer_entries or []]
+        self.raw = raw if raw is None else str(raw)
+
+
+class Request(Message):
+
+    __slots__ = ('scheme', 'method', 'target')
+
+    def __init__(self, scheme, method, target, version, header_entries,
+                 body=None, trailer_entries=None, raw=None):
+        super(Request, self).__init__(version, header_entries,
+                                      body, trailer_entries, raw)
+        self.scheme = scheme if scheme is None else str(scheme)
+        self.method = Method(method)
+        self.target = str(target)
+
+    def __repr__(self):
+        return '<Request %s>' % self.method
+
+
+class Response(Message):
+
+    __slots__ = ('request', 'status', 'reason')
+
+    def __init__(self, request, version, status, reason, header_entries,
+                 body=None, trailer_entries=None, raw=None):
+        super(Response, self).__init__(version, header_entries,
+                                       body, trailer_entries, raw)
+        self.request = request
+        self.status = StatusCode(status)
+        self.reason = reason if reason is None else str(reason)
+
+    def __repr__(self):
+        return '<Response %d>' % self.status
+
+
 class HTTPVersion(ProtocolString):
 
     __slots__ = ()

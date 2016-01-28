@@ -1,7 +1,7 @@
 # -*- coding: utf-8; -*-
 
 
-class ReportNode(object):
+class Blackboard(object):
 
     __slots__ = ('complaints',)
 

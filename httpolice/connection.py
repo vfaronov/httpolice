@@ -1,41 +1,50 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import blackboard, message, parse, request, response
+from httpolice import message, parse, request, response, structure
+from httpolice.blackboard import Blackboard
 from httpolice.known import m, st, tc
-from httpolice.structure import Unparseable, okay
+from httpolice.request import RequestView
+from httpolice.response import ResponseView
+from httpolice.structure import Unparseable
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import crlf
 
 
-class Exchange(blackboard.ReportNode):
-
-    self_name = 'exch'
-
-    def __repr__(self):
-        return 'Exchange(%r, %r)' % (self.request, self.responses)
-
-    def __init__(self, request_, responses):
-        super(Exchange, self).__init__()
-        self.request = request_
-        self.responses = responses
-        for resp in self.responses or []:
-            resp.request = self.request
-
-    @property
-    def sub_nodes(self):
-        if okay(self.request):
-            yield self.request
-        for resp in self.responses:
-            if okay(resp):
-                yield resp
+def analyze_streams(inbound, outbound, scheme=None):
+    """
+    :type inbound: str
+    :type outbound: str
+    :type scheme: str | None
+    """
+    conn = Connection()
+    parse_streams(conn, inbound, outbound, scheme=scheme)
+    check_connection(conn)
+    return conn
 
 
-class Connection(blackboard.ReportNode):
+def analyze_exchange(request, responses):
+    """
+    :type request: structure.Request
+    :type responses: list[structure.Response]
+    """
+    req_view = RequestView(request)
+    resp_views = [ResponseView(req_view, resp) for resp in responses]
+    exch = Exchange(req_view, resp_views)
+    check_exchange(exch)
+    return exch
+
+
+class Connection(Blackboard):
 
     self_name = 'conn'
 
     def __init__(self, exchanges=None,
                  unparsed_inbound=None, unparsed_outbound=None):
+        """
+        :type exchanges: list[Exchange]
+        :type unparsed_inbound: str | None
+        :type unparsed_outbound: str | None
+        """
         super(Connection, self).__init__()
         self.exchanges = exchanges or []
         self.unparsed_inbound = unparsed_inbound
@@ -46,71 +55,78 @@ class Connection(blackboard.ReportNode):
         return self.exchanges
 
 
+class Exchange(Blackboard):
+
+    self_name = 'exch'
+
+    def __repr__(self):
+        return 'Exchange(%r, %r)' % (self.request, self.responses)
+
+    def __init__(self, req, resps):
+        """
+        :type req: RequestView
+        :type resp: list[ResponseView]
+        """
+        super(Exchange, self).__init__()
+        assert all(resp.request is req for resp in resps)
+        self.request = req
+        self.responses = resps
+
+    @property
+    def sub_nodes(self):
+        yield self.request
+        for resp in self.responses:
+            yield resp
+
+
 def check_connection(conn):
     for exch in conn.exchanges:
-        if okay(exch):
-            check_exchange(exch)
+        check_exchange(exch)
 
 
 def check_exchange(exch):
-    if okay(exch.request):
-        request.check_request(exch.request)
-    if exch.responses is not None:
-        response.check_responses(exch.responses)
+    request.check_request(exch.request)
+    response.check_responses(exch.responses)
 
 
-def parse_two_streams(inbound, outbound, scheme=None):
-    conn = Connection()
-    parse_requests(conn, inbound, scheme=scheme)
-    parse_responses(conn, outbound)
-    return conn
+def parse_streams(connection, inbound, outbound, scheme=None):
+    requests = _parse_requests(connection, inbound, scheme)
+    _parse_responses(connection, requests, outbound)
 
 
-def parse_inbound_stream(stream, scheme=None):
-    conn = Connection()
-    parse_requests(conn, stream, scheme=scheme)
-    return conn
-
-
-def parse_outbound_stream(stream):
-    conn = Connection()
-    parse_responses(conn, stream)
-    return conn
-
-
-def parse_requests(connection, stream, scheme=None):
+def _parse_requests(connection, stream, scheme=None):
     state = parse.State(stream)
-    exchanges = []
+    result = []
     while state.sane and not state.is_eof():
         req = _parse_request_heading(state, scheme)
-        exch = Exchange(req, None)
-        exchanges.append(exch)
-        state.dump_complaints(exch, u'request heading')
         if req is Unparseable:
-            break
-        _parse_request_body(req, state)
-        req.raw = state.cut()
-        state.dump_complaints(req, u'request body framing')
-        if not state.sane:
-            req.complain(1007)
-            break
-    connection.exchanges.extend(exchanges)
+            state.dump_complaints(connection, u'request heading')
+        else:
+            result.append(req)
+            _parse_request_body(req, state)
+            req.inner.raw = state.cut()
+    if not state.is_eof():
+        connection.complain(1007)
     connection.unparsed_inbound = state.remaining()
+    return result
 
 
 def _parse_request_heading(state, scheme=None):
     try:
+        saved = state.save()
         (method_, target, version_) = rfc7230.request_line.parse(state)
         entries = \
             parse.many(rfc7230.header_field + ~crlf).parse(state)
         crlf.parse(state)
     except parse.ParseError, e:
-        state.complain(1006, error=e)
+        state.restore(saved)
         state.sane = False
+        state.complain(1006, error=e)
         return Unparseable
     else:
-        req = request.Request(method_, target, version_, entries,
-                              scheme=scheme)
+        req = RequestView(structure.Request(scheme, method_, target, version_,
+                                            entries))
+        state.dump_complaints(req, u'request heading')
         return req
 
 
@@ -122,7 +138,7 @@ def _parse_request_body(req, state):
         if codings.pop() == tc.chunked:
             message.parse_chunked(req, state)
         else:
-            req.body = Unparseable
+            req.inner.body = Unparseable
             req.complain(1001)
             state.sane = False
         while codings and (req.body is not Unparseable):
@@ -131,74 +147,50 @@ def _parse_request_body(req, state):
     elif req.headers.content_length:
         n = req.headers.content_length.value
         if n is Unparseable:
-            req.body = Unparseable
+            req.inner.body = Unparseable
             state.sane = False
         else:
             try:
-                req.body = parse.nbytes(n, n).parse(state)
+                req.inner.body = parse.nbytes(n, n).parse(state)
             except parse.ParseError:
-                req.body = Unparseable
+                req.inner.body = Unparseable
                 req.complain(1004)
                 state.sane = False
 
     else:
-        req.body = None
+        req.inner.body = None
 
 
-def parse_responses(connection, stream):
-    # If there are existing exchanges on this connection,
-    # it's probably the result of parsing the inbound stream,
-    # so these are just requests and we'll need to fill in the responses.
-    exchanges = list(connection.exchanges)
-
-    # Skip the exchanges where responses are already filled in.
-    while exchanges and exchanges[0].responses:
-        exchanges.pop(0)
-
-    # We may also need to add new exchanges, though.
-    # This happens either if there were more responses than requests
-    # (in which case we need to report a notice),
-    # or if there were no requests at all
-    # (in which case we're just working with responses and it's OK).
-    not_pristine = bool(exchanges)
-    new_exchanges = []
-
+def _parse_responses(connection, requests, stream):
     state = parse.State(stream)
-    while state.sane and not state.is_eof():
-        # Select the next exchange.
-        if exchanges:
-            exch = exchanges.pop(0)
-            exch.responses = []
-        else:
-            exch = Exchange(None, [])
-            new_exchanges.append(exch)
-            if not_pristine:
-                exch.complain(1008)
-
+    while requests and state.sane and not state.is_eof():
+        req = requests.pop(0)
         # Parse all responses corresponding to this request.
         # RFC 7230 section 3.3.
+        responses = []
         while state.sane:
-            resp = _parse_response_heading(state)
-            state.dump_complaints(exch, u'response heading')
-            exch.responses.append(resp)
+            resp = _parse_response_heading(req, state)
             if resp is Unparseable:
-                break
-            resp.request = exch.request
-            _parse_response_body(resp, state, exch.request)
-            state.dump_complaints(resp, u'response body framing')
-            resp.raw = state.cut()
-            if not state.sane: 
-                break
-            if not resp.status.informational:
-                # This is the final response for this request.
-                # Proceed to the next.
-                break
-
-    connection.exchanges.extend(new_exchanges)
+                state.dump_complaints(connection, u'request heading')
+            else:
+                responses.append(resp)
+                _parse_response_body(resp, state)
+                resp.inner.raw = state.cut()
+                if (not resp.status.informational) or \
+                        (resp.status == st.switching_protocols):
+                    # This is the final response for this request.
+                    # Proceed to the next request.
+                    connection.exchanges.append(Exchange(req, responses))
+                    break
+    if not state.is_eof():
+        if state.sane:
+            connection.complain(1008)
+        else:
+            connection.complain(1010)
     connection.unparsed_outbound = state.remaining()
 
 
-def _parse_response_heading(state):
+def _parse_response_heading(req, state):
     try:
         (version, status, reason) = rfc7230.status_line.parse(state)
         entries = parse.many(rfc7230.header_field + ~crlf).parse(state)
@@ -208,26 +200,30 @@ def _parse_response_heading(state):
         state.sane = False
         return Unparseable
     else:
-        resp = response.Response(version, status, entries, reason=reason)
+        resp = ResponseView(req, structure.Response(req.inner, version, status,
+                                                    reason, entries))
+        state.dump_complaints(resp, u'response heading')
         return resp
 
 
-def _parse_response_body(resp, state, req):
+def _parse_response_body(resp, state):
+    req = resp.request
+
     # RFC 7230 section 3.3.3.
     if resp.status == st.switching_protocols:
-        resp.body = None
+        resp.inner.body = None
         resp.complain(1011)
         state.sane = False
 
-    elif okay(req) and req.method == m.CONNECT and resp.status.successful:
-        resp.body = None
+    elif req and req.method == m.CONNECT and resp.status.successful:
+        resp.inner.body = None
         resp.complain(1012)
         state.sane = False
 
     elif (resp.status.informational or
               resp.status in [st.no_content, st.not_modified] or
-              (okay(req) and req.method == m.HEAD)):
-        resp.body = None
+              (req and req.method == m.HEAD)):
+        resp.inner.body = None
 
     elif resp.headers.transfer_encoding:
         codings = list(resp.headers.transfer_encoding)
@@ -235,26 +231,22 @@ def _parse_response_body(resp, state, req):
             codings.pop()
             message.parse_chunked(resp, state)
         else:
-            resp.body = parse.anything.parse(state)
+            resp.inner.body = parse.anything.parse(state)
         while codings and (resp.body is not Unparseable):
             message.decode_transfer_coding(resp, codings.pop())
-        if not state.sane:
-            resp.complain(1010)
 
     elif resp.headers.content_length.is_present:
         n = resp.headers.content_length.value
         if n is Unparseable:
-            resp.body = Unparseable
+            resp.inner.body = Unparseable
             state.sane = False
         else:
             try:
-                resp.body = parse.nbytes(n, n).parse(state)
+                resp.inner.body = parse.nbytes(n, n).parse(state)
             except parse.ParseError:
-                resp.body = Unparseable
+                resp.inner.body = Unparseable
                 resp.complain(1004)
                 state.sane = False
-        if not state.sane:
-            resp.complain(1010)
 
     else:
-        resp.body = parse.anything.parse(state)
+        resp.inner.body = parse.anything.parse(state)

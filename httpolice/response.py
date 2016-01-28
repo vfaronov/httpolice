@@ -18,29 +18,27 @@ from httpolice.util.uri import url_equals
 import urlparse
 
 
-class Response(message.Message):
+class ResponseView(message.MessageView):
+
+    def __init__(self, request, inner):
+        super(ResponseView, self).__init__(inner)
+        self.request = request
 
     def __repr__(self):
-        return '<Response %d>' % self.status
+        return '<ResponseView %d>' % self.status
 
-    def __init__(self, version, status, header_entries,
-                 body=None, trailer_entries=None, reason=None, raw=None):
-        super(Response, self).__init__(version, header_entries,
-                                       body, trailer_entries, raw)
-        self.status = status
-        self.reason = reason
-        self.request = None
+    status = property(lambda self: self.inner.status)
+    reason = property(lambda self: self.inner.reason)
 
 
 def check_responses(resps):
     for resp in resps:
-        if okay(resp):
-            check_response(resp)
+        check_response(resp)
 
 
 def check_response(resp):
     check_response_itself(resp)
-    if okay(resp.request):
+    if resp.request:
         check_response_in_context(resp, resp.request)
 
 

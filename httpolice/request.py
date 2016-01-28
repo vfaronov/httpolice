@@ -18,20 +18,19 @@ from httpolice.structure import EntityTag, Versioned, http11, okay
 from httpolice.syntax import rfc7230
 
 
-class Request(message.Message):
+class RequestView(message.MessageView):
+
+    def __init__(self, inner):
+        super(RequestView, self).__init__(inner)
+        self._parse_target()
+        self.effective_uri = self._build_effective_uri()
 
     def __repr__(self):
-        return '<Request %s>' % self.method
+        return '<RequestView %s>' % self.method
 
-    def __init__(self, method_, target, version_, header_entries,
-                 body=None, trailer_entries=None, scheme=None, raw=None):
-        super(Request, self).__init__(version_, header_entries,
-                                      body, trailer_entries, raw)
-        self.method = method_
-        self.target = target
-        self._parse_target()
-        self.scheme = scheme
-        self.effective_uri = self._build_effective_uri()
+    scheme = property(lambda self: self.inner.scheme)
+    method = property(lambda self: self.inner.method)
+    target = property(lambda self: self.inner.target)
 
     def _parse_target(self):
         def _parses_as(parser):
