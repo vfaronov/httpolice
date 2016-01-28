@@ -1,16 +1,15 @@
-1158 1159
+# Notice 1161 does not apply to responses.
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
 Host: example.com
 User-Agent: demo
-Cache-Control: No-cache=":"
-Pragma: no-cache
 
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 14
+Cache-Control: no-cache, max-age=0
 
 Hello world!

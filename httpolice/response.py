@@ -152,6 +152,9 @@ def check_response_itself(resp):
         if cache_directive.is_for_response(d.item) == False:
             resp.complain(1153, directive=d.item)
 
+    if u'no-cache' in headers.pragma:
+        resp.complain(1162)
+
 
 def check_response_in_context(resp, req):
     if okay(resp.body) and resp.body and resp.headers.content_type.is_absent \

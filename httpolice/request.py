@@ -197,3 +197,7 @@ def check_request(req):
             req.complain(1152, directive=d.item)
         if d == cache.no_cache and d.param is not None:
             req.complain(1159, directive=d.item)
+
+    if req.headers.cache_control.no_cache and \
+            u'no-cache' not in req.headers.pragma:
+        req.complain(1161)

@@ -593,6 +593,8 @@ class TestRequest(unittest.TestCase):
                   'Via: 1.1 baz\r\n'
                   'Cache-Control: qux="xyzzy 123", ,no-transform, abcde\r\n'
                   'Cache-Control: min-fresh, no-store=yes\r\n'
+                  'Pragma: no-cache, foo, bar=baz, qux="xyzzy"\r\n'
+                  'Pragma: no-cache=krekfewhrfk\r\n'
                   '\r\n')
         [req] = self.parse(stream)
         self.assertEqual(req.headers.cache_control.value,
@@ -604,6 +606,12 @@ class TestRequest(unittest.TestCase):
                           Parametrized(CacheDirective(u'abcde'), None),
                           Parametrized(cache.min_fresh, Unparseable),
                           Parametrized(cache.no_store, None)])
+        self.assertEqual(req.headers.pragma.value,
+                         [u'no-cache',
+                          (u'foo', None),
+                          (u'bar', u'baz'),
+                          (u'qux', 'xyzzy'),
+                          Unparseable])
 
         self.assert_(cache.max_age in req.headers.cache_control)
         self.assertEqual(req.headers.cache_control.max_age, 3600)

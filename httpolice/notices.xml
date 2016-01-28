@@ -1190,4 +1190,24 @@
     <explain>In this request’s <ref to="msg.headers.cache_control"/> header, the <cache>no-cache</cache> directive has an argument. But the specification for <cache>no-cache</cache> only defines an argument when used in responses.</explain>
   </error>
 
+  <error id="1160">
+    <title>Using extension pragma ‘<ref to="pragma"/>’</title>
+    <explain>This message’s <ref to="header"/> header contains a ‘<ref to="pragma"/>’ extension pragma. Extension pragmas (that is, pragma directives other than ‘no-cache’) are deprecated in <rfc num="7234" sect="5.4"/>.</explain>
+  </error>
+
+  <comment id="1161">
+    <title>“<ref to="msg.headers.cache_control"/>: <cache>no-cache</cache>” without “<ref to="msg.headers.pragma"/>: no-cache”</title>
+    <rfc num="7234" sect="5.4">
+      When sending a no-cache request, a client ought to include both the
+   pragma and cache-control directives, unless <h>Cache-Control</h>: <cache>no-cache</cache>
+   is purposefully omitted to target other Cache-Control response
+   directives at HTTP/1.1 caches.
+    </rfc>
+  </comment>
+
+  <error id="1162">
+    <title>Response with <ref to="msg.headers.pragma"/>: no-cache</title>
+    <explain>This response contains the ‘no-cache’ pragma directive, which is defined by <rfc num="7234" sect="5.4"/> for requests, but not for responses.</explain>
+  </error>
+
 </notices>
