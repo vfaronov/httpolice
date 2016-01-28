@@ -795,16 +795,19 @@ class TestFromFiles(unittest.TestCase):
 
     @classmethod
     def make_test(cls, filename):
-        if '.' in filename:
-            test_name, scheme = filename.split('.', 1)
-        else:
-            test_name = filename
-            scheme = None
+        test_name = filename.split('.')[0]
         def test(self):
-            self.run_test(filename, scheme)
+            self.run_test(filename)
         setattr(cls, 'test_%s' % test_name, test)
 
     def run_test(self, filename, scheme=None):
+        if '.' in filename:
+            _, scheme = filename.split('.')
+        else:
+            scheme = 'http'
+        if scheme == 'noscheme':
+            scheme = None
+
         with open(filename) as f:
             data = f.read()
         header, data = data.split('======== BEGIN INBOUND STREAM ========\r\n')
@@ -812,15 +815,18 @@ class TestFromFiles(unittest.TestCase):
         lines = [ln for ln in header.splitlines() if not ln.startswith('#')]
         line = lines[0]
         expected = sorted(int(n) for n in line.split())
+
         conn = connection.parse_two_streams(inb, outb, scheme=scheme)
         connection.check_connection(conn)
         buf = StringIO()
         report.TextReport(buf).render_all([conn])
+
         actual = sorted(int(ln[5:9]) for ln in buf.getvalue().splitlines()
                         if ln.startswith('**** '))
         self.covered.update(actual)
         self.assertEquals(expected, actual)
         report.HTMLReport(StringIO()).render_all([conn])
+
         if self.examples is not None:
             for ident, ctx in conn.collect_complaints():
                 self.examples.setdefault(ident, ctx)
