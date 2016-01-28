@@ -31,9 +31,21 @@ class Registry(object):
 
     key_order = []
     xmlns = {'iana': 'http://www.iana.org/assignments'}
+    relative_url = None
+    name = None
+    known_dict = None
 
     def __init__(self, base_url='http://www.iana.org/assignments/'):
         self.base_url = base_url
+
+    def get_all(self):
+        tree = self._get_xml(self.relative_url)
+        entries = []
+        for record in tree.findall('//iana:record', self.xmlns):
+            entry = self._from_record(record)
+            if entry:
+                entries.append(entry)
+        return [(self.name, entries, self.known_dict)]
 
     def _get_xml(self, relative_url):
         req = urllib2.Request(
@@ -41,6 +53,9 @@ class Registry(object):
             headers={'Accept': 'text/xml, application/xml',
                      'User-Agent': 'HTTPolice-IANA-tool Python-urllib'})
         return lxml.etree.parse(urllib2.urlopen(req))
+
+    def _from_record(self, record):
+        raise NotImplementedError()
 
     def extract_citations(self, record):
         for xref in record.findall('iana:xref', self.xmlns):
@@ -63,58 +78,57 @@ class Registry(object):
 
 class HeaderRegistry(Registry):
 
-    def get_all(self):
-        tree = self._get_xml('message-headers/message-headers.xml')
-        entries = []
-        for record in tree.findall('//iana:record', self.xmlns):
-            if record.find('iana:protocol', self.xmlns).text != 'http':
-                continue
-            value = record.find('iana:value', self.xmlns)
-            entry = {
-                '_': FieldName(value.text),
-                '_citations': list(self.extract_citations(record)),
-            }
-            entries.append(entry)
-            status = record.find('iana:status', self.xmlns)
-            if (status is not None) and status.text:
-                entry['iana_status'] = status.text
-        return [('headers', entries, h)]
+    name = 'headers'
+    known_dict = h
+    relative_url = 'message-headers/message-headers.xml'
+
+    def _from_record(self, record):
+        if record.find('iana:protocol', self.xmlns).text != 'http':
+            return None
+        entry = {
+            '_': FieldName(record.find('iana:value', self.xmlns).text),
+            '_citations': list(self.extract_citations(record)),
+        }
+        status = record.find('iana:status', self.xmlns)
+        if (status is not None) and status.text:
+            entry['iana_status'] = status.text
+        return entry
 
 
 class MethodRegistry(Registry):
 
-    def get_all(self):
-        tree = self._get_xml('http-methods/http-methods.xml')
-        entries = []
-        for record in tree.findall('//iana:record', self.xmlns):
-            entries.append({
-                '_': Method(record.find('iana:value', self.xmlns).text),
-                '_citations': list(self.extract_citations(record)),
-                'safe': yes_no(record.find('iana:safe', self.xmlns).text),
-                'idempotent':
-                    yes_no(record.find('iana:idempotent', self.xmlns).text),
-            })
-        return [('methods', entries, m)]
+    name = 'methods'
+    known_dict = m
+    relative_url = 'http-methods/http-methods.xml'
+
+    def _from_record(self, record):
+        return {
+            '_': Method(record.find('iana:value', self.xmlns).text),
+            '_citations': list(self.extract_citations(record)),
+            'safe': yes_no(record.find('iana:safe', self.xmlns).text),
+            'idempotent':
+                yes_no(record.find('iana:idempotent', self.xmlns).text),
+        }
 
 
 class StatusCodeRegistry(Registry):
 
-    def get_all(self):
-        tree = self._get_xml('http-status-codes/http-status-codes.xml')
-        entries = []
-        for record in tree.findall('//iana:record', self.xmlns):
-            value = record.find('iana:value', self.xmlns).text
-            if not value.isdigit():
-                continue
-            description = record.find('iana:description', self.xmlns).text
-            if description.lower() == 'unassigned':
-                continue
-            entries.append({
-                '_': StatusCode(value),
-                '_citations': list(self.extract_citations(record)),
-                '_title': description,
-            })
-        return [('status codes', entries, st)]
+    name = 'status codes'
+    known_dict = st
+    relative_url = 'http-status-codes/http-status-codes.xml'
+
+    def _from_record(self, record):
+        value = record.find('iana:value', self.xmlns).text
+        if not value.isdigit():
+            return None
+        description = record.find('iana:description', self.xmlns).text
+        if description.lower() == 'unassigned':
+            return None
+        return {
+            '_': StatusCode(value),
+            '_citations': list(self.extract_citations(record)),
+            '_title': description,
+        }
 
 
 class ParametersRegistry(Registry):
@@ -160,68 +174,68 @@ class ParametersRegistry(Registry):
 
 class MediaTypeRegistry(Registry):
 
-    def get_all(self):
-        tree = self._get_xml('media-types/media-types.xml')
-        entries = []
-        for record in tree.findall('//iana:record', self.xmlns):
-            toplevel = record.getparent().get('id')
-            subtype = record.find('iana:name', self.xmlns).text.lower()
-            if subtype.startswith('vnd.') or subtype.startswith('prs.'):
-                continue
-            if len(subtype.split()) > 1:
-                if ('deprecated' in subtype) or ('obsoleted' in subtype):
-                    entry = {'deprecated': True}
-                    subtype = subtype.split()[0]
-                else:
-                    continue
+    name = 'media types'
+    known_dict = media
+    relative_url = 'media-types/media-types.xml'
+
+    def _from_record(self, record):
+        toplevel = record.getparent().get('id')
+        subtype = record.find('iana:name', self.xmlns).text.lower()
+        if subtype.startswith('vnd.') or subtype.startswith('prs.'):
+            return None
+        if len(subtype.split()) > 1:
+            if ('deprecated' in subtype) or ('obsoleted' in subtype):
+                entry = {'deprecated': True}
+                subtype = subtype.split()[0]
             else:
-                entry = {}
-            entry['_'] = MediaType(u'%s/%s' % (toplevel, subtype))
-            entry['_citations'] = list(self.extract_citations(record))
-            if not entry['_citations']:
-                continue
-            entries.append(entry)
-        return [('media types', entries, media)]
+                return None
+        else:
+            entry = {}
+        entry['_'] = MediaType(u'%s/%s' % (toplevel, subtype))
+        entry['_citations'] = list(self.extract_citations(record))
+        if not entry['_citations']:
+            return None
+        return entry
 
 
 class UpgradeTokenRegistry(Registry):
 
-    def get_all(self):
-        tree = self._get_xml('http-upgrade-tokens/http-upgrade-tokens.xml')
-        entries = []
-        for record in tree.findall('//iana:record', self.xmlns):
-            entries.append({
-                '_': UpgradeToken(record.find('iana:value', self.xmlns).text),
-                '_citations': list(self.extract_citations(record)),
-                '_title':
-                    record.find('iana:description', self.xmlns).text,
-            })
-        return [('upgrade tokens', entries, upgrade)]
+    name = 'upgrade tokens'
+    known_dict = upgrade
+    relative_url = 'http-upgrade-tokens/http-upgrade-tokens.xml'
+
+    def _from_record(self, record):
+        return {
+            '_': UpgradeToken(record.find('iana:value', self.xmlns).text),
+            '_citations': list(self.extract_citations(record)),
+            '_title':
+                record.find('iana:description', self.xmlns).text,
+        }
 
 
 class CacheDirectiveRegistry(Registry):
 
-    def get_all(self):
-        tree = self._get_xml('http-cache-directives/http-cache-directives.xml')
-        entries = []
-        for record in tree.findall('//iana:record', self.xmlns):
-            entries.append({
-                '_': CacheDirective(
-                        record.find('iana:value', self.xmlns).text),
-                '_citations': list(self.extract_citations(record)),
-            })
-        return [('cache directives', entries, cache)]
+    name = 'cache directives'
+    known_dict = cache
+    relative_url = 'http-cache-directives/http-cache-directives.xml'
+
+    def _from_record(self, record):
+        return {
+            '_': CacheDirective(
+                    record.find('iana:value', self.xmlns).text),
+            '_citations': list(self.extract_citations(record)),
+        }
 
 
 class WarnCodeRegistry(Registry):
 
-    def get_all(self):
-        tree = self._get_xml('http-warn-codes/http-warn-codes.xml')
-        entries = []
-        for record in tree.findall('//iana:record', self.xmlns):
-            entries.append({
-                '_': WarnCode(record.find('iana:value', self.xmlns).text),
-                '_citations': list(self.extract_citations(record)),
-                '_title': record.find('iana:description', self.xmlns).text,
-            })
-        return [('warn codes', entries, warn)]
+    name = 'warn codes'
+    known_dict = warn
+    relative_url = 'http-warn-codes/http-warn-codes.xml'
+
+    def _from_record(self, record):
+        return {
+            '_': WarnCode(record.find('iana:value', self.xmlns).text),
+            '_citations': list(self.extract_citations(record)),
+            '_title': record.find('iana:description', self.xmlns).text,
+        }
