@@ -71,12 +71,12 @@ class HeaderView(object):
         entries = []
         values = []
         items = self.message.headers.enumerate(self.name)
+        parser = (header.parser_for(self.name) or parse.anything) + parse.eof
         for from_trailer, entry in items:
             if from_trailer and header.is_bad_for_trailer(self.name):
                 entry.complain(1026)
+                continue
             entries.append(entry)
-            parser = \
-                (header.parser_for(self.name) or parse.anything) + parse.eof
             state = parse.State(entry.value, annotate_classes=known.classes)
             try:
                 parsed = parser.parse(state)
