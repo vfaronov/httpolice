@@ -236,10 +236,6 @@ class TextReport(object):
             self.write(u'++ %s: %s\n' %
                        (entry.name, entry.value.decode('ascii', 'ignore')))
 
-        for entry in msg.header_entries:
-            self.render_notices(entry)
-        for entry in msg.trailer_entries or []:
-            self.render_notices(entry)
         self.render_notices(msg)
 
     def render_connection(self, connection):
@@ -299,21 +295,22 @@ class HTMLReport(object):
                 else:
                     render_known(piece)
 
-    def render_header_entries(self, entries):
-        for entry in entries:
+    def render_header_entries(self, message, entries, from_trailer):
+        for i, entry in enumerate(entries):
             with H.div(__inline=True, **for_object(entry)):
                 with H.span(**for_object(entry.name)):
                     render_known(entry.name)
                 H.span(u': ')
                 with H.span(**for_object(entry.value)):
-                    if entry.annotated:
-                        self.render_annotated(entry.annotated)
+                    annotated = message.annotations.get((from_trailer, i))
+                    if annotated is not None:
+                        self.render_annotated(annotated)
                     else:
                         H.span(
                             printable(entry.value.decode('utf-8', 'ignore')))
 
     def render_message(self, msg):
-        self.render_header_entries(msg.header_entries)
+        self.render_header_entries(msg, msg.header_entries, False)
 
         body, transforms = displayable_body(msg)
         if body is Unparseable:
@@ -329,7 +326,7 @@ class HTMLReport(object):
         if msg.trailer_entries:
             with H.div(_class='review-block'):
                 H.p(u'Header fields from the chunked trailer:', _class='hint')
-                self.render_header_entries(msg.trailer_entries)
+                self.render_header_entries(msg, msg.trailer_entries, True)
 
     def render_request(self, req):
         if req is Unparseable:

@@ -35,22 +35,6 @@ class ReportNode(object):
             yield c
 
 
-class HeaderEntry(ReportNode):
-
-    __slots__ = ('name', 'value', 'annotated')
-
-    self_name = 'header'
-
-    def __init__(self, name, value):
-        super(HeaderEntry, self).__init__()
-        self.name = FieldName(name)
-        self.value = value
-        self.annotated = None
-
-    def __repr__(self):
-        return '<HeaderEntry %s>' % self.name
-
-
 ################ Representations of the various elements of the protocol
 
 
@@ -144,6 +128,18 @@ class StatusCode(int):
     redirection = property(lambda self: 300 <= self < 399)
     client_error = property(lambda self: 400 <= self < 499)
     server_error = property(lambda self: 500 <= self < 599)
+
+
+class HeaderEntry(namedtuple('HeaderEntry', ('name', 'value'))):
+
+    __slots__ = ()
+
+    def __new__(cls, name, value):
+        return super(HeaderEntry, cls).__new__(cls,
+                                               FieldName(name), str(value))
+
+    def __repr__(self):
+        return '<HeaderEntry %s>' % self.name
 
 
 class FieldName(CaseInsensitive):

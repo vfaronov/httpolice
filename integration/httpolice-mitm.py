@@ -17,7 +17,7 @@ def response(context, flow):
         httpolice.common.Method(flow.request.method),
         flow.request.path,
         httpolice.common.HTTPVersion(flow.request.http_version),
-        [httpolice.common.HeaderEntry(httpolice.common.FieldName(k), v)
+        [httpolice.common.HeaderEntry(k, v)
          for k, v in flow.request.headers.fields],
         flow.request.content or None,
         scheme=flow.request.scheme,
@@ -27,7 +27,7 @@ def response(context, flow):
         httpolice.common.StatusCode(flow.response.status_code),
         reason=flow.response.reason,
         header_entries=[
-            httpolice.common.HeaderEntry(httpolice.common.FieldName(k), v)
+            httpolice.common.HeaderEntry(k, v)
             for k, v in flow.response.headers.fields
         ],
         body=flow.response.content,

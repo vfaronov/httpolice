@@ -3,7 +3,7 @@
 <notices>
 
   <error id="1000">
-    <title>Malformed <ref to="header"/> header</title>
+    <title>Malformed <ref to="entry"/> header</title>
     <explain>Parse error: <ref to="error"/></explain>
   </error>
 
@@ -185,7 +185,7 @@
   </comment>
 
   <error id="1026">
-    <title><ref to="header"/> in a trailer</title>
+    <title><ref to="entry"/> in a trailer</title>
     <rfc num="7230" sect="4.1.2">
       A sender MUST NOT generate a trailer that contains a field necessary
    for message framing (e.g., <h>Transfer-Encoding</h> and <h>Content-Length</h>),
@@ -1161,27 +1161,27 @@
 
   <comment id="1154">
     <title>Unquoted argument to the <ref to="directive"/> cache directive</title>
-    <explain>The specification for the <ref to="directive"/> directive recommends that its argument be wrapped in double quotes. But in this message’s <ref to="header"/> header, it was not quoted.</explain>
+    <explain>The specification for the <ref to="directive"/> directive recommends that its argument be wrapped in double quotes. But in this message’s <ref to="entry"/> header, it was not quoted.</explain>
   </comment>
 
   <comment id="1155">
     <title>Quoted argument to the <ref to="directive"/> cache directive</title>
-    <explain>In this message’s <ref to="header"/> header, the argument to the <ref to="directive"/> directive is wrapped in double quotes. But the specification for <ref to="directive"/> recommends that it be written as a plain token, without quotes.</explain>
+    <explain>In this message’s <ref to="entry"/> header, the argument to the <ref to="directive"/> directive is wrapped in double quotes. But the specification for <ref to="directive"/> recommends that it be written as a plain token, without quotes.</explain>
   </comment>
 
   <error id="1156">
     <title><ref to="directive"/> cache directive with no argument</title>
-    <explain>According to the specification, the <ref to="directive"/> directive must have an argument. But in this message’s <ref to="header"/> header, it has no argument.</explain>
+    <explain>According to the specification, the <ref to="directive"/> directive must have an argument. But in this message’s <ref to="entry"/> header, it has no argument.</explain>
   </error>
 
   <error id="1157">
     <title><ref to="directive"/> cache directive with an argument</title>
-    <explain>In this message’s <ref to="header"/> header, the <ref to="directive"/> directive has an argument. But the specification for <ref to="directive"/> defines no argument.</explain>
+    <explain>In this message’s <ref to="entry"/> header, the <ref to="directive"/> directive has an argument. But the specification for <ref to="directive"/> defines no argument.</explain>
   </error>
 
   <error id="1158">
     <title>Malformed <ref to="directive"/> cache directive</title>
-    <explain>When parsing the argument to the <ref to="directive"/> directive in this message’s <ref to="header"/> header, the following error occurred:</explain>
+    <explain>When parsing the argument to the <ref to="directive"/> directive in this message’s <ref to="entry"/> header, the following error occurred:</explain>
     <explain><ref to="error"/></explain>
   </error>
 
@@ -1192,7 +1192,7 @@
 
   <error id="1160">
     <title>Using extension pragma ‘<ref to="pragma"/>’</title>
-    <explain>This message’s <ref to="header"/> header contains a ‘<ref to="pragma"/>’ extension pragma. Extension pragmas (that is, pragma directives other than ‘no-cache’) are deprecated in <rfc num="7234" sect="5.4"/>.</explain>
+    <explain>This message’s <ref to="place"/> header contains a ‘<ref to="pragma"/>’ extension pragma. Extension pragmas (that is, pragma directives other than ‘no-cache’) are deprecated in <rfc num="7234" sect="5.4"/>.</explain>
   </error>
 
   <comment id="1161">

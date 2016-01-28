@@ -46,11 +46,12 @@ class HeadersView(object):
 
     def enumerate(self, name=None):
         return [
-            (from_trailer, field)
-            for from_trailer, fields in [(False, self._message.header_entries),
-                                         (True, self._message.trailer_entries)]
-            for field in fields or []
-            if (name is None) or (name == field.name)
+            (from_trailer, i, entry)
+            for from_trailer, entries
+            in [(False, self._message.header_entries),
+                (True, self._message.trailer_entries)]
+            for i, entry in enumerate(entries or [])
+            if (name is None) or (name == entry.name)
         ]
 
 
@@ -72,21 +73,22 @@ class HeaderView(object):
         values = []
         items = self.message.headers.enumerate(self.name)
         parser = (header.parser_for(self.name) or parse.anything) + parse.eof
-        for from_trailer, entry in items:
+        for from_trailer, i, entry in items:
             if from_trailer and header.is_bad_for_trailer(self.name):
-                entry.complain(1026)
+                self.message.complain(1026, entry=entry)
                 continue
             entries.append(entry)
             state = parse.State(entry.value, annotate_classes=known.classes)
             try:
                 parsed = parser.parse(state)
             except parse.ParseError, e:
-                entry.complain(1000, error=e)
+                self.message.complain(1000, entry=entry, error=e)
                 parsed = Unparseable
             else:
                 parsed = self._process_parsed(entry, parsed)
-                entry.annotated = state.collect_annotations()
-                state.dump_complaints(entry, entry)
+                self.message.annotations[(from_trailer, i)] = \
+                    state.collect_annotations()
+                state.dump_complaints(self.message, entry)
             values.append(parsed)
         return entries, values
 
@@ -200,38 +202,41 @@ class CacheControlView(MultiHeaderView):
     def _process_parsed(self, entry, ds):
         return [self._process_directive(entry, d) for d in ds]
 
-    @staticmethod
-    def _process_directive(entry, directive_with_argument):
+    def _process_directive(self, entry, directive_with_argument):
         directive, argument = directive_with_argument
+
+        def complain(ident, **kwargs):
+            self.message.complain(ident, entry=entry,
+                                  directive=directive, **kwargs)
 
         # Here we make use of the fact that `rfc7230.token` returns `unicode`
         # whereas `rfc7230.quoted_string` returns `str`
         # (because a ``<quoted-string>`` may contain non-ASCII characters).
         if isinstance(argument, unicode) and \
                 cache_directive.quoted_string_preferred(directive):
-            entry.complain(1154, directive=directive)
+            complain(1154)
         if isinstance(argument, str) and \
                 cache_directive.token_preferred(directive):
-            entry.complain(1155, directive=directive)
+            complain(1155)
 
         parser = cache_directive.parser_for(directive)
         if argument is None:
             if cache_directive.argument_required(directive):
-                entry.complain(1156, directive=directive)
+                complain(1156)
                 argument = Unparseable
         else:
             if cache_directive.no_argument(directive):
-                entry.complain(1157, directive=directive)
+                complain(1157)
                 argument = None
             elif parser is not None:
                 state = parse.State(str(argument))
                 try:
                     argument = (parser + parse.eof).parse(state)
                 except parse.ParseError, e:
-                    entry.complain(1158, directive=directive, error=e)
+                    complain(1158, error=e)
                     argument = Unparseable
                 else:
-                    state.dump_complaints(entry, entry)
+                    state.dump_complaints(self.message, entry)
 
         return Parametrized(directive, argument)
 

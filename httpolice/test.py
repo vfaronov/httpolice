@@ -512,10 +512,10 @@ class TestRequest(unittest.TestCase):
                           Unparseable,
                           Parametrized(u'gzip', []),
                           Parametrized(u'chunked', [])])
-        self.assertEqual(req.header_entries[1].annotated,
+        self.assertEqual(req.annotations[(False, 1)],
                          [TransferCoding(u'foo')])
-        self.assert_(req.header_entries[2].annotated is None)
-        self.assertEqual(req.header_entries[3].annotated,
+        self.assert_((False, 2) not in req.annotations)
+        self.assertEqual(req.annotations[(False, 3)],
                          [TransferCoding(u'gzip'), ', ',
                           TransferCoding(u'chunked')])
 
