@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.common import Citation, ContentCoding, RFC
+from httpolice.citation import Citation, RFC
+from httpolice.structure import ContentCoding
 from httpolice.known.base import KnownDict
 
 

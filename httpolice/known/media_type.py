@@ -1,7 +1,8 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.common import Citation, MediaType, RFC
+from httpolice.citation import Citation, RFC
 from httpolice.known.base import KnownDict
+from httpolice.structure import MediaType
 
 
 def deprecated(name):

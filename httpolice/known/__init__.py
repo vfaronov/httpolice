@@ -1,6 +1,6 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import common
+from httpolice import structure
 from httpolice.known.cache_directive import known as cache
 from httpolice.known.content_coding import known as cc
 from httpolice.known.header import known as h
@@ -14,17 +14,17 @@ from httpolice.known.upgrade_token import known as upgrade
 from httpolice.known.warn_code import known as warn
 
 classes = {
-    common.CacheDirective: cache,
-    common.ContentCoding: cc,
-    common.FieldName: h,
-    common.MediaType: media,
-    common.Method: m,
-    common.ProductName: prod,
-    common.RangeUnit: unit,
-    common.StatusCode: st,
-    common.TransferCoding: tc,
-    common.UpgradeToken: upgrade,
-    common.WarnCode: warn,
+    structure.CacheDirective: cache,
+    structure.ContentCoding: cc,
+    structure.FieldName: h,
+    structure.MediaType: media,
+    structure.Method: m,
+    structure.ProductName: prod,
+    structure.RangeUnit: unit,
+    structure.StatusCode: st,
+    structure.TransferCoding: tc,
+    structure.UpgradeToken: upgrade,
+    structure.WarnCode: warn,
 }
 
 

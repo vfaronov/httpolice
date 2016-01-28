@@ -1,6 +1,5 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.common import EntityTag
 from httpolice.parse import (
     argwrap,
     char_class,
@@ -11,6 +10,7 @@ from httpolice.parse import (
     string,
     subst,
 )
+from httpolice.structure import EntityTag
 from httpolice.syntax.common import dquote
 from httpolice.syntax.rfc7230 import obs_text
 

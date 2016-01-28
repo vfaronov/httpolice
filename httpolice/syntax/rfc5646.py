@@ -1,7 +1,7 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.common import LanguageTag
 from httpolice.parse import char_class, decode_into, join, rfc, string, stringx
+from httpolice.structure import LanguageTag
 from httpolice.syntax.common import ALPHA, DIGIT
 
 

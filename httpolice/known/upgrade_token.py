@@ -1,7 +1,8 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.common import RFC, UpgradeToken
+from httpolice.citation import RFC
 from httpolice.known.base import KnownDict
+from httpolice.structure import UpgradeToken
 
 
 known = KnownDict([

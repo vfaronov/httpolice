@@ -1,10 +1,10 @@
 # -*- coding: utf-8; -*-
 
-import httpolice.common
 import httpolice.connection
 import httpolice.report
 import httpolice.request
 import httpolice.response
+import httpolice.structure
 
 
 def start(context, argv):
@@ -14,20 +14,20 @@ def start(context, argv):
 
 def response(context, flow):
     req = httpolice.request.Request(
-        httpolice.common.Method(flow.request.method),
+        httpolice.structure.Method(flow.request.method),
         flow.request.path,
-        httpolice.common.HTTPVersion(flow.request.http_version),
-        [httpolice.common.HeaderEntry(k, v)
+        httpolice.structure.HTTPVersion(flow.request.http_version),
+        [httpolice.structure.HeaderEntry(k, v)
          for k, v in flow.request.headers.fields],
         flow.request.content or None,
         scheme=flow.request.scheme,
     )
     resp = httpolice.response.Response(
-        httpolice.common.HTTPVersion(flow.response.http_version),
-        httpolice.common.StatusCode(flow.response.status_code),
+        httpolice.structure.HTTPVersion(flow.response.http_version),
+        httpolice.structure.StatusCode(flow.response.status_code),
         reason=flow.response.reason,
         header_entries=[
-            httpolice.common.HeaderEntry(k, v)
+            httpolice.structure.HeaderEntry(k, v)
             for k, v in flow.response.headers.fields
         ],
         body=flow.response.content,

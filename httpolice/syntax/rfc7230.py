@@ -2,18 +2,6 @@
 
 import re
 
-from httpolice.common import (
-    ConnectionOption,
-    FieldName,
-    HeaderEntry,
-    HTTPVersion,
-    Method,
-    Parametrized,
-    StatusCode,
-    TransferCoding,
-    UpgradeToken,
-    Versioned,
-)
 from httpolice.parse import (
     ParseError,
     argwrap,
@@ -35,6 +23,18 @@ from httpolice.parse import (
     string1,
     times,
     wrap,
+)
+from httpolice.structure import (
+    ConnectionOption,
+    FieldName,
+    HeaderEntry,
+    HTTPVersion,
+    Method,
+    Parametrized,
+    StatusCode,
+    TransferCoding,
+    UpgradeToken,
+    Versioned,
 )
 from httpolice.syntax import rfc3986
 from httpolice.syntax.common import (

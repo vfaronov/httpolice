@@ -1,11 +1,5 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.common import (
-    CacheDirective,
-    Parametrized,
-    WarnCode,
-    WarningValue,
-)
 from httpolice.parse import (
     ParseError,
     argwrap,
@@ -18,6 +12,12 @@ from httpolice.parse import (
     rfc,
     stringx,
     wrap,
+)
+from httpolice.structure import (
+    CacheDirective,
+    Parametrized,
+    WarnCode,
+    WarningValue,
 )
 from httpolice.syntax import rfc3986
 from httpolice.syntax.common import digit, dquote, sp

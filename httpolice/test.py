@@ -6,13 +6,13 @@ import os
 import unittest
 
 from httpolice import (
-    common,
     connection,
     notice,
     parse,
     report,
 )
-from httpolice.common import (
+from httpolice.known import cache, cc, m, media, tc, unit
+from httpolice.structure import (
     CacheDirective,
     CaseInsensitive,
     ContentCoding,
@@ -28,8 +28,8 @@ from httpolice.common import (
     Versioned,
     WarnCode,
     WarningValue,
+    http11,
 )
-from httpolice.known import cache, cc, m, media, tc, unit
 from httpolice.syntax import rfc3986, rfc7230, rfc7231, rfc7233
 
 
@@ -441,7 +441,7 @@ class TestRequest(unittest.TestCase):
         self.assertEquals(req1.method, u'GET')
         self.assertEquals(repr(req1.method), "Method(u'GET')")
         self.assertEquals(req1.target, u'/foo/bar/baz?qux=xyzzy')
-        self.assertEquals(req1.version, common.http11)
+        self.assertEquals(req1.version, http11)
         self.assertEquals(req1.header_entries[0].name, u'Host')
         self.assertEquals(req1.header_entries[0].value, 'example.com')
         self.assertEquals(req1.header_entries[1].name, u'X-Foo')

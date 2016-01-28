@@ -1,7 +1,8 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.common import Method, RFC
+from httpolice.citation import RFC
 from httpolice.known.base import KnownDict
+from httpolice.structure import Method
 
 
 def defines_body(name):

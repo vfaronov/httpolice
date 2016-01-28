@@ -1,7 +1,7 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import common
-from httpolice.common import CaseInsensitive
+from httpolice import blackboard
+from httpolice.structure import CaseInsensitive
 
 
 class Ignore(object):
@@ -26,7 +26,7 @@ class MismatchError(ParseError):
         self.found = found
 
 
-class State(common.ReportNode):
+class State(blackboard.ReportNode):
 
     def __init__(self, data, annotate_classes=None):
         super(State, self).__init__()

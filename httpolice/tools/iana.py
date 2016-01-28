@@ -6,21 +6,20 @@ import urlparse
 
 import lxml.etree
 
-from httpolice.common import (
+from httpolice.citation import Citation, RFC
+from httpolice.known import cache, cc, h, m, media, st, tc, unit, upgrade, warn
+from httpolice.structure import (
     CacheDirective,
-    Citation,
     ContentCoding,
     FieldName,
     MediaType,
     Method,
     RangeUnit,
-    RFC,
     StatusCode,
     TransferCoding,
     UpgradeToken,
     WarnCode,
 )
-from httpolice.known import cache, cc, h, m, media, st, tc, unit, upgrade, warn
 
 
 def yes_no(s):

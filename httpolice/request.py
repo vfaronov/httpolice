@@ -3,7 +3,6 @@
 import urlparse
 
 from httpolice import message, parse
-from httpolice.common import EntityTag, Versioned, http11, okay
 from httpolice.known import (
     cache,
     cache_directive,
@@ -15,6 +14,7 @@ from httpolice.known import (
     product,
     tc,
 )
+from httpolice.structure import EntityTag, Versioned, http11, okay
 from httpolice.syntax import rfc7230
 
 

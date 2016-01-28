@@ -1,13 +1,13 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import common, message, parse, request, response
-from httpolice.common import Unparseable, okay
+from httpolice import blackboard, message, parse, request, response
 from httpolice.known import m, st, tc
+from httpolice.structure import Unparseable, okay
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import crlf
 
 
-class Exchange(common.ReportNode):
+class Exchange(blackboard.ReportNode):
 
     self_name = 'exch'
 
@@ -30,7 +30,7 @@ class Exchange(common.ReportNode):
                 yield resp
 
 
-class Connection(common.ReportNode):
+class Connection(blackboard.ReportNode):
 
     self_name = 'conn'
 

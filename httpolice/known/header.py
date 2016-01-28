@@ -1,8 +1,9 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.common import Citation, FieldName, RFC
+from httpolice.citation import Citation, RFC
 from httpolice.known.base import KnownDict
 from httpolice.parse import anything, decode
+from httpolice.structure import FieldName
 from httpolice.syntax import (
     rfc3986,
     rfc5646,

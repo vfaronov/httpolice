@@ -3,15 +3,6 @@
 import calendar
 from datetime import date, datetime, time
 
-from httpolice.common import (
-    CaseInsensitive,
-    Charset,
-    ContentCoding,
-    MediaType,
-    Parametrized,
-    ProductName,
-    Versioned,
-)
 from httpolice.parse import (
     ParseError,
     argwrap,
@@ -26,6 +17,15 @@ from httpolice.parse import (
     subst,
     rfc,
     wrap,
+)
+from httpolice.structure import (
+    CaseInsensitive,
+    Charset,
+    ContentCoding,
+    MediaType,
+    Parametrized,
+    ProductName,
+    Versioned,
 )
 from httpolice.syntax.common import digit, sp
 from httpolice.syntax.rfc4647 import language_range

@@ -1,7 +1,8 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.common import CacheDirective, RFC
+from httpolice.citation import RFC
 from httpolice.known.base import KnownDict
+from httpolice.structure import CacheDirective
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import integer
 

@@ -3,17 +3,17 @@
 import lxml.etree
 import pkg_resources
 
-from httpolice import common
+from httpolice import citation, structure
 
 
 protocol_items = {
-    'cache': common.CacheDirective,
-    'cc': common.ContentCoding,
-    'h': common.FieldName,
-    'm': common.Method,
-    'media': common.MediaType,
-    'st': common.StatusCode,
-    'tc': common.TransferCoding,
+    'cache': structure.CacheDirective,
+    'cc': structure.ContentCoding,
+    'h': structure.FieldName,
+    'm': structure.Method,
+    'media': structure.MediaType,
+    'st': structure.StatusCode,
+    'tc': structure.TransferCoding,
 }
 
 
@@ -56,7 +56,7 @@ class Citation(Text):
 
     @property
     def info(self):
-        return common.Citation(self.get('title'), self.get('url'))
+        return citation.Citation(self.get('title'), self.get('url'))
 
 
 class RFC(Citation):
@@ -68,7 +68,7 @@ class RFC(Citation):
             sect = tuple(int(n) for n in self.get('sect').split('.'))
         else:
             sect = None
-        return common.RFC(num, section=sect)
+        return citation.RFC(num, section=sect)
 
 
 class ProtocolItem(lxml.etree.ElementBase):

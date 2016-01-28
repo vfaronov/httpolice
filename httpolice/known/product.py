@@ -1,7 +1,7 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.common import ProductName
 from httpolice.known.base import KnownDict
+from httpolice.structure import ProductName
 
 
 def is_library(name):

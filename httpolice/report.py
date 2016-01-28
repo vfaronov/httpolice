@@ -6,8 +6,8 @@ import re
 import dominate
 import dominate.tags as H
 
-from httpolice import common, header_view, known, message, notice
-from httpolice.common import Unparseable, okay
+from httpolice import header_view, known, message, notice
+from httpolice.structure import Parametrized, Unparseable, okay
 from httpolice.util.text import has_nonprintable, nicely_join, printable
 
 
@@ -55,7 +55,7 @@ def piece_to_text(piece, ctx):
             return piece_to_text(piece.info, ctx)
     elif hasattr(piece, 'contents'):
         return pieces_to_text(piece.contents, ctx)
-    elif isinstance(piece, common.Parametrized):
+    elif isinstance(piece, Parametrized):
         return piece_to_text(piece.item, ctx)
     elif hasattr(piece, 'name'):
         return piece_to_text(piece.name, ctx)
@@ -99,7 +99,7 @@ def piece_to_html(piece, ctx):
                 pieces_to_html(piece.contents, ctx)
     elif hasattr(piece, 'contents'):
         pieces_to_html(piece.contents, ctx)
-    elif isinstance(piece, common.Parametrized):
+    elif isinstance(piece, Parametrized):
         piece_to_html(piece.item, ctx)
     elif hasattr(piece, 'name'):
         piece_to_html(piece.name, ctx)

@@ -11,14 +11,14 @@ import zlib
 import defusedxml
 import defusedxml.ElementTree
 
-from httpolice import common, header_view, parse
-from httpolice.common import Unparseable, okay
+from httpolice import blackboard, header_view, parse
 from httpolice.known import cc, header, media, media_type, tc
+from httpolice.structure import FieldName, Unparseable, okay
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import crlf
 
 
-class Message(common.ReportNode):
+class Message(blackboard.ReportNode):
 
     self_name = 'msg'
 
@@ -86,8 +86,8 @@ def check_message(msg):
         msg.complain(1020)
 
     for opt in msg.headers.connection.okay:
-        if header.is_bad_for_connection(common.FieldName(opt)):
-            msg.complain(1034, header=msg.headers[common.FieldName(opt)])
+        if header.is_bad_for_connection(FieldName(opt)):
+            msg.complain(1034, header=msg.headers[FieldName(opt)])
 
     if msg.headers.content_type.is_okay:
         if media_type.deprecated(msg.headers.content_type.value.item):

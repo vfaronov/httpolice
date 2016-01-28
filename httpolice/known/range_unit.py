@@ -1,7 +1,8 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.common import RFC, RangeUnit
+from httpolice.citation import RFC
 from httpolice.known.base import KnownDict
+from httpolice.structure import RangeUnit
 
 
 known = KnownDict([

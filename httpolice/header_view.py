@@ -3,8 +3,8 @@
 import operator
 
 from httpolice import known, parse
-from httpolice.common import Parametrized, Unparseable, okay
 from httpolice.known import cache, cache_directive, h, header
+from httpolice.structure import Parametrized, Unparseable, okay
 
 
 class HeadersView(object):

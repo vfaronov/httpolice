@@ -1,12 +1,6 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import message
-from httpolice.common import (
-    EntityTag,
-    http10,
-    http11,
-    okay,
-)
 from httpolice.known import (
     cache_directive,
     h,
@@ -18,6 +12,7 @@ from httpolice.known import (
     tc,
     unit,
 )
+from httpolice.structure import EntityTag, http10, http11, okay
 from httpolice.util.uri import url_equals
 
 import urlparse

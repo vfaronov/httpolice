@@ -1,6 +1,5 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.common import ContentRange, RangeSpecifier, RangeUnit
 from httpolice.parse import (
     ParseError,
     argwrap,
@@ -17,6 +16,7 @@ from httpolice.parse import (
     subst,
     wrap,
 )
+from httpolice.structure import ContentRange, RangeSpecifier, RangeUnit
 from httpolice.syntax.common import char, integer, vchar
 from httpolice.syntax.rfc7230 import comma_list1, token
 
