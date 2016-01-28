@@ -1211,8 +1211,8 @@
   </error>
 
   <comment id="1163">
-    <title>Strange warning code <ref to="code"/></title>
-    <explain><rfc num="7234" sect="5.5"/> defines two classes of warning codes—1xx and 2xx—but this message’s <ref to="msg.headers.warning"/> header contains a <ref to="code"/> warning code.</explain>
+    <title>Strange warn code <ref to="code"/></title>
+    <explain><rfc num="7234" sect="5.5"/> defines two classes of warn codes—1xx and 2xx—but this message’s <ref to="msg.headers.warning"/> header contains a <ref to="code"/> warn code.</explain>
   </comment>
 
   <comment id="1164">
