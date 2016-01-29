@@ -1270,4 +1270,28 @@
     <explain>The <ref to="msg.request.method"/> method is defined as non-cacheable.</explain>
   </error>
 
+  <error id="1173">
+    <title>Response from cache to a request with <ref to="msg.request.headers.cache_control"/>: <cache>no-cache</cache></title>
+    <rfc num="7234" sect="5.2.1.4">
+      The "no-cache" request directive indicates that a cache MUST NOT use
+   a stored response to satisfy the request without successful
+   validation on the origin server.
+    </rfc>
+  </error>
+
+  <error id="1174">
+    <title>Response from cache to a request with <ref to="msg.request.headers.pragma"/>: no-cache</title>
+    <rfc num="7234" sect="5.4">
+      When the <h>Cache-Control</h> header field is not present in a request,
+   caches MUST consider the no-cache request pragma-directive as having
+   the same effect as if "<h>Cache-Control</h>: <cache>no-cache</cache>" were present (see
+   Section 5.2.1).
+    </rfc>
+    <rfc num="7234" sect="5.2.1.4">
+      The "no-cache" request directive indicates that a cache MUST NOT use
+   a stored response to satisfy the request without successful
+   validation on the origin server.
+    </rfc>
+  </error>
+
 </notices>

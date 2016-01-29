@@ -402,3 +402,8 @@ def check_response_in_context(resp, req):
             resp.complain(1172)
         if resp.headers.age > req.headers.cache_control.max_age:
             resp.complain(1170)
+        if req.headers.cache_control.no_cache:
+            resp.complain(1173)
+        elif req.headers.cache_control.is_absent and \
+                u'no-cache' in req.headers.pragma:
+            resp.complain(1174)
