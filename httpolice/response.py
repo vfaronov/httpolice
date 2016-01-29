@@ -177,7 +177,8 @@ def check_response_in_context(resp, req):
             resp.complain(1019)
         if resp.headers.content_length.is_present:
             resp.complain(1024)
-    elif not resp.status.informational and \
+    elif req.method != m.HEAD and \
+            not resp.status.informational and \
             resp.status not in [st.no_content, st.not_modified] and \
             resp.headers.content_length.is_absent and \
             tc.chunked not in resp.headers.transfer_encoding and \
