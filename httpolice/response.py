@@ -57,6 +57,9 @@ def check_response_itself(resp):
     headers = resp.headers
     body = resp.body
 
+    if not (100 <= status < 600):
+        resp.complain(1167)
+
     if status.informational or status == st.no_content:
         if headers.transfer_encoding.is_present:
             resp.complain(1018)
