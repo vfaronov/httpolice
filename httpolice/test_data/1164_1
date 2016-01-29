@@ -14,6 +14,7 @@ Warning: 214 - "Transformation Applied"
 Warning: 110 - "Response is Stale" "Thu, 31 Dec 2015 14:10:27 GMT"
 Warning: 199 - "Something Else Happened" "Thu, 31 Dec 2015 18:26:56 GMT"
 Age: 930
+Cache-Control: max-age=600
 Via: 1.1 proxy.example.net:8080
 
 Hello world!

@@ -14,6 +14,7 @@ protocol_items = {
     'media': structure.MediaType,
     'st': structure.StatusCode,
     'tc': structure.TransferCoding,
+    'warn': structure.WarnCode,
 }
 
 

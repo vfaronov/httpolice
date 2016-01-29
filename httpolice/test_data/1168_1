@@ -10,6 +10,7 @@ HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 14
+Cache-Control: max-age=9000
 Age: 3021
 
 Hello world!

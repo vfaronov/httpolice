@@ -1,4 +1,4 @@
-1168 1000
+1180 1178 1168
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
@@ -8,9 +8,12 @@ User-Agent: demo
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
+Via: 1.1 megacacher
 Content-Type: text/plain
 Content-Length: 14
-Cache-Control: max-age=9000
-Age: 3 hours
+Last-Modified: Mon, 16 Nov 2015 00:15:03 GMT
+Etag: W/"371PUZg6SJ"
+Age: 109026
+Vary: Cookie,Accept-Encoding
 
 Hello world!

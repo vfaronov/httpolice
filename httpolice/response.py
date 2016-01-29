@@ -13,6 +13,7 @@ from httpolice.known import (
     status_code,
     tc,
     unit,
+    warn,
 )
 from httpolice.structure import EntityTag, http10, http11, okay
 from httpolice.util.uri import url_equals
@@ -53,6 +54,22 @@ class ResponseView(message.MessageView):
                 self.complain(1169, code=warning.code)
                 return True
         return False
+
+    @memoized_property
+    def heuristic_expiration(self):
+        if not self.from_cache:
+            return self.from_cache
+        if warn.heuristic_expiration in self.headers.warning:
+            self.complain(1179)
+            return True
+        if self.headers.expires.is_present:
+            return False
+        if self.headers.cache_control.max_age:
+            return False
+        elif self.headers.cache_control.is_absent:
+            self.complain(1178)
+            return True
+        return None
 
 
 def check_responses(resps):
@@ -186,6 +203,10 @@ def check_response_itself(resp):
         if status_code.is_cacheable_by_default(status) == False:
             if headers.expires.is_absent and headers.cache_control.is_absent:
                 resp.complain(1177)
+
+    if resp.heuristic_expiration and headers.age > (24 * 60 * 60) and \
+            warn.heuristic_expiration not in headers.warning:
+        resp.complain(1180)
 
 
 def check_response_in_context(resp, req):

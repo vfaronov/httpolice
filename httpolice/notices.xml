@@ -1313,4 +1313,24 @@
     <explain>The <ref to="msg.status"/> status code is not defined as cacheable by default. According to <rfc num="7234" sect="3"/>, such a response can only be cached if it explicitly allows caching with headers such as <h>Expires</h>. But this response has no such headers, so it is not cacheable.</explain>
   </error>
 
+  <debug id="1178">
+    <title>Heuristic freshness</title>
+    <explain>Because this response has no explicit freshness controls (such as <h>Expires</h> or <cache>max-age</cache>), the cache that served it must have chosen its expiration time heuristically. See <rfc num="7234" sect="4.2.2"/>.</explain>
+  </debug>
+
+  <debug id="1179">
+    <title>Heuristic freshness</title>
+    <explain>The <warn>113</warn> status code in this response’s <ref to="msg.headers.warning"/> header means that the expiration time for this response was chosen heuristically by the cache.</explain>
+  </debug>
+
+  <comment id="1180">
+    <title>Missing <warn>113</warn> warn code</title>
+    <rfc num="7234" sect="4.2.2">
+      When a heuristic is used to calculate freshness lifetime, a cache
+   SHOULD generate a <h>Warning</h> header field with a <warn>113</warn> warn-code (see
+   Section 5.5.4) in the response if its <ref to="msg.headers.age">current_age</ref> is more than 24
+   hours and such a warning is not already present.
+    </rfc>
+  </comment>
+
 </notices>
