@@ -353,9 +353,7 @@ def check_response_in_context(resp, req):
         elif req.method != m.GET:
             resp.complain(1137)
 
-        if (resp.headers.content_type.is_okay and
-                resp.headers.content_type.value.item ==
-                    media.multipart_byteranges and
+        if (resp.headers.content_type == media.multipart_byteranges and
                 req.headers.range.is_okay and
                 req.headers.range.value.unit == unit.bytes and
                 len(req.headers.range.value.ranges) == 1):
