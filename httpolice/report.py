@@ -178,15 +178,15 @@ def displayable_body(msg):
     else:
         r = r.decode('utf-8', 'replace')
 
-    if has_nonprintable(r):
-        transforms.append(u'replacing non-printable characters '
-                          u'with the \ufffd sign')
-        r = printable(r)
-
     limit = 5000
     if len(r) > limit:
         r = r[:limit]
         transforms.append(u'taking the first %d characters' % limit)
+
+    if has_nonprintable(r):
+        transforms.append(u'replacing non-printable characters '
+                          u'with the \ufffd sign')
+        r = printable(r)
 
     return r, transforms
 
