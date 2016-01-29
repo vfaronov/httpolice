@@ -12,7 +12,7 @@ import defusedxml
 import defusedxml.ElementTree
 
 from httpolice import parse
-from httpolice.blackboard import Blackboard
+from httpolice.blackboard import Blackboard, memoized_property
 from httpolice.header import HeadersView
 from httpolice.known import cc, header, media, media_type, tc
 from httpolice.structure import FieldName, Unparseable, okay
@@ -28,7 +28,6 @@ class MessageView(Blackboard):
         super(MessageView, self).__init__()
         self.inner = inner
         self.rebuild_headers()
-        self._decoded_body = None
         self.annotations = {}
 
     version = property(lambda self: self.inner.version)
@@ -40,13 +39,8 @@ class MessageView(Blackboard):
     def rebuild_headers(self):
         self.headers = HeadersView(self)
 
-    @property
+    @memoized_property
     def decoded_body(self):
-        if self._decoded_body is None:
-            self._decode_body()
-        return self._decoded_body
-
-    def _decode_body(self):
         r = self.body
         codings = list(self.headers.content_encoding)
         while codings and okay(r):
@@ -68,7 +62,7 @@ class MessageView(Blackboard):
                 r = Unparseable
             else:
                 r = Unparseable
-        self._decoded_body = r
+        return r
 
 
 def check_message(msg):
