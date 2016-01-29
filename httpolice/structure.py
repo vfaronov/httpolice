@@ -69,6 +69,12 @@ class CaseInsensitive(ProtocolString):
     def __hash__(self):
         return hash(self.lower())
 
+    def startswith(self, other):
+        return self.lower().startswith(other.lower())
+
+    def endswith(self, other):
+        return self.lower().endswith(other.lower())
+
 
 ###############################################################################
 

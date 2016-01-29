@@ -4,7 +4,7 @@
 POST /articles/ HTTP/1.1
 Host: example.com
 User-Agent: demo
-Content-Type: multipart/form-data;boundary="SomethingElse"
+Content-Type: Multipart/Form-Data;boundary="SomethingElse"
 Content-Length: 837
 
 --HereGoes
