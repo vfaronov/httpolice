@@ -3,6 +3,7 @@
 import urlparse
 
 from httpolice import message, parse
+from httpolice.blackboard import memoized_property
 from httpolice.known import (
     cache,
     cache_directive,
@@ -20,11 +21,6 @@ from httpolice.syntax import rfc7230
 
 class RequestView(message.MessageView):
 
-    def __init__(self, inner):
-        super(RequestView, self).__init__(inner)
-        self._parse_target()
-        self.effective_uri = self._build_effective_uri()
-
     def __repr__(self):
         return '<RequestView %s>' % self.method
 
@@ -32,28 +28,40 @@ class RequestView(message.MessageView):
     method = property(lambda self: self.inner.method)
     target = property(lambda self: self.inner.target)
 
-    def _parse_target(self):
-        def _parses_as(parser):
-            try:
-                (parser + parse.eof).parse(parse.State(self.target))
-            except parse.ParseError:
-                return False
-            else:
-                return True
-        self.is_origin_form = _parses_as(rfc7230.origin_form)
-        self.is_asterisk_form = _parses_as(rfc7230.asterisk_form)
-        self.is_authority_form = (
-            _parses_as(rfc7230.authority_form)
+    def _target_parses_as(self, parser):
+        try:
+            (parser + parse.eof).parse(parse.State(self.target))
+        except parse.ParseError:
+            return False
+        else:
+            return True
+
+    @memoized_property
+    def is_origin_form(self):
+        return self._target_parses_as(rfc7230.origin_form)
+
+    @memoized_property
+    def is_asterisk_form(self):
+        return self._target_parses_as(rfc7230.asterisk_form)
+
+    @memoized_property
+    def is_authority_form(self):
+        return (
+            self._target_parses_as(rfc7230.authority_form) and
             # ``*`` can be parsed as an ``<authority>``.
-            and not self.is_asterisk_form)
-        self.is_absolute_form = (
-            _parses_as(rfc7230.absolute_form)
+            not self.is_asterisk_form)
+
+    @memoized_property
+    def is_absolute_form(self):
+        return (
+            self._target_parses_as(rfc7230.absolute_form) and
             # ``example.com:80`` can be parsed as an ``<absolute-URI>``
             # with a ``<scheme>`` of ``example.com``
             # and a ``<path-rootless>`` of ``80``.
-            and not self.is_authority_form)
+            not self.is_authority_form)
 
-    def _build_effective_uri(self):
+    @memoized_property
+    def effective_uri(self):
         # RFC 7230 section 5.5.
         if self.is_absolute_form:
             return self.target

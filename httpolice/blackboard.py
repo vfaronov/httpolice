@@ -1,5 +1,7 @@
 # -*- coding: utf-8; -*-
 
+import functools
+
 
 class Blackboard(object):
 
@@ -9,6 +11,7 @@ class Blackboard(object):
 
     def __init__(self):
         self.complaints = None
+        self.memoized = {}
 
     def complain(self, notice_ident, **kwargs):
         if self.complaints is None:
@@ -28,3 +31,13 @@ class Blackboard(object):
                 yield c
         for c in self.complaints or []:
             yield c
+
+
+def memoized_property(getter):
+    @property
+    @functools.wraps(getter)
+    def inner_getter(self):
+        if getter.__name__ not in self.memoized:
+            self.memoized[getter.__name__] = getter(self)
+        return self.memoized[getter.__name__]
+    return inner_getter
