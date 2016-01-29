@@ -1265,4 +1265,9 @@
     <explain>The <ref to="msg.method"/> method is defined as non-cacheable, so the <ref to="directive"/> directive in this request’s <h>Cache-Control</h> header  makes no difference.</explain>
   </comment>
 
+  <error id="1172">
+    <title>Response from cache to a <ref to="msg.request.method"/> request</title>
+    <explain>The <ref to="msg.request.method"/> method is defined as non-cacheable.</explain>
+  </error>
+
 </notices>

@@ -398,5 +398,7 @@ def check_response_in_context(resp, req):
                 resp.complain(1150)
 
     if resp.from_cache:
+        if method.is_cacheable(req.method) == False:
+            resp.complain(1172)
         if resp.headers.age > req.headers.cache_control.max_age:
             resp.complain(1170)
