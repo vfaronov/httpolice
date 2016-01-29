@@ -37,6 +37,16 @@ class MessageView(Blackboard):
     trailer_entries = property(lambda self: self.inner.trailer_entries)
     raw = property(lambda self: self.inner.raw)
 
+    @property
+    def annotated_header_entries(self):
+        return [(entry, self.annotations.get((False, i), [entry.value]))
+                for i, entry in enumerate(self.header_entries)]
+
+    @property
+    def annotated_trailer_entries(self):
+        return [(entry, self.annotations.get((True, i), [entry.value]))
+                for i, entry in enumerate(self.trailer_entries)]
+
     def rebuild_headers(self):
         self.headers = HeadersView(self)
 

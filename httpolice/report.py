@@ -346,22 +346,16 @@ class HTMLReport(Report):
                 else:
                     render_known(piece)
 
-    def _render_header_entries(self, msg, entries, from_trailer):
-        for i, entry in enumerate(entries):
+    def _render_header_entries(self, annotated_entries):
+        for entry, annotated in annotated_entries:
             with H.div(__inline=True, **for_object(entry)):
                 with H.span(**for_object(entry.name)):
                     render_known(entry.name)
                 H.span(u': ')
-                with H.span(**for_object(entry.value)):
-                    annotated = msg.annotations.get((from_trailer, i))
-                    if annotated is not None:
-                        self._render_annotated(annotated)
-                    else:
-                        H.span(
-                            printable(entry.value.decode('utf-8', 'replace')))
+                self._render_annotated(annotated)
 
     def _render_message(self, msg):
-        self._render_header_entries(msg, msg.header_entries, False)
+        self._render_header_entries(msg.annotated_header_entries)
 
         body, transforms = displayable_body(msg)
         if body is Unparseable:
@@ -377,7 +371,7 @@ class HTMLReport(Report):
         if msg.trailer_entries:
             with H.div(_class='review-block'):
                 H.p(u'Header fields from the chunked trailer:', _class='hint')
-                self._render_header_entries(msg, msg.trailer_entries, True)
+                self._render_header_entries(msg.annotated_trailer_entries)
 
     def _render_request(self, req):
         with H.div(_class='review'):
