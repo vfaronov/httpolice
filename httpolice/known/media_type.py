@@ -119,7 +119,7 @@ known = KnownDict([
  {'_': MediaType(u'application/jose+json'), '_citations': [RFC(7515)]},
  {'_': MediaType(u'application/jrd+json'), '_citations': [RFC(7033)]},
  {'_': MediaType(u'application/json'),
-  '_citations': [RFC(7158)],
+  '_citations': [RFC(7159)],
   'is_json': True},
  {'_': MediaType(u'application/json-patch+json'), '_citations': [RFC(6902)]},
  {'_': MediaType(u'application/json-seq'), '_citations': [RFC(7464)]},
