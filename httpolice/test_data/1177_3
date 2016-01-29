@@ -1,0 +1,19 @@
+1168
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 302 Found
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Location: http://example.com/index.html
+Via: 1.1 megacacher
+Content-Type: text/plain
+Content-Length: 25
+Last-Modified: Wed, 30 Dec 2015 00:15:03 GMT
+Expires: Sat, 30 Jan 2016 00:15:03 GMT
+Age: 1203
+
+Please see /index.html.

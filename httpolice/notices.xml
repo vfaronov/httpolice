@@ -1308,4 +1308,9 @@
     <explain>According to <rfc num="7234" sect="3"/>, a cache cannot store a response that includes the <cache>no-store</cache> directive in its <h>Cache-Control</h> header.</explain>
   </error>
 
+  <error id="1177">
+    <title>Non-cacheable <ref to="msg.status"/> response served from cache</title>
+    <explain>The <ref to="msg.status"/> status code is not defined as cacheable by default. According to <rfc num="7234" sect="3"/>, such a response can only be cached if it explicitly allows caching with headers such as <h>Expires</h>. But this response has no such headers, so it is not cacheable.</explain>
+  </error>
+
 </notices>

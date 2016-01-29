@@ -1,0 +1,18 @@
+1168
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 322 Quantum Redirect
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Location: http://example.com/index.html
+Via: 1.1 megacacher
+Content-Type: text/plain
+Content-Length: 52
+Last-Modified: Wed, 30 Dec 2015 00:15:03 GMT
+Age: 1203
+
+Please follow the quantum wormhole to /index.html.

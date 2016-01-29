@@ -10,6 +10,7 @@ from httpolice.known import (
     media,
     method,
     st,
+    status_code,
     tc,
     unit,
 )
@@ -182,6 +183,9 @@ def check_response_itself(resp):
             resp.complain(1175)
         if headers.cache_control.no_store:
             resp.complain(1176)
+        if status_code.is_cacheable_by_default(status) == False:
+            if headers.expires.is_absent and headers.cache_control.is_absent:
+                resp.complain(1177)
 
 
 def check_response_in_context(resp, req):
