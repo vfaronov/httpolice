@@ -1303,4 +1303,9 @@
     </rfc>
   </error>
 
+  <error id="1176">
+    <title>Response from cache with <ref to="msg.headers.cache_control"/>: <cache>no-store</cache></title>
+    <explain>According to <rfc num="7234" sect="3"/>, a cache cannot store a response that includes the <cache>no-store</cache> directive in its <h>Cache-Control</h> header.</explain>
+  </error>
+
 </notices>

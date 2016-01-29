@@ -180,6 +180,8 @@ def check_response_itself(resp):
             resp.complain(1166)
         if headers.cache_control.no_cache:
             resp.complain(1175)
+        if headers.cache_control.no_store:
+            resp.complain(1176)
 
 
 def check_response_in_context(resp, req):
