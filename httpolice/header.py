@@ -34,7 +34,7 @@ class HeadersView(object):
     def names(self):
         seen = set()
         for entries in [self._message.header_entries,
-                        self._message.trailer_entries or []]:
+                        self._message.trailer_entries]:
             for entry in entries:
                 if entry.name not in seen:
                     yield entry.name

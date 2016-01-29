@@ -150,7 +150,7 @@ def check_message(msg):
             tc.chunked not in msg.headers.transfer_encoding:
         msg.complain(1054)
 
-    for entry in msg.trailer_entries or []:
+    for entry in msg.trailer_entries:
         if entry.name not in msg.headers.trailer:
             msg.complain(1030, header=entry)
 
