@@ -53,7 +53,7 @@ class ResponseView(message.MessageView):
             if 100 <= warning.code < 200:
                 self.complain(1169, code=warning.code)
                 return True
-        return False
+        return None
 
     @memoized_property
     def heuristic_expiration(self):
