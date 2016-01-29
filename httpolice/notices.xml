@@ -1205,10 +1205,11 @@
     </rfc>
   </comment>
 
-  <error id="1162">
+  <comment id="1162">
     <title>Response with <ref to="msg.headers.pragma"/>: no-cache</title>
     <explain>This response contains the ‘no-cache’ pragma directive, which is defined by <rfc num="7234" sect="5.4"/> for requests, but not for responses.</explain>
-  </error>
+    <!-- Not an error because very widespread and benign. -->
+  </comment>
 
   <comment id="1163">
     <title>Strange warn code <ref to="code"/></title>
