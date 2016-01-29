@@ -175,8 +175,11 @@ def check_response_itself(resp):
     if u'no-cache' in headers.pragma:
         resp.complain(1162)
 
-    if resp.from_cache and headers.age.is_absent:
-        resp.complain(1166)
+    if resp.from_cache:
+        if headers.age.is_absent:
+            resp.complain(1166)
+        if headers.cache_control.no_cache:
+            resp.complain(1175)
 
 
 def check_response_in_context(resp, req):

@@ -1294,4 +1294,13 @@
     </rfc>
   </error>
 
+  <error id="1175">
+    <title>Response from cache with <ref to="msg.headers.cache_control"/>: <cache>no-cache</cache></title>
+    <rfc num="7234" sect="5.2.2.2">
+      The "no-cache" response directive indicates that the response MUST
+   NOT be used to satisfy a subsequent request without successful
+   validation on the origin server.
+    </rfc>
+  </error>
+
 </notices>
