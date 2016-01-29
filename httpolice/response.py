@@ -30,6 +30,14 @@ class ResponseView(message.MessageView):
     status = property(lambda self: self.inner.status)
     reason = property(lambda self: self.inner.reason)
 
+    @property
+    def full_content(self):
+        if self.status == st.partial_content and \
+                not self.headers.content_type == media.multipart_byteranges:
+            return None
+        else:
+            return super(ResponseView, self).full_content
+
 
 def check_responses(resps):
     for resp in resps:
@@ -48,9 +56,6 @@ def check_response_itself(resp):
     status = resp.status
     headers = resp.headers
     body = resp.body
-
-    if status != st.partial_content:
-        message.check_payload_body(resp)
 
     if status.informational or status == st.no_content:
         if headers.transfer_encoding.is_present:
@@ -133,9 +138,13 @@ def check_response_itself(resp):
         resp.complain(1147)
 
     if status == st.partial_content:
-        if headers.content_type.is_okay and \
-                headers.content_type.value.item == media.multipart_byteranges:
-            message.check_payload_body(resp)
+        if headers.content_type == media.multipart_byteranges:
+            if okay(resp.multipart_data):
+                for i, part in enumerate(resp.multipart_data.get_payload()):
+                    if u'Content-Range' not in part:
+                        resp.complain(1141, part_num=(i + 1))
+                    if u'Content-Type' not in part:
+                        resp.complain(1142, part_num=(i + 1))
             if headers.content_range.is_present:
                 resp.complain(1143)
         elif headers.content_range.is_absent:

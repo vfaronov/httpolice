@@ -6,6 +6,7 @@ import email
 import email.errors
 import gzip
 import json
+import urlparse
 import zlib
 
 import defusedxml
@@ -64,11 +65,86 @@ class MessageView(Blackboard):
                 r = Unparseable
         return r
 
+    @property
+    def full_content(self):
+        return self.decoded_body
+
+    @memoized_property
+    def json_data(self):
+        if not okay(self.full_content):
+            return self.full_content
+        ctype = self.headers.content_type
+        if not ctype.is_okay or not media_type.is_json(ctype.value.item):
+            return None
+        try:
+            return json.loads(self.full_content)
+        except Exception, e:
+            self.complain(1038, error=e)
+            return Unparseable
+
+    @memoized_property
+    def xml_data(self):
+        if not okay(self.full_content):
+            return self.full_content
+        ctype = self.headers.content_type
+        if not ctype.is_okay or not media_type.is_xml(ctype.value.item):
+            return None
+        try:
+            return defusedxml.ElementTree.fromstring(self.full_content)
+        except defusedxml.DefusedXmlException:
+            return Unparseable
+        except Exception, e:
+            self.complain(1039, error=e)
+            return Unparseable
+
+    @memoized_property
+    def multipart_data(self):
+        if not okay(self.full_content):
+            return self.full_content
+        ctype = self.headers.content_type
+        if not ctype.is_okay or not media_type.is_multipart(ctype.value.item):
+            return None
+        multipart_code = ('Content-Type: ' + ctype.entries[0].value + '\r\n'
+                          '\r\n' + self.full_content)
+        parsed = email.message_from_string(multipart_code)
+        for defect in parsed.defects:
+            if isinstance(defect, email.errors.NoBoundaryInMultipartDefect):
+                self.complain(1139)
+            elif isinstance(defect, email.errors.StartBoundaryNotFoundDefect):
+                self.complain(1140)
+        return parsed if parsed.is_multipart() else Unparseable
+
+    @memoized_property
+    def url_encoded_data(self):
+        if not okay(self.full_content):
+            return self.full_content
+        if not (self.headers.content_type ==
+                media.application_x_www_form_urlencoded):
+            return None
+        # This list is taken from the HTML specification --
+        # http://www.w3.org/TR/html/forms.html#url-encoded-form-data --
+        # as the exhaustive list of bytes that can be output
+        # by a "conformant" URL encoder.
+        good_bytes = ([0x25, 0x26, 0x2A, 0x2B, 0x2D, 0x2E, 0x5F] +
+                      range(0x30, 0x40) + range(0x41, 0x5B) +
+                      range(0x61, 0x7B))
+        for byte in self.full_content:
+            if ord(byte) not in good_bytes:
+                self.complain(1040, offending_value=hex(ord(byte)))
+                return Unparseable
+        return urlparse.parse_qs(self.full_content)
+
 
 def check_message(msg):
     # Force parsing every header present in the message according to its rules.
     for hdr in msg.headers:
         _ = hdr.value
+
+    # Force checking the payload for various content types.
+    _ = msg.json_data
+    _ = msg.xml_data
+    _ = msg.multipart_data
+    _ = msg.url_encoded_data
 
     if msg.headers.trailer.is_present and \
             tc.chunked not in msg.headers.transfer_encoding:
@@ -107,63 +183,6 @@ def check_message(msg):
             msg.complain(1163, code=warning.code)
         if warning.date and msg.headers.date != warning.date:
             msg.complain(1164, code=warning.code)
-
-
-def check_payload_body(msg):
-    if not okay(msg.decoded_body) or not msg.headers.content_type.is_okay:
-        return
-
-    data = msg.decoded_body
-    the_type = msg.headers.content_type.value.item
-
-    if media_type.is_json(the_type):
-        try:
-            json.loads(data)
-        except Exception, e:
-            msg.complain(1038, error=e)
-
-    if media_type.is_xml(the_type):
-        try:
-            defusedxml.ElementTree.fromstring(data)
-        except defusedxml.DefusedXmlException:
-            pass
-        except Exception, e:
-            msg.complain(1039, error=e)
-
-    if media_type.is_multipart(the_type):
-        check_multipart(msg, the_type,
-                        msg.headers.content_type.entries[0].value, data)
-
-    if the_type == media.application_x_www_form_urlencoded:
-        # This list is taken from the HTML specification --
-        # http://www.w3.org/TR/html/forms.html#url-encoded-form-data --
-        # as the exhaustive list of bytes that can be output
-        # by a "conformant" URL encoder.
-        good_bytes = ([0x25, 0x26, 0x2A, 0x2B, 0x2D, 0x2E, 0x5F] +
-                      range(0x30, 0x40) + range(0x41, 0x5B) +
-                      range(0x61, 0x7B))
-        for byte in data:
-            if ord(byte) not in good_bytes:
-                msg.complain(1040, offending_value=hex(ord(byte)))
-                break
-
-
-def check_multipart(msg, the_type, raw_type, data):
-    parsed = email.message_from_string('Content-Type: ' + raw_type +
-                                       '\r\n\r\n' + data)
-    for defect in parsed.defects:
-        if isinstance(defect, email.errors.NoBoundaryInMultipartDefect):
-            msg.complain(1139)
-        elif isinstance(defect, email.errors.StartBoundaryNotFoundDefect):
-            msg.complain(1140)
-
-    if parsed.is_multipart():      # Will be false in case of the above defects
-        if the_type == media.multipart_byteranges:
-            for i, part in enumerate(parsed.get_payload()):
-                if u'Content-Range' not in part:
-                    msg.complain(1141, part_num=(i + 1))
-                if u'Content-Type' not in part:
-                    msg.complain(1142, part_num=(i + 1))
 
 
 def body_charset(msg):
