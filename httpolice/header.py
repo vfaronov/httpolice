@@ -153,7 +153,7 @@ class SingleHeaderView(HeaderView):
             return self.is_okay and other.is_okay and \
                 op(self.value, other.value)
         else:
-            return self.is_okay and op(self.value, other)
+            return self.is_okay and okay(other) and op(self.value, other)
 
     __lt__ = lambda self, other: self._compare(other, operator.lt)
     __le__ = lambda self, other: self._compare(other, operator.le)

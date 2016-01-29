@@ -396,3 +396,7 @@ def check_response_in_context(resp, req):
                 req.headers.range.value.unit == unit.bytes:
             if resp.headers.content_range.is_absent:
                 resp.complain(1150)
+
+    if resp.from_cache:
+        if resp.headers.age > req.headers.cache_control.max_age:
+            resp.complain(1170)

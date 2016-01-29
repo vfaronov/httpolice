@@ -1255,4 +1255,9 @@
     <explain>The <ref to="code"/> warn code in this response’s <ref to="msg.headers.warning"/> header implies that it was served from a cache, without contacting the origin server. See <rfc num="7234" sect="5.5"/>.</explain>
   </debug>
 
+  <comment id="1170">
+    <title>Response from cache older than <cache>max-age</cache></title>
+    <explain>This response’s <ref to="msg.headers.age"/> of <ref to="msg.headers.age.value"/> is greater than the <cache>max-age</cache> of <ref to="msg.request.headers.cache_control.max_age"/> requested by the client’s <ref to="msg.request.headers.cache_control"/> header.</explain>
+  </comment>
+
 </notices>
