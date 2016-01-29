@@ -1,0 +1,19 @@
+1171
+
+======== BEGIN INBOUND STREAM ========
+PUT /articles/123/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: text/plain
+Content-Length: 16
+Cache-Control: no-transform, no-store
+
+Hello world!
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 18
+
+Article updated.

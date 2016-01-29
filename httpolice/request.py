@@ -211,3 +211,10 @@ def check_request(req):
     for warning in req.headers.warning.okay:
         if 100 <= warning.code < 200:
             req.complain(1165, code=warning.code)
+
+    if method.is_cacheable(req.method) == False:
+        for direct in req.headers.cache_control:
+            if direct.item in [cache.max_age, cache.max_stale, cache.min_fresh,
+                               cache.no_cache, cache.no_store,
+                               cache.only_if_cached]:
+                req.complain(1171, directive=direct)

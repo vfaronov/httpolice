@@ -1260,4 +1260,9 @@
     <explain>This response’s <ref to="msg.headers.age"/> of <ref to="msg.headers.age.value"/> is greater than the <cache>max-age</cache> of <ref to="msg.request.headers.cache_control.max_age"/> requested by the client’s <ref to="msg.request.headers.cache_control"/> header.</explain>
   </comment>
 
+  <comment id="1171">
+    <title><ref to="msg.method"/> request with <ref to="msg.headers.cache_control"/>: <ref to="directive"/></title>
+    <explain>The <ref to="msg.method"/> method is defined as non-cacheable, so the <ref to="directive"/> directive in this request’s <h>Cache-Control</h> header  makes no difference.</explain>
+  </comment>
+
 </notices>

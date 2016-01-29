@@ -8,6 +8,9 @@ from httpolice.structure import Method
 def defines_body(name):
     return known.get_info(name).get('defines_body')
 
+def is_cacheable(name):
+    return known.get_info(name).get('cacheable')
+
 def is_safe(name):
     return known.get_info(name).get('safe')
 
@@ -42,6 +45,7 @@ known = KnownMethods([
   'safe': False},
  {'_': Method(u'CONNECT'),
   '_citations': [RFC(7231, section=(4, 3, 6))],
+  'cacheable': False,
   'defines_body': False,
   'idempotent': False,
   'safe': False},
@@ -51,16 +55,19 @@ known = KnownMethods([
   'safe': False},
  {'_': Method(u'DELETE'),
   '_citations': [RFC(7231, section=(4, 3, 5))],
+  'cacheable': False,
   'defines_body': False,
   'idempotent': True,
   'safe': False},
  {'_': Method(u'GET'),
   '_citations': [RFC(7231, section=(4, 3, 1))],
+  'cacheable': True,
   'defines_body': False,
   'idempotent': True,
   'safe': True},
  {'_': Method(u'HEAD'),
   '_citations': [RFC(7231, section=(4, 3, 2))],
+  'cacheable': True,
   'defines_body': False,
   'idempotent': True,
   'safe': True},
@@ -106,6 +113,7 @@ known = KnownMethods([
   'safe': False},
  {'_': Method(u'OPTIONS'),
   '_citations': [RFC(7231, section=(4, 3, 7))],
+  'cacheable': False,
   'idempotent': True,
   'safe': True},
  {'_': Method(u'ORDERPATCH'),
@@ -119,6 +127,7 @@ known = KnownMethods([
   'safe': False},
  {'_': Method(u'POST'),
   '_citations': [RFC(7231, section=(4, 3, 3))],
+  'cacheable': True,
   'defines_body': True,
   'idempotent': False,
   'safe': False},
@@ -137,6 +146,7 @@ known = KnownMethods([
   'safe': False},
  {'_': Method(u'PUT'),
   '_citations': [RFC(7231, section=(4, 3, 4))],
+  'cacheable': False,
   'defines_body': True,
   'idempotent': True,
   'safe': False},
@@ -154,6 +164,7 @@ known = KnownMethods([
   'safe': True},
  {'_': Method(u'TRACE'),
   '_citations': [RFC(7231, section=(4, 3, 8))],
+  'cacheable': False,
   'defines_body': False,
   'idempotent': True,
   'safe': True},
@@ -186,5 +197,5 @@ known = KnownMethods([
   'idempotent': True,
   'safe': False}
  ],
- extra_info=['defines_body', 'idempotent', 'safe']
+ extra_info=['cacheable', 'defines_body', 'idempotent', 'safe']
 )
