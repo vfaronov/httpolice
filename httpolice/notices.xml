@@ -1236,14 +1236,23 @@
   </error>
 
   <error id="1166">
-    <title>Warn code <ref to="code"/> with no <h>Age</h> header</title>
-    <explain>This response’s <ref to="msg.headers.warning"/> header contains the <ref to="code"/> warn code, which implies that the response was served from a cache without validation. According to <rfc num="7234" sect="4"/>, the cache must add an <h>Age</h> header to the response in this situation. But this response has no such header.</explain>
-    <explain>See also <rfc num="7234" sect="5.5"/>.</explain>
+    <title>Response from cache with no <h>Age</h> header</title>
+    <explain>According to <rfc num="7234" sect="4"/>, a cache must add an <h>Age</h> header to every response that it serves without contacting the origin server. But this response has no such header.</explain>
   </error>
 
   <error id="1167">
     <title>Bad status code <ref to="msg.status"/></title>
     <explain>According to <rfc num="7231" sect="6"/>, HTTP status codes can only range from 100 to 599.</explain>
   </error>
+
+  <debug id="1168">
+    <title>Response from cache</title>
+    <explain>The presence of the <ref to="msg.headers.age"/> header in this response implies that it was served from a cache, without contacting the origin server.</explain>
+  </debug>
+
+  <debug id="1169">
+    <title>Response from cache</title>
+    <explain>The <ref to="code"/> warn code in this response’s <ref to="msg.headers.warning"/> header implies that it was served from a cache, without contacting the origin server. See <rfc num="7234" sect="5.5"/>.</explain>
+  </debug>
 
 </notices>

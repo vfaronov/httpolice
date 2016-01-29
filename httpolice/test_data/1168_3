@@ -1,19 +1,15 @@
-1165 1168
+
 
 ======== BEGIN INBOUND STREAM ========
-GET http://example.com/ HTTP/1.1
+GET / HTTP/1.1
 Host: example.com
 User-Agent: demo
-Cache-Control: only-if-cached, max-stale
-Warning: 112 - "disconnected operation"
 
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 14
-Via: 1.1 proxy.example.net:8080
-Age: 904
-Warning: 110 - "stale response"
+Age: 4
 
 Hello world!

@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import message
+from httpolice.blackboard import memoized_property
 from httpolice.known import (
     cache_directive,
     h,
@@ -37,6 +38,20 @@ class ResponseView(message.MessageView):
             return None
         else:
             return super(ResponseView, self).full_content
+
+    @memoized_property
+    def from_cache(self):
+        # Some caches (e.g. Polipo) may add an ``Age`` of a few seconds
+        # even to freshly obtained/validated responses, due to delays.
+        # To avoid false positives, we use an arbitrary cutoff of 10.
+        if self.headers.age.is_present and not self.headers.age < 10:
+            self.complain(1168)
+            return True
+        for warning in self.headers.warning.okay:
+            if 100 <= warning.code < 200:
+                self.complain(1169, code=warning.code)
+                return True
+        return False
 
 
 def check_responses(resps):
@@ -160,10 +175,8 @@ def check_response_itself(resp):
     if u'no-cache' in headers.pragma:
         resp.complain(1162)
 
-    for warning in headers.warning.okay:
-        if 100 <= warning.code < 200:
-            if headers.age.is_absent:
-                resp.complain(1166, code=warning.code)
+    if resp.from_cache and headers.age.is_absent:
+        resp.complain(1166)
 
 
 def check_response_in_context(resp, req):
