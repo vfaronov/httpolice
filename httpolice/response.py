@@ -68,6 +68,25 @@ class ResponseView(message.MessageView):
             return True
         return None
 
+    @memoized_property
+    def stale(self):
+        for code in [warn.response_is_stale, warn.revalidation_failed]:
+            if code in self.headers.warning:
+                self.complain(1183, code=code)
+                return True
+        # We can't know if the response comes from a shared cache,
+        # so we just skip this if there is special expiration time for those.
+        if self.headers.cache_control.s_maxage is None:
+            if self.headers.age > self.headers.cache_control.max_age:
+                self.complain(1184)
+                return True
+            if self.headers.expires.is_okay and self.headers.date.is_okay:
+                delta = self.headers.expires.value - self.headers.date.value
+                if self.headers.age > delta.total_seconds():
+                    self.complain(1185)
+                    return True
+        return None
+
 
 def check_responses(resps):
     for resp in resps:
@@ -209,6 +228,10 @@ def check_response_itself(resp):
             resp.complain(1181)
         elif headers.cache_control.max_age is not None:
             resp.complain(1182)
+
+    if resp.stale:
+        if warn.response_is_stale not in headers.warning:
+            resp.complain(1186)
 
 
 def check_response_in_context(resp, req):

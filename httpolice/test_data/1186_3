@@ -1,20 +1,21 @@
-1165 1183 1168
+1186 1185 1168
 
 ======== BEGIN INBOUND STREAM ========
-GET http://example.com/ HTTP/1.1
+GET / HTTP/1.1
 Host: example.com
 User-Agent: demo
-Cache-Control: only-if-cached, max-stale
-Warning: 112 - "disconnected operation"
 
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
+Via: 1.1 megacacher
 Content-Type: text/plain
 Content-Length: 14
-Via: 1.1 proxy.example.net:8080
-Cache-Control: max-age=600
-Age: 904
-Warning: 110 - "stale response"
+Last-Modified: Wed, 30 Dec 2015 00:15:03 GMT
+Etag: W/"371PUZg6SJ"
+Cache-Control: public
+Expires: Thu, 31 Dec 2015 21:26:56 GMT
+Age: 25208
+Vary: Cookie,Accept-Encoding
 
 Hello world!

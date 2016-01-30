@@ -1,0 +1,23 @@
+1168
+
+# The presence of ``s-maxage`` suppresses our freshness calculations
+# because we can't know if it's ``s-maxage`` or ``max-age`` that should apply.
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Via: 1.1 megacacher
+Content-Type: text/plain
+Content-Length: 14
+Last-Modified: Wed, 30 Dec 2015 00:15:03 GMT
+Etag: W/"371PUZg6SJ"
+Cache-Control: public, max-age=21600, s-maxage=86400
+Age: 25208
+Vary: Cookie,Accept-Encoding
+
+Hello world!

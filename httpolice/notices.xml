@@ -1349,4 +1349,27 @@
     </rfc>
   </error>
 
+  <comment id="1183">
+    <title>Stale response</title>
+    <explain>The <ref to="code"/> warn code in this response’s <ref to="msg.headers.warning"/> header means that the response is stale, as defined by <rfc num="7234" sect="4.2"/>.</explain>
+  </comment>
+
+  <comment id="1184">
+    <title>Stale response</title>
+    <explain>This response’s <ref to="msg.headers.age"/> is greater than the <cache>max-age</cache> specified in its <ref to="msg.headers.cache_control"/> header. This means that the response is stale, as defined by <rfc num="7234" sect="4.2"/>.</explain>
+  </comment>
+
+  <comment id="1185">
+    <title>Stale response</title>
+    <explain>This response’s <ref to="msg.headers.age"/> is greater than the difference between its <ref to="msg.headers.expires"/> date and its <ref to="msg.headers.date"/> header. This means that the response is stale, as defined by <rfc num="7234" sect="4.2"/>.</explain>
+  </comment>
+
+  <comment id="1186">
+    <title>Stale response without <ref to="msg.headers.warning"/>: <warn>110</warn></title>
+    <rfc num="7234" sect="4.2.4">
+      A cache SHOULD generate a <h>Warning</h> header field with the <warn>110</warn> warn-code
+   (see Section 5.5.1) in stale responses.
+    </rfc>
+  </comment>
+
 </notices>
