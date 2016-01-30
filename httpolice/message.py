@@ -201,9 +201,11 @@ def check_message(msg):
         if warning.date and msg.headers.date != warning.date:
             msg.complain(1164, code=warning.code)
 
-    if msg.transformed and \
-            warn.transformation_applied not in msg.headers.warning:
-        msg.complain(1191)
+    if msg.transformed:
+        if warn.transformation_applied not in msg.headers.warning:
+            msg.complain(1191)
+        if msg.headers.cache_control.no_transform:
+            msg.complain(1192)
 
 
 def body_charset(msg):

@@ -1413,11 +1413,11 @@
   </error>
 
   <error id="1192">
-    <title>Transformed response to a request with <ref to="msg.headers.cache_control"/>: <cache>no-transform</cache></title>
-    <rfc num="7234" sect="5.2.1.6">
-      The "<cache>no-transform</cache>" request directive indicates that an intermediary
-   (whether or not it implements a cache) MUST NOT transform the
-   payload, as defined in Section 5.7.2 of [RFC7230].
+    <title>Transformed message with <ref to="msg.headers.cache_control"/>: <cache>no-transform</cache></title>
+    <rfc num="7230" sect="5.7.2">
+      A proxy MUST NOT transform the payload (Section 3.3 of [RFC7231]) of
+   a message that contains a <cache>no-transform</cache> cache-control directive
+   (Section 5.2 of [RFC7234]).
     </rfc>
   </error>
 
