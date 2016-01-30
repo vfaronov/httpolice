@@ -12,10 +12,8 @@ Via: 1.1 megacacher
 Content-Type: text/plain
 Content-Length: 14
 Last-Modified: Sun, 09 Aug 2015 21:16:37 GMT
-Etag: W/"371PUZg6SJ"
 Expires: Mon, 04 Jan 2016 18:26:56 GMT
 Age: 109200
-Vary: Cookie,Accept-Encoding
 Warning: 113 proxy.example.net:8080 "Heuristic Expiration" "Thu, 31 Dec 2015 18:26:56 GMT"
 
 Hello world!

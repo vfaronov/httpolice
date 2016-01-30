@@ -14,6 +14,5 @@ Content-Length: 14
 Last-Modified: Wed, 30 Dec 2015 00:15:03 GMT
 Cache-Control: no-store
 Age: 1203
-Vary: Cookie,Accept-Encoding
 
 Hello world!

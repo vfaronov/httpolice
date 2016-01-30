@@ -12,10 +12,8 @@ Via: 1.1 megacacher
 Content-Type: text/plain
 Content-Length: 14
 Last-Modified: Wed, 30 Dec 2015 00:15:03 GMT
-Etag: W/"371PUZg6SJ"
-Cache-Control: private, must-revalidate
+Cache-Control: private,must-revalidate
 Age: 25208
-Vary: Cookie,Accept-Encoding
 Warning: 110 - "Response is Stale"
 Warning: 111 - "Revalidation Failed"
 
