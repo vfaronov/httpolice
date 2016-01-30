@@ -242,7 +242,7 @@
   </error>
 
   <comment id="1032">
-    <title><ref to="msg.headers.host"/> is not the first request header</title>
+    <title><ref to="msg.headers.host"/> is not the first header</title>
     <rfc num="7230" sect="5.4">
       Since the <h>Host</h> field-value is critical information for handling a
    request, a user agent SHOULD generate Host as the first header field
@@ -287,12 +287,14 @@
 
   <error id="1038">
     <title>Bad JSON <ref to="msg.body">payload</ref></title>
-    <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is JSON, but HTTPolice tried to parse it as JSON and got the following error: <ref to="error"/></explain>
+    <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is JSON, but HTTPolice tried to parse it as JSON and got the following error:</explain>
+    <explain><ref to="error"/></explain>
   </error>
 
   <error id="1039">
     <title>Bad XML <ref to="msg.body">payload</ref></title>
-    <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is XML, but HTTPolice tried to parse it as XML and got the following error: <ref to="error"/></explain>
+    <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is XML, but HTTPolice tried to parse it as XML and got the following error:</explain>
+    <explain><ref to="error"/></explain>
   </error>
 
   <error id="1040">
@@ -834,7 +836,7 @@
 
   <comment id="1110">
     <title><ref to="msg.status"/> response with no <h>Date</h> header</title>
-    <explain>According to <rfc num="7231" sect="7.1.1.2"/>, any <ref to="msg.status"/> response must include a <h>Date</h> header, unless the server has no usable clock.</explain>
+    <explain>According to <rfc num="7231" sect="7.1.1.2"/>, every <ref to="msg.status"/> response must include a <h>Date</h> header, unless the server has no usable clock.</explain>
   </comment>
 
   <error id="1111">
