@@ -3,6 +3,7 @@
 from httpolice import message
 from httpolice.blackboard import memoized_property
 from httpolice.known import (
+    cache,
     cache_directive,
     h,
     header,
@@ -241,6 +242,25 @@ def check_response_itself(resp):
             resp.complain(1186)
         if headers.cache_control.must_revalidate:
             resp.complain(1187)
+
+    for direct1, direct2 in [(cache.public, cache.no_store),
+                             (cache.private, cache.public),
+                             (cache.private, cache.no_store),
+                             (cache.proxy_revalidate, cache.private),
+                             (cache.max_age, cache.no_store),
+                             (cache.s_maxage, cache.no_store)]:
+        if headers.cache_control[direct1] and headers.cache_control[direct2]:
+            resp.complain(1193, directive1=direct1, directive2=direct2)
+
+    if headers.cache_control.s_maxage and \
+            headers.cache_control.private in [True, []]:
+        resp.complain(1193,
+                      directive1=cache.s_maxage, directive2=cache.private)
+
+    if headers.cache_control.max_age and \
+            headers.cache_control.no_cache in [True, []]:
+        resp.complain(1193,
+                      directive1=cache.max_age, directive2=cache.no_cache)
 
 
 def check_response_in_context(resp, req):

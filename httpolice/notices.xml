@@ -1421,4 +1421,9 @@
     </rfc>
   </error>
 
+  <error id="1193">
+    <title><ref to="directive1"/> together with <ref to="directive2"/></title>
+    <explain>This message’s <ref to="msg.headers.cache_control"/> header includes both the <ref to="directive1"/> and the <ref to="directive2"/> directives, which contradict each other.</explain>
+  </error>
+
 </notices>
