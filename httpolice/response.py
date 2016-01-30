@@ -262,6 +262,9 @@ def check_response_itself(resp):
         resp.complain(1193,
                       directive1=cache.max_age, directive2=cache.no_cache)
 
+    if status == st.unauthorized and headers.www_authenticate.is_absent:
+        resp.complain(1194)
+
 
 def check_response_in_context(resp, req):
     if okay(resp.body) and resp.body and resp.headers.content_type.is_absent \

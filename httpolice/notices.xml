@@ -1428,4 +1428,13 @@
     <explain>This message’s <ref to="msg.headers.cache_control"/> header includes both the <ref to="directive1"/> and the <ref to="directive2"/> directives, which contradict each other.</explain>
   </error>
 
+  <error id="1194">
+    <title><ref to="msg.status"/> response with no <h>WWW-Authenticate</h></title>
+    <rfc num="7235" sect="3.1">
+      The server generating a <st>401</st> response MUST send
+   a <h>WWW-Authenticate</h> header field (Section 4.1) containing at least one
+   challenge applicable to the target resource.
+    </rfc>
+  </error>
+
 </notices>
