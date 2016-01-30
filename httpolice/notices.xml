@@ -1151,7 +1151,7 @@
 
   <error id="1152">
     <title><ref to="directive"/> cache directive in a request</title>
-    <explain>This request’s <ref to="msg.headers.cache_control"/> header includes the <ref to="directive"/> directive, which defined for responses, but not for requests.</explain>
+    <explain>This request’s <ref to="msg.headers.cache_control"/> header includes the <ref to="directive"/> directive, which is defined for responses, but not for requests.</explain>
   </error>
 
   <error id="1153">
@@ -1320,7 +1320,7 @@
 
   <debug id="1179">
     <title>Heuristic freshness</title>
-    <explain>The <warn>113</warn> status code in this response’s <ref to="msg.headers.warning"/> header means that the expiration time for this response was chosen heuristically by the cache.</explain>
+    <explain>The <warn>113</warn> warn code in this response’s <ref to="msg.headers.warning"/> header means that the expiration time for this response was chosen heuristically by the cache.</explain>
   </debug>
 
   <comment id="1180">
