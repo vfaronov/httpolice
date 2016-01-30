@@ -150,11 +150,11 @@ class StatusCode(int):
     def __repr__(self):
         return 'StatusCode(%d)' % self
 
-    informational = property(lambda self: 100 <= self < 199)
-    successful = property(lambda self: 200 <= self < 299)
-    redirection = property(lambda self: 300 <= self < 399)
-    client_error = property(lambda self: 400 <= self < 499)
-    server_error = property(lambda self: 500 <= self < 599)
+    informational = property(lambda self: 100 <= self <= 199)
+    successful = property(lambda self: 200 <= self <= 299)
+    redirection = property(lambda self: 300 <= self <= 399)
+    client_error = property(lambda self: 400 <= self <= 499)
+    server_error = property(lambda self: 500 <= self <= 599)
 
 
 class HeaderEntry(namedtuple('HeaderEntry', ('name', 'value'))):
