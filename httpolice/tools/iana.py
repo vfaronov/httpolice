@@ -7,7 +7,6 @@ import urlparse
 import lxml.etree
 
 from httpolice.citation import Citation, RFC
-from httpolice.known import cache, cc, h, m, media, st, tc, unit, upgrade, warn
 from httpolice.structure import (
     CacheDirective,
     ContentCoding,
@@ -31,8 +30,7 @@ class Registry(object):
     key_order = []
     xmlns = {'iana': 'http://www.iana.org/assignments'}
     relative_url = None
-    name = None
-    known_dict = None
+    cls = None
 
     def __init__(self, base_url='http://www.iana.org/assignments/'):
         self.base_url = base_url
@@ -44,7 +42,7 @@ class Registry(object):
             entry = self._from_record(record)
             if entry:
                 entries.append(entry)
-        return [(self.name, entries, self.known_dict)]
+        return [(self.cls, entries)]
 
     def _get_xml(self, relative_url):
         req = urllib2.Request(
@@ -77,8 +75,7 @@ class Registry(object):
 
 class HeaderRegistry(Registry):
 
-    name = 'headers'
-    known_dict = h
+    cls = FieldName
     relative_url = 'message-headers/message-headers.xml'
 
     def _from_record(self, record):
@@ -96,8 +93,7 @@ class HeaderRegistry(Registry):
 
 class MethodRegistry(Registry):
 
-    name = 'methods'
-    known_dict = m
+    cls = Method
     relative_url = 'http-methods/http-methods.xml'
 
     def _from_record(self, record):
@@ -112,8 +108,7 @@ class MethodRegistry(Registry):
 
 class StatusCodeRegistry(Registry):
 
-    name = 'status codes'
-    known_dict = st
+    cls = StatusCode
     relative_url = 'http-status-codes/http-status-codes.xml'
 
     def _from_record(self, record):
@@ -135,9 +130,9 @@ class ParametersRegistry(Registry):
     def get_all(self):
         tree = self._get_xml('http-parameters/http-parameters.xml')
         return [
-            ('content codings', list(self._content_codings(tree)), cc),
-            ('range units', list(self._range_units(tree)), unit),
-            ('transfer codings', list(self._transfer_codings(tree)), tc),
+            (ContentCoding, list(self._content_codings(tree))),
+            (RangeUnit, list(self._range_units(tree))),
+            (TransferCoding, list(self._transfer_codings(tree))),
         ]
 
     def _content_codings(self, tree):
@@ -173,8 +168,7 @@ class ParametersRegistry(Registry):
 
 class MediaTypeRegistry(Registry):
 
-    name = 'media types'
-    known_dict = media
+    cls = MediaType
     relative_url = 'media-types/media-types.xml'
 
     def _from_record(self, record):
@@ -199,8 +193,7 @@ class MediaTypeRegistry(Registry):
 
 class UpgradeTokenRegistry(Registry):
 
-    name = 'upgrade tokens'
-    known_dict = upgrade
+    cls = UpgradeToken
     relative_url = 'http-upgrade-tokens/http-upgrade-tokens.xml'
 
     def _from_record(self, record):
@@ -214,8 +207,7 @@ class UpgradeTokenRegistry(Registry):
 
 class CacheDirectiveRegistry(Registry):
 
-    name = 'cache directives'
-    known_dict = cache
+    cls = CacheDirective
     relative_url = 'http-cache-directives/http-cache-directives.xml'
 
     def _from_record(self, record):
@@ -228,8 +220,7 @@ class CacheDirectiveRegistry(Registry):
 
 class WarnCodeRegistry(Registry):
 
-    name = 'warn codes'
-    known_dict = warn
+    cls = WarnCode
     relative_url = 'http-warn-codes/http-warn-codes.xml'
 
     def _from_record(self, record):
