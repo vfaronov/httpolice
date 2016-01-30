@@ -232,6 +232,8 @@ def check_response_itself(resp):
     if resp.stale:
         if warn.response_is_stale not in headers.warning:
             resp.complain(1186)
+        if headers.cache_control.must_revalidate:
+            resp.complain(1187)
 
 
 def check_response_in_context(resp, req):

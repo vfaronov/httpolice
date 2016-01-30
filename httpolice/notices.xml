@@ -1372,4 +1372,13 @@
     </rfc>
   </comment>
 
+  <error id="1187">
+    <title>Stale response with <ref to="msg.headers.cache_control"/>: <cache>must-revalidate</cache></title>
+    <rfc num="7234" sect="5.2.2.1">
+      The "<cache>must-revalidate</cache>" response directive indicates that once it has
+   become stale, a cache MUST NOT use the response to satisfy subsequent
+   requests without successful validation on the origin server.
+    </rfc>
+  </error>
+
 </notices>
