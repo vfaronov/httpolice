@@ -1,6 +1,6 @@
 $(document).ready(function() {
     $('.notice-para').hide();
-    $('.notice-heading').append(
+    $('.notice-heading').prepend(
         $('<a class="toggle-notice">explain</span>').click(function() {
             $(this).closest('.notice').find('.notice-para').toggle();
         })
