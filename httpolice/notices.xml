@@ -1381,4 +1381,15 @@
     </rfc>
   </error>
 
+  <comment id="1188">
+    <title>Possibly wrong stale response</title>
+    <rfc num="7234" sect="4.2.4">
+      A cache MUST NOT send stale responses unless it is disconnected
+   (i.e., it cannot contact the origin server or otherwise find a
+   forward path) or doing so is explicitly allowed (e.g., by the
+   <cache>max-stale</cache> request directive; see Section 5.2.1).
+    </rfc>
+    <explain>If the cache is disconnected, it should have added a <h>Warning</h> header with a <warn>112</warn> or <warn>111</warn> warn code to indicate that.</explain>
+  </comment>
+
 </notices>

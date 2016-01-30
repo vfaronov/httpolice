@@ -464,3 +464,9 @@ def check_response_in_context(resp, req):
         elif req.headers.cache_control.is_absent and \
                 u'no-cache' in req.headers.pragma:
             resp.complain(1174)
+
+    if resp.stale and \
+            warn.revalidation_failed not in resp.headers.warning and \
+            warn.disconnected_operation not in resp.headers.warning and \
+            req.headers.cache_control.max_stale is None:
+        resp.complain(1188)

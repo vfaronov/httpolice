@@ -12,5 +12,6 @@ Content-Type: text/plain
 Content-Length: 14
 Cache-Control: max-age=600
 Warning: 110 - "Response is Stale"
+Warning: 111 - "Revalidation Failed"
 
 Hello world!
