@@ -1315,7 +1315,7 @@
 
   <debug id="1178">
     <title>Heuristic freshness</title>
-    <explain>Because this response has no explicit freshness controls (such as <h>Expires</h> or <cache>max-age</cache>), the cache that served it must have chosen its expiration time heuristically. See <rfc num="7234" sect="4.2.2"/>.</explain>
+    <explain>Because this response has no explicit freshness controls (such as <h>Expires</h> or <cache>max-age</cache>), HTTPolice will assume that its expiration time was chosen heuristically by the cache. See <rfc num="7234" sect="4.2.2"/>.</explain>
   </debug>
 
   <debug id="1179">
