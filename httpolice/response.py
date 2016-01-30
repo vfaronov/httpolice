@@ -43,10 +43,7 @@ class ResponseView(message.MessageView):
 
     @memoized_property
     def from_cache(self):
-        # Some caches (e.g. Polipo) may add an ``Age`` of a few seconds
-        # even to freshly obtained/validated responses, due to delays.
-        # To avoid false positives, we use an arbitrary cutoff of 10.
-        if self.headers.age.is_present and not self.headers.age < 10:
+        if self.headers.age.is_present:
             self.complain(1168)
             return True
         for warning in self.headers.warning.okay:
