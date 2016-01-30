@@ -201,9 +201,14 @@ def check_response_itself(resp):
             if headers.expires.is_absent and headers.cache_control.is_absent:
                 resp.complain(1177)
 
-    if resp.heuristic_expiration and headers.age > (24 * 60 * 60) and \
-            warn.heuristic_expiration not in headers.warning:
-        resp.complain(1180)
+    if resp.heuristic_expiration:
+        if headers.age > (24 * 60 * 60) and \
+                warn.heuristic_expiration not in headers.warning:
+            resp.complain(1180)
+        if headers.expires.is_present:
+            resp.complain(1181)
+        elif headers.cache_control.max_age is not None:
+            resp.complain(1182)
 
 
 def check_response_in_context(resp, req):

@@ -1,0 +1,21 @@
+1182 1179 1168
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Via: 1.1 megacacher
+Content-Type: text/plain
+Content-Length: 14
+Last-Modified: Sun, 09 Aug 2015 21:16:37 GMT
+Etag: W/"371PUZg6SJ"
+Cache-Control: public, max-age=345600
+Age: 109200
+Vary: Cookie,Accept-Encoding
+Warning: 113 proxy.example.net:8080 "Heuristic Expiration" "Thu, 31 Dec 2015 18:26:56 GMT"
+
+Hello world!

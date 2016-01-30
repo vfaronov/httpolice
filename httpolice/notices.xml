@@ -1333,4 +1333,20 @@
     </rfc>
   </comment>
 
+  <error id="1181">
+    <title>Heuristic freshness when <ref to="msg.headers.expires"/> is present</title>
+    <rfc num="7234" sect="4.2.2">
+      A cache MUST NOT use heuristics to determine freshness when an
+   explicit expiration time is present in the stored response.
+    </rfc>
+  </error>
+
+  <error id="1182">
+    <title>Heuristic freshness when <cache>max-age</cache> is <ref to="msg.headers.cache_control">present</ref></title>
+    <rfc num="7234" sect="4.2.2">
+      A cache MUST NOT use heuristics to determine freshness when an
+   explicit expiration time is present in the stored response.
+    </rfc>
+  </error>
+
 </notices>
