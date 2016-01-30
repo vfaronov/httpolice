@@ -271,8 +271,7 @@ def check_response_in_context(resp, req):
             resp.complain(1033)
 
     if req.is_absolute_form and resp.headers.via.is_absent and \
-            not resp.status.informational and \
-            resp.status != st.proxy_authentication_required:
+            resp.status.successful:
         resp.complain(1046)
 
     if resp.status == st.switching_protocols:

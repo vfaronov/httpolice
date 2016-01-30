@@ -1,0 +1,15 @@
+
+
+======== BEGIN INBOUND STREAM ========
+GET http://example.com/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Cache-Control: only-if-cache, max-stale
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 504 Gateway Timeout
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 35
+
+We don't have that cached, sorry.
