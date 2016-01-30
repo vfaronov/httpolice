@@ -37,6 +37,25 @@ from httpolice.structure import (
 from httpolice.syntax import rfc3986, rfc7230, rfc7231, rfc7233
 
 
+def load_test_file(filename):
+    if '.' in filename:
+        scheme = filename.split('.')[-1]
+    else:
+        scheme = 'http'
+    if scheme == 'noscheme':
+        scheme = None
+
+    with open(filename) as f:
+        data = f.read()
+    header, data = data.split('======== BEGIN INBOUND STREAM ========\r\n')
+    inb, outb = data.split('======== BEGIN OUTBOUND STREAM ========\r\n')
+    lines = [ln for ln in header.splitlines() if not ln.startswith('#')]
+    line = lines[0]
+    expected = sorted(int(n) for n in line.split())
+
+    return inb, outb, scheme, expected
+
+
 class TestCommon(unittest.TestCase):
 
     def test_data_structures(self):
@@ -806,31 +825,15 @@ class TestFromFiles(unittest.TestCase):
         setattr(cls, 'test_%s' % test_name, test)
 
     def run_test(self, filename, scheme=None):
-        if '.' in filename:
-            _, scheme = filename.split('.')
-        else:
-            scheme = 'http'
-        if scheme == 'noscheme':
-            scheme = None
-
-        with open(filename) as f:
-            data = f.read()
-        header, data = data.split('======== BEGIN INBOUND STREAM ========\r\n')
-        inb, outb = data.split('======== BEGIN OUTBOUND STREAM ========\r\n')
-        lines = [ln for ln in header.splitlines() if not ln.startswith('#')]
-        line = lines[0]
-        expected = sorted(int(n) for n in line.split())
-
-        conn = analyze_streams(inb, outb, scheme=scheme)
+        inb, outb, scheme, expected = load_test_file(filename)
+        conn = analyze_streams(inb, outb, scheme)
         buf = StringIO()
         TextReport.render([conn], buf)
         actual = sorted(int(ln[5:9]) for ln in buf.getvalue().splitlines()
                         if ln.startswith('**** '))
         self.covered.update(actual)
         self.assertEquals(expected, actual)
-
         HTMLReport.render([conn], StringIO())
-
         if self.examples is not None:
             for ident, ctx in conn.collect_complaints():
                 self.examples.setdefault(ident, ctx)
