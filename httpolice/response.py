@@ -219,7 +219,7 @@ def check_response_itself(resp):
     if resp.from_cache:
         if headers.age.is_absent:
             resp.complain(1166)
-        if headers.cache_control.no_cache:
+        if headers.cache_control.no_cache in [True, []]:
             resp.complain(1175)
         if headers.cache_control.no_store:
             resp.complain(1176)
