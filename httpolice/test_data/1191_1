@@ -1,4 +1,4 @@
-1075 1190
+1191 1190
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
@@ -10,6 +10,6 @@ HTTP/1.1 203 Non-Authoritative Information
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 14
-Warning: 214 - "Transformation Applied"
+Via: 1.1 proxy.example.net
 
 Hello world!

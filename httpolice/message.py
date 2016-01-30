@@ -15,7 +15,7 @@ import defusedxml.ElementTree
 from httpolice import parse
 from httpolice.blackboard import Blackboard, memoized_property
 from httpolice.header import HeadersView
-from httpolice.known import cc, header, media, media_type, tc
+from httpolice.known import cc, header, media, media_type, tc, warn
 from httpolice.structure import FieldName, Unparseable, okay
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import crlf
@@ -144,6 +144,13 @@ class MessageView(Blackboard):
                 return Unparseable
         return urlparse.parse_qs(self.full_content)
 
+    @memoized_property
+    def transformed(self):
+        if warn.transformation_applied in self.headers.warning:
+            self.complain(1189)
+            return True
+        return None
+
 
 def check_message(msg):
     # Force parsing every header present in the message according to its rules.
@@ -193,6 +200,10 @@ def check_message(msg):
             msg.complain(1163, code=warning.code)
         if warning.date and msg.headers.date != warning.date:
             msg.complain(1164, code=warning.code)
+
+    if msg.transformed and \
+            warn.transformation_applied not in msg.headers.warning:
+        msg.complain(1191)
 
 
 def body_charset(msg):

@@ -1392,4 +1392,33 @@
     <explain>If the cache is disconnected, it should have added a <h>Warning</h> header with a <warn>112</warn> or <warn>111</warn> warn code to indicate that.</explain>
   </comment>
 
+  <debug id="1189">
+    <title>Transformed message</title>
+    <explain>The <warn>214</warn> warn code in this message’s <ref to="msg.headers.warning"/> header means that it was transformed by an intermediary, as defined in <rfc num="7230" sect="5.7.2"/>.</explain>
+  </debug>
+
+  <debug id="1190">
+    <title>Transformed message</title>
+    <explain>The <ref to="msg.status"/> status code means that this response was transformed by an intermediary, as defined in <rfc num="7230" sect="5.7.2"/>.</explain>
+  </debug>
+
+  <error id="1191">
+    <title>Transformed message without <h>Warning</h>: <warn>214</warn></title>
+    <rfc num="7230" sect="5.7.2">
+      A proxy that transforms a
+   payload MUST add a <h>Warning</h> header field with the warn-code of <warn>214</warn>
+   ("Transformation Applied") if one is not already in the message (see
+   Section 5.5 of [RFC7234]).
+    </rfc>
+  </error>
+
+  <error id="1192">
+    <title>Transformed response to a request with <ref to="msg.headers.cache_control"/>: <cache>no-transform</cache></title>
+    <rfc num="7234" sect="5.2.1.6">
+      The "<cache>no-transform</cache>" request directive indicates that an intermediary
+   (whether or not it implements a cache) MUST NOT transform the
+   payload, as defined in Section 5.7.2 of [RFC7230].
+    </rfc>
+  </error>
+
 </notices>

@@ -87,6 +87,13 @@ class ResponseView(message.MessageView):
                     return True
         return None
 
+    @memoized_property
+    def transformed(self):
+        if self.status == st.non_authoritative_information:
+            self.complain(1190)
+            return True
+        return super(ResponseView, self).transformed
+
 
 def check_responses(resps):
     for resp in resps:
@@ -470,3 +477,6 @@ def check_response_in_context(resp, req):
             warn.disconnected_operation not in resp.headers.warning and \
             req.headers.cache_control.max_stale is None:
         resp.complain(1188)
+
+    if resp.transformed and req.headers.cache_control.no_transform:
+        resp.complain(1192)
