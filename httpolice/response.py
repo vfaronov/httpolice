@@ -247,7 +247,6 @@ def check_response_itself(resp):
     for direct1, direct2 in [(cache.public, cache.no_store),
                              (cache.private, cache.public),
                              (cache.private, cache.no_store),
-                             (cache.proxy_revalidate, cache.private),
                              (cache.max_age, cache.no_store),
                              (cache.s_maxage, cache.no_store)]:
         if headers.cache_control[direct1] and headers.cache_control[direct2]:
