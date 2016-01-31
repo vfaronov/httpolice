@@ -8,6 +8,7 @@ import lxml.etree
 
 from httpolice.citation import Citation, RFC
 from httpolice.structure import (
+    AuthScheme,
     CacheDirective,
     ContentCoding,
     FieldName,
@@ -228,4 +229,16 @@ class WarnCodeRegistry(Registry):
             '_': WarnCode(record.find('iana:value', self.xmlns).text),
             '_citations': list(self.extract_citations(record)),
             '_title': record.find('iana:description', self.xmlns).text,
+        }
+
+
+class AuthSchemeRegistry(Registry):
+
+    cls = AuthScheme
+    relative_url = 'http-authschemes/http-authschemes.xml'
+
+    def _from_record(self, record):
+        return {
+            '_': AuthScheme(record.find('iana:value', self.xmlns).text),
+            '_citations': list(self.extract_citations(record)),
         }
