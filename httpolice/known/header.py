@@ -637,6 +637,7 @@ known = KnownDict([
   'rule': SINGLE},
  {'_': FieldName(u'Via'),
   '_citations': [RFC(7230, section=(5, 7, 1))],
+  'bad_for_connection': True,
   'for_request': True,
   'for_response': True,
   'iana_status': 'standard',
