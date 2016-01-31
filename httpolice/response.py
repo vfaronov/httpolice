@@ -118,6 +118,9 @@ def check_response_itself(resp):
     if not (100 <= status < 600):
         resp.complain(1167)
 
+    if status.informational and u'close' in headers.connection:
+        resp.complain(1198)
+
     if status.informational or status == st.no_content:
         if headers.transfer_encoding.is_present:
             resp.complain(1018)
@@ -281,6 +284,8 @@ def check_response_in_context(resp, req):
             resp.complain(1019)
         if resp.headers.content_length.is_present:
             resp.complain(1024)
+        if u'close' in resp.headers.connection:
+            resp.complain(1199)
     elif req.method != m.HEAD and \
             not resp.status.informational and \
             resp.status not in [st.no_content, st.not_modified] and \

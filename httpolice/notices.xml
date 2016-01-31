@@ -1456,4 +1456,14 @@
     <explain>This message includes the <ref to="header"/> header, which is listed as “obsoleted” or “deprecated” in the <cite title="IANA message headers registry" url="http://www.iana.org/assignments/message-headers/message-headers.xhtml"/>.</explain>
   </comment>
 
+  <error id="1198">
+    <title>“<ref to="msg.headers.connection"/>: close” in a <ref to="msg.status"/> response</title>
+    <explain>The <ref to="msg.status"/> status code means that this is an interim response, and more responses will follow on the same connection. But the ‘close’ option in this response’s <h>Connection</h> header means that the server will close the connection after sending this response. Either one is wrong here.</explain>
+  </error>
+
+  <error id="1199">
+    <title>“<ref to="msg.headers.connection"/>: close” in a <ref to="msg.status"/> response to <ref to="msg.request.method"/></title>
+    <explain>A <ref to="msg.status"/> response to a <m>CONNECT</m> request means that this connection is becoming a tunnel. But the ‘close’ option in this response’s <h>Connection</h> header means that the server will close the connection after sending this response. Either one is wrong here.</explain>
+  </error>
+
 </notices>
