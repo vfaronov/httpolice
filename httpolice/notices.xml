@@ -1194,7 +1194,7 @@
 
   <error id="1160">
     <title>Using extension pragma ‘<ref to="pragma"/>’</title>
-    <explain>This message’s <ref to="place"/> header contains a ‘<ref to="pragma"/>’ extension pragma. Extension pragmas (that is, pragma directives other than ‘no-cache’) are deprecated in <rfc num="7234" sect="5.4"/>.</explain>
+    <explain>This message’s <ref to="msg.headers.pragma"/> header contains a ‘<ref to="pragma"/>’ extension pragma. Extension pragmas (that is, pragma directives other than ‘no-cache’) are deprecated in <rfc num="7234" sect="5.4"/>.</explain>
   </error>
 
   <comment id="1161">
