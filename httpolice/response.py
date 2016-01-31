@@ -265,6 +265,10 @@ def check_response_itself(resp):
     if status == st.unauthorized and headers.www_authenticate.is_absent:
         resp.complain(1194)
 
+    if status == st.proxy_authentication_required and \
+            headers.proxy_authenticate.is_absent:
+        resp.complain(1195)
+
 
 def check_response_in_context(resp, req):
     if okay(resp.body) and resp.body and resp.headers.content_type.is_absent \

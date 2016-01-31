@@ -1437,4 +1437,13 @@
     </rfc>
   </error>
 
+  <error id="1195">
+    <title><ref to="msg.status"/> response with no <h>Proxy-Authenticate</h></title>
+    <rfc num="7235" sect="3.2">
+      The proxy MUST send a
+   <h>Proxy-Authenticate</h> header field (Section 4.3) containing a challenge
+   applicable to that proxy for the target resource.
+    </rfc>
+  </error>
+
 </notices>
