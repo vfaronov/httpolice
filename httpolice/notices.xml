@@ -1446,4 +1446,9 @@
     </rfc>
   </error>
 
+  <error id="1196">
+    <title>Unquoted ‘realm’ parameter in <ref to="place"/></title>
+    <explain>According to <rfc num="7235" sect="2.2"/>, the value of the ‘realm’ parameter must be a quoted string, but here it was a plain token.</explain>
+  </error>
+
 </notices>

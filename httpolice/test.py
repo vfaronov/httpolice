@@ -813,7 +813,7 @@ class TestResponse(unittest.TestCase):
                   'WWW-Authenticate: Baz\r\n'
                   'WWW-Authenticate: Wrong=bad, Better\r\n'
                   'WWW-Authenticate: scheme1 foo=bar, baz=qux, scheme2\r\n'
-                  'WWW-Authenticate: Newauth realm="apps", type=1,\r\n'
+                  'WWW-Authenticate: Newauth Realm="apps", type=1,\r\n'
                   '    title="Login to \\"apps\\"",\r\n'
                   '    Basic realm="simple"\r\n'
                   '\r\n'
