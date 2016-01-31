@@ -379,8 +379,8 @@ class HTMLReport(Report):
                 with H.span(**for_object(req.method)):
                     render_known(req.method)
                 H.span(u' ')
-                H.span(req.target, _class='request-target',
-                       **for_object(req.target))
+                H.span(req.target.decode('utf-8', 'replace'),
+                       **for_object(req.target, 'request-target'))
                 H.span(u' ')
                 H.span(req.version, **for_object(req.version))
             self._render_message(req)
