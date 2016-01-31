@@ -75,7 +75,13 @@ known = KnownDict([
  {'_': StatusCode(304),
   '_citations': [RFC(7232, section=(4, 1))],
   '_title': 'Not Modified',
-  'cacheable_by_default': False},
+  # The cacheability story here is a complicated by the fact that
+  # a cache can generate a 304 response out of a stored 200 response
+  # (as in RFC 7234 section 4.3.2).
+  # It's not clear to me whether an ``Age`` header
+  # would make sense on such a response,
+  # so let's not check it for now.
+  'cacheable_by_default': None},
  {'_': StatusCode(305),
   '_citations': [RFC(7231, section=(6, 4, 5))],
   '_title': 'Use Proxy'},
