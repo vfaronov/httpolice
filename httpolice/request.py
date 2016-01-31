@@ -87,7 +87,7 @@ class RequestView(message.MessageView):
 def check_request(req):
     message.check_message(req)
 
-    if okay(req.body) and req.body and req.headers.content_type.is_absent:
+    if req.body and req.headers.content_type.is_absent:
         req.complain(1041)
 
     if (method.defines_body(req.method) and
@@ -124,11 +124,10 @@ def check_request(req):
     for hdr in req.headers:
         if header.is_for_request(hdr.name) == False:
             req.complain(1063, header=hdr)
-        elif header.is_representation_metadata(hdr.name) and \
-                req.body is None:
+        elif header.is_representation_metadata(hdr.name) and not req.body:
             req.complain(1053, header=hdr)
 
-    if okay(req.body) and req.body:
+    if req.body:
         if req.method == m.GET:
             req.complain(1056)
         elif req.method == m.HEAD:
@@ -138,13 +137,13 @@ def check_request(req):
         elif req.method == m.CONNECT:
             req.complain(1061)
 
-    if req.method == m.OPTIONS and \
-            okay(req.body) and req.body and req.headers.content_type.is_absent:
+    if req.method == m.OPTIONS and req.body and \
+            req.headers.content_type.is_absent:
         req.complain(1062)
 
     if req.headers.expect.is_present:
         if req.headers.expect == '100-continue':
-            if req.body is None:
+            if not req.body:
                 req.complain(1066)
         else:
             req.complain(1065)

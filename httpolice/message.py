@@ -54,7 +54,7 @@ class MessageView(Blackboard):
     def decoded_body(self):
         r = self.body
         codings = list(self.headers.content_encoding)
-        while codings and okay(r):
+        while codings and okay(r) and r:
             coding = codings.pop()
             if coding in [cc.gzip, cc.x_gzip]:
                 try:

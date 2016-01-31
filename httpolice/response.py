@@ -272,9 +272,9 @@ def check_response_itself(resp):
 
 
 def check_response_in_context(resp, req):
-    if okay(resp.body) and resp.body and resp.headers.content_type.is_absent \
-            and not (resp.status == st.partial_content and
-                     req.headers.if_range.is_present):
+    if resp.body and resp.headers.content_type.is_absent and \
+            not (resp.status == st.partial_content and
+                 req.headers.if_range.is_present):
         resp.complain(1041)
 
     if req.method == m.CONNECT and resp.status.successful:

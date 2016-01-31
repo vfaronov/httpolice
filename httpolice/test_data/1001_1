@@ -4,6 +4,7 @@
 POST / HTTP/1.1
 Host: example.com
 User-Agent: demo
+Content-Type: text/plain
 Transfer-Encoding: chunked, gzip
 
 qwrfwerfwerf
