@@ -286,3 +286,8 @@ class WarnCode(int):
 
     def __repr__(self):
         return 'WarnCode(%d)' % self
+
+
+class AuthScheme(CaseInsensitive):
+
+    __slots__ = ()

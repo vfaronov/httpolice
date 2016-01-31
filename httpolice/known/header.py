@@ -12,6 +12,7 @@ from httpolice.syntax import (
     rfc7232,
     rfc7233,
     rfc7234,
+    rfc7235,
 )
 from httpolice.syntax.common import integer
 
@@ -629,7 +630,12 @@ known = KnownDict([
   'rule': MULTI},
  {'_': FieldName(u'WWW-Authenticate'),
   '_citations': [RFC(7235, section=(4, 1))],
-  'iana_status': 'standard'},
+  'bad_for_connection': True,
+  'for_request': False,
+  'for_response': True,
+  'iana_status': 'standard',
+  'parser': rfc7230.comma_list1(rfc7235.challenge),
+  'rule': MULTI},
  {'_': FieldName(u'Want-Digest'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Warning'),
   '_citations': [RFC(7234, section=(5, 5))],

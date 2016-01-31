@@ -11,6 +11,7 @@ from httpolice.known import cache, cc, m, media, tc, unit
 from httpolice.notice import notices
 from httpolice.report import render_notice_examples
 from httpolice.structure import (
+    AuthScheme,
     CacheDirective,
     CaseInsensitive,
     ContentCoding,
@@ -802,6 +803,40 @@ class TestResponse(unittest.TestCase):
         self.assert_(WarnCode(123) in resp1.headers.warning)
         self.assert_(WarnCode(567) in resp1.headers.warning)
         self.assert_(WarnCode(199) not in resp1.headers.warning)
+
+    def test_www_authenticate(self):
+        inbound = self.req(m.GET)
+        stream = ('HTTP/1.1 401 Unauthorized\r\n'
+                  'Content-Type: text/plain\r\n'
+                  'WWW-Authenticate: Basic realm="my \\"magical\\" realm"\r\n'
+                  'WWW-Authenticate: Foo  , Bar jgfCGSU8u== \r\n'
+                  'WWW-Authenticate: Baz\r\n'
+                  'WWW-Authenticate: Wrong=bad, Better\r\n'
+                  'WWW-Authenticate: scheme1 foo=bar, baz=qux, scheme2\r\n'
+                  'WWW-Authenticate: Newauth realm="apps", type=1,\r\n'
+                  '    title="Login to \\"apps\\"",\r\n'
+                  '    Basic realm="simple"\r\n'
+                  '\r\n'
+                  'Hello world!\r\n')
+        [[resp1]] = self.parse(inbound, stream)
+        self.assertEquals(
+            resp1.headers.www_authenticate.value,
+            [
+                Parametrized(AuthScheme(u'Basic'),
+                             [(u'realm', 'my "magical" realm')]),
+                Parametrized(AuthScheme(u'Foo'), None),
+                Parametrized(AuthScheme(u'Bar'), 'jgfCGSU8u=='),
+                Parametrized(AuthScheme(u'Baz'), None),
+                Unparseable,
+                Parametrized(AuthScheme(u'Scheme1'), [(u'foo', u'bar'),
+                                                      (u'baz', u'qux')]),
+                Parametrized(AuthScheme(u'Scheme2'), None),
+                Parametrized(AuthScheme(u'Newauth'),
+                             [(u'realm', 'apps'), (u'type', u'1'),
+                              (u'title', 'Login to "apps"')]),
+                Parametrized(AuthScheme(u'basic'), [(u'realm', 'simple')]),
+            ]
+        )
 
 
 class TestFromFiles(unittest.TestCase):
