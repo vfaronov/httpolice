@@ -23,6 +23,10 @@ SET_COOKIE = 3
 CACHE_CONTROL = 4
 
 
+def deprecated(name):
+    return known.get_info(name).get('iana_status') in [u'deprecated',
+                                                       u'obsoleted']
+
 def is_bad_for_connection(name):
     return known.get_info(name).get('bad_for_connection')
 

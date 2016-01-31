@@ -153,9 +153,12 @@ class MessageView(Blackboard):
 
 
 def check_message(msg):
-    # Force parsing every header present in the message according to its rules.
     for hdr in msg.headers:
+        # Force parsing every header present in the message
+        # according to its syntax rules.
         _ = hdr.value
+        if header.deprecated(hdr.name):
+            msg.complain(1197, header=hdr)
 
     # Force checking the payload for various content types.
     _ = msg.json_data

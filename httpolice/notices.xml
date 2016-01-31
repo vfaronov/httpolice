@@ -1451,4 +1451,9 @@
     <explain>According to <rfc num="7235" sect="2.2"/>, the value of the ‘realm’ parameter must be a quoted string, but here it was a plain token.</explain>
   </error>
 
+  <comment id="1197">
+    <title>Using deprecated header <ref to="header"/></title>
+    <explain>This message includes the <ref to="header"/> header, which is listed as “obsoleted” or “deprecated” in the <cite title="IANA message headers registry" url="http://www.iana.org/assignments/message-headers/message-headers.xhtml"/>.</explain>
+  </comment>
+
 </notices>
