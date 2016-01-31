@@ -81,7 +81,8 @@ class ResponseView(message.MessageView):
             if self.headers.age > self.headers.cache_control.max_age:
                 self.complain(1184)
                 return True
-            if self.headers.expires.is_okay and self.headers.date.is_okay:
+            if self.headers.cache_control.max_age is None and \
+                    self.headers.expires.is_okay and self.headers.date.is_okay:
                 delta = self.headers.expires.value - self.headers.date.value
                 if self.headers.age > delta.total_seconds():
                     self.complain(1185)
