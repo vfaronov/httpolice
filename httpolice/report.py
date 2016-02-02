@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 import codecs
+import json
 import re
 
 import dominate
@@ -163,7 +164,10 @@ def displayable_body(msg):
     if msg.headers.transfer_encoding:
         transforms.append(u'removing Transfer-Encoding')
 
-    if okay(msg.decoded_body):
+    if okay(msg.json_data):
+        r = json.dumps(msg.json_data, indent=2, ensure_ascii=False)
+        transforms.append(u'pretty-printing')
+    elif okay(msg.decoded_body):
         r = msg.decoded_body
         if msg.headers.content_encoding:
             transforms.append(u'removing Content-Encoding')
