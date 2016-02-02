@@ -1511,4 +1511,19 @@
     </rfc>
   </comment>
 
+  <error id="1206">
+    <title><ref to="header"/>: <auth>Basic</auth> with no realm</title>
+    <explain>The Basic authentication scheme requires a ‘realm’ parameter. See <rfc num="7617" sect="2"/>.</explain>
+  </error>
+
+  <error id="1207">
+    <title><ref to="header"/>: <auth>Basic</auth> with a ‘<ref to="param"/>’ parameter</title>
+    <explain>No ‘<ref to="param"/>’ parameter is defined for the Basic authentication scheme. See <rfc num="7617" sect="2"/>.</explain>
+  </error>
+
+  <error id="1208">
+    <title><ref to="header"/>: <auth>Basic</auth> with a “<ref to="charset"/>” charset</title>
+    <explain>According to <rfc num="7617" sect="2.1"/>, the ‘charset’ parameter to the Basic authentication scheme can only have the value “UTF-8”.</explain>
+  </error>
+
 </notices>

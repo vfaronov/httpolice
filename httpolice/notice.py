@@ -7,6 +7,7 @@ from httpolice import citation, structure
 
 
 protocol_items = {
+    'auth': structure.AuthScheme,
     'cache': structure.CacheDirective,
     'cc': structure.ContentCoding,
     'h': structure.FieldName,

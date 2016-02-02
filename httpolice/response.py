@@ -3,6 +3,7 @@
 from httpolice import message
 from httpolice.blackboard import memoized_property
 from httpolice.known import (
+    auth,
     cache,
     cache_directive,
     h,
@@ -277,6 +278,20 @@ def check_response_itself(resp):
     if status == st.proxy_authentication_required and \
             headers.proxy_authenticate.is_absent:
         resp.complain(1195)
+
+    for hdr in [resp.headers.www_authenticate,
+                resp.headers.proxy_authenticate]:
+        for challenge in hdr.okay:
+            if challenge.item == auth.basic:
+                if u'realm' not in challenge.param_names:
+                    resp.complain(1206, header=hdr)
+                for k, v in challenge.param or []:
+                    if k == u'charset':
+                        v = v.decode('utf-8', 'replace')
+                        if v.lower() != u'utf-8':
+                            resp.complain(1208, header=hdr, charset=v)
+                    elif k != u'realm':
+                        resp.complain(1207, header=hdr, param=k)
 
 
 def check_response_in_context(resp, req):

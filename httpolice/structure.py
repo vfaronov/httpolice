@@ -33,6 +33,10 @@ class Parametrized(namedtuple('Parametrized', ('item', 'param'))):
     def __ne__(self, other):
         return (self.item != other) and super(Parametrized, self).__ne__(other)
 
+    @property
+    def param_names(self):
+        return set(name for name, value in self.param or [])
+
 
 class Versioned(namedtuple('Versioned', ('item', 'version'))):
 
