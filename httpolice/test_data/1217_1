@@ -1,0 +1,16 @@
+1217
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Accept-Patch: text/x-diff
+Allow: GET,HEAD,OPTIONS
+Content-Length: 14
+
+Hello world!

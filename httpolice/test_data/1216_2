@@ -1,0 +1,15 @@
+
+
+======== BEGIN INBOUND STREAM ========
+OPTIONS /articles/123/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Length: 0
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Length: 0
+Allow: OPTIONS, GET, HEAD, PUT, PATCH, DELETE
+Accept-Patch: text/x-diff
+

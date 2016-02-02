@@ -1578,4 +1578,14 @@
     </rfc>
   </comment>
 
+  <comment id="1216">
+    <title>“<ref to="msg.headers.allow"/>: <m>PATCH</m>” without <h>Accept-Patch</h></title>
+    <explain>This <ref to="msg.request.method"/> response indicates in its <ref to="msg.headers.allow"/> header that the <m>PATCH</m> method is supported. According to <rfc num="5789" sect="3.1"/>, in this case the server should also send an <h>Accept-Patch</h> header.</explain>
+  </comment>
+
+  <error id="1217">
+    <title><ref to="msg.headers.accept_patch"/> without “<ref to="msg.headers.allow"/>: <m>PATCH</m>”</title>
+    <explain>This response’s <h>Accept-Patch</h> header means that this resource supports the <m>PATCH</m> method, but it’s missing from the <h>Allow</h> header.</explain>
+  </error>
+
 </notices>

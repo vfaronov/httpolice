@@ -294,6 +294,10 @@ def check_response_itself(resp):
                     elif k != u'realm':
                         resp.complain(1207, header=hdr, param=k)
 
+    if headers.allow.is_present and headers.accept_patch.is_present and \
+            m.PATCH not in headers.allow:
+        resp.complain(1217)
+
 
 def check_response_in_context(resp, req):
     if resp.body and resp.headers.content_type.is_absent and \
@@ -545,3 +549,7 @@ def check_response_in_context(resp, req):
         if resp.status == st.unsupported_media_type:
             if resp.headers.accept_patch.is_absent:
                 resp.complain(1215)
+
+    if req.method == m.OPTIONS and m.PATCH in resp.headers.allow and \
+            resp.headers.accept_patch.is_absent:
+        resp.complain(1216)
