@@ -375,16 +375,12 @@ def check_response_in_context(resp, req):
         resp.complain(1086)
 
     if resp.status == st.not_acceptable:
-        all_headers = set(h.name for h in req.headers)
-        known_conneg = set(h.name for h in req.headers
-                           if header.is_proactive_conneg(h.name) == True)
-        known_not_conneg = set(h.name for h in req.headers
-                               if header.is_proactive_conneg(h.name) == False)
-        if known_not_conneg == all_headers:
+        if not req.headers.possibly(header.is_proactive_conneg):
             resp.complain(1090)
-        elif not known_conneg:
+        elif not req.headers.clearly(header.is_proactive_conneg):
             resp.complain(1091)
-        elif known_conneg == set([h.accept_language]):
+        elif req.headers.clearly(header.is_proactive_conneg) == \
+                set([h.accept_language]):
             resp.complain(1117)
 
     if resp.status == st.length_required and \
@@ -438,25 +434,20 @@ def check_response_in_context(resp, req):
             resp.complain(1123)
 
     if resp.status in [st.not_modified, st.precondition_failed]:
-        all_headers = set(h.name for h in req.headers)
-        known_precond = set(h.name for h in req.headers
-                            if header.is_precondition(h.name) == True)
-        known_not_precond = set(h.name for h in req.headers
-                                if header.is_precondition(h.name) == False)
-
         if req.method not in [m.GET, m.HEAD] and \
                 resp.status == st.not_modified:
             resp.complain(1124)
-        elif known_not_precond == all_headers:
+        elif not req.headers.possibly(header.is_precondition):
             resp.complain(1125)
-        elif not known_precond:
+        elif not req.headers.clearly(header.is_precondition):
             resp.complain(1126)
-        elif known_precond == set([h.if_modified_since]):
+        elif req.headers.clearly(header.is_precondition) == \
+                set([h.if_modified_since]):
             if req.method not in [m.GET, m.HEAD]:
                 resp.complain(1128)
-        elif known_precond.issubset(set([h.if_match, h.if_none_match,
-                                         h.if_modified_since,
-                                         h.if_unmodified_since, h.if_range])):
+        elif req.headers.clearly(header.is_precondition).issubset(
+                set([h.if_match, h.if_none_match,
+                     h.if_modified_since, h.if_unmodified_since, h.if_range])):
             if req.method in [m.CONNECT, m.OPTIONS, m.TRACE]:
                 resp.complain(1129)
 

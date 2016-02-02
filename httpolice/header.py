@@ -54,6 +54,12 @@ class HeadersView(object):
             if (name is None) or (name == entry.name)
         ]
 
+    def clearly(self, predicate):
+        return set(name for name in self.names if predicate(name))
+
+    def possibly(self, predicate):
+        return set(name for name in self.names if predicate(name) != False)
+
 
 class HeaderView(object):
 
