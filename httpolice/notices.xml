@@ -1494,4 +1494,12 @@
     </rfc>
   </comment>
 
+  <comment id="1204">
+    <title><ref to="msg.status"/> response with no payload</title>
+    <rfc num="6585" sect="6">
+      The response representation SHOULD contain a link to a resource that
+   allows the user to submit credentials (e.g., with an HTML form).
+    </rfc>
+  </comment>
+
 </notices>

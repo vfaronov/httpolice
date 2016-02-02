@@ -238,7 +238,8 @@ known = KnownDict([
   '_title': 'Not Extended'},
  {'_': StatusCode(511),
   '_citations': [RFC(6585, section=(6,))],
-  '_title': 'Network Authentication Required'}
+  '_title': 'Network Authentication Required',
+  'cacheable': NOT_AT_ALL}
  ],
  name_from_title=True,
  extra_info=['cacheable']
