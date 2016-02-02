@@ -1472,4 +1472,12 @@
     <!-- This is not an error because the server might not recognize this particular header. -->
   </comment>
 
+  <comment id="1201">
+    <title><ref to="msg.status"/> response with no payload</title>
+    <rfc num="6585" sect="3">
+      Responses using this status code SHOULD explain how to resubmit the
+   request successfully.
+    </rfc>
+  </comment>
+
 </notices>
