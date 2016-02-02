@@ -1,5 +1,7 @@
 # -*- coding: utf-8; -*-
 
+import argparse
+
 import httpolice
 from httpolice.known import h, st
 
@@ -31,7 +33,15 @@ def preprocess_response(resp):
 
 
 def start(context, argv):
-    context.out_filename = argv[1]
+    parser = argparse.ArgumentParser(
+        description='Run HTTPolice as a mitmdump script.',
+        prog='httpolice-mitmdump.py')
+    parser.add_argument('-H', '--html', action='store_true',
+                        help='render HTML report instead of plain text')
+    parser.add_argument('--only-with-notices', action='store_true',
+                        help='exclude exchanges that have no notices')
+    parser.add_argument('out_filename')
+    context.args = parser.parse_args(argv[1:])
     context.pairs = []
 
 
@@ -54,5 +64,11 @@ def response(context, flow):
 def done(context):
     result = [httpolice.analyze_exchange(req, [resp])
               for req, resp in context.pairs]
-    with open(context.out_filename, 'w') as outf:
-        httpolice.HTMLReport.render(result, outf)
+    if context.args.only_with_notices:
+        result = [exch for exch in result if any(exch.collect_complaints())]
+    if context.args.html:
+        report_cls = httpolice.HTMLReport
+    else:
+        report_cls = httpolice.TextReport
+    with open(context.args.out_filename, 'w') as outf:
+        report_cls.render(result, outf)
