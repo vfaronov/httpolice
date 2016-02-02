@@ -13,6 +13,7 @@ from httpolice.known import (
     h,
     header,
     m,
+    media_type,
     method,
     product,
     tc,
@@ -250,3 +251,7 @@ def check_request(req):
                                              char=hex(ord(c)))
                 else:
                     req.complain(1209, header=hdr)
+
+    if req.method == m.PATCH and req.headers.content_type.is_okay:
+        if media_type.is_patch(req.headers.content_type.value.item) == False:
+            req.complain(1213)

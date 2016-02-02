@@ -17,6 +17,9 @@ def is_xml(name):
 def is_multipart(name):
     return name.startswith(u'multipart/')
 
+def is_patch(name):
+    return known.get_info(name).get('patch')
+
 
 known = KnownDict([
  {'_': MediaType(u'application/1d-interleaved-parityfec'),
@@ -120,8 +123,10 @@ known = KnownDict([
  {'_': MediaType(u'application/jrd+json'), '_citations': [RFC(7033)]},
  {'_': MediaType(u'application/json'),
   '_citations': [RFC(7159)],
-  'is_json': True},
- {'_': MediaType(u'application/json-patch+json'), '_citations': [RFC(6902)]},
+  'is_json': True,
+  'patch': False},
+ {'_': MediaType(u'application/json-patch+json'), '_citations': [RFC(6902)],
+  'patch': True},
  {'_': MediaType(u'application/json-seq'), '_citations': [RFC(7464)]},
  {'_': MediaType(u'application/jwk+json'), '_citations': [RFC(7517)]},
  {'_': MediaType(u'application/jwk-set+json'), '_citations': [RFC(7517)]},
@@ -150,7 +155,8 @@ known = KnownDict([
   '_citations': [RFC(6796)]},
  {'_': MediaType(u'application/mediaservercontrol+xml'),
   '_citations': [RFC(5022)]},
- {'_': MediaType(u'application/merge-patch+json'), '_citations': [RFC(7396)]},
+ {'_': MediaType(u'application/merge-patch+json'), '_citations': [RFC(7396)],
+  'patch': True},
  {'_': MediaType(u'application/metalink4+xml'), '_citations': [RFC(5854)]},
  {'_': MediaType(u'application/mets+xml'), '_citations': [RFC(6207)]},
  {'_': MediaType(u'application/mikey'), '_citations': [RFC(3830)]},
@@ -300,7 +306,8 @@ known = KnownDict([
  {'_': MediaType(u'application/x-www-form-urlencoded'),
   '_citations': [Citation(None,
                           'http://www.w3.org/TR/html/iana.html'
-                          '#application/x-www-form-urlencoded')]},
+                          '#application/x-www-form-urlencoded')],
+  'patch': False},
  {'_': MediaType(u'application/x400-bp'), '_citations': [RFC(1494)]},
  {'_': MediaType(u'application/xacml+xml'), '_citations': [RFC(7061)]},
  {'_': MediaType(u'application/xcap-att+xml'), '_citations': [RFC(4825)]},
@@ -319,11 +326,13 @@ known = KnownDict([
                           'html/iana.html#application/xhtml+xml')]},
  {'_': MediaType(u'application/xml'),
   '_citations': [RFC(7303)],
-  'is_xml': True},
+  'is_xml': True,
+  'patch': False},
  {'_': MediaType(u'application/xml-dtd'), '_citations': [RFC(7303)]},
  {'_': MediaType(u'application/xml-external-parsed-entity'),
   '_citations': [RFC(7303)]},
- {'_': MediaType(u'application/xml-patch+xml'), '_citations': [RFC(7351)]},
+ {'_': MediaType(u'application/xml-patch+xml'), '_citations': [RFC(7351)],
+  'patch': True},
  {'_': MediaType(u'application/xmpp+xml'), '_citations': [RFC(3923)]},
  {'_': MediaType(u'application/xslt+xml'),
   '_citations': [Citation(None,
@@ -522,13 +531,15 @@ known = KnownDict([
  {'_': MediaType(u'text/grammar-ref-list'), '_citations': [RFC(6787)]},
  {'_': MediaType(u'text/html'),
   '_citations': [Citation(None,
-                          'http://www.w3.org/TR/html/iana.html#text/html')]},
+                          'http://www.w3.org/TR/html/iana.html#text/html')],
+  'patch': False},
  {'_': MediaType(u'text/javascript'),
   '_citations': [RFC(4329)],
   'deprecated': True},
  {'_': MediaType(u'text/parityfec'), '_citations': [RFC(5109)]},
  {'_': MediaType(u'text/plain'),
-  '_citations': [RFC(2046), RFC(3676), RFC(5147)]},
+  '_citations': [RFC(2046), RFC(3676), RFC(5147)],
+  'patch': False},
  {'_': MediaType(u'text/raptorfec'), '_citations': [RFC(6682)]},
  {'_': MediaType(u'text/red'), '_citations': [RFC(4102)]},
  {'_': MediaType(u'text/rfc822-headers'), '_citations': [RFC(6522)]},
@@ -543,7 +554,8 @@ known = KnownDict([
  {'_': MediaType(u'text/vcard'), '_citations': [RFC(6350)]},
  {'_': MediaType(u'text/xml'),
   '_citations': [RFC(7303)],
-  'is_xml': True},
+  'is_xml': True,
+  'patch': False},
  {'_': MediaType(u'text/xml-external-parsed-entity'),
   '_citations': [RFC(7303)]},
  {'_': MediaType(u'video/1d-interleaved-parityfec'),
@@ -587,4 +599,4 @@ known = KnownDict([
  {'_': MediaType(u'video/smpte292m'), '_citations': [RFC(3497)]},
  {'_': MediaType(u'video/ulpfec'), '_citations': [RFC(5109)]},
  {'_': MediaType(u'video/vc1'), '_citations': [RFC(4425)]}
-], extra_info=['deprecated', 'is_json', 'is_xml'])
+], extra_info=['deprecated', 'is_json', 'is_xml', 'patch'])

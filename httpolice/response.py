@@ -10,6 +10,7 @@ from httpolice.known import (
     header,
     m,
     media,
+    media_type,
     method,
     st,
     status_code,
@@ -534,3 +535,8 @@ def check_response_in_context(resp, req):
             if header.is_precondition(hdr.name):
                 resp.complain(1200, header=hdr)
                 break
+
+    if req.method == m.PATCH and req.headers.content_type.is_okay:
+        if media_type.is_patch(req.headers.content_type.value.item) == False:
+            if resp.status.successful:
+                resp.complain(1214)

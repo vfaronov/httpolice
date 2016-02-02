@@ -70,7 +70,8 @@ class RFC(Citation):
             sect = tuple(int(n) for n in self.get('sect').split('.'))
         else:
             sect = None
-        return citation.RFC(num, section=sect)
+        errata = int(self.get('errata')) if self.get('errata') else None
+        return citation.RFC(num, section=sect, errata=errata)
 
 
 class ProtocolItem(lxml.etree.ElementBase):

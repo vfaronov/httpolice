@@ -1,0 +1,18 @@
+1213
+
+======== BEGIN INBOUND STREAM ========
+PATCH /articles/123/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: text/plain;charset=utf-8
+Content-Length: 11
+
+foo bar
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 415 Unsupported Media Type
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 34
+
+Use a real patch format, please.

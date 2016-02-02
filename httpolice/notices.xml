@@ -1551,4 +1551,22 @@
     </rfc>
   </error>
 
+  <error id="1213">
+    <title><ref to="msg.method"/> with <ref to="msg.headers.content_type"/>: <ref to="msg.headers.content_type.value"/></title>
+    <explain>The <m>PATCH</m> method only makes sense with media types that define how to apply the patch. <ref to="msg.headers.content_type.value"/> is not such a media type.</explain>
+    <explain>For example, <media>application/merge-patch+json</media> would be a suitable patch format for JSON.</explain>
+    <explain>See also <rfc num="5789" errata="3169"/>.</explain>
+  </error>
+
+  <comment id="1214">
+    <title><ref to="msg.status">Successful</ref> application of a <ref to="msg.request.headers.content_type"><ref to="msg.request.headers.content_type.value"/></ref> <ref to="msg.request.method">patch</ref></title>
+    <rfc num="5789" errata="3169">
+      If a server receives a <m>PATCH</m>
+   request with a media type whose specification does not define
+   semantics specific to <m>PATCH</m>, the server SHOULD reject the request by
+   returning the <st>415</st> Unsupported Media Type status code, unless a more
+   specific error status code takes priority.
+    </rfc>
+  </comment>
+
 </notices>
