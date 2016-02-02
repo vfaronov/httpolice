@@ -1,10 +1,12 @@
 # -*- coding: utf-8; -*-
 
+import base64
 import urlparse
 
 from httpolice import message, parse
 from httpolice.blackboard import memoized_property
 from httpolice.known import (
+    auth,
     cache,
     cache_directive,
     cc,
@@ -17,6 +19,7 @@ from httpolice.known import (
 )
 from httpolice.structure import EntityTag, Versioned, http11, okay
 from httpolice.syntax import rfc7230
+from httpolice.syntax.common import CTL
 
 
 class RequestView(message.MessageView):
@@ -224,3 +227,26 @@ def check_request(req):
         if req.headers.cache_control[direct1] and \
                 req.headers.cache_control[direct2]:
             req.complain(1193, directive1=direct1, directive2=direct2)
+
+    for hdr in [req.headers.authorization, req.headers.proxy_authorization]:
+        if hdr.is_okay:
+            scheme, credentials = hdr.value
+            if scheme == auth.basic:
+                if isinstance(credentials, unicode):
+                    try:
+                        credentials = base64.b64decode(credentials)
+                    except Exception, e:
+                        req.complain(1210, header=hdr, error=e)
+                    else:
+                        # RFC 7617 section 2 requires that,
+                        # whatever the encoding of the credentials,
+                        # it must be ASCII-compatible,
+                        # so we don't need to know it.
+                        if ':' not in credentials:
+                            req.complain(1211, header=hdr)
+                        for c in credentials:
+                            if c in CTL:
+                                req.complain(1212, header=hdr,
+                                             char=hex(ord(c)))
+                else:
+                    req.complain(1209, header=hdr)

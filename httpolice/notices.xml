@@ -1526,4 +1526,29 @@
     <explain>According to <rfc num="7617" sect="2.1"/>, the ‘charset’ parameter to the Basic authentication scheme can only have the value “UTF-8”.</explain>
   </error>
 
+  <error id="1209">
+    <title>Malformed <ref to="header"/>: <auth>Basic</auth></title>
+    <explain>In the Basic authentication scheme, credentials are sent as a single Base64 string. See <rfc num="7617" sect="2"/>.</explain>
+  </error>
+
+  <error id="1210">
+    <title>Malformed <ref to="header"/>: <auth>Basic</auth></title>
+    <explain>In the Basic authentication scheme, the user ID and password are combined with a colon ‘:’ and packed into Base64. In this request’s <ref to="header"/> header, HTTPolice tried to decode them from Base64 and got the following error:</explain>
+    <explain><ref to="error"/></explain>
+    <explain>See <rfc num="7617" sect="2"/>.</explain>
+  </error>
+
+  <error id="1211">
+    <title>Malformed <ref to="header"/>: <auth>Basic</auth></title>
+    <explain>In the Basic authentication scheme, the user ID and password are combined with a colon ‘:’ and packed into Base64. But in this request’s <ref to="header"/> header, there is no ‘:’ after decoding from Base64. See <rfc num="7617" sect="2"/>.</explain>
+  </error>
+
+  <error id="1212">
+    <title>Control character <ref to="char"/> in <ref to="header"/>: <auth>Basic</auth></title>
+    <rfc num="7617" sect="2">
+      The user-id and password MUST NOT contain any control characters (see
+   "CTL" in Appendix B.1 of [RFC5234]).
+    </rfc>
+  </error>
+
 </notices>

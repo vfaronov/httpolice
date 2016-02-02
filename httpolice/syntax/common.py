@@ -17,6 +17,7 @@ alpha = char_class(ALPHA)
 CHAR = char_range(0x01, 0x7F)
 char = char_class(CHAR)
 crlf = (~maybe('\r') + '\n')   // u'newline'
+CTL = char_range(0x00, 0x1F) + '\x7f'
 DIGIT = char_range(0x30, 0x39)
 digit = char_class(DIGIT)
 HEXDIG = DIGIT + 'ABCDEFabcdef'

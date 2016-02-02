@@ -3,6 +3,7 @@
 from httpolice.parse import (
     argwrap,
     char_class,
+    decode,
     eof,
     function,
     join,
@@ -33,8 +34,8 @@ def _parse_auth_param(state):
 
 auth_param = function(_parse_auth_param)
 
-token68 = join(string1(char_class(ALPHA + DIGIT + '-._~+/')) + string('=')) \
-    // rfc(7235, u'token68')
+token68 = decode(join(string1(char_class(ALPHA + DIGIT + '-._~+/')) +
+                      string('=')))   // rfc(7235, u'token68')
 
 def _parse_auth_params(state):
     r = comma_list(auth_param).parse(state)
