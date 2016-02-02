@@ -216,7 +216,7 @@ def check_request(req):
             req.complain(1165, code=warning.code)
 
     if method.is_cacheable(req.method) == False:
-        for direct in req.headers.cache_control:
+        for direct in req.headers.cache_control.okay:
             if direct.item in [cache.max_age, cache.max_stale, cache.min_fresh,
                                cache.no_cache, cache.no_store,
                                cache.only_if_cached]:
