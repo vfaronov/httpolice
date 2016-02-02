@@ -182,7 +182,8 @@ def check_response_itself(resp):
 
     if headers.retry_after.is_present and \
             not status.redirection and \
-            status not in [st.payload_too_large, st.service_unavailable]:
+            status not in [st.payload_too_large, st.service_unavailable,
+                           st.too_many_requests]:
         resp.complain(1113)
 
     if headers.date < headers.last_modified:
