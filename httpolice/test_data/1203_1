@@ -1,0 +1,13 @@
+1203
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 429 Too Many Requests
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Length: 0
+Retry-After: 3600
+

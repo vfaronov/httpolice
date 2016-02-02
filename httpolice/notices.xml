@@ -1485,4 +1485,13 @@
     <explain>According to its specification, the <ref to="msg.status"/> status code cannot be served from a cache.</explain>
   </error>
 
+  <comment id="1203">
+    <title><ref to="msg.status"/> response with no payload</title>
+    <rfc num="6585" sect="4">
+      The response representations SHOULD include details explaining the
+   condition, and MAY include a <h>Retry-After</h> header indicating how long
+   to wait before making a new request.
+    </rfc>
+  </comment>
+
 </notices>

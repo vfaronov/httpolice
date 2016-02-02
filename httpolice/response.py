@@ -368,6 +368,8 @@ def check_response_in_context(resp, req):
             resp.complain(1096)
         elif resp.status == st.precondition_required:
             resp.complain(1201)
+        elif resp.status == st.too_many_requests:
+            resp.complain(1203)
         elif resp.status.client_error:
             resp.complain(1087)
         elif resp.status == st.http_version_not_supported:
