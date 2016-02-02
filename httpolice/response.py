@@ -499,3 +499,9 @@ def check_response_in_context(resp, req):
             warn.disconnected_operation not in resp.headers.warning and \
             req.headers.cache_control.max_stale is None:
         resp.complain(1188)
+
+    if resp.status == st.precondition_required:
+        for hdr in req.headers:
+            if header.is_precondition(hdr.name):
+                resp.complain(1200, header=hdr)
+                break

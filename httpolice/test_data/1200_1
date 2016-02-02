@@ -1,0 +1,19 @@
+1200
+
+======== BEGIN INBOUND STREAM ========
+PUT /articles/123/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: text/plain
+Content-Length: 16
+If-Match: "85m7uPU2MLiBz"
+
+Hello world!
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 428 Precondition Required
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 31
+
+Please include an entity tag.
