@@ -3,11 +3,12 @@
 from cStringIO import StringIO
 from datetime import datetime
 import os
+import random
 import unittest
 
 from httpolice import HTMLReport, TextReport, analyze_exchange, analyze_streams
 from httpolice import parse
-from httpolice.known import cache, cc, m, media, tc, unit
+from httpolice.known import cache, cc, h, header, m, media, st, tc, unit
 from httpolice.notice import notices
 from httpolice.report import render_notice_examples
 from httpolice.structure import (
@@ -16,8 +17,9 @@ from httpolice.structure import (
     CaseInsensitive,
     ContentCoding,
     ContentRange,
-    HTTPVersion,
     FieldName,
+    HeaderEntry,
+    HTTPVersion,
     LanguageTag,
     Method,
     MediaType,
@@ -33,6 +35,7 @@ from httpolice.structure import (
     Versioned,
     WarnCode,
     WarningValue,
+    http10,
     http11,
 )
 from httpolice.syntax import rfc3986, rfc7230, rfc7231, rfc7233
@@ -837,6 +840,29 @@ class TestResponse(unittest.TestCase):
                 Parametrized(AuthScheme(u'basic'), [(u'realm', 'simple')]),
             ]
         )
+
+    def test_fuzz(self):
+        # Make sure we don't raise exceptions on very wrong inputs.
+        interesting_headers = [hdr for hdr in h if header.parser_for(hdr)]
+        for _ in range(20):
+            req = Request(random.choice(['http', 'https', 'foobar']),
+                          random.choice(list(m)), os.urandom(10),
+                          random.choice([http10, http11, u'HTTP/3.0']),
+                          [HeaderEntry(random.choice(interesting_headers),
+                                       os.urandom(10)) for _ in range(5)],
+                          os.urandom(50),
+                          [HeaderEntry(random.choice(interesting_headers),
+                                       os.urandom(10))])
+            resps = [Response(req,
+                              random.choice([http10, http11, u'HTTP/3.0']),
+                              random.choice(list(st)), os.urandom(10),
+                              [HeaderEntry(random.choice(interesting_headers),
+                                           os.urandom(10)) for _ in range(5)],
+                              os.urandom(50),
+                              [HeaderEntry(random.choice(interesting_headers),
+                                           os.urandom(10))])
+                     for _ in range(random.randint(1, 3))]
+            analyze_exchange(req, resps)
 
 
 class TestFromFiles(unittest.TestCase):

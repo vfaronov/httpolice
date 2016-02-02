@@ -22,6 +22,9 @@ class KnownDict(object):
         else:
             raise AttributeError(name)
 
+    def __iter__(self):
+        return iter(self._by_key)
+
     def get_info(self, key):
         return self._by_key.get(key, {})
 
