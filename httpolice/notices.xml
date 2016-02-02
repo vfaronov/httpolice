@@ -1480,4 +1480,9 @@
     </rfc>
   </comment>
 
+  <error id="1202">
+    <title><ref to="msg.status"/> response from cache</title>
+    <explain>According to its specification, the <ref to="msg.status"/> status code cannot be served from a cache.</explain>
+  </error>
+
 </notices>

@@ -16,6 +16,7 @@ from httpolice.known import (
     unit,
     warn,
 )
+from httpolice.known.status_code import NOT_AT_ALL, NOT_BY_DEFAULT
 from httpolice.structure import EntityTag, http10, http11, okay
 from httpolice.util.uri import url_equals
 
@@ -228,7 +229,9 @@ def check_response_itself(resp):
             resp.complain(1175)
         if headers.cache_control.no_store:
             resp.complain(1176)
-        if status_code.is_cacheable_by_default(status) == False:
+        if status_code.is_cacheable(status) == NOT_AT_ALL:
+            resp.complain(1202)
+        elif status_code.is_cacheable(status) == NOT_BY_DEFAULT:
             if headers.expires.is_absent and headers.cache_control.is_absent:
                 resp.complain(1177)
 
