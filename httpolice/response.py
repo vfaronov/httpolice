@@ -280,8 +280,7 @@ def check_response_itself(resp):
             headers.proxy_authenticate.is_absent:
         resp.complain(1195)
 
-    for hdr in [resp.headers.www_authenticate,
-                resp.headers.proxy_authenticate]:
+    for hdr in [headers.www_authenticate, headers.proxy_authenticate]:
         for challenge in hdr.okay:
             if challenge.item == auth.basic:
                 if u'realm' not in challenge.param_names:
