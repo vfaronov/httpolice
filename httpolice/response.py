@@ -536,7 +536,12 @@ def check_response_in_context(resp, req):
                 resp.complain(1200, header=hdr)
                 break
 
-    if req.method == m.PATCH and req.headers.content_type.is_okay:
-        if media_type.is_patch(req.headers.content_type.value.item) == False:
-            if resp.status.successful:
+    if req.method == m.PATCH:
+        if resp.status.successful:
+            if (req.headers.content_type.is_okay and
+                    media_type.is_patch(req.headers.content_type.value.item) ==
+                    False):
                 resp.complain(1214)
+        if resp.status == st.unsupported_media_type:
+            if resp.headers.accept_patch.is_absent:
+                resp.complain(1215)

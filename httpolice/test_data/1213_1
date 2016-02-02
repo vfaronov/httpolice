@@ -14,5 +14,6 @@ HTTP/1.1 415 Unsupported Media Type
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 34
+Accept-Patch: application/merge-patch+json, application/json-patch+json
 
 Use a real patch format, please.

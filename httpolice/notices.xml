@@ -1569,4 +1569,13 @@
     </rfc>
   </comment>
 
+  <comment id="1215">
+    <title><ref to="msg.status"/> response to <ref to="msg.request.method"/> without <h>Accept-Patch</h></title>
+    <rfc num="5789" sect="2.2">
+      Such a response SHOULD include an
+      <h>Accept-Patch</h> response header as described in Section 3.1 to notify
+      the client what patch document media types are supported.
+    </rfc>
+  </comment>
+
 </notices>

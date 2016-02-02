@@ -1,19 +1,21 @@
-1213
+1215
 
 ======== BEGIN INBOUND STREAM ========
 PATCH /articles/123/ HTTP/1.1
 Host: example.com
 User-Agent: demo
-Content-Type: text/plain;charset=utf-8
-Content-Length: 11
+Content-Type: text/x-diff
+Content-Length: 44
 
-foo bar
-
+1c1
+< Hello world!
+---
+> Goodbye world!
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 415 Unsupported Media Type
 Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Location: http://example.com/articles/123/
 Content-Type: text/plain
-Content-Length: 34
-Accept-Patch: text/x-diff
+Content-Length: 35
 
-Use a real patch format, please.
+text/x-diff? We don't speak that.
