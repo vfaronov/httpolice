@@ -153,6 +153,8 @@ def check_response_itself(resp):
             resp.complain(1080)
         elif status == st.temporary_redirect:
             resp.complain(1084)
+        elif status == st.permanent_redirect:
+            resp.complain(1205)
 
     if status == st.use_proxy:
         resp.complain(1082)
@@ -335,7 +337,8 @@ def check_response_in_context(resp, req):
         location = urlparse.urljoin(req.effective_uri,
                                     resp.headers.location.value)
         if url_equals(req.effective_uri, location):
-            if resp.status in [st.multiple_choices, st.temporary_redirect]:
+            if resp.status in [st.multiple_choices, st.temporary_redirect,
+                               st.permanent_redirect]:
                 resp.complain(1085)
             if resp.status in [st.moved_permanently, st.found, st.see_other] \
                     and req.method != m.POST:
@@ -381,7 +384,8 @@ def check_response_in_context(resp, req):
 
     if req.method == m.OPTIONS and req.is_asterisk_form and \
             resp.status in [st.multiple_choices, st.moved_permanently,
-                            st.found, st.temporary_redirect]:
+                            st.found, st.temporary_redirect,
+                            st.permanent_redirect]:
         resp.complain(1086)
 
     if resp.status == st.not_acceptable:
