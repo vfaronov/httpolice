@@ -1,0 +1,26 @@
+# PATCH has a weird caching story: RFC 5789 section 2 basically says that
+# a ``Cache-Control`` on a response to PATCH applies not to that response,
+# but to a hypothetical future GET on the same resource.
+# I'm leaving this file here to be reminded when I decide to
+# check for absence of cache controls on responses to non-cacheable methods.
+
+======== BEGIN INBOUND STREAM ========
+PATCH /articles/123/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: text/x-diff
+Content-Length: 44
+
+1c1
+< Hello world!
+---
+> Goodbye world!
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Location: http://example.com/articles/123/
+Content-Type: text/plain
+Content-Length: 16
+Cache-Control: public, max-age=300
+
+Goodbye world!

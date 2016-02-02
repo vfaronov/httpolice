@@ -122,6 +122,7 @@ known = KnownMethods([
   'safe': False},
  {'_': Method(u'PATCH'),
   '_citations': [RFC(5789, section=(2,))],
+  'cacheable': False,
   'defines_body': True,
   'idempotent': False,
   'safe': False},
