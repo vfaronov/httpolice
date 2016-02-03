@@ -407,7 +407,15 @@ known = KnownDict([
   'parser': rfc7231.http_date,
   'representation_metadata': True,
   'rule': SINGLE},
- {'_': FieldName(u'Link'), '_citations': [RFC(5988)]},
+ {'_': FieldName(u'Link'),
+  '_citations': [RFC(5988, section=(5,))],
+  # Not sure if this makes any sense on requests.
+  # With the ``anchor`` parameter, perhaps.
+  # Leaving undefined for now.
+  'for_request': None,
+  'for_response': True,
+  'precondition': False,
+  'proactive_conneg': False},
  {'_': FieldName(u'Location'),
   '_citations': [RFC(7231, section=(7, 1, 2))],
   'bad_for_trailer': True,
