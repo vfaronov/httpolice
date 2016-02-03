@@ -35,7 +35,7 @@ def _parse_extension_pragma(state):
     k, v = inner.parse(state)
     if k.lower() == u'no-cache':
         raise ParseError()
-    return k, v
+    return Parametrized(k, v)
 
 extension_pragma = function(_parse_extension_pragma) \
     // rfc(7234, u'extension-pragma')

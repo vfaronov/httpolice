@@ -210,9 +210,9 @@ def check_message(msg):
         if msg.headers.cache_control.no_transform:
             msg.complain(1192)
 
-    for pragma in msg.headers.pragma:
+    for pragma in msg.headers.pragma.okay:
         if pragma != u'no-cache':
-            msg.complain(1160, pragma=pragma)
+            msg.complain(1160, pragma=pragma.item)
 
 
 def body_charset(msg):
