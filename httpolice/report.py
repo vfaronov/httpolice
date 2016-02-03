@@ -161,26 +161,28 @@ def displayable_body(msg):
     transforms = []
     if not okay(r):
         return r, transforms
+
+    r = r.decode('utf-8', 'replace')
     if msg.headers.transfer_encoding:
         transforms.append(u'removing Transfer-Encoding')
+
+    if okay(msg.decoded_body):
+        r = msg.decoded_body.decode('utf-8', 'replace')
+        if msg.headers.content_encoding:
+            transforms.append(u'removing Content-Encoding')
 
     if okay(msg.json_data):
         r = json.dumps(msg.json_data, indent=2, ensure_ascii=False)
         transforms.append(u'pretty-printing')
     elif okay(msg.decoded_body):
-        r = msg.decoded_body
-        if msg.headers.content_encoding:
-            transforms.append(u'removing Content-Encoding')
         charset = message.body_charset(msg) or 'UTF-8'
         try:
             codec = codecs.lookup(charset)
         except LookupError:
             codec = codecs.lookup('utf-8')
-        r = r.decode(codec.name, 'replace')
+        r = msg.decoded_body.decode(codec.name, 'replace')
         if codec.name != 'utf-8':
             transforms.append(u'decoding from %s' % charset)
-    else:
-        r = r.decode('utf-8', 'replace')
 
     limit = 5000
     if len(r) > limit:
