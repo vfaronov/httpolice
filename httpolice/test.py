@@ -8,7 +8,7 @@ import unittest
 
 from httpolice import HTMLReport, TextReport, analyze_exchange, analyze_streams
 from httpolice import parse
-from httpolice.known import cache, cc, h, header, m, media, st, tc, unit
+from httpolice.known import cache, cc, h, header, hsts, m, media, st, tc, unit
 from httpolice.notice import notices
 from httpolice.report import render_notice_examples
 from httpolice.structure import (
@@ -19,6 +19,7 @@ from httpolice.structure import (
     ContentRange,
     FieldName,
     HeaderEntry,
+    HSTSDirective,
     HTTPVersion,
     LanguageTag,
     Method,
@@ -840,6 +841,30 @@ class TestResponse(unittest.TestCase):
                 Parametrized(AuthScheme(u'basic'), [(u'realm', 'simple')]),
             ]
         )
+
+    def test_hsts(self):
+        inbound = self.req(m.GET)
+        stream = ('HTTP/1.1 200 OK\r\n'
+                  'Content-Type: text/plain\r\n'
+                  'Strict-Transport-Security: foo\r\n'
+                  'Strict-Transport-Security: ;max-age  =  "15768000" ;\r\n'
+                  '     includeSubdomains=xyzzy; ; max-age;  foobar ;\r\n'
+                  '\r\n'
+                  'Hello world!\r\n')
+        [[resp1]] = self.parse(inbound, stream)
+        self.assertEquals(
+            resp1.headers.strict_transport_security.value,
+            [
+                Parametrized(hsts.max_age, 15768000),
+                Parametrized(hsts.includesubdomains, None),
+                Parametrized(hsts.max_age, Unparseable),
+                Parametrized(HSTSDirective(u'fooBar'), None),
+            ]
+        )
+        self.assertEquals(
+            resp1.headers.strict_transport_security.max_age, 15768000)
+        self.assertEquals(
+            resp1.headers.strict_transport_security.includesubdomains, True)
 
     def test_fuzz(self):
         # Make sure we don't raise exceptions on very wrong inputs.

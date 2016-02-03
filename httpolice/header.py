@@ -3,7 +3,8 @@
 import operator
 
 from httpolice import known, parse
-from httpolice.known import cache, cache_directive, h, header
+from httpolice.known import cache_directive, h, header
+import httpolice.known.hsts_directive
 from httpolice.structure import Parametrized, Unparseable, okay
 
 
@@ -19,12 +20,14 @@ class HeadersView(object):
     def __getitem__(self, key):
         if key not in self._cache:
             rule = header.rule_for(key)
-            if rule == header.SINGLE:
+            if key == h.cache_control:
+                cls = CacheControlView
+            elif key == h.strict_transport_security:
+                cls = StrictTransportSecurityView
+            elif rule in [header.SINGLE, header.SINGLE_LIST]:
                 cls = SingleHeaderView
             elif rule == header.MULTI:
                 cls = MultiHeaderView
-            elif rule == header.CACHE_CONTROL:
-                cls = CacheControlView
             else:
                 cls = UnknownHeaderView
             self._cache[key] = cls(self._message, key)
@@ -169,7 +172,7 @@ class SingleHeaderView(HeaderView):
     __gt__ = lambda self, other: self._compare(other, operator.gt)
 
 
-class MultiHeaderView(HeaderView):
+class ListHeaderView(HeaderView):
 
     def __iter__(self):
         return iter(self.value)
@@ -188,6 +191,13 @@ class MultiHeaderView(HeaderView):
         # but it's only invoked when the `Parametrized` is on the left side.
         return any(val == other for val in self.value)
 
+    @property
+    def okay(self):
+        return [v for v in self if okay(v)]
+
+
+class MultiHeaderView(ListHeaderView):
+
     def _parse(self):
         entries, values = self._pre_parse()
         self._value = []
@@ -198,15 +208,55 @@ class MultiHeaderView(HeaderView):
                 self._value.extend(sub_values)
         self._entries = entries
 
-    @property
-    def okay(self):
-        return [v for v in self if okay(v)]
 
+class DirectivesView(ListHeaderView):
 
-class CacheControlView(MultiHeaderView):
+    knowledge_module = None
 
     def _process_parsed(self, entry, ds):
         return [self._process_directive(entry, d) for d in ds]
+
+    def _process_directive(self, entry, directive_with_argument):
+        directive, argument = directive_with_argument
+
+        def complain(ident, **kwargs):
+            self.message.complain(ident, entry=entry,
+                                  directive=directive, **kwargs)
+
+        parser = self.knowledge_module.parser_for(directive)
+        if argument is None:
+            if self.knowledge_module.argument_required(directive):
+                complain(1156)
+                argument = Unparseable
+        else:
+            if self.knowledge_module.no_argument(directive):
+                complain(1157)
+                argument = None
+            elif parser is not None:
+                state = parse.State(str(argument))
+                try:
+                    argument = (parser + parse.eof).parse(state)
+                except parse.ParseError, e:
+                    complain(1158, error=e)
+                    argument = Unparseable
+                else:
+                    state.dump_complaints(self.message, entry)
+
+        return Parametrized(directive, argument)
+
+    def __getattr__(self, key):
+        return self[getattr(self.knowledge_module.known, key)]
+
+    def __getitem__(self, key):
+        for directive, argument in self.okay:
+            if directive == key:
+                return True if argument is None else argument
+        return None
+
+
+class CacheControlView(DirectivesView, MultiHeaderView):
+
+    knowledge_module = cache_directive
 
     def _process_directive(self, entry, directive_with_argument):
         directive, argument = directive_with_argument
@@ -225,32 +275,10 @@ class CacheControlView(MultiHeaderView):
                 cache_directive.token_preferred(directive):
             complain(1155)
 
-        parser = cache_directive.parser_for(directive)
-        if argument is None:
-            if cache_directive.argument_required(directive):
-                complain(1156)
-                argument = Unparseable
-        else:
-            if cache_directive.no_argument(directive):
-                complain(1157)
-                argument = None
-            elif parser is not None:
-                state = parse.State(str(argument))
-                try:
-                    argument = (parser + parse.eof).parse(state)
-                except parse.ParseError, e:
-                    complain(1158, error=e)
-                    argument = Unparseable
-                else:
-                    state.dump_complaints(self.message, entry)
+        return super(CacheControlView, self). \
+            _process_directive(entry, (directive, argument))
 
-        return Parametrized(directive, argument)
 
-    def __getattr__(self, key):
-        return self[getattr(cache, key)]
+class StrictTransportSecurityView(DirectivesView, SingleHeaderView):
 
-    def __getitem__(self, key):
-        for directive, argument in self.okay:
-            if directive == key:
-                return True if argument is None else argument
-        return None
+    knowledge_module = httpolice.known.hsts_directive

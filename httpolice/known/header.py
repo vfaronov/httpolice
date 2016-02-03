@@ -7,6 +7,7 @@ from httpolice.structure import FieldName
 from httpolice.syntax import (
     rfc3986,
     rfc5646,
+    rfc6797,
     rfc7230,
     rfc7231,
     rfc7232,
@@ -18,9 +19,9 @@ from httpolice.syntax.common import integer
 
 
 SINGLE = 1
-MULTI = 2
-SET_COOKIE = 3
-CACHE_CONTROL = 4
+SINGLE_LIST = 2
+MULTI = 3
+SET_COOKIE = 4
 
 
 def deprecated(name):
@@ -161,7 +162,7 @@ known = KnownDict([
   'parser': rfc7230.comma_list1(rfc7234.cache_directive),
   'precondition': False,
   'proactive_conneg': False,
-  'rule': CACHE_CONTROL},
+  'rule': MULTI},
  {'_': FieldName(u'CalDAV-Timezones'),
   '_citations': [],
   'iana_status': 'standard'},
@@ -588,8 +589,12 @@ known = KnownDict([
  {'_': FieldName(u'SoapAction'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Status-URI'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Strict-Transport-Security'),
-  '_citations': [RFC(6797)],
-  'iana_status': 'standard'},
+  '_citations': [RFC(6797, section=(6, 1))],
+  'for_request': False,
+  'for_response': True,
+  'iana_status': 'standard',
+  'parser': rfc6797.strict_transport_security,
+  'rule': SINGLE_LIST},
  {'_': FieldName(u'Surrogate-Capability'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Surrogate-Control'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'TCN'), '_citations': [RFC(4229)]},

@@ -8,6 +8,7 @@ from httpolice.known import (
     cache_directive,
     h,
     header,
+    hsts,
     m,
     media,
     media_type,
@@ -297,6 +298,18 @@ def check_response_itself(resp):
             m.PATCH not in headers.allow:
         resp.complain(1217)
 
+    if headers.strict_transport_security.is_okay:
+        if hsts.max_age not in headers.strict_transport_security:
+            resp.complain(1218)
+        if headers.strict_transport_security.max_age == 0 and \
+                headers.strict_transport_security.includesubdomains:
+            resp.complain(1219)
+        seen = set()
+        for direct, _ in headers.strict_transport_security:
+            if direct in seen:
+                resp.complain(1220, directive=direct)
+            seen.add(direct)
+
 
 def check_response_in_context(resp, req):
     if resp.body and resp.headers.content_type.is_absent and \
@@ -552,3 +565,7 @@ def check_response_in_context(resp, req):
     if req.method == m.OPTIONS and m.PATCH in resp.headers.allow and \
             resp.headers.accept_patch.is_absent:
         resp.complain(1216)
+
+    if resp.headers.strict_transport_security.is_present and \
+            req.scheme == 'http':
+        resp.complain(1221)

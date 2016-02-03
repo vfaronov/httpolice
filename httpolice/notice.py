@@ -11,6 +11,7 @@ protocol_items = {
     'cache': structure.CacheDirective,
     'cc': structure.ContentCoding,
     'h': structure.FieldName,
+    'hsts': structure.HSTSDirective,
     'm': structure.Method,
     'media': structure.MediaType,
     'st': structure.StatusCode,

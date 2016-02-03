@@ -1,0 +1,16 @@
+1220 1013
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+Strict-Transport-Security: includeSubDomains
+Strict-Transport-Security: max-age=86400; includeSubDomains; Max-Age=3600;
+
+Hello world!

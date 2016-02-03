@@ -295,3 +295,8 @@ class WarnCode(int):
 class AuthScheme(CaseInsensitive):
 
     __slots__ = ()
+
+
+class HSTSDirective(CaseInsensitive):
+
+    __slots__ = ()

@@ -1172,17 +1172,17 @@
   </comment>
 
   <error id="1156">
-    <title><ref to="directive"/> cache directive with no argument</title>
+    <title><ref to="entry"/>: <ref to="directive"/> with no argument</title>
     <explain>According to the specification, the <ref to="directive"/> directive must have an argument. But in this message’s <ref to="entry"/> header, it has no argument.</explain>
   </error>
 
   <error id="1157">
-    <title><ref to="directive"/> cache directive with an argument</title>
+    <title><ref to="entry"/>: <ref to="directive"/> with an argument</title>
     <explain>In this message’s <ref to="entry"/> header, the <ref to="directive"/> directive has an argument. But the specification for <ref to="directive"/> defines no argument.</explain>
   </error>
 
   <error id="1158">
-    <title>Malformed <ref to="directive"/> cache directive</title>
+    <title>Malformed <ref to="entry"/>: <ref to="directive"/></title>
     <explain>When parsing the argument to the <ref to="directive"/> directive in this message’s <ref to="entry"/> header, the following error occurred:</explain>
     <explain><ref to="error"/></explain>
   </error>
@@ -1586,6 +1586,32 @@
   <error id="1217">
     <title><ref to="msg.headers.accept_patch"/> without “<ref to="msg.headers.allow"/>: <m>PATCH</m>”</title>
     <explain>This response’s <h>Accept-Patch</h> header means that this resource supports the <m>PATCH</m> method, but it’s missing from the <h>Allow</h> header.</explain>
+  </error>
+
+  <error id="1218">
+    <title>HSTS without <hsts>max-age</hsts></title>
+    <explain>According to <rfc num="6797" sect="6.1.1"/>, a <ref to="msg.headers.strict_transport_security"/> header must have a <hsts>max-age</hsts> directive.</explain>
+  </error>
+
+  <comment id="1219">
+    <title>HSTS: <hsts>max-age</hsts>=0 with <hsts>includeSubDomains</hsts></title>
+    <explain>The “<hsts>max-age</hsts>=0” directive in this response’s <ref to="msg.headers.strict_transport_security"/> header tells the user agent to delete the HSTS policy for the domain. The <hsts>includeSubDomains</hsts> directive makes no difference in this case.</explain>
+    <explain>See <rfc num="6797" sect="6.2"/>.</explain>
+  </comment>
+
+  <error id="1220">
+    <title>Multiple <ref to="directive"/> directives in <ref to="msg.headers.strict_transport_security">HSTS</ref></title>
+    <rfc num="6797" sect="6.1">
+      All directives MUST appear only once in an STS header field.
+    </rfc>
+  </error>
+
+  <error id="1221">
+    <title><ref to="msg.headers.strict_transport_security"/> without TLS</title>
+    <rfc num="6798" sect="7.2">
+      An HSTS Host MUST NOT include the STS header field in HTTP responses
+   conveyed over non-secure transport.
+    </rfc>
   </error>
 
 </notices>
