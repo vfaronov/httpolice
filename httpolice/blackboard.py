@@ -5,8 +5,6 @@ import functools
 
 class Blackboard(object):
 
-    __slots__ = ('complaints',)
-
     self_name = 'self'
 
     def __init__(self):
