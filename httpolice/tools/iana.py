@@ -1,5 +1,6 @@
 # -*- coding: utf-8; -*-
 
+import pprint
 import re
 import urllib2
 import urlparse
@@ -7,6 +8,7 @@ import urlparse
 import lxml.etree
 
 from httpolice.citation import Citation, RFC
+import httpolice.known
 from httpolice.structure import (
     AuthScheme,
     CacheDirective,
@@ -187,8 +189,6 @@ class MediaTypeRegistry(Registry):
             entry = {}
         entry['_'] = MediaType(u'%s/%s' % (toplevel, subtype))
         entry['_citations'] = list(self.extract_citations(record))
-        if not entry['_citations']:
-            return None
         return entry
 
 
@@ -242,3 +242,53 @@ class AuthSchemeRegistry(Registry):
             '_': AuthScheme(record.find('iana:value', self.xmlns).text),
             '_citations': list(self.extract_citations(record)),
         }
+
+
+def make_diff(here, there):
+    not_here, mismatch, not_there = [], [], []
+    for key, entry in there.items():
+        if key in here:
+            entry_diff = {k: {'here': here[key].get(k), 'there': v}
+                          for k, v in entry.items()
+                          if not _info_match(k, here[key].get(k), v)}
+            if entry_diff:
+                entry_diff['_'] = key
+                mismatch.append(entry_diff)
+        elif entry['_citations']:
+            # We don't have much use for entries without citations.
+            not_here.append(entry)
+    for key in set(here) - set(there):
+        not_there.append(here[key])
+    return not_here, mismatch, not_there
+
+
+def _info_match(key, here, there):
+    if key == '_citations':
+        # We consider the citation lists matching if
+        # for every citation listed at IANA
+        # we have the same citation or a more specific one.
+        for there_cit in there:
+            if not any(here_cit.subset_of(there_cit) for here_cit in here):
+                return False
+        return True
+    else:
+        return here == there
+
+
+def main():
+    for reg in Registry.__subclasses__():
+        for cls, entries in reg().get_all():
+            here = httpolice.known.classes[cls]
+            there = {entry['_']: entry for entry in entries}
+            not_here, mismatch, not_there = make_diff(here, there)
+            for title, updates in [('not here', not_here),
+                                   ('mismatch', mismatch),
+                                   ('not there', not_there)]:
+                if updates:
+                    print '======== %s %s ========\n' % (cls.__name__, title)
+                    pprint.pprint(updates)
+                    print '\n'
+
+
+if __name__ == '__main__':
+    main()

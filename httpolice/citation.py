@@ -18,18 +18,17 @@ class Citation(object):
     def __ne__(self, other):
         return not self == other
 
+    def subset_of(self, other):
+        return self == other
+
     def __hash__(self):
         return hash((self.title, self.url))
 
 
 class RFC(Citation):
 
-    # The reason we do this as a special subclass
-    # that remembers the RFC-specific `num`/`section`/`appendix` attributes
-    # is because these values, as produced by :mod:`httpolice.tools.iana`,
-    # are pretty-printed and copied directly
-    # into the source code of the various `httpolice.known` modules,
-    # so we want their `repr()` to look nice there.
+    # We remember the RFC-specific locators (number, section, etc.)
+    # in order to get a nice `repr()` and a correct :meth:`subset_of`.
 
     __slots__ = ('num', 'section', 'appendix', 'errata')
 
@@ -64,3 +63,16 @@ class RFC(Citation):
                 title += u' %s %s' % (word1, section_text)
                 url += u'#%s-%s' % (word2, section_text)
         super(RFC, self).__init__(title, url)
+
+    def subset_of(self, other):
+        if self.num != other.num:
+            return False
+        if other.section:
+            return self.section and \
+                self.section[:len(other.section)] == other.section
+        if other.appendix:
+            return self.appendix and \
+                self.appendix[:len(other.appendix)] == other.appendix
+        if other.errata:
+            return self.errata == other.errata
+        return True
