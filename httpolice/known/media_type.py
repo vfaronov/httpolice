@@ -226,6 +226,7 @@ known = KnownDict([
   '_citations': [RFC(5362)]},
  {'_': MediaType(u'application/resource-lists+xml'),
   '_citations': [RFC(4826)]},
+ {'_': MediaType(u'application/rfc+xml'), '_citations': [RFC(7749)]},
  {'_': MediaType(u'application/rlmi+xml'), '_citations': [RFC(4662)]},
  {'_': MediaType(u'application/rls-services+xml'), '_citations': [RFC(4826)]},
  {'_': MediaType(u'application/rpki-ghostbusters'), '_citations': [RFC(6493)]},
