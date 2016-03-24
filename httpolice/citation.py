@@ -16,7 +16,7 @@ class Citation(object):
             self.title == other.title and self.url == other.url
 
     def __ne__(self, other):
-        return self != other
+        return not self == other
 
     def __hash__(self):
         return hash((self.title, self.url))
