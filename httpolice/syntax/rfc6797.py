@@ -1,25 +1,26 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.parse import (
-    argwrap,
-    many,
-    maybe,
-    wrap,
-)
+from httpolice.citation import RFC
+from httpolice.parse import auto, fill_names, many, maybe, pivot, skip, string1
 from httpolice.structure import HSTSDirective, Parametrized
-from httpolice.syntax.rfc7230 import ows, quoted_string, token
+from httpolice.syntax.common import DIGIT
+from httpolice.syntax.rfc7230 import OWS, quoted_string, token
 
 
 # This has been slightly adapted to the rules of RFC 7230.
-# The ``<OWS>`` are derived from the "linear ``*LWS``" requirement.
+# The ``OWS`` are derived from the "linear ``*LWS``" requirement.
 
-directive_name = wrap(HSTSDirective, token)
-directive_value = token | quoted_string
-directive = argwrap(
-    Parametrized,
-    directive_name + maybe(~(ows + '=' + ows) + directive_value))
+directive_name = HSTSDirective << token                                 > auto
+directive_value = token | quoted_string                                 > auto
+directive = Parametrized << (
+    directive_name * maybe(skip(OWS * '=' * OWS) * directive_value))    > pivot
 
-strict_transport_security = argwrap(
-    lambda x, xs: [elem for elem in [x] + xs if elem is not None],
-    maybe(directive) +
-    many(~(ows + ';' + ows) + maybe(directive)))
+def _collect_elements(xs):
+    return [elem for elem in xs if elem is not None]
+
+Strict_Transport_Security = _collect_elements << (
+    maybe(directive) % many(skip(OWS * ';' * OWS) * maybe(directive)))  > pivot
+
+max_age_value = int << string1(DIGIT)                                   > pivot
+
+fill_names(globals(), RFC(6797))

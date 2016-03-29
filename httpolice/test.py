@@ -91,16 +91,45 @@ class TestSyntax(unittest.TestCase):
 
     def assertParse(self, parser, text, result=None):
         r = parser.parse(parse.State(text))
-        if result is not None:
+        if result is Unparseable:
+            self.assert_(r is Unparseable)
+        elif result is not None:
             self.assertEqual(r, result)
 
     def assertNoParse(self, parser, text):
         self.assertRaises(parse.ParseError, parser.parse, parse.State(text))
 
+    def test_parser_edge_cases(self):
+        # Our parser implementation is general enough that
+        # some of its branches are not being exercised by our regular tests,
+        # so I had to come up with these contrived examples to test them.
+
+        p = parse.many(rfc7230.tchar)                       > parse.named('p')
+        p1 = '1' * p                                        > parse.named('p1')
+        p2 = '11' * p * parse.skip('\n')                    > parse.named('p2')
+        self.assertParse(p1 | p2, '11abc', ('1', ['1', 'a', 'b', 'c']))
+        self.assertParse(p1 | p2, '11abc\n', ('11', ['a', 'b', 'c']))
+
+        p = parse.recursive()                               > parse.named('p')
+        p.rec = (rfc7230.tchar * p |
+                 parse.subst(None) << parse.empty)
+        self.assertParse(p, 'abc', ('a', ('b', ('c', None))))
+
+        p = parse.literal('ab')                             > parse.named('p')
+        p0 = parse.subst('') << parse.empty | p             > parse.named('p0')
+        p1 = 'xab' * p0                                     > parse.named('p1')
+        p2 = 'x' * parse.string(p0) * '!'                   > parse.named('p2')
+        self.assertParse(p1 | p2, 'xabab', ('xab', 'ab'))
+        self.assertParse(p1 | p2, 'xabab!', ('x', 'abab', '!'))
+
+        p = parse.empty | parse.literal('a')                > parse.named('p')
+        p0 = p * 'x'                                        > parse.named('x')
+        self.assertParse(p0, 'x', 'x')
+
     def test_comma_list(self):
-        p = rfc7230.comma_list(rfc7230.token) + parse.eof
+        p = rfc7230.comma_list(rfc7230.token)
         self.assertParse(p, '', [])
-        self.assertParse(p, ' , ,, , ,', [])
+        self.assertParse(p, ', ,, , ,', [])
         self.assertParse(p, 'foo', ['foo'])
         self.assertParse(p, 'foo,bar', ['foo', 'bar'])
         self.assertParse(p, 'foo, bar,', ['foo', 'bar'])
@@ -109,7 +138,7 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'foo;bar')
 
     def test_comma_list1(self):
-        p = rfc7230.comma_list1(rfc7230.token) + parse.eof
+        p = rfc7230.comma_list1(rfc7230.token)
         self.assertNoParse(p, '')
         self.assertNoParse(p, '  \t ')
         self.assertNoParse(p, ' , ,, , ,')
@@ -120,8 +149,16 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'foo,"bar"')
         self.assertNoParse(p, 'foo;bar')
 
+    def test_comment(self):
+        p = rfc7230.comment(include_parens=False)
+        self.assertParse(p, '(foo (bar \\) baz "( qux)") xyzzy \\123 )',
+                         u'foo (bar ) baz "( qux)") xyzzy 123 ')
+        self.assertParse(p, '(раз (два три) четыре пять)',
+                         u'раз (два три) четыре пять')
+        self.assertNoParse(p, '(foo "bar)" baz)')
+
     def test_transfer_coding(self):
-        p = rfc7230.transfer_coding + parse.eof
+        p = rfc7230.transfer_coding()
         self.assertParse(p, 'chunked', Parametrized(tc.chunked, []))
         self.assertParse(p, 'foo',
                          Parametrized(TransferCoding(u'foo'), []))
@@ -133,15 +170,16 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'foo;???')
         self.assertNoParse(p, 'foo;"bar"="baz"')
 
-        p = rfc7230.t_codings + parse.eof
-        self.assertParse(p, 'gzip;q=0.345', Parametrized(tc.gzip,
-                                                         [(u'q', 0.345)]))
-        self.assertParse(p, 'gzip; Q=1.0', Parametrized(tc.gzip, [(u'Q', 1)]))
+        p = rfc7230.t_codings
+        self.assertParse(p, 'gzip;q=0.345',
+                         Parametrized(Parametrized(tc.gzip, []), 0.345))
+        self.assertParse(p, 'gzip; Q=1.0',
+                         Parametrized(Parametrized(tc.gzip, []), 1))
         self.assertParse(p, 'trailers', u'trailers')
         self.assertNoParse(p, 'gzip;q=2.0')
 
     def test_media_type(self):
-        p = rfc7231.media_type + parse.eof
+        p = rfc7231.media_type
         self.assertParse(
             p, 'Text/HTML; Charset="utf-8"',
             Parametrized(media.text_html, [(u'charset', u'utf-8')]))
@@ -150,7 +188,7 @@ class TestSyntax(unittest.TestCase):
             Parametrized(MediaType(u'application/vnd.github.v3+json'), []))
 
     def test_accept(self):
-        p = rfc7231.accept + parse.eof
+        p = rfc7231.Accept
         self.assertParse(
             p,
             'text/html;charset="utf-8";Q=1;profile="mobile", '
@@ -222,7 +260,7 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'text/html;q="0.123"')
 
     def test_accept_charset(self):
-        p = rfc7231.accept_charset + parse.eof
+        p = rfc7231.Accept_Charset
         self.assertParse(
             p, 'iso-8859-5, unicode-1-1 ; q=0.8',
             [
@@ -232,7 +270,7 @@ class TestSyntax(unittest.TestCase):
         )
 
     def test_accept_encoding(self):
-        p = rfc7231.accept_encoding + parse.eof
+        p = rfc7231.Accept_Encoding
         self.assertParse(
             p, 'compress, gzip',
             [Parametrized(cc.compress, None), Parametrized(cc.gzip, None)])
@@ -253,7 +291,7 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'gzip, q=1.0')
 
     def test_accept_language(self):
-        p = rfc7231.accept_language + parse.eof
+        p = rfc7231.Accept_Language
         self.assertParse(
             p, 'da, en-gb;q=0.8, en;q=0.7',
             [
@@ -275,21 +313,21 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'en; q = 0.7')
 
     def test_request_target(self):
-        p = rfc7230.origin_form + parse.eof
+        p = rfc7230.origin_form
         self.assertParse(p, '/where?q=now')
         self.assertNoParse(p, '/hello world')
 
-        p = rfc7230.absolute_form + parse.eof
+        p = rfc7230.absolute_form
         self.assertParse(p, 'http://www.example.com:80')
 
-        p = rfc7230.authority_form + parse.eof
+        p = rfc7230.authority_form
         self.assertParse(p, 'www.example.com:80')
         self.assertParse(p, '[::0]:8080')
 
-        p = rfc7230.asterisk_form + parse.eof
+        p = rfc7230.asterisk_form
         self.assertParse(p, '*')
 
-        p = rfc3986.absolute_uri + parse.eof
+        p = rfc3986.absolute_URI
         self.assertParse(p, 'ftp://ftp.is.co.za/rfc/rfc1808.txt')
         self.assertParse(p, 'http://www.ietf.org/rfc/rfc2396.txt')
         self.assertParse(p, 'ldap://[2001:db8::7]/c=GB?objectClass?one')
@@ -301,7 +339,7 @@ class TestSyntax(unittest.TestCase):
                          'urn:oasis:names:specification:docbook:dtd:xml:4.1.2')
 
     def test_partial_uri(self):
-        p = rfc7230.partial_uri + parse.eof
+        p = rfc7230.partial_URI
         self.assertParse(p, '/')
         self.assertParse(p, '/foo/bar?baz=qux&xyzzy=123')
         self.assertParse(p, 'foo/bar/')
@@ -309,7 +347,7 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, '/foo#bar=baz')
 
     def test_via(self):
-        p = rfc7230.via + parse.eof
+        p = rfc7230.Via
         self.assertParse(p, '1.0 fred, 1.1 p.example.net',
                          [(Versioned(u'HTTP', u'1.0'), u'fred', None),
                           (Versioned(u'HTTP', u'1.1'),
@@ -335,13 +373,13 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'proxy1, proxy2')
 
     def test_protocol(self):
-        p = rfc7230.protocol + parse.eof
+        p = rfc7230.protocol
         self.assertParse(p, 'h2c', (u'h2c', None))
         self.assertParse(p, 'FSTR/2', (u'FSTR', u'2'))
         self.assertNoParse(p, '/2')
 
     def test_user_agent(self):
-        p = rfc7231.user_agent + parse.eof
+        p = rfc7231.User_Agent
         self.assertParse(
             p,
             'Mozilla/5.0 '
@@ -371,7 +409,7 @@ class TestSyntax(unittest.TestCase):
             ])
 
     def test_http_date(self):
-        p = rfc7231.http_date + parse.eof
+        p = rfc7231.HTTP_date
         self.assertParse(p, 'Sun, 06 Nov 1994 08:49:37 GMT',
                          datetime(1994, 11, 6, 8, 49, 37))
         self.assertParse(p, 'Sunday, 06-Nov-94 08:49:37 GMT',
@@ -380,11 +418,12 @@ class TestSyntax(unittest.TestCase):
                          datetime(1994, 11, 6, 8, 49, 37))
         self.assertParse(p, 'Sun Nov 16 08:49:37 1994',
                          datetime(1994, 11, 16, 8, 49, 37))
-        self.assertNoParse(p, 'Sun, 29 Feb 2015 14:11:06 GMT')
-        self.assertNoParse(p, 'Wed, 13 Jan 2016 24:09:06 GMT')
+        self.assertParse(p, 'Sun Nov 36 08:49:37 1994', Unparseable)
+        self.assertParse(p, 'Sun Nov 16 28:49:37 1994', Unparseable)
+        self.assertNoParse(p, 'Foo, 13 Jan 2016 24:09:06 GMT')
 
     def test_acceptable_ranges(self):
-        p = rfc7233.acceptable_ranges + parse.eof
+        p = rfc7233.acceptable_ranges
         self.assertParse(p, 'none', [])
         self.assertParse(p, 'NONE', [])
         self.assertParse(p, 'none,', [RangeUnit(u'none')])
@@ -392,7 +431,7 @@ class TestSyntax(unittest.TestCase):
                          [unit.bytes, RangeUnit(u'pages')])
 
     def test_range(self):
-        p = rfc7233.range + parse.eof
+        p = rfc7233.Range
         self.assertParse(
             p, 'bytes=0-499',
             RangeSpecifier(unit.bytes, [(0, 499)]))
@@ -420,7 +459,7 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, '1-5')
 
     def test_content_range(self):
-        p = rfc7233.content_range + parse.eof
+        p = rfc7233.Content_Range
         self.assertParse(
             p, 'bytes 42-1233/1234',
             ContentRange(unit.bytes, ((42, 1233), 1234)))
@@ -526,6 +565,29 @@ class TestRequest(unittest.TestCase):
         [req1] = self.parse(stream)
         self.assertEqual(req1.method, u'GET')
         self.assert_(req1.body is None)
+
+    def test_funny_headers(self):
+        stream = ('GET / HTTP/1.1\r\n'
+                  'Host: example.com\r\n'
+                  'Foo:    \r\n'
+                  '     \r\n'
+                  '  bar baz qux\r\n'
+                  '    xyzzy\r\n'
+                  ' \r\n'
+                  'Bar:\r\n'
+                  ' \r\n'
+                  ' wololo\t\t\r\n'
+                  'Baz:\r\n'
+                  '\r\n')
+        [req1] = self.parse(stream)
+        # According to my reading of the spec (which may be wrong),
+        # every ``obs-fold`` becomes one space,
+        # and these spaces are *not* stripped
+        # from either end of the resulting ``field-value``.
+        self.assertEqual(req1.header_entries[1].value,
+                         '  bar baz qux xyzzy ')
+        self.assertEqual(req1.header_entries[2].value, '  wololo')
+        self.assertEqual(req1.header_entries[3].value, '')
 
     def test_transfer_codings(self):
         stream = ('POST / HTTP/1.1\r\n'

@@ -1,8 +1,15 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.parse import wrap
+from httpolice.citation import RFC
+from httpolice.parse import auto, fill_names, pivot, string, string_times
 from httpolice.structure import LanguageTag
-from httpolice.syntax.rfc5646 import language_tag
+from httpolice.syntax.common import ALPHA, DIGIT
 
 
-language_range = language_tag | wrap(LanguageTag, '*')
+alphanum = ALPHA | DIGIT                                                > auto
+language_range = LanguageTag << (
+    string_times(1, 8, ALPHA) + string('-' + string_times(1, 8, alphanum)) |
+    '*')                                                                > pivot
+
+
+fill_names(globals(), RFC(4647))

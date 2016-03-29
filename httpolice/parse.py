@@ -1,30 +1,439 @@
 # -*- coding: utf-8; -*-
 
+from collections import OrderedDict
+import operator
+
+from bitstring import BitArray, Bits
+
 from httpolice.blackboard import Blackboard
-from httpolice.structure import CaseInsensitive
 
 
-class Ignore(object):
-
-    def __init__(self, value):
-        self.value = value
+###############################################################################
+# Combinators to construct a grammar suitable for the Earley algorithm.
 
 
-class ParseError(Exception):
+class Symbol(object):
 
-    pass
+    def __init__(self, name=None, citation=None, is_pivot=False,
+                 is_ephemeral=None):
+        self.name = name
+        self.citation = citation
+        self.is_pivot = is_pivot
+        self._is_ephemeral = is_ephemeral
+
+    def __repr__(self):
+        return '<%s %s>' % (self.__class__.__name__,
+                            self.name or hex(id(self)))
+
+    def __gt__(self, seal):
+        if self.name is None:
+            sealed = self
+        else:
+            sealed = SimpleNonterminal(rules=[Rule((self,))])
+        seal(sealed)
+        return sealed
+
+    @property
+    def is_ephemeral(self):
+        if self._is_ephemeral is None:
+            return (self.name is None)
+        else:
+            return self._is_ephemeral
+
+    def group(self):
+        raise NotImplementedError
+
+    def is_nullable(self):
+        raise NotImplementedError
+
+    def as_rule(self):
+        raise NotImplementedError
+
+    def as_rules(self):
+        raise NotImplementedError
+
+    def as_nonterminal(self):
+        raise NotImplementedError
+
+    def __or__(self, other):
+        other = as_symbol(other)
+        return SimpleNonterminal(rules=self.as_rules() + other.as_rules())
+
+    def __ror__(self, other):
+        other = as_symbol(other)
+        return SimpleNonterminal(rules=other.as_rules() + self.as_rules())
+
+    def __mul__(self, other):
+        other = as_symbol(other)
+        return SimpleNonterminal(
+            rules=[self.as_rule().concat(other.as_rule())])
+
+    def __rmul__(self, other):
+        other = as_symbol(other)
+        return SimpleNonterminal(
+            rules=[other.as_rule().concat(self.as_rule())])
+
+    def __rlshift__(self, func):
+        if isinstance(func, type) and not (func is int or func is float or
+                                           func is unicode):
+            is_ephemeral = False
+        else:
+            is_ephemeral = None
+        return SimpleNonterminal(
+            rules=[rule.wrap(func) for rule in self.as_rules()],
+            is_ephemeral=is_ephemeral)
+
+    def __add__(self, other):
+        return operator.add << self * other
+
+    def __radd__(self, other):
+        return operator.add << other * self
+
+    def __mod__(self, other):
+        return _continue_right_list << self * other
+
+    def parse(self, input_state, partial=False):
+        return parse(input_state, self.as_nonterminal(), partial)
 
 
-class MismatchError(ParseError):
+class Terminal(Symbol):
 
-    def __init__(self, pos, expected, found):
-        super(MismatchError, self).__init__(
-            u'at byte position %d: expected %s - found %r' %
-            (pos, expected, found))
-        self.pos = pos
-        self.expected = expected
-        self.found = found
+    def __init__(self, name=None, citation=None, bits=None):
+        super(Terminal, self).__init__(name, citation, is_pivot=False)
+        self.bits = bits if bits is not None else Bits(256)
 
+    def match(self, c):
+        return self.bits[ord(c)]
+
+    def group(self):
+        return self
+
+    def as_rule(self):
+        return Rule((self,))
+
+    def as_rules(self):
+        return [self.as_rule()]
+
+    def as_nonterminal(self):
+        return SimpleNonterminal(rules=self.as_rules())
+
+    def __or__(self, other):
+        other = as_symbol(other)
+        if isinstance(other, Terminal):
+            return Terminal(bits=self.bits | other.bits)
+        else:
+            return super(Terminal, self).__or__(other)
+
+    def __sub__(self, other):
+        return Terminal(bits=self.bits ^ (self.bits & other.bits))
+
+    def is_nullable(self):
+        return False
+
+
+class Nonterminal(Symbol):
+
+    def __init__(self, name=None, citation=None, is_pivot=False,
+                 is_ephemeral=None):
+        super(Nonterminal, self).__init__(name, citation, is_pivot,
+                                          is_ephemeral)
+        self._is_nullable = None
+
+    @property
+    def rules(self):
+        raise NotImplementedError
+
+    def as_rule(self):
+        if self.is_ephemeral and len(self.rules) == 1:
+            return self.rules[0]
+        else:
+            return Rule((self,))
+
+    def as_rules(self):
+        if self.is_ephemeral:
+            return self.rules
+        else:
+            return [self.as_rule()]
+
+    def as_nonterminal(self):
+        return self
+
+    def is_nullable(self):
+        if self._is_nullable is None:
+            self._is_nullable = any(all(sym.is_nullable()
+                                        for sym in rule.symbols)
+                                    for rule in self.rules)
+        return self._is_nullable
+
+
+class SimpleNonterminal(Nonterminal):
+
+    def __init__(self, name=None, citation=None, is_pivot=False,
+                 is_ephemeral=None, rules=None):
+        super(SimpleNonterminal, self).__init__(name, citation, is_pivot,
+                                                is_ephemeral)
+        if rules is None:
+            rules = []
+        self._rules = rules
+
+    @property
+    def rules(self):
+        return self._rules
+
+    def group(self):
+        if self.is_ephemeral:
+            return SimpleNonterminal(rules=self.rules, is_ephemeral=False)
+        else:
+            return self
+
+    def set_rules_from(self, other):
+        self._rules = other.rules
+
+    rec = property(None, set_rules_from)
+
+
+class RepeatedNonterminal(Nonterminal):
+
+    def __init__(self, name=None, citation=None, max_count=None, inner=None):
+        super(RepeatedNonterminal, self).__init__(name, citation,
+                                                  is_pivot=False,
+                                                  is_ephemeral=False)
+        self.max_count = max_count
+        self.inner = inner
+        self._rules = None
+
+    def group(self):
+        return self
+
+    @property
+    def rules(self):
+        if self._rules is None:
+            r = subst([]) << empty
+            if self.max_count is None:
+                # We don't apply any semantic actions here
+                # because this form is special-cased in :func:`_find_results`.
+                # The ``group()`` is needed for that optimization, too.
+                r = r | self * group(self.inner)
+            elif self.max_count > 1:
+                next_ = RepeatedNonterminal(max_count=self.max_count - 1,
+                                            inner=self.inner)
+                r = r | _continue_right_list << self.inner * next_
+            else:
+                r = r | _begin_list << self.inner
+            self._rules = r.rules
+        return self._rules
+
+
+class Rule(object):
+
+    def __init__(self, symbols, action=None):
+        self.symbols = symbols
+        self.action = action
+
+        # This small hack allows us to check if an Earley item is completed
+        # with a single tuple lookup, without a bounds check.
+        # This speeds up parsing a bit.
+        self.xsymbols = self.symbols + (None,)
+
+    def __repr__(self):
+        return '<Rule %r>' % (self.symbols,)
+
+    def concat(self, other):
+        if self.action is None and other.action is None:
+            concat_action = None
+        else:
+            len1 = len(self.symbols)
+            action1 = self.action
+            action2 = other.action
+            def concat_action(complain, nodes):
+                nodes1 = nodes[:len1]
+                if action1 is not None:
+                    nodes1 = action1(complain, nodes1)
+                nodes2 = nodes[len1:]
+                if action2 is not None:
+                    nodes2 = action2(complain, nodes2)
+                return nodes1 + nodes2
+        return Rule(self.symbols + other.symbols, concat_action)
+
+    def wrap(self, func):
+        inner_action = self.action
+        def wrapper_action(complain, nodes):
+            if inner_action is not None:
+                nodes = inner_action(complain, nodes)
+            nodes = tuple(node for node in nodes if node is not _SKIP)
+            if getattr(func, 'with_complaints', False):
+                r = func(complain, *nodes)
+            else:
+                r = func(*nodes)
+            if r is _SKIP:
+                return ()
+            else:
+                return (r,)
+        return Rule(self.symbols, wrapper_action)
+
+
+empty = SimpleNonterminal(name='empty', rules=[Rule(())], is_ephemeral=True)
+
+
+def octet_range(min_, max_):
+    bits = BitArray(256)
+    for i in range(min_, max_ + 1):
+        bits[i] = True
+    return Terminal(bits=Bits(bits))
+
+def octet(value):
+    return octet_range(value, value)
+
+def literal(s):
+    if len(s) == 1:
+        return octet(ord(s.lower())) | octet(ord(s.upper()))
+    else:
+        r = empty
+        for c in s:
+            r = r * literal(c)
+        return _join_args << r
+
+def as_symbol(x):
+    return x if isinstance(x, Symbol) else literal(x)
+
+
+recursive = SimpleNonterminal
+
+
+class _Skip(object):
+
+    def __repr__(self):
+        return '_SKIP'
+
+_SKIP = _Skip()
+
+def skip(x):
+    return _skip_args << as_symbol(x)
+
+def group(x):
+    return as_symbol(x).group()
+
+
+def maybe(inner, default=None):
+    return inner | subst(default) << empty
+
+def maybe_str(inner):
+    return maybe(inner, '')
+
+
+def times(min_, max_, inner):
+    inner = as_symbol(inner)
+    if min_ == 0:
+        return RepeatedNonterminal(max_count=max_, inner=inner)
+    else:
+        min_rule = empty
+        for _ in range(min_):
+            min_rule = min_rule * group(inner)
+        min_rule = _as_list << min_rule
+        if max_ == min_:
+            return min_rule
+        else:
+            rest_rule = RepeatedNonterminal(max_count=(None if max_ is None
+                                                       else max_ - min_),
+                                            inner=inner)
+            return min_rule + rest_rule
+
+def string_times(min_, max_, inner):
+    return ''.join << times(min_, max_, inner)
+
+def many(inner):
+    return times(0, None, inner)
+
+def string(inner):
+    return ''.join << many(inner)
+
+def many1(inner):
+    return times(1, None, inner)
+
+def string1(inner):
+    return ''.join << many1(inner)
+
+
+def string_excluding(terminal, excluding):
+    initials = set(s[0].lower() for s in excluding if s)
+
+    free = terminal
+    for c in initials:
+        free = free - literal(c)
+
+    r = free + string(terminal)
+    for c in initials:
+        continuations = [s[1:] for s in excluding if s and s[0].lower() == c]
+        r = r | literal(c) + string_excluding(terminal, continuations)
+    if '' not in excluding:
+        r = r | subst('') << empty
+    return r
+
+
+class _AutoName(object):
+
+    def __repr__(self):
+        return '_AUTO'
+
+_AUTO = _AutoName()
+
+
+def named(name, citation=None, is_pivot=False):
+    def seal(symbol):
+        symbol.name = name
+        symbol.citation = citation
+        symbol.is_pivot = is_pivot
+    return seal
+
+def auto(symbol):
+    symbol.name = _AUTO
+
+def pivot(symbol):
+    symbol.name = _AUTO
+    symbol.is_pivot = True
+
+def fill_names(scope, citation):
+    for name, x in scope.items():
+        if isinstance(x, Symbol) and x.name is _AUTO:
+            x.name = name.rstrip('_').replace('_', '-')
+            x.citation = citation
+
+
+###############################################################################
+# Functions that are useful as semantic actions in parsing rules.
+
+def decode(s):
+    return s.decode('utf-8', 'replace')
+
+def _skip_args(*_):
+    return _SKIP
+
+def _join_args(*args):
+    return ''.join(args)
+
+def subst(r):
+    def substitute(*_):
+        return r
+    return substitute
+
+def _as_list(*args):
+    return list(args)
+
+def _begin_list(*args):
+    return [args if len(args) > 1 else args[0]]
+
+def _continue_right_list(*args):
+    list_ = args[-1]
+    new_elem = args[:-1] if len(args) > 2 else args[0]
+    return [new_elem] + list_
+
+def can_complain(func):
+    func.with_complaints = True
+    return func
+
+
+###############################################################################
+# The "parsing state" abstraction.
 
 class State(Blackboard):
 
@@ -33,7 +442,6 @@ class State(Blackboard):
         self.data = data
         self.pos = 0
         self.sane = True
-        self.last_cut = 0
         self.annotate_classes = tuple(annotate_classes or ())
         self.annotations = []
         self.complaints = []
@@ -45,13 +453,20 @@ class State(Blackboard):
             target.complain(notice_ident, **context)
         self.complaints = []
 
-    def cut(self):
-        was = self.last_cut
-        self.last_cut = self.pos
-        return self.data[was:self.pos]
+    def consume(self, n):
+        r = self.data[self.pos:(self.pos + n)]
+        if len(r) < n:
+            raise ParseError(symbol=None,
+                             i=self.pos + len(r),
+                             found=None, expected=[('any data', None)])
+        else:
+            self.pos += n
+            return r
 
     def remaining(self):
-        return self.data[self.last_cut:]
+        r = self.data[self.pos:]
+        self.pos = len(self.data)
+        return r
 
     def save(self):
         return self.pos, list(self.annotations), list(self.complaints)
@@ -60,297 +475,358 @@ class State(Blackboard):
         self.pos, self.annotations, self.complaints = saved
 
     def is_eof(self):
-        return not self.peek()
-
-    def annotate(self, obj, begin):
-        if isinstance(obj, self.annotate_classes):
-            self.annotations.append((obj, begin, self.pos))
+        return self.pos >= len(self.data)
 
     def collect_annotations(self):
         r = []
-        pos = 0
-        for (obj, begin, end) in self.annotations:
-            if begin >= pos:
-                r.append(self.data[pos:begin])
+        i = 0
+        for (start, end, obj) in self.annotations:
+            if start >= i:
+                r.append(self.data[i:start])
                 r.append(obj)
-                pos = end
-        r.append(self.data[pos:])
-        return [s for s in r if s != '']
-
-    def consume(self, s, case_insensitive=False):
-        present = self.data[self.pos : self.pos + len(s)]
-        if (present == s) or \
-                (case_insensitive and present.lower() == s.lower()):
-            self.pos += len(present)
-            return present
-        return None
-
-    def consume_anything(self, n=None):
-        if n is None:
-            s = self.data[self.pos:]
-        else:
-            s = self.data[self.pos : self.pos + n]
-        self.pos += len(s)
-        return s
-
-    def peek(self, n=1):
-        return self.data[self.pos : self.pos + n]
+                i = end
+        r.append(self.data[i:])
+        return [chunk for chunk in r if chunk != '']
 
 
-def parsify(inner):
-    if isinstance(inner, str):
-        return LiteralParser(inner)
-    else:
-        return inner
+###############################################################################
+# The actual Earley parsing algorithms.
+# These are written in a sort of low-level, non-idiomatic Python
+# to make them less terribly inefficient.
+# To compensate for this, they are heavily commented.
 
 
-class Parser(object):
+def _add_item(items, items_idx, items_set, symbol, rule, pos, start):
+    # `items`, `items_idx` and `items_set` together constitute
+    # an inventory of Earley items at a certain position of the input.
+    # ``(symbol, rule, pos, start)`` is the item we want to append to it,
+    # unless it's already present there.
 
-    def parse(self, state):
-        raise NotImplementedError
+    # `items` is the master list that is used for iterating over all items.
+    # `items_idx` is an index of items by their *next symbols*,
+    # which speeds up some frequent lookups.
+    # `items_set` is the set of all items,
+    # which speeds up checking for presence of an item before adding it.
 
-    def __ror__(self, other):
-        return AlternativeParser([parsify(other), self])
+    # In fact, `items_set` stores "fingerprints" of items, not actual items.
+    # This makes it faster, as object equality is reduced to integer equality.
+    fingerprint = (id(symbol), id(rule), pos, start)
 
-    def __or__(self, other):
-        return AlternativeParser([self, parsify(other)])
-
-    def __add__(self, other):
-        return SequenceParser([self, parsify(other)])
-
-    def __radd__(self, other):
-        return SequenceParser([parsify(other), self])
-
-    def __invert__(self):
-        return WrapParser(Ignore, self)
-
-    def __floordiv__(self, name):
-        return NamedParser(name, self)
-
-
-class EOFParser(object):
-
-    def parse(self, state):
-        if not state.is_eof():
-            raise MismatchError(state.pos, u'end of data', state.peek(5))
-        return Ignore(None)
+    if fingerprint not in items_set:
+        items_set.add(fingerprint)
+        items.append((symbol, rule, pos, start))
+        items_idx.setdefault(rule.xsymbols[pos], []).append(
+            (symbol, rule, pos, start))
 
 
-class FuncParser(Parser):
+def parse(state, target_symbol, partial=False):
+    data = state.data[state.pos:]
+    (items, items_idx, items_set) = ([], {}, set())
 
-    def __init__(self, func):
-        super(FuncParser, self).__init__()
-        self.func = func
+    # Seed the initial items inventory with rules for `target_symbol`.
+    chart = [(items, items_idx, items_set)]
+    for rule in target_symbol.rules:
+        _add_item(items, items_idx, items_set, target_symbol, rule, 0, 0)
 
-    def parse(self, state):
-        return self.func(state)
+    # Outer loop: over `data`.
+    i = 0                  # Position in `data`.
+    last_good_i = None     # `i` of the last complete parse of `target_symbol`.
+    while True:
+        token = data[i] if i < len(data) else None
 
+        # Initialize the items inventory for the next `i`,
+        # because we will be adding to it on successful scans.
+        chart.append(([], {}, set()))
 
-class NBytesParser(Parser):
+        # Load the items inventory for the current `i`.
+        (items, items_idx, items_set) = chart[i]
+        if len(items) == 0:
+            # This means that there were no successful scans at previous `i`,
+            # so we have a parse error (or a partial parse of `data`).
+            break
 
-    def __init__(self, min_n=None, max_n=None):
-        super(NBytesParser, self).__init__()
-        self.min_n = min_n
-        self.max_n = max_n
+        # Inner loop: over items at the current `i`.
+        j = 0
+        while True:
+            (symbol, rule, pos, start) = items[j]
+            next_symbol = rule.xsymbols[pos]
 
-    def parse(self, state):
-        saved = state.save()
-        s = state.consume_anything(self.max_n)
-        if (self.min_n is not None) and (len(s) < self.min_n):
-            state.restore(saved)
-            raise ParseError(u'at byte position %d: '
-                             u'expected at least %d more bytes, '
-                             u'but only %d remaining' %
-                             (state.pos, self.min_n, len(s)))
-        else:
-            return s
+            if next_symbol is None:
+                # This is a completed item.
+                if symbol is target_symbol:
+                    # Remember as a valid parse.
+                    last_good_i = i
+                # Earley completion:
+                # copy items from this rule's start `i` to the current `i`,
+                # advancing their rules by 1 position.
+                (_, items_idx1, _) = chart[start]
+                candidates = items_idx1.get(symbol, [])
+                for (symbol1, rule1, pos1, start1) in candidates:
+                    _add_item(items, items_idx, items_set,
+                              symbol1, rule1, pos1 + 1, start1)
 
+            elif isinstance(next_symbol, Nonterminal):
+                # Skip over nullable symbols. See:
+                # http://loup-vaillant.fr/tutorials/earley-parsing/empty-rules
+                if next_symbol.is_nullable():
+                    _add_item(items, items_idx, items_set,
+                              symbol, rule, pos + 1, start)
+                # Earley prediction:
+                # add rules for `next_symbol` to the current `i`.
+                for next_rule in next_symbol.rules:
+                    _add_item(items, items_idx, items_set,
+                              next_symbol, next_rule, 0, i)
 
-class NamedParser(Parser):
-
-    def __init__(self, name, inner):
-        super(NamedParser, self).__init__()
-        self.name = name
-        self.inner = parsify(inner)
-
-    def parse(self, state):
-        pos = state.pos
-        try:
-            return self.inner.parse(state)
-        except MismatchError, e:
-            if e.pos == pos:
-                raise MismatchError(e.pos, self.name, e.found)
             else:
-                raise
+                # `next_symbol` is a `Terminal`.
+                # Earley scan:
+                # copy this item to the next `i`,
+                # advancing its rule by 1 position.
+                if token is not None and next_symbol.match(token):
+                    (items1, items_idx1, items_set1) = chart[i + 1]
+                    _add_item(items1, items_idx1, items_set1,
+                              symbol, rule, pos + 1, start)
+
+            j += 1
+            if j == len(items):
+                break
+
+        if i == len(data):
+            break
+        i += 1
+
+    if (last_good_i is not None) and (last_good_i == i or partial):
+        results = _find_results(data, target_symbol, chart, last_good_i,
+                                state.annotate_classes)
+        for start_i, _, result, complaints, annotations in results:
+            # There may be multiple valid parses in case of ambiguities,
+            # but in practice we just want
+            # the first parse that stretches to the beginning of the input.
+            if start_i == 0:
+                state.pos += last_good_i
+                for notice_ident, context in complaints:
+                    state.complain(notice_ident, **context)
+                state.annotations.extend(annotations)
+                return result
+
+    raise _build_parse_error(data, target_symbol, chart)
 
 
-class LiteralParser(Parser):
+def _find_results(data, symbol, chart, end_i, annotate_classes,
+                  outer_parents=None):
+    # The trivial base case is to find the parse result of a terminal.
+    if isinstance(symbol, Terminal):
+        token = data[end_i - 1]
+        if symbol.match(token):
+            yield end_i - 1, None, token, [], []
+            return
 
-    def __init__(self, s, case_insensitive=False):
-        super(LiteralParser, self).__init__()
-        self.literal = s
-        self.case_insensitive = case_insensitive
+    # With that out of the way, the interesting story is nonterminals.
 
-    def parse(self, state):
-        s = state.consume(self.literal, self.case_insensitive)
-        if s:
-            return s
+    # Iterate over all completed items for this nonterminal at this `i`.
+    (_, items_idx, _) = chart[end_i]
+    for item in items_idx.get(None, []):
+        (sym, rule, _, start_i) = item
+        if sym is not symbol:
+            continue
+
+        # We don't want to consider items that are
+        # already being processed further up the stack.
+        # Otherwise, we would fall into unbounded recursion.
+        if outer_parents is None:
+            outer_parents = []
+        if item in outer_parents:
+            continue
+
+        # Now we recursively collect the results
+        # for each symbol of this rule, starting from the end.
+        # There may be multiple completed items for each symbol,
+        # but we need to find a combination that "fits together":
+        # every next item starts where the previous item ends.
+
+        # This process can more elegantly be coded as
+        # two mutually recursive functions (see
+        # https://github.com/tomerfiliba/tau/blob/ebefd88/earley3.py#L145
+        # for an example),
+        # but that hits maximum recursion depth too soon.
+        # Instead, we roll our own "stack" composed of "frames".
+        # Every frame corresponds to one position (symbol) in the rule.
+        # We start with one empty frame.
+        frames = [(end_i, outer_parents + [item], None, None, None, None)]
+
+        # We have to special-case `RepeatedNonterminal` because
+        # it can produce long strings that exceed maximum recursion depth
+        # (for example, request URIs with even moderately long query strings).
+        # We unroll its left recursion, producing one frame *per repetition*.
+        if isinstance(symbol, RepeatedNonterminal) and \
+                rule.xsymbols[0] is symbol:
+            n_nodes = None
+            inner_symbol = rule.symbols[-1]
         else:
-            raise MismatchError(state.pos, u'%r' % self.literal,
-                                state.peek(len(self.literal)))
+            n_nodes = len(rule.symbols)
 
+        while True:
+            (i, parents, rs, node, complaints, annotations) = frames.pop()
+            if len(frames) == n_nodes:
+                # We found a complete parse for this rule.
+                # It starts at `i`. Is that what we expected?
+                if i != start_i:
+                    # We'll just keep trying other combinations.
+                    continue
 
-class CharClassParser(Parser):
+                # Great. We have the raw results for each inner symbol.
+                # Now we need to do some post-processing.
+                # First, we collect the complaints and annotations
+                # that were produced when parsing these symbols.
+                nodes = []
+                all_complaints = []
+                all_annotations = []
+                for (_, _, _, n, coms, anns) in reversed(frames):
+                    nodes.append(n)
+                    all_complaints.extend(coms)
+                    all_annotations.extend(anns)
 
-    def __init__(self, chars):
-        super(CharClassParser, self).__init__()
-        self.chars = chars
-
-    def parse(self, state):
-        c = state.peek()
-        if c and (c in self.chars):
-            return state.consume(c)
-        else:
-            raise MismatchError(state.pos, u'one of %r' % self.chars, c)
-
-
-class SequenceParser(Parser):
-
-    def __init__(self, inners):
-        super(SequenceParser, self).__init__()
-        self.inners = [parsify(inner) for inner in inners]
-
-    def parse(self, state):
-        rs = []
-        for inner in self.inners:
-            r = inner.parse(state)
-            if not isinstance(r, Ignore):
-                rs.append(r)
-        if len(rs) == 1:
-            return rs[0]
-        else:
-            return tuple(rs)
-
-    def __add__(self, other):
-        if isinstance(other, SequenceParser):
-            return SequenceParser(self.inners + other.inners)
-        else:
-            return SequenceParser(self.inners + [other])
-
-
-class AlternativeParser(Parser):
-
-    def __init__(self, inners):
-        super(AlternativeParser, self).__init__()
-        self.inners = [parsify(inner) for inner in inners]
-
-    def parse(self, state):
-        mismatch_errors = []
-        other_errors = []
-        for inner in self.inners:
-            saved = state.save()
-            try:
-                r = inner.parse(state)
-            except MismatchError, e:
-                state.restore(saved)
-                mismatch_errors.append(e)
-            except ParseError, e:
-                state.restore(saved)
-                other_errors.append(e)
-            else:
-                return r
-
-        if mismatch_errors:
-            max_pos = max(e.pos for e in mismatch_errors)
-            best_errors = sorted(
-                (e for e in mismatch_errors if e.pos == max_pos),
-                key=lambda e: len(e.found), reverse=True)
-            raise MismatchError(max_pos,
-                                u' or '.join(e.expected for e in best_errors),
-                                best_errors[0].found)
-        else:
-            raise other_errors[-1]
-
-    def __or__(self, other):
-        if isinstance(other, AlternativeParser):
-            return AlternativeParser(self.inners + other.inners)
-        else:
-            return AlternativeParser(self.inners + [other])
-
-
-class TimesParser(Parser):
-
-    def __init__(self, min_, max_, inner):
-        super(TimesParser, self).__init__()
-        self.min_ = min_
-        self.max_ = max_
-        self.inner = parsify(inner)
-
-    def parse(self, state):
-        r = []
-        while (self.max_ is None) or (len(r) < self.max_):
-            saved = state.save()
-            try:
-                r.append(self.inner.parse(state))
-            except ParseError:
-                state.restore(saved)
-                if (self.min_ is None) or (len(r) >= self.min_):
-                    return r
+                # Then we invoke the rule's semantic action,
+                # which determines the final form of the parse result.
+                # It can also add its own complaints.
+                if rule.action is not None:
+                    def complain(id_, **ctx):
+                        all_complaints.append((id_, ctx))
+                    nodes = rule.action(complain, tuple(nodes))
+                nodes = tuple(n for n in nodes if n is not _SKIP)
+                if len(nodes) == 0:
+                    result = _SKIP
+                elif len(nodes) == 1:
+                    result = nodes[0]
                 else:
-                    raise
-        return r
+                    result = nodes
+
+                # Finally, annotate if needed.
+                if isinstance(result, annotate_classes):
+                    all_annotations.append((start_i, end_i, result))
+
+                # And that's one complete parse for `target_symbol`
+                # ending at `end_i`.
+                yield start_i, item, result, all_complaints, all_annotations
+
+                if len(frames) == 0:
+                    break
+
+            else:
+                # We haven't covered the entire rule yet. Keep working.
+                # Handle the symbol at the current position of the rule.
+                if rs is None:
+                    if n_nodes is not None:
+                        inner_symbol = rule.symbols[-len(frames) - 1]
+                    # Recursively get an iterator
+                    # over possible results for this symbol.
+                    rs = _find_results(data, inner_symbol, chart, i,
+                                       annotate_classes, parents)
+
+                # Get the next result for this symbol.
+                r = next(rs, None)
+                if r is None:
+                    # None left, so we must fall back (to ``pos + 1``)
+                    # and try other results for the previous symbol.
+                    if len(frames) > 0:
+                        continue
+                    else:
+                        # If there are no previous symbols,
+                        # then there are no more parses for this `item`.
+                        break
+
+                new_i, new_item, new_node, new_complaints, new_annotations = r
+
+                if new_i < i:
+                    # We moved one or more token to the left in the input data,
+                    # so there's no more danger of unbounded recursion.
+                    new_parents = []
+                elif n_nodes is None:
+                    # No input data was consumed, so we stayed at the same `i`.
+                    # Because we are unrolling recursion into iteration,
+                    # we must avoid this Earley item on our next iteration,
+                    # otherwise we will be stuck at the same place forever.
+                    new_parents = parents + [new_item]
+                else:
+                    # No input data was consumed, so we stayed at the same `i`.
+                    # But "unbounded iteration" won't happen here
+                    # because we are limited to `n_nodes`.
+                    new_parents = parents
+
+                if n_nodes is None and new_i == start_i:
+                    # We found a valid parse for this `RepeatedNonterminal`.
+                    # Assemble the results like in the general case above,
+                    # only we don't need to apply any semantic actions.
+                    nodes = [new_node]
+                    all_complaints = new_complaints[:]
+                    all_annotations = new_annotations[:]
+                    for (_, _, _, n, coms, anns) in reversed(frames):
+                        nodes.append(n)
+                        all_complaints.extend(coms)
+                        all_annotations.extend(anns)
+                    yield new_i, item, nodes, all_complaints, all_annotations
+
+                if new_i >= start_i:
+                    # Store the result on our stack.
+                    # Also store the iterator,
+                    # so we can come back to it and get further results.
+                    frames.append((i, parents, rs, new_node,
+                                   new_complaints, new_annotations))
+                    # Proceed to the next symbol (at ``pos - 1``)
+                    # and try to find a result for that, ending at `new_i`.
+                    frames.append((new_i, new_parents, None, None, None, None))
+                else:
+                    # This result gets us too far back in the input data.
+                    # But we will try other results from this iterator.
+                    frames.append((i, parents, rs, node,
+                                   complaints, annotations))
 
 
-class WrapParser(Parser):
+class ParseError(Exception):
 
-    def __init__(self, func, inner):
-        super(WrapParser, self).__init__()
-        self.func = func
-        self.inner = parsify(inner)
-
-    def parse(self, state):
-        begin = state.pos
-        r = self.func(self.inner.parse(state))
-        state.annotate(r, begin)
-        return r
+    def __init__(self, symbol, i, found, expected):
+        super(ParseError, self).__init__(
+            'failed to parse %s: unexpected %r at octet position %r' %
+            (symbol, found, i))
+        self.symbol = symbol
+        self.i = i
+        self.found = found
+        self.expected = expected
 
 
-class LookaheadParser(Parser):
+def _build_parse_error(data, target_symbol, chart):
+    # Find the last `i` that had some Earley items --
+    # that is, the last `i` where we could still make sense of the input data.
+    i, items = [(i, items)
+                for (i, (items, _, _)) in enumerate(chart)
+                if len(items) > 0][-1]
+    found = data[i] if i < len(data) else None   # `None` meaning "end of data"
 
-    def __init__(self, inner):
-        super(LookaheadParser, self).__init__()
-        self.inner = parsify(inner)
+    # What terminal symbols did we expect at that `i`?
+    expected = OrderedDict()
+    for (symbol, rule, pos, start) in items:
+        next_symbol = rule.xsymbols[pos]
+        if isinstance(next_symbol, Terminal):
+            # And why did we expect it? As part of what nonterminals?
+            expected.setdefault(next_symbol, set()).update(
+                _find_pivots(chart, symbol, start))
 
-    def parse(self, state):
-        saved = state.save()
-        try:
-            self.inner.parse(state)
-        finally:
-            state.restore(saved)
+        if symbol is target_symbol and next_symbol is None:
+            # This item indicates a complete parse of `target_symbol`,
+            # so if the input data just stopped there, that would work, too,
+            expected[None] = None
+
+    return ParseError(target_symbol, i, found, expected.items())
 
 
-eof = EOFParser()
-function = FuncParser
-nbytes = NBytesParser
-anything = nbytes(None, None)
-wrap = WrapParser
-group = lambda inner: wrap(lambda x: x, inner)
-argwrap = lambda func, inner: wrap(lambda args: func(*args), inner)
-subst = lambda s, inner: wrap(lambda _: s, inner)
-maybe = lambda inner, empty=None: inner | function(lambda _: empty)
-literal = LiteralParser
-char_class = CharClassParser
-times = TimesParser
-many = lambda inner: times(0, None, inner)
-many1 = lambda inner: times(1, None, inner)
-join = lambda inner: wrap(''.join, inner)
-string = lambda inner: join(many(inner))
-string1 = lambda inner: join(many1(inner))
-stringx = lambda min_, max_, inner: join(times(min_, max_, inner))
-decode = lambda inner: wrap(lambda s: s.decode('utf-8', 'replace'), inner)
-decode_into = lambda con, inner: wrap(con, decode(inner))
-ci = lambda s: decode_into(CaseInsensitive, literal(s, case_insensitive=True))
-lookahead = LookaheadParser
-
-rfc = lambda num, rule: u'<%s> (RFC %d)' % (rule, num)
-char_range = lambda min_, max_: ''.join(chr(x) for x in range(min_, max_ + 1))
+def _find_pivots(chart, symbol, start, stack=None):
+    if symbol.is_pivot:
+        yield symbol
+    else:
+        stack = (stack or []) + [(symbol, start)]
+        (_, items_idx, _) = chart[start]
+        parents = items_idx.get(symbol, [])
+        for (parent, _, _, parent_start) in parents:
+            if (parent, parent_start) not in stack:
+                for p in _find_pivots(chart, parent, parent_start, stack):
+                    yield p

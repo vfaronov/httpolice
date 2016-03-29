@@ -3,20 +3,23 @@
 import calendar
 from datetime import date, datetime, time
 
+from httpolice.citation import RFC
 from httpolice.parse import (
-    ParseError,
-    argwrap,
-    ci,
+    auto,
+    can_complain,
+    octet,
     decode,
-    function,
-    join,
+    fill_names,
     literal,
     many,
     maybe,
-    stringx,
+    maybe_str,
+    named,
+    pivot,
+    skip,
+    string1,
+    string_times,
     subst,
-    rfc,
-    wrap,
 )
 from httpolice.structure import (
     CaseInsensitive,
@@ -25,168 +28,221 @@ from httpolice.structure import (
     MediaType,
     Parametrized,
     ProductName,
+    Unparseable,
     Versioned,
 )
-from httpolice.syntax.common import digit, sp
+from httpolice.syntax.common import DIGIT, SP
+from httpolice.syntax.rfc3986 import absolute_URI, URI_reference
 from httpolice.syntax.rfc4647 import language_range
+from httpolice.syntax.rfc5646 import Language_Tag as language_tag
 from httpolice.syntax.rfc7230 import (
+    OWS,
+    RWS,
     comma_list,
     comma_list1,
     comment,
-    ows,
+    field_name,
+    method,
+    partial_URI,
     quoted_string,
-    rws,
     token,
+    token_excluding,
 )
 
 
-parameter = (wrap(CaseInsensitive, token) + ~literal('=') +
-             (token | decode(quoted_string)))   // rfc(7231, u'parameter')
-type_ = token
-subtype = token
-media_type = argwrap(
-    Parametrized,
-    wrap(MediaType, join(type_ + '/' + subtype)) +
-    many(~(ows + ';' + ows) + parameter))    // rfc(7231, u'media-type')
+def parameter(exclude=None):
+    return (
+        (CaseInsensitive << (token_excluding(exclude) if exclude else token)) *
+        skip('=') * (token | quoted_string)
+    ) > named('parameter', RFC(7231), is_pivot=True)
 
-content_coding = wrap(ContentCoding, token)    // rfc(7231, u'content-coding')
+type_ = token                                                           > pivot
+subtype = token                                                         > pivot
+media_type = Parametrized << (
+    (MediaType << type_ + '/' + subtype) *
+    many(skip(OWS * ';' * OWS) * parameter()))                          > pivot
 
-product_version = token
-product = argwrap(
-    Versioned,
-    wrap(ProductName, token) +
-    maybe(~literal('/') + product_version))
-user_agent = server = argwrap(
-    lambda p1, ps: [p1] + ps,
-    product + many(~rws + (product | comment)))
+content_coding = ContentCoding << token                                 > pivot
 
-day_name = (subst(0, 'Mon') | subst(1, 'Tue') | subst(2, 'Wed') |
-            subst(3, 'Thu') | subst(4, 'Fri') | subst(5, 'Sat') |
-            subst(6, 'Sun'))
+product_version = token                                                 > pivot
+product = Versioned << ((ProductName << token) *
+                        maybe(skip('/') * product_version))             > pivot
+User_Agent = product % many(skip(RWS) *
+                            (product | comment(include_parens=False)))  > pivot
+Server = product % many(skip(RWS) *
+                        (product | comment(include_parens=False)))      > pivot
 
-def _to_date(d, m, y):
+day_name = (subst(0) << octet(0x4D) * octet(0x6F) * octet(0x6E) |
+            subst(1) << octet(0x54) * octet(0x75) * octet(0x65) |
+            subst(2) << octet(0x57) * octet(0x65) * octet(0x64) |
+            subst(3) << octet(0x54) * octet(0x68) * octet(0x75) |
+            subst(4) << octet(0x46) * octet(0x72) * octet(0x69) |
+            subst(5) << octet(0x53) * octet(0x61) * octet(0x74) |
+            subst(6) << octet(0x53) * octet(0x75) * octet(0x6E))        > pivot
+
+@can_complain
+def _to_date(complain, d, m, y):
     try:
         return date(y, m, d)
     except ValueError:
-        raise ParseError(u'nonexistent date: %d-%02d-%02d' % (y, m, d))
+        complain(1222, date='%d-%02d-%02d' % (y, m, d))
+        return Unparseable
 
-day = wrap(int, stringx(2, 2, digit))
-month = (subst(1, 'Jan') | subst(2, 'Feb') | subst(3, 'Mar') |
-         subst(4, 'Apr') | subst(5, 'May') | subst(6, 'Jun') |
-         subst(7, 'Jul') | subst(8, 'Aug') | subst(9, 'Sep') |
-         subst(10, 'Oct') | subst(11, 'Nov') | subst(12, 'Dec'))
-year = wrap(int, stringx(4, 4, digit))
-date1 = argwrap(_to_date, day + ~sp + month + ~sp + year)
+day = int << string_times(2, 2, DIGIT)                                  > pivot
+month = (subst(1) << octet(0x4A) * octet(0x61) * octet(0x6E)  |
+         subst(2) << octet(0x46) * octet(0x65) * octet(0x62)  |
+         subst(3) << octet(0x4D) * octet(0x61) * octet(0x72)  |
+         subst(4) << octet(0x41) * octet(0x70) * octet(0x72)  |
+         subst(5) << octet(0x4D) * octet(0x61) * octet(0x79)  |
+         subst(6) << octet(0x4A) * octet(0x75) * octet(0x6E)  |
+         subst(7) << octet(0x4A) * octet(0x75) * octet(0x6C)  |
+         subst(8) << octet(0x41) * octet(0x75) * octet(0x67)  |
+         subst(9) << octet(0x53) * octet(0x65) * octet(0x70)  |
+         subst(10) << octet(0x4F) * octet(0x63) * octet(0x74) |
+         subst(11) << octet(0x4E) * octet(0x6F) * octet(0x76) |
+         subst(12) << octet(0x44) * octet(0x65) * octet(0x63))          > pivot
+year = int << string_times(4, 4, DIGIT)                                 > pivot
 
-def _to_time(h, m, s):
+date1 = _to_date << day * skip(SP) * month * skip(SP) * year            > pivot
+
+@can_complain
+def _to_time(complain, h, m, s):
     try:
         # This doesn't parse the leap second 23:59:60
         # that is explicitly specified in the RFC.
         # I can ignore this for now.
-        # TODO: maybe return 23:59:59 + a debug notice.
         return time(h, m, s)
     except ValueError:
-        raise ParseError(u'nonexistent time: %02d:%02d:%02d' % (h, m, s))
+        complain(1223, time='%02d:%02d:%02d' % (h, m, s))
+        return Unparseable
 
-hour = wrap(int, stringx(2, 2, digit))
-minute = wrap(int, stringx(2, 2, digit))
-second = wrap(int, stringx(2, 2, digit))
+hour = int << string_times(2, 2, DIGIT)                                 > pivot
+minute = int << string_times(2, 2, DIGIT)                               > pivot
+second = int << string_times(2, 2, DIGIT)                               > pivot
 
-time_of_day = argwrap(_to_time,
-                      hour + ~literal(':') + minute + ~literal(':') + second)
+time_of_day = _to_time << (hour * skip(':') *
+                           minute * skip(':') *
+                           second)                                      > pivot
 
 def _to_datetime(dow, d, t):
-    return (dow, datetime(d.year, d.month, d.day, t.hour, t.minute, t.second))
+    if d is Unparseable or t is Unparseable:
+        return (dow, Unparseable)
+    else:
+        return (dow, datetime(d.year, d.month, d.day,
+                              t.hour, t.minute, t.second))
 
-imf_fixdate = argwrap(
-    _to_datetime,
-    day_name + ~(',' + sp) + date1 + ~sp + time_of_day + ~(sp + 'GMT')) \
-    // rfc(7231, u'IMF-fixdate')
+GMT = octet(0x47) * octet(0x4D) * octet(0x54)                           > auto
+IMF_fixdate = _to_datetime << (day_name * skip(',' * SP) *
+                               date1 * skip(SP) *
+                               time_of_day * skip(SP * GMT))            > pivot
 
-day_name_l = (subst(0, 'Monday') | subst(1, 'Tuesday') |
-              subst(2, 'Wednesday') | subst(3, 'Thursday') |
-              subst(4, 'Friday') | subst(5, 'Saturday') | subst(6, 'Sunday'))
+day_name_l = (
+    subst(0) << (octet(0x4D) * octet(0x6F) * octet(0x6E) * octet(0x64) *
+                 octet(0x61) * octet(0x79)) |
+    subst(1) << (octet(0x54) * octet(0x75) * octet(0x65) * octet(0x73) *
+                 octet(0x64) * octet(0x61) * octet(0x79)) |
+    subst(2) << (octet(0x57) * octet(0x65) * octet(0x64) * octet(0x6E) *
+                 octet(0x65) * octet(0x73) * octet(0x64) * octet(0x61) *
+                 octet(0x79)) |
+    subst(3) << (octet(0x54) * octet(0x68) * octet(0x75) * octet(0x72) *
+                 octet(0x73) * octet(0x64) * octet(0x61) * octet(0x79)) |
+    subst(4) << (octet(0x46) * octet(0x72) * octet(0x69) * octet(0x64) *
+                 octet(0x61) * octet(0x79)) |
+    subst(5) << (octet(0x53) * octet(0x61) * octet(0x74) * octet(0x75) *
+                 octet(0x72) * octet(0x64) * octet(0x61) * octet(0x79)) |
+    subst(6) << (octet(0x53) * octet(0x75) * octet(0x6E) * octet(0x64) *
+                 octet(0x61) * octet(0x79))
+)                                                                       > pivot
 
-date2 = argwrap(
-    _to_date,
-    day + ~literal('-') + month + ~literal('-') +
-    wrap(lambda s: int('19' + s), stringx(2, 2, digit)))
+date2 = _to_date << (
+    day * skip('-') *
+    month * skip('-') *
+    ((lambda s: int('19' + s)) << string_times(2, 2, DIGIT)))           > pivot
 
-rfc850_date = argwrap(
-    _to_datetime,
-    day_name_l + ~(',' + sp) + date2 + ~sp + time_of_day + ~(sp + 'GMT'))
+rfc850_date = _to_datetime << (day_name_l * skip(',' * SP) *
+                               date2 * skip(SP) *
+                               time_of_day * skip(SP * GMT))            > pivot
 
-date3 = month + ~sp + wrap(int, stringx(2, 2, digit) | (~sp + digit))
+date3 = month * skip(SP) * (int << string_times(2, 2, DIGIT) |
+                            int << skip(SP) * DIGIT)                    > pivot
 
-asctime_date = argwrap(
-    lambda dow, m, d, t, y: _to_datetime(dow, _to_date(d, m, y), t),
-    day_name + ~sp + date3 + ~sp + time_of_day + ~sp + year)
+@can_complain
+def _from_asctime(complain, dow, dm, t, y):
+    (m, d) = dm
+    return _to_datetime(dow, _to_date(complain, d, m, y), t)
 
-def _parse_obs_date(state):
-    r = (rfc850_date | asctime_date).parse(state)
-    state.complain(1107)
+asctime_date = _from_asctime << (day_name * skip(SP) *
+                                 date3 * skip(SP) *
+                                 time_of_day * skip(SP) *
+                                 year)                                  > pivot
+
+@can_complain
+def _obsolete_date(complain, r):
+    complain(1107)
     return r
 
-obs_date = function(_parse_obs_date)   // rfc(7231, u'obs-date')
+obs_date = (_obsolete_date << rfc850_date |
+            _obsolete_date << asctime_date)                             > pivot
 
-def _parse_http_date(state):
-    claimed_dow, r = (imf_fixdate | obs_date).parse(state)
-    if r.weekday() != claimed_dow:
-        state.complain(1108, date=r.strftime('%Y-%m-%d'),
-                       claimed=calendar.day_name[claimed_dow],
-                       actual=calendar.day_name[r.weekday()])
+@can_complain
+def _check_day_of_week(complain, r):
+    (claimed_dow, r) = r
+    if r is not Unparseable and r.weekday() != claimed_dow:
+        complain(1108, date=r.strftime('%Y-%m-%d'),
+                 claimed=calendar.day_name[claimed_dow],
+                 actual=calendar.day_name[r.weekday()])
     return r
 
-http_date = function(_parse_http_date)
+HTTP_date = (_check_day_of_week << IMF_fixdate |
+             _check_day_of_week << obs_date)                            > pivot
 
-def _parse_media_range_parameter(state):
-    k, v = parameter.parse(state)
-    if k == u'q':
-        raise ParseError()          # let `accept_params` handle from here on
-    return (k, v)
+def media_range(no_q=False):
+    return Parametrized << (
+        (MediaType << literal('*/*') |
+         MediaType << type_ + '/' + '*' |
+         MediaType << type_ + '/' + subtype) *
+        many(skip(OWS * ';' * OWS) * parameter(exclude=['q'] if no_q else []))
+    ) > named('media-range', RFC(7231), is_pivot=True)
 
-_media_range_parameter = function(_parse_media_range_parameter)
+qvalue = (float << '0' + maybe_str('.' + string_times(0, 3, DIGIT)) |
+          float << '1' + maybe_str('.' + string_times(0, 3, '0')))      > pivot
+weight = skip(OWS * ';' * OWS * 'q=') * qvalue                          > pivot
+accept_ext = (skip(OWS * ';' * OWS) * token *
+              maybe(skip('=') * (token | quoted_string)))               > pivot
 
-qvalue = wrap(
-    float,
-    join('0' + maybe(join('.' + stringx(0, 3, digit)), '')) |
-    join('1' + maybe(join('.' + stringx(0, 3, '0')), '')))
-weight = ~(ows + ';' + ows + ci('q') + '=') + qvalue
+def _prepend_q(q, xs):
+    return [(CaseInsensitive('q'), q)] + xs
 
-media_range = argwrap(
-    Parametrized,
-    (
-        wrap(MediaType, '*/*') |
-        wrap(MediaType, join(type_ + '/*')) |
-        wrap(MediaType, join(type_ + '/' + subtype))
-    ) +
-    many(~(ows + ';' + ows) + _media_range_parameter))
+accept_params = _prepend_q << weight * many(accept_ext)                 > pivot
 
-accept_ext = (
-    ~(ows + ';' + ows) +
-     wrap(CaseInsensitive, token) +
-     ~literal('=') +
-     (token | decode(quoted_string)))
-accept_params = argwrap(lambda w, exts: [(CaseInsensitive(u'q'), w)] + exts,
-                        weight + many(accept_ext))
+Accept = comma_list(Parametrized << (media_range(no_q=True) *
+                                     maybe(accept_params, [])))         > pivot
 
-accept = comma_list(argwrap(
-    Parametrized,
-    media_range + maybe(accept_params, [])))
+charset = Charset << token                                              > pivot
+Accept_Charset = comma_list1(
+    Parametrized << ((charset | Charset << literal('*')) *
+                     maybe(weight)))                                    > pivot
 
-charset = wrap(Charset, token)
+codings = (content_coding |
+           ContentCoding << literal('identity') |
+           ContentCoding << literal('*'))                               > pivot
+Accept_Encoding = comma_list(Parametrized << codings * maybe(weight))   > pivot
 
-accept_charset = comma_list1(argwrap(
-    Parametrized,
-    (charset | wrap(Charset, '*')) + maybe(weight)))
+Accept_Language = comma_list1(
+    Parametrized << language_range * maybe(weight))                     > pivot
 
-codings = (
-    content_coding |
-    wrap(ContentCoding, 'identity') |
-    wrap(ContentCoding, '*'))
+delay_seconds = int << string1(DIGIT)                                   > pivot
+Retry_After = HTTP_date | delay_seconds                                 > pivot
 
-accept_encoding = comma_list(argwrap(Parametrized, codings + maybe(weight)))
+Allow = comma_list(method)                                              > pivot
+Content_Encoding = comma_list1(content_coding)                          > pivot
+Content_Language = comma_list1(language_tag)                            > pivot
+Content_Location = absolute_URI | partial_URI                           > pivot
+Content_Type = media_type                                               > pivot
+Date = HTTP_date                                                        > pivot
+Location = URI_reference                                                > pivot
+Max_Forwards = int << string1(DIGIT)                                    > pivot
+Referer = absolute_URI | partial_URI                                    > pivot
+Vary = decode('*') | comma_list1(field_name)                            > pivot
 
-accept_language = comma_list1(argwrap(
-    Parametrized,
-    language_range + maybe(weight)))
+fill_names(globals(), RFC(7231))

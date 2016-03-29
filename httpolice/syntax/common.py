@@ -1,38 +1,36 @@
 # -*- coding: utf-8; -*-
 
+from httpolice.citation import RFC
 from httpolice.parse import (
-    char_class,
-    char_range,
-    literal,
-    maybe,
-    string1,
-    wrap,
+    auto,
+    can_complain,
+    fill_names,
+    named,
+    octet,
+    octet_range,
 )
 
 
-# RFC 5234
+ALPHA = octet_range(0x41, 0x5A) | octet_range(0x61, 0x7A)               > auto
+CHAR = octet_range(0x01, 0x7F)                                          > auto
+CTL = octet_range(0x00, 0x1F) | octet(0x7F)                             > auto
+CR = octet(0x0D)                                                        > auto
+DIGIT = octet_range(0x30, 0x39)                                         > auto
+DQUOTE = octet(0x22)                                                    > auto
+HEXDIG = DIGIT | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'                      > auto
+HTAB = octet(0x09)                                                      > auto
+LF = octet(0x0A)                                                        > auto
+SP = octet(0x20)                                                        > auto
+VCHAR = octet_range(0x21, 0x7E)                                         > auto
 
-ALPHA = char_range(0x41, 0x5A) + char_range(0x61, 0x7A)
-alpha = char_class(ALPHA)
-CHAR = char_range(0x01, 0x7F)
-char = char_class(CHAR)
-crlf = (~maybe('\r') + '\n')   // u'newline'
-CTL = char_range(0x00, 0x1F) + '\x7f'
-DIGIT = char_range(0x30, 0x39)
-digit = char_class(DIGIT)
-HEXDIG = DIGIT + 'ABCDEFabcdef'
-hexdig = char_class(HEXDIG)
-HTAB = '\t'
-SP = ' '
-sp = literal(SP)
-sp_htab = char_class(SP + HTAB)
-VCHAR = char_range(0x21, 0x7E)
-vchar = char_class(VCHAR)
-DQUOTE = '"'
-dquote = literal(DQUOTE)
+def CRLF(lax=False):
+    @can_complain
+    def _lf_without_cr(complain, s):
+        complain(1224)
+        return s
+    r = CR + LF
+    if lax:
+        r = r | (_lf_without_cr << LF)
+    return r > named('CRLF', RFC(5234))
 
-
-# Auxiliary
-
-integer = wrap(int, string1(digit))
-hex_integer = wrap(lambda s: int(s, 16), string1(hexdig))
+fill_names(globals(), RFC(5234))

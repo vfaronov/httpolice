@@ -18,7 +18,7 @@ from httpolice.header import HeadersView
 from httpolice.known import cc, header, media, media_type, tc, warn
 from httpolice.structure import FieldName, Unparseable, okay
 from httpolice.syntax import rfc7230
-from httpolice.syntax.common import crlf
+from httpolice.syntax.common import CRLF
 
 
 class MessageView(Blackboard):
@@ -35,7 +35,6 @@ class MessageView(Blackboard):
     header_entries = property(lambda self: self.inner.header_entries)
     body = property(lambda self: self.inner.body)
     trailer_entries = property(lambda self: self.inner.trailer_entries)
-    raw = property(lambda self: self.inner.raw)
 
     @property
     def annotated_header_entries(self):
@@ -201,7 +200,7 @@ def check_message(msg):
     for warning in msg.headers.warning.okay:
         if warning.code < 100 or warning.code > 299:
             msg.complain(1163, code=warning.code)
-        if warning.date and msg.headers.date != warning.date:
+        if okay(warning.date) and msg.headers.date != warning.date:
             msg.complain(1164, code=warning.code)
 
     if msg.transformed:
@@ -222,16 +221,28 @@ def body_charset(msg):
                 return value
 
 
+def parse_chunk(state):
+    size = rfc7230.chunk_size.parse(state, partial=True)
+    parse.maybe(rfc7230.chunk_ext).parse(state, partial=True)
+    CRLF(lax=True).parse(state, partial=True)
+    if size == 0:
+        return ''
+    else:
+        data = state.consume(size)
+        CRLF(lax=True).parse(state, partial=True)
+        return data
+
+
 def parse_chunked(msg, state):
     data = []
     try:
         saved = state.save()
-        chunk = rfc7230.chunk.parse(state)
+        chunk = parse_chunk(state)
         while chunk:
             data.append(chunk)
-            chunk = rfc7230.chunk.parse(state)
-        trailer = rfc7230.trailer_part.parse(state)
-        crlf.parse(state)
+            chunk = parse_chunk(state)
+        trailer = rfc7230.trailer_part.parse(state, partial=True)
+        CRLF(lax=True).parse(state, partial=True)
     except parse.ParseError, e:
         state.restore(saved)
         state.sane = False

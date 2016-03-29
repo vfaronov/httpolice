@@ -1,58 +1,63 @@
 # -*- coding: utf-8; -*-
 
+from httpolice.citation import RFC
 from httpolice.parse import (
-    argwrap,
-    char_class,
+    auto,
+    can_complain,
     decode,
-    eof,
-    function,
-    join,
-    literal,
-    lookahead,
+    fill_names,
     maybe,
-    rfc,
+    pivot,
+    skip,
     string,
     string1,
-    wrap,
 )
 from httpolice.structure import AuthScheme, CaseInsensitive, Parametrized
-from httpolice.syntax.common import ALPHA, DIGIT, sp
-from httpolice.syntax.rfc7230 import bws, comma_list, ows, quoted_string, token
+from httpolice.syntax.common import ALPHA, DIGIT, SP
+from httpolice.syntax.rfc7230 import (
+    BWS,
+    comma_list,
+    comma_list1,
+    quoted_string,
+    token,
+)
 
 
-auth_scheme = wrap(AuthScheme, token)   // rfc(7235, u'auth-scheme')
+auth_scheme = AuthScheme << token                                       > pivot
+token68 = decode << (
+    string1(ALPHA | DIGIT | '-' | '.' | '_' | '~' | '+' | '/') +
+    string('='))                                                        > pivot
 
-def _parse_auth_param(state):
-    k, v = (token + ~(bws + '=' + bws) + (token | quoted_string)).parse(state)
+@can_complain
+def _check_realm(complain, k, v):
     k = CaseInsensitive(k)
     # Rely on the fact that `token` returns `unicode`
     # whereas `quoted_string` returns `str`
     # (because the text inside a quoted string may be non-ASCII).
     if k == u'realm' and isinstance(v, unicode):
-        state.complain(1196)
-    return k, v
+        complain(1196)
+    return (k, v)
 
-auth_param = function(_parse_auth_param)
+auth_param = _check_realm << (token * skip(BWS * '=' * BWS) *
+                              (token | quoted_string))                  > pivot
 
-token68 = decode(join(string1(char_class(ALPHA + DIGIT + '-._~+/')) +
-                      string('=')))   // rfc(7235, u'token68')
-
-def _parse_auth_params(state):
-    r = comma_list(auth_param).parse(state)
-
-    # TODO: this evil hack is needed because of the ambiguity
-    # between the final comma of ``#auth_param``
-    # and the intermediate comma of ``1#challenge``
-    # (see the note in RFC 7235 section 4.1).
-    if state.data[state.pos - 1] == ',':
-        state.pos -= 1
-
-    # Normalize "no parameters" to `None`.
+def _empty_to_none(r):
     return r or None
 
-challenge = credentials = argwrap(
-    Parametrized,
-    auth_scheme +
-    maybe(~string1(sp) +
-          ((token68 + ~lookahead(ows + (eof | literal(',')))) |
-           function(_parse_auth_params))))
+challenge = Parametrized << (
+    auth_scheme *
+    maybe(skip(string1(SP)) *
+          (token68 | _empty_to_none << comma_list(auth_param))))        > auto
+
+WWW_Authenticate = comma_list1(challenge)                               > pivot
+Proxy_Authenticate = comma_list1(challenge)                             > pivot
+
+credentials = Parametrized << (
+    auth_scheme *
+    maybe(skip(string1(SP)) *
+          (token68 | _empty_to_none << comma_list(auth_param))))        > auto
+
+Authorization = credentials                                             > pivot
+Proxy_Authorization = credentials                                       > pivot
+
+fill_names(globals(), RFC(7235))

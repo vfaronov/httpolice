@@ -1,88 +1,87 @@
 # -*- coding: utf-8; -*-
 
+from httpolice.citation import RFC
 from httpolice.parse import (
-    char_class,
-    join,
+    auto,
+    empty,
+    fill_names,
     literal,
-    maybe,
-    rfc,
+    maybe_str,
+    octet_range,
+    pivot,
     string,
     string1,
-    stringx,
+    string_times,
 )
-from httpolice.syntax.common import (
-    ALPHA,
-    DIGIT,
-    HEXDIG,
-    digit,
-    hexdig,
-)
+from httpolice.syntax.common import ALPHA, DIGIT, HEXDIG
 
 
-pct_encoded = join('%' + char_class(HEXDIG) + char_class(HEXDIG))
-sub_delims = char_class("!$&'()*+,;=")
-unreserved = char_class(ALPHA + DIGIT + "-._~")
-pchar = unreserved | pct_encoded | sub_delims | char_class(':@')
+pct_encoded = '%' + HEXDIG + HEXDIG                                     > auto
+sub_delims = (literal('!') | '$' | '&' | "'" | '(' | ')' | '*' | '+' |
+              ',' | ';' | '=')                                          > auto
+unreserved = ALPHA | DIGIT | '-' | '.' | '_' | '~'                      > auto
+pchar = unreserved | sub_delims | ':' | '@' | pct_encoded               > auto
 
-segment = string(pchar)
-segment_nz = string1(pchar)
-segment_nz_nc = string1(unreserved | pct_encoded | sub_delims | '@')
+segment = string(pchar)                                                 > auto
+segment_nz = string1(pchar)                                             > auto
+segment_nz_nc = string1(unreserved | sub_delims | '@' | pct_encoded)    > auto
 
-scheme = join(char_class(ALPHA) + string(char_class(ALPHA + DIGIT + '+-.'))) \
-    // rfc(3986, u'scheme')
-userinfo = string(unreserved | pct_encoded | sub_delims | ':') \
-    // rfc(3986, u'userinfo')
-dec_octet = (
-    digit |
-    join(char_class('123456789') + digit) |
-    join('1' + stringx(2, 2, digit)) |
-    join('2' + char_class('01234') + digit) |
-    join('25' + char_class('012345')))
-ipv4address = join(
-    dec_octet + '.' + dec_octet + '.' + dec_octet + '.' + dec_octet) \
-    // rfc(3986, u'IPv4address')
-ipv6address = string1(char_class(HEXDIG + ':.'))     # TODO
-ipvfuture = join(
-    'v' + string1(hexdig) + '.' + string1(unreserved | sub_delims | ':'))
-ip_literal = join('[' + (ipv6address | ipvfuture) + ']') \
-    // rfc(3986, u'IP-literal')
-# FIXME: I had to temporarily remove ``<sub-delims>`` from ``<reg-name>``
-# because it was messing up my naive parser in comma lists (e.g. in ``Via``).
-reg_name = string(unreserved | pct_encoded)   // rfc(3986, u'reg-name')
-host = ip_literal | ipv4address | reg_name
-port = string(digit)   // rfc(3986, u'port')
-authority = join(maybe(join(userinfo + '@'), '') +
-                 host + maybe(join(':' + port), ''))
+scheme = ALPHA + string(ALPHA | DIGIT | '+' | '-' | '.')                > pivot
+userinfo = string(unreserved | sub_delims | ':' | pct_encoded)          > pivot
+dec_octet = (DIGIT |
+             octet_range(0x31, 0x39) + DIGIT |
+             '1' + DIGIT + DIGIT |
+             '2' + octet_range(0x30, 0x34) + DIGIT |
+             '25' + octet_range(0x30, 0x35))                            > auto
+IPv4address = (dec_octet + '.' + dec_octet + '.' +
+               dec_octet + '.' + dec_octet)                             > pivot
+h16 = string_times(1, 4, HEXDIG)                                        > auto
+ls32 = (h16 + ':' + h16) | IPv4address                                  > auto
+IPv6address = (
+    string_times(6, 6, h16 + ':') + ls32 |
+    '::' + string_times(5, 5, h16 + ':') + ls32 |
+    maybe_str(h16) + '::' + string_times(4, 4, h16 + ':') + ls32 |
+    maybe_str(string_times(0, 1, h16 + ':') + h16) +
+        '::' + string_times(3, 3, h16 + ':') + ls32 |
+    maybe_str(string_times(0, 2, h16 + ':') + h16) +
+        '::' + string_times(2, 2, h16 + ':') + ls32 |
+    maybe_str(string_times(0, 3, h16 + ':') + h16) + '::' + h16 + ':' + ls32 |
+    maybe_str(string_times(0, 4, h16 + ':') + h16) + '::' + ls32 |
+    maybe_str(string_times(0, 5, h16 + ':') + h16) + '::' + h16 |
+    maybe_str(string_times(0, 6, h16 + ':') + h16) + '::'
+    )                                                                   > pivot
+IPvFuture = ('v' + string1(HEXDIG) + '.' +
+             string1(unreserved | sub_delims | ':'))                    > pivot
+IP_literal = '[' + (IPv6address | IPvFuture) + ']'                      > pivot
+reg_name = string(unreserved | sub_delims | pct_encoded)                > pivot
+host = IP_literal | IPv4address | reg_name                              > pivot
+port = string(DIGIT)                                                    > pivot
+authority = maybe_str(userinfo + '@') + host + maybe_str(':' + port)    > pivot
 
-path_abempty = string(join('/' + segment))   // rfc(3986, u'path-abempty')
-path_absolute = join(
-    '/' +
-    maybe(join(segment_nz + string(join('/' + segment))), '')) \
-    // rfc(3986, u'path-absolute')
-path_noscheme = join(segment_nz_nc + string(join('/' + segment))) \
-    // rfc(3986, u'path-noscheme')
-path_rootless = join(segment_nz + string(join('/' + segment))) \
-    // rfc(3986, u'path-rootless')
-path_empty = literal('')   // rfc(3986, u'path-empty')
+path_abempty = string('/' + segment)                                    > auto
+path_absolute = '/' + maybe_str(segment_nz + string('/' + segment))     > auto
+path_noscheme = segment_nz_nc + string('/' + segment)                   > auto
+path_rootless = segment_nz + string('/' + segment)                      > auto
+path_empty = empty                                                      > auto
 
-hier_part = (join('//' + authority + path_abempty) |
-             path_absolute | path_rootless | path_empty)
+hier_part = ('//' + authority + path_abempty |
+             path_absolute | path_rootless | path_empty)                > pivot
 
-query = string(pchar | char_class('/?'))
-fragment = string(pchar | char_class('/?'))
+query = string(pchar | '/' | '?')                                       > pivot
+fragment = string(pchar | '/' | '?')                                    > pivot
 
-absolute_uri = join(scheme + ':' + hier_part + maybe(join('?' + query), ''))
+absolute_URI = scheme + ':' + hier_part + maybe_str('?' + query)        > pivot
 
-relative_part = (
-    join('//' + authority + path_abempty) |
-    path_absolute | path_noscheme | path_empty) \
-    // rfc(3986, u'relative-part')
+relative_part = ('//' + authority + path_abempty |
+                 path_absolute | path_noscheme | path_empty)            > pivot
 
-uri = join(scheme + ':' + hier_part + maybe(join('?' + query), '') +
-           maybe(join('#' + fragment), ''))
+URI = (scheme + ':' + hier_part +
+       maybe_str('?' + query) + maybe_str('#' + fragment))              > pivot
 
-relative_ref = join(relative_part +
-                    maybe(join('?' + query), '') +
-                    maybe(join('#' + fragment), ''))
+relative_ref = (relative_part +
+                maybe_str('?' + query) + maybe_str('#' + fragment))     > pivot
 
-uri_reference = uri | relative_ref
+URI_reference = URI | relative_ref                                      > pivot
+
+
+fill_names(globals(), RFC(3986))

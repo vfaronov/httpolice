@@ -3,8 +3,7 @@
 from httpolice.citation import RFC
 from httpolice.known.base import KnownDict
 from httpolice.structure import CacheDirective
-from httpolice.syntax import rfc7230
-from httpolice.syntax.common import integer
+from httpolice.syntax import rfc7230, rfc7234
 
 
 TOKEN_PREFERRED = 0
@@ -44,21 +43,21 @@ known = KnownDict([
   'argument_form': TOKEN_PREFERRED,
   'for_request': True,
   'for_response': True,
-  'parser': integer},
+  'parser': rfc7234.delta_seconds},
  {'_': CacheDirective(u'max-stale'),
   '_citations': [RFC(7234, section=(5, 2, 1, 2))],
   'argument': OPTIONAL,
   'argument_form': TOKEN_PREFERRED,
   'for_request': True,
   'for_response': False,
-  'parser': integer},
+  'parser': rfc7234.delta_seconds},
  {'_': CacheDirective(u'min-fresh'),
   '_citations': [RFC(7234, section=(5, 2, 1, 3))],
   'argument': REQUIRED,
   'argument_form': TOKEN_PREFERRED,
   'for_request': True,
   'for_response': False,
-  'parser': integer},
+  'parser': rfc7234.delta_seconds},
  {'_': CacheDirective(u'must-revalidate'),
   '_citations': [RFC(7234, section=(5, 2, 2, 1))],
   'argument': NO,
@@ -109,7 +108,7 @@ known = KnownDict([
   'argument_form': TOKEN_PREFERRED,
   'for_request': False,
   'for_response': True,
-  'parser': integer},
+  'parser': rfc7234.delta_seconds},
  {'_': CacheDirective(u'stale-if-error'),
   '_citations': [RFC(5861, section=(4,))]},
  {'_': CacheDirective(u'stale-while-revalidate'),

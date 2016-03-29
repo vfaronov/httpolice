@@ -1614,4 +1614,20 @@
     </rfc>
   </error>
 
+  <error id="1222">
+    <title>Impossible date in <ref to="place"/></title>
+    <explain>“<ref to="date"/>” is not a valid date.</explain>
+  </error>
+
+  <error id="1223">
+    <title>Impossible time in <ref to="place"/></title>
+    <explain>“<ref to="time"/>” is not a valid time.</explain>
+  </error>
+
+  <error id="1224">
+    <title>LF without CR in <ref to="place"/></title>
+    <explain>Lines in HTTP message framing are terminated by two bytes: a carriage return (CR) followed by a line feed (LF). Some implementations accept a bare LF without CR, like in this message, but this is not reliable.</explain>
+    <explain>See also <rfc num="7230" sect="3.5"/>.</explain>
+  </error>
+
 </notices>

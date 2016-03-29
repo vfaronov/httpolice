@@ -1,30 +1,30 @@
 # -*- coding: utf-8; -*-
 
-import re
-
+from httpolice.citation import RFC
 from httpolice.parse import (
-    ParseError,
-    argwrap,
-    char_class,
-    char_range,
-    ci,
+    auto,
+    can_complain,
     decode,
-    decode_into,
-    function,
-    join,
+    fill_names,
+    group,
     literal,
-    lookahead,
     many,
-    many1,
     maybe,
-    nbytes,
-    rfc,
+    maybe_str,
+    named,
+    octet,
+    octet_range,
+    pivot,
+    recursive,
+    skip,
     string,
     string1,
-    times,
-    wrap,
+    string_excluding,
+    string_times,
+    subst,
 )
 from httpolice.structure import (
+    CaseInsensitive,
     ConnectionOption,
     FieldName,
     HeaderEntry,
@@ -36,205 +36,223 @@ from httpolice.structure import (
     UpgradeToken,
     Versioned,
 )
-from httpolice.syntax import rfc3986
+from httpolice.syntax.rfc3986 import (
+    absolute_URI,
+    authority,
+    host as uri_host,
+    query,
+    relative_part,
+    port,
+    segment,
+)
 from httpolice.syntax.common import (
     ALPHA,
-    crlf,
-    digit,
+    CRLF,
     DIGIT,
-    dquote,
-    hex_integer,
+    DQUOTE,
+    HEXDIG,
     HTAB,
     SP,
-    sp,
-    sp_htab,
     VCHAR,
 )
 
 
-obs_text = char_class(char_range(0x80, 0xFF))
+obs_text = octet_range(0x80, 0xFF)                                      > auto
 
-tchar = char_class("!#$%&'*+-.^_`|~" + DIGIT + ALPHA)
-token = decode(string1(tchar))   // rfc(7230, u'token')
+tchar = (literal('!') | '#' | '$' | '%' | '&' | "'" | '*' | '+' | '-' | '.' |
+         '^' | '_' | '`' | '|' | '~' | DIGIT | ALPHA)                   > auto
+
+token = unicode << string1(tchar)                                       > auto
+
+def token_excluding(excluding):
+    return unicode << string_excluding(tchar, [''] + list(excluding))
 
 def quoted_pair(sensible_for):
-    # In RFC 7230 ``quoted-pair`` is a single rule,
+    # In RFC 7230, ``<quoted-pair>`` is a single rule,
     # but we parametrize it to report no. 1017 depending on the context.
-    def parser(state):
-        inner = (~literal('\\') + (char_class(HTAB + SP + VCHAR) | obs_text))
-        r = inner.parse(state)
-        if r not in sensible_for:
-            state.complain(1017, char=r.decode('ascii', 'replace'))
-        return r
-    return function(parser)
+    @can_complain
+    def check_sensible(complain, c):
+        if c not in sensible_for:
+            complain(1017, char=c.decode('ascii', 'replace'))
+        return c
+    return (check_sensible << skip('\\') * (HTAB | SP | VCHAR | obs_text)
+            > named('quoted-pair', RFC(7230)))
 
-qdtext = char_class(HTAB + SP + '\x21' +
-                    char_range(0x23, 0x5B) + char_range(0x5D, 0x7E)) | obs_text
-quoted_string = (~dquote + string(qdtext | quoted_pair('"\\')) + ~dquote) \
-    // rfc(7230, u'quoted-string')
-ctext = char_class(HTAB + SP + char_range(0x21, 0x27) +
-                   char_range(0x2A, 0x5B) + char_range(0x5D, 0x7E)) | obs_text
+qdtext = (HTAB | SP | octet(0x21) | octet_range(0x23, 0x5B) |
+          octet_range(0x5D, 0x7E) | obs_text)                           > auto
+quoted_string = (skip(DQUOTE) *
+                 string(qdtext | quoted_pair(sensible_for='"\\')) *
+                 skip(DQUOTE))                                          > auto
 
-def _parse_comment(state):            # recursive
-    inner = decode(~literal('(') +
-                    string(ctext | quoted_pair('()\\') | comment) +
-                   ~literal(')'))   // rfc(7230, u'comment')
-    return inner.parse(state)
+ctext = (HTAB | SP | octet_range(0x21, 0x27) | octet_range(0x2A, 0x5B) |
+         octet_range(0x5D, 0x7E) | obs_text)                            > auto
 
-comment = function(_parse_comment)
+def comment(include_parens=False):
+    inner = recursive() > named('comment', RFC(7230))
+    inner.rec = '(' + string(ctext | quoted_pair(sensible_for='()\\') |
+                             inner) + ')'
+    inner = decode << inner
+    if not include_parens:
+        inner = (lambda s: s[1:-1]) << inner
+    return inner > named('comment', RFC(7230))
 
-ows = string(sp_htab)
+OWS = string(SP | HTAB)                                                 > auto
 
-def _parse_rws(state):
-    r = string1(sp_htab).parse(state)
-    if r != ' ':
-        state.complain(1014, num=len(r))
+@can_complain
+def _check_just_one_space(complain, s):
+    if s != ' ':
+        complain(1014, num=len(s))
+    return s
+
+RWS = _check_just_one_space << string1(SP | HTAB)                       > auto
+
+@can_complain
+def _bad_whitespace(complain, s):
+    if s:
+        complain(1015)
+    return s
+
+BWS = _bad_whitespace << OWS                                            > auto
+
+@can_complain
+def _collect_elements(complain, xs):
+    if xs is None:
+        xs = []
+    r = [elem for elem in xs if elem is not None]
+    if len(r) != len(xs):
+        complain(1151)
     return r
-rws = function(_parse_rws)
 
-def _parse_bws(state):
-    r = ows.parse(state)
-    if r:
-        state.complain(1015)
-    return ''
-bws = function(_parse_bws)
+def comma_list(element):
+    return _collect_elements << maybe(
+        (subst([None, None]) << literal(',') |
+         (lambda x: [x]) << group(element)) +
+        many(skip(OWS * ',') * maybe(skip(OWS) * element))
+    ) > named('#rule', RFC(7230, section=(7,)))
 
-def _collect_elements(state, raw):
-    r = []
-    for elem in [raw[0]] + raw[1]:
-        if elem is None:
-            state.complain(1151)
-        else:
-            r.append(elem)
-    return r
+def comma_list1(element):
+    return _collect_elements << (
+        many(subst(None) << ',' * OWS) +
+        ((lambda x: [x]) << group(element)) +
+        many(skip(OWS * ',') * maybe(skip(OWS) * element))
+    ) > named('1#rule', RFC(7230, section=(7,)))
 
-def comma_list(inner):
-    def _parse_comma_list(state):
-        r = (maybe(inner) + many(~(ows + ',') + maybe(~ows + inner))). \
-            parse(state)
-        if r == (None, []):
-            return []
-        else:
-            return _collect_elements(state, r)
-    return function(_parse_comma_list)
+method = Method << token                                                > pivot
 
-def comma_list1(inner):
-    def _parse_comma_list1(state):
-        r = (~many(',' + ows) + inner +
-              many(~(ows + ',') + maybe(~ows + inner))).parse(state)
-        return _collect_elements(state, r)
-    return function(_parse_comma_list1)
+absolute_path = string1('/' + segment)                                  > pivot
+partial_URI = relative_part + maybe_str('?' + query)                    > pivot
+origin_form = absolute_path + maybe_str('?' + query)                    > pivot
+absolute_form = absolute_URI                                            > pivot
+authority_form = authority                                              > pivot
+asterisk_form = literal('*')                                            > auto
+request_target = (origin_form |
+                  absolute_form |
+                  authority_form |
+                  asterisk_form)                                        > pivot
 
-method = wrap(Method, token)   // rfc(7230, u'method')
+HTTP_name = octet(0x48) + octet(0x54) + octet(0x54) + octet(0x50)       > auto
+HTTP_version = HTTPVersion << HTTP_name + '/' + DIGIT + '.' + DIGIT     > pivot
 
-absolute_path = string1(join('/' + rfc3986.segment)) \
-    // rfc(7230, u'absolute-path')
-partial_uri = join(
-    rfc3986.relative_part +
-    maybe(join('?' + rfc3986.query), '')) \
-    // rfc(7230, u'partial-URI')
-origin_form = join(absolute_path + maybe(join('?' + rfc3986.query), empty=''))
-absolute_form = rfc3986.absolute_uri
-authority_form = rfc3986.authority
-asterisk_form = literal('*')
-request_target = (
-    (origin_form + ~lookahead(' ')) |
-    (authority_form + ~lookahead(' ')) |
-    (absolute_form + ~lookahead(' ')) |
-    (asterisk_form + ~lookahead(' ')))
+status_code = StatusCode << string_times(3, 3, DIGIT)                   > pivot
+reason_phrase = string(HTAB | SP | VCHAR | obs_text)                    > pivot
 
-http_version = decode_into(HTTPVersion, join('HTTP/' + digit + '.' + digit)) \
-    // rfc(7230, u'HTTP-version')
+request_line = (method * skip(SP) *
+                request_target * skip(SP) *
+                HTTP_version * skip(CRLF(lax=True)))                    > pivot
 
-status_code = wrap(StatusCode, join(times(3, 3, digit))) \
-    // rfc(7230, u'status-code')
-reason_phrase = string(char_class(HTAB + SP + VCHAR) | obs_text) \
-    // rfc(7230, u'reason-phrase')
+status_line = (HTTP_version * skip(SP) *
+               status_code * skip(SP) *
+               reason_phrase * skip(CRLF(lax=True)))                    > pivot
 
-request_line = method + ~sp + request_target + ~sp + http_version + ~crlf
-status_line = http_version + ~sp + status_code + ~sp + reason_phrase + ~crlf
+field_name = FieldName << token                                         > pivot
+field_vchar = VCHAR | obs_text                                          > auto
 
-field_name = wrap(FieldName, token)   // rfc(7230, u'field-name')
-field_vchar = char_class(VCHAR) | obs_text
-field_content = wrap(str.rstrip,        # see errata to RFC 7230
-                     join(field_vchar + string(sp_htab | field_vchar)))
-
-def _parse_obs_fold(state):
-    (ows + crlf + many1(sp_htab)).parse(state)
-    state.complain(1016)
+@can_complain
+def _process_obs_fold(complain, _):
+    complain(1016)
     return ' '
-obs_fold = function(_parse_obs_fold)
 
-field_value = string(field_content | obs_fold)
-header_field = argwrap(HeaderEntry,
-                       field_name + ~(':' + ows) + field_value + ~ows)
+obs_fold = _process_obs_fold << CRLF(lax=True) + string1(SP | HTAB)     > auto
 
-transfer_parameter = \
-    (token + ~(bws + '=' + bws) + (token | decode(quoted_string))) \
-    // rfc(7230, u'transfer-parameter')
-transfer_extension = argwrap(
-    Parametrized,
-    wrap(TransferCoding, token) +
-    many(~(ows + ';' + ows) + transfer_parameter)) \
-    // rfc(7230, u'transfer-extension')
-# We don't special-case gzip/deflate/etc. here, as the ABNF doesn't preclude
-# parsing "gzip" as <transfer-extension> with an empty list of parameters.
-transfer_coding = transfer_extension
+# We don't use the original RFC 7230 ``field-value`` and ``field-content``
+# because they are wrong (see RFC Errata ID: 4189)
+# and also very inefficient for an Earley parser.
+# The following rewritten versions are much faster
+# and seem to capture the behavior intended by the specification.
 
-def _check_rank(coding):
-    # The <t-ranking> is parsed as part of the <transfer-extension>,
-    # so we need to check it manually.
-    if coding.param:
-        name, value = coding.param.pop()
-        if name.lower() == u'q':
-            if not re.match(ur'0(\.[0-9]{0,3})?', value) and \
-                    not re.match(ur'1(\.0{0,3})?', value):
-                raise ParseError(u'bad <rank> (RFC 7230): %r' % value)
-            value = float(value)
-        coding.param.append((name, value))
-    return coding
+field_content = (field_vchar +
+                 maybe_str(string(SP | HTAB | field_vchar) +
+                           field_vchar))                                > auto
+field_value = recursive()                                               > auto
+field_value.rec = (maybe_str(field_content) |
+                   field_value + obs_fold + maybe_str(field_content))
 
-t_codings = (ci('trailers') | wrap(_check_rank, transfer_coding))
+header_field = HeaderEntry << (field_name * skip(':' * OWS) *
+                               field_value * skip(OWS))                 > pivot
 
-chunk_size = hex_integer   // rfc(7230, u'chunk-size')
-chunk_ext_name = token   // rfc(7230, u'chunk-ext-name')
-chunk_ext_val = token | decode(quoted_string)
-chunk_ext = \
-    many(~literal(';') + chunk_ext_name +
-          maybe(~literal('=') + chunk_ext_val))   // rfc(7230, u'chunk-ext')
+def transfer_parameter(no_q=False):
+    return Parametrized << (
+        (token_excluding(['q']) if no_q else token) *
+        skip(BWS * '=' * BWS) * (token | quoted_string)
+    ) > named('transfer-parameter', RFC(7230), is_pivot=True)
 
-def _parse_chunk(state):
-    size = chunk_size.parse(state)
-    maybe(chunk_ext).parse(state)
-    crlf.parse(state)
-    if size == 0:
-        return ''
-    else:
-        data = nbytes(size, size).parse(state)
-        crlf.parse(state)
-        return data
+_built_in_codings = ['chunked', 'compress', 'deflate', 'gzip']
+_empty_params = lambda c: Parametrized(c, [])
 
-chunk = function(_parse_chunk)
-trailer_part = many(header_field + ~crlf)
+def transfer_extension(exclude=None, no_q=False):
+    return Parametrized << (
+        (TransferCoding << token_excluding(exclude or [])) *
+        many(skip(OWS * ';' * OWS) * transfer_parameter(no_q))
+    ) > named('transfer-extension', RFC(7230), is_pivot=True)
 
-host = join(rfc3986.host + maybe(join(':' + rfc3986.port), ''))
+def transfer_coding(no_trailers=False, no_q=False):
+    exclude = _built_in_codings
+    if no_trailers:
+        exclude = exclude + ['trailers']
+    r = transfer_extension(exclude, no_q)
+    for name in _built_in_codings:
+        r = r | _empty_params << (TransferCoding << literal(name))
+    return r > named('transfer-coding', RFC(7230), is_pivot=True)
 
-connection_option = wrap(ConnectionOption, token)
+Transfer_Encoding = comma_list1(transfer_coding())                      > pivot
 
-protocol_name = token   // rfc(7230, u'protocol-name')
-protocol_version = token   // rfc(7230, u'protocol-version')
-protocol = argwrap(
-    Versioned,
-    wrap(UpgradeToken, protocol_name) +
-    maybe(~literal('/') + protocol_version))
+rank = (float << '0' + maybe_str('.' + string_times(0, 3, DIGIT)) |
+        float << '1' + maybe_str('.' + string_times(0, 3, '0')))        > pivot
+t_ranking = skip(OWS * ';' * OWS * 'q=') * rank                         > pivot
+t_codings = (CaseInsensitive << literal('trailers') |
+             Parametrized << (transfer_coding(no_trailers=True, no_q=True) *
+                              maybe(t_ranking)))                        > pivot
+TE = comma_list(t_codings)                                              > pivot
 
-received_protocol = argwrap(
-    Versioned,
-    maybe(protocol_name + ~literal('/'), u'HTTP') +
-    protocol_version)
-pseudonym = token   // rfc(7230, u'pseudonym')
-received_by = (
-    decode(join(rfc3986.host + maybe(join(':' + rfc3986.port), ''))) |
-    pseudonym)   // rfc(7230, u'received-by')
-via = comma_list1(received_protocol + ~rws + received_by +
-                  maybe(~rws + comment))
+Trailer = comma_list1(field_name)                                       > pivot
+
+chunk_size = (lambda s: int(s, 16)) << string1(HEXDIG)                  > pivot
+chunk_ext_name = token                                                  > auto
+chunk_ext_val = token | quoted_string                                   > auto
+chunk_ext = many(skip(';') * chunk_ext_name *
+                 maybe(skip('=') * chunk_ext_val))                      > pivot
+
+trailer_part = many(header_field * skip(CRLF(lax=True)))                > pivot
+
+Host = uri_host + maybe_str(':' + port)                                 > pivot
+
+connection_option = ConnectionOption << token                           > pivot
+Connection = comma_list1(connection_option)                             > pivot
+
+protocol_name = token                                                   > pivot
+protocol_version = token                                                > pivot
+protocol = Versioned << ((UpgradeToken << protocol_name) *
+                         maybe(skip('/') * protocol_version))           > pivot
+Upgrade = comma_list1(protocol)                                         > pivot
+
+received_protocol = Versioned << (maybe(protocol_name * skip('/'), u'HTTP') *
+                                  protocol_version)                     > pivot
+pseudonym = token                                                       > pivot
+received_by = (decode << uri_host + maybe_str(':' + port)) | pseudonym  > pivot
+Via = comma_list1(received_protocol * skip(RWS) *
+                  received_by *
+                  maybe(skip(RWS) * comment(include_parens=False)))     > pivot
+
+Content_Length = int << string1(DIGIT)                                  > pivot
+
+fill_names(globals(), RFC(7230))

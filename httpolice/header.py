@@ -81,23 +81,27 @@ class HeaderView(object):
         entries = []
         values = []
         items = self.message.headers.enumerate(self.name)
-        parser = (header.parser_for(self.name) or parse.anything) + parse.eof
+        parser = header.parser_for(self.name)
         for from_trailer, i, entry in items:
             if from_trailer and header.is_bad_for_trailer(self.name):
                 self.message.complain(1026, entry=entry)
                 continue
             entries.append(entry)
-            state = parse.State(entry.value, annotate_classes=known.classes)
-            try:
-                parsed = parser.parse(state)
-            except parse.ParseError, e:
-                self.message.complain(1000, entry=entry, error=e)
-                parsed = Unparseable
+            if parser is None:
+                parsed = entry.value
             else:
-                parsed = self._process_parsed(entry, parsed)
-                self.message.annotations[(from_trailer, i)] = \
-                    state.collect_annotations()
-                state.dump_complaints(self.message, entry)
+                state = parse.State(entry.value,
+                                    annotate_classes=known.classes)
+                try:
+                    parsed = parser.parse(state)
+                except parse.ParseError, e:
+                    self.message.complain(1000, entry=entry, error=e)
+                    parsed = Unparseable
+                else:
+                    parsed = self._process_parsed(entry, parsed)
+                    self.message.annotations[(from_trailer, i)] = \
+                        state.collect_annotations()
+                    state.dump_complaints(self.message, entry)
             values.append(parsed)
         return entries, values
 
@@ -235,7 +239,7 @@ class DirectivesView(ListHeaderView):
             elif parser is not None:
                 state = parse.State(str(argument))
                 try:
-                    argument = (parser + parse.eof).parse(state)
+                    argument = parser.parse(state)
                 except parse.ParseError, e:
                     complain(1158, error=e)
                     argument = Unparseable

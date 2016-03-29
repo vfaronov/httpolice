@@ -1,81 +1,86 @@
 # -*- coding: utf-8; -*-
 
+from httpolice.citation import RFC
 from httpolice.parse import (
-    ParseError,
-    argwrap,
-    ci,
+    auto,
+    can_complain,
     decode,
-    eof,
-    function,
-    group,
+    fill_names,
     literal,
-    lookahead,
     maybe,
+    pivot,
+    skip,
     string,
     string1,
     subst,
-    wrap,
 )
 from httpolice.structure import ContentRange, RangeSpecifier, RangeUnit
-from httpolice.syntax.common import char, integer, vchar
-from httpolice.syntax.rfc7230 import comma_list1, token
+from httpolice.syntax.common import CHAR, DIGIT, SP, VCHAR
+from httpolice.syntax.rfc7230 import comma_list1, token_excluding
+from httpolice.syntax.rfc7231 import HTTP_date
+from httpolice.syntax.rfc7232 import entity_tag
 
 
+bytes_unit = RangeUnit << literal('bytes')                              > auto
+other_range_unit = RangeUnit << token_excluding(['bytes'])              > auto
+range_unit = bytes_unit | other_range_unit                              > pivot
 acceptable_ranges = (
-    subst([], ci('none') + ~lookahead(eof)) |
-    comma_list1(wrap(RangeUnit, token)))
+    subst([]) << literal('none') |
+    comma_list1(range_unit))                                            > pivot
+Accept_Ranges = acceptable_ranges                                       > pivot
 
-bytes_unit = wrap(RangeUnit, ci('bytes'))
-
-def _parse_byte_range_spec(state):
-    first, last = (integer + ~literal('-') + maybe(integer)).parse(state)
+@can_complain
+def _well_formed1(complain, first, last):
     if (last is not None) and (first > last):
-        state.complain(1133)
-    return first, last
+        complain(1133)
+    return (first, last)
 
-byte_range_spec = function(_parse_byte_range_spec)
-suffix_byte_range_spec = wrap(
-    lambda x: (None, x),
-    ~literal('-') + integer)
-byte_range_set = comma_list1(byte_range_spec | suffix_byte_range_spec)
-byte_ranges_specifier = argwrap(
-    RangeSpecifier,
-    bytes_unit + ~literal('=') + byte_range_set)
+first_byte_pos = int << string1(DIGIT)                                  > auto
+last_byte_pos = int << string1(DIGIT)                                   > auto
+byte_range_spec = _well_formed1 << (first_byte_pos * skip('-') *
+                                    maybe(last_byte_pos))               > pivot
 
-def _parse_other_range_unit(state):
-    r = wrap(RangeUnit, token).parse(state)
-    if r == RangeUnit(u'bytes'):
-        raise ParseError()
-    return r
+suffix_length = int << string1(DIGIT)                                   > auto
+suffix_byte_range_spec = \
+    (lambda x: (None, x)) << skip('-') * suffix_length                  > pivot
 
-other_range_unit = function(_parse_other_range_unit)
-other_range_set = decode(string1(vchar))
-other_ranges_specifier = argwrap(
-    RangeSpecifier,
-    other_range_unit + ~literal('=') + other_range_set)
+byte_range_set = comma_list1(byte_range_spec | suffix_byte_range_spec)  > auto
+byte_ranges_specifier = RangeSpecifier << (
+    bytes_unit * skip('=') * byte_range_set)                            > pivot
 
-range = other_ranges_specifier | byte_ranges_specifier
+other_range_set = decode << string1(VCHAR)                              > auto
+other_ranges_specifier = RangeSpecifier << (
+    other_range_unit * skip('=') * other_range_set)                     > pivot
 
-byte_range = integer + ~literal('-') + integer
+Range = byte_ranges_specifier | other_ranges_specifier                  > pivot
+
+byte_range = first_byte_pos * skip('-') * last_byte_pos                 > auto
+complete_length = int << string1(DIGIT)                                 > auto
 byte_range_resp = (
-    group(byte_range) + ~literal('/') + (integer | subst(None, '*')))
-unsatisfied_range = subst(None, '*/') + integer
+    byte_range * skip('/') *
+    (complete_length | subst(None) << literal('*')))                    > pivot
 
-def _parse_byte_content_range(state):
-    inner = bytes_unit + ~literal(' ') + (byte_range_resp | unsatisfied_range)
-    r = ContentRange(*inner.parse(state))
+unsatisfied_range = (
+    (subst(None) << literal('*/')) * complete_length)                   > pivot
+
+@can_complain
+def _well_formed2(complain, r):
     bounds, complete = r.range
     if bounds is not None:
         first, last = bounds
         if (last < first) or ((complete is not None) and (complete <= last)):
-            state.complain(1148)
+            complain(1148)
     return r
 
-byte_content_range = function(_parse_byte_content_range)
+byte_content_range = _well_formed2 << (ContentRange << (
+    bytes_unit * skip(SP) * (byte_range_resp | unsatisfied_range)))     > pivot
 
-other_range_resp = string(char)
-other_content_range = argwrap(
-    ContentRange,
-    other_range_unit + ~literal(' ') + other_range_resp)
+other_range_resp = decode << string(CHAR)                               > pivot
+other_content_range = ContentRange << (
+    other_range_unit * skip(SP) * other_range_resp)                     > pivot
 
-content_range = other_content_range | byte_content_range
+Content_Range = byte_content_range | other_content_range                > pivot
+
+If_Range = entity_tag | HTTP_date                                       > pivot
+
+fill_names(globals(), RFC(7233))

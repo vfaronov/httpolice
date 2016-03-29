@@ -34,7 +34,7 @@ class RequestView(message.MessageView):
 
     def _target_parses_as(self, parser):
         try:
-            (parser + parse.eof).parse(parse.State(self.target))
+            parser.parse(parse.State(self.target))
         except parse.ParseError:
             return False
         else:
@@ -246,7 +246,7 @@ def check_request(req):
                         if ':' not in credentials:
                             req.complain(1211, header=hdr)
                         for c in credentials:
-                            if c in CTL:
+                            if CTL.match(c):
                                 req.complain(1212, header=hdr,
                                              char=hex(ord(c)))
                 else:

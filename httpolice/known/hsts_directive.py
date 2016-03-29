@@ -3,7 +3,7 @@
 from httpolice.citation import RFC
 from httpolice.known.base import KnownDict
 from httpolice.structure import HSTSDirective
-from httpolice.syntax.common import integer
+from httpolice.syntax import rfc6797
 
 
 NO = 0
@@ -28,5 +28,5 @@ known = KnownDict([
  {'_': HSTSDirective('max-age'),
   '_citations': [RFC(6797, section=(6, 1, 1))],
   'argument': REQUIRED,
-  'parser': integer},
+  'parser': rfc6797.max_age_value},
 ], extra_info=['argument', 'parser'])

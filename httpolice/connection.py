@@ -7,7 +7,13 @@ from httpolice.request import RequestView
 from httpolice.response import ResponseView
 from httpolice.structure import Unparseable
 from httpolice.syntax import rfc7230
-from httpolice.syntax.common import crlf
+from httpolice.syntax.common import CRLF
+
+
+_header_entries = (
+    parse.many(rfc7230.header_field * parse.skip(CRLF(lax=True))) *
+    parse.skip(CRLF(lax=True))
+)
 
 
 def analyze_streams(inbound, outbound, scheme=None):
@@ -104,7 +110,6 @@ def _parse_requests(connection, stream, scheme=None):
         else:
             result.append(req)
             _parse_request_body(req, state)
-            req.inner.raw = state.cut()
     if not state.is_eof():
         connection.complain(1007)
     connection.unparsed_inbound = state.remaining()
@@ -113,13 +118,9 @@ def _parse_requests(connection, stream, scheme=None):
 
 def _parse_request_heading(state, scheme=None):
     try:
-        saved = state.save()
-        (method_, target, version_) = rfc7230.request_line.parse(state)
-        entries = \
-            parse.many(rfc7230.header_field + ~crlf).parse(state)
-        crlf.parse(state)
+        ((method_, target, version_), entries) = \
+            (rfc7230.request_line * _header_entries).parse(state, partial=True)
     except parse.ParseError, e:
-        state.restore(saved)
         state.sane = False
         state.complain(1006, error=e)
         return Unparseable
@@ -151,7 +152,7 @@ def _parse_request_body(req, state):
             state.sane = False
         else:
             try:
-                req.inner.body = parse.nbytes(n, n).parse(state)
+                req.inner.body = state.consume(n)
             except parse.ParseError:
                 req.inner.body = Unparseable
                 req.complain(1004)
@@ -175,7 +176,6 @@ def _parse_responses(connection, requests, stream):
             else:
                 responses.append(resp)
                 _parse_response_body(resp, state)
-                resp.inner.raw = state.cut()
                 if (not resp.status.informational) or \
                         (resp.status == st.switching_protocols):
                     # This is the final response for this request.
@@ -192,16 +192,15 @@ def _parse_responses(connection, requests, stream):
 
 def _parse_response_heading(req, state):
     try:
-        (version, status, reason) = rfc7230.status_line.parse(state)
-        entries = parse.many(rfc7230.header_field + ~crlf).parse(state)
-        crlf.parse(state)
+        ((version_, status, reason), entries) = \
+            (rfc7230.status_line * _header_entries).parse(state, partial=True)
     except parse.ParseError, e:
         state.complain(1009, error=e)
         state.sane = False
         return Unparseable
     else:
-        resp = ResponseView(req, structure.Response(req.inner, version, status,
-                                                    reason, entries))
+        resp = ResponseView(req, structure.Response(req.inner, version_,
+                                                    status, reason, entries))
         state.dump_complaints(resp, u'response heading')
         return resp
 
@@ -231,7 +230,7 @@ def _parse_response_body(resp, state):
             codings.pop()
             message.parse_chunked(resp, state)
         else:
-            resp.inner.body = parse.anything.parse(state)
+            resp.inner.body = state.remaining()
         while codings and (resp.body is not Unparseable):
             message.decode_transfer_coding(resp, codings.pop())
 
@@ -242,11 +241,11 @@ def _parse_response_body(resp, state):
             state.sane = False
         else:
             try:
-                resp.inner.body = parse.nbytes(n, n).parse(state)
+                resp.inner.body = state.consume(n)
             except parse.ParseError:
                 resp.inner.body = Unparseable
                 resp.complain(1004)
                 state.sane = False
 
     else:
-        resp.inner.body = parse.anything.parse(state)
+        resp.inner.body = state.remaining()
