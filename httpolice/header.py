@@ -90,18 +90,18 @@ class HeaderView(object):
             if parser is None:
                 parsed = entry.value
             else:
-                state = parse.State(entry.value,
-                                    annotate_classes=known.classes)
+                stream = parse.Stream(entry.value,
+                                      annotate_classes=known.classes)
                 try:
-                    parsed = parser.parse(state)
+                    parsed = stream.parse(parser, to_eof=True)
                 except parse.ParseError, e:
                     self.message.complain(1000, entry=entry, error=e)
                     parsed = Unparseable
                 else:
                     parsed = self._process_parsed(entry, parsed)
                     self.message.annotations[(from_trailer, i)] = \
-                        state.collect_annotations()
-                    state.dump_complaints(self.message, entry)
+                        stream.collect_annotations()
+                    stream.dump_complaints(self.message, entry)
             values.append(parsed)
         return entries, values
 
@@ -237,14 +237,14 @@ class DirectivesView(ListHeaderView):
                 complain(1157)
                 argument = None
             elif parser is not None:
-                state = parse.State(str(argument))
+                stream = parse.Stream(str(argument))
                 try:
-                    argument = parser.parse(state)
+                    argument = stream.parse(parser, to_eof=True)
                 except parse.ParseError, e:
                     complain(1158, error=e)
                     argument = Unparseable
                 else:
-                    state.dump_complaints(self.message, entry)
+                    stream.dump_complaints(self.message, entry)
 
         return Parametrized(directive, argument)
 

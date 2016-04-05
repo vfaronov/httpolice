@@ -5,8 +5,6 @@ import operator
 
 from bitstring import BitArray, Bits
 
-from httpolice.blackboard import Blackboard
-
 
 ###############################################################################
 # Combinators to construct a grammar suitable for the Earley algorithm.
@@ -91,9 +89,6 @@ class Symbol(object):
 
     def __mod__(self, other):
         return _continue_right_list << self * other
-
-    def parse(self, input_state, partial=False):
-        return parse(input_state, self.as_nonterminal(), partial)
 
 
 class Terminal(Symbol):
@@ -433,49 +428,77 @@ def can_complain(func):
 
 
 ###############################################################################
-# The "parsing state" abstraction.
+# The input stream and parse error abstractions.
 
-class State(Blackboard):
+class Stream(object):
 
     def __init__(self, data, annotate_classes=None):
-        super(State, self).__init__()
+        super(Stream, self).__init__()
+        self._stack = []
         self.data = data
-        self.pos = 0
+        self.point = 0
         self.sane = True
-        self.annotate_classes = tuple(annotate_classes or ())
-        self.annotations = []
         self.complaints = []
+        self.annotations = []
+        self.annotate_classes = tuple(annotate_classes or ())
+
+    def __enter__(self):
+        self._stack.append((self.point,
+                            self.complaints[:], self.annotations[:]))
+        return self
+
+    def __exit__(self, exc_type, _1, _2):
+        frame = self._stack.pop()
+        if exc_type is not None:
+            (self.point, self.complaints, self.annotations) = frame
+        return False
+
+    def __getitem__(self, i):
+        if 0 <= i < len(self.data) - self.point:
+            return self.data[self.point + i]
+        elif i == len(self.data) - self.point:
+            return None
+        else:
+            raise IndexError(i)
+
+    def is_eof(self):
+        return self.point == len(self.data)
+
+    def skip(self, n):
+        self.point = min(self.point + n, len(self.data))
+
+    def consume_n_bytes(self, n):
+        r = self.data[self.point:(self.point + n)]
+        if len(r) < n:
+            raise ParseError(point=self.point,
+                             found=u'%d bytes' % len(r),
+                             expected=[(u'%d bytes' % n,)])
+        else:
+            self.point += n
+            return r
+
+    def consume_rest(self):
+        r = self.data[self.point:]
+        self.point = len(self.data)
+        return r
+
+    def parse(self, target, to_eof=False):
+        return parse(self, target.as_nonterminal(), to_eof)
+
+    def complain(self, notice_ident, **context):
+        self.complaints.append((notice_ident, context))
+
+    def add_complaints(self, complaints):
+        self.complaints.extend(complaints)
 
     def dump_complaints(self, target, place=u'???'):
-        for notice_ident, context in self.complaints:
-            context.pop(self.self_name)
+        for (notice_ident, context) in self.complaints:
             context['place'] = place
             target.complain(notice_ident, **context)
         self.complaints = []
 
-    def consume(self, n):
-        r = self.data[self.pos:(self.pos + n)]
-        if len(r) < n:
-            raise ParseError(symbol=None,
-                             i=self.pos + len(r),
-                             found=None, expected=[('any data', None)])
-        else:
-            self.pos += n
-            return r
-
-    def remaining(self):
-        r = self.data[self.pos:]
-        self.pos = len(self.data)
-        return r
-
-    def save(self):
-        return self.pos, list(self.annotations), list(self.complaints)
-
-    def restore(self, saved):
-        self.pos, self.annotations, self.complaints = saved
-
-    def is_eof(self):
-        return self.pos >= len(self.data)
+    def add_annotations(self, annotations):
+        self.annotations.extend(annotations)
 
     def collect_annotations(self):
         r = []
@@ -487,6 +510,16 @@ class State(Blackboard):
                 i = end
         r.append(self.data[i:])
         return [chunk for chunk in r if chunk != '']
+
+
+class ParseError(Exception):
+
+    def __init__(self, point, found, expected):
+        super(ParseError, self).__init__(u'unexpected %r at byte position %r' %
+                                         (found, point))
+        self.point = point
+        self.found = found
+        self.expected = expected
 
 
 ###############################################################################
@@ -519,8 +552,7 @@ def _add_item(items, items_idx, items_set, symbol, rule, pos, start):
             (symbol, rule, pos, start))
 
 
-def parse(state, target_symbol, partial=False):
-    data = state.data[state.pos:]
+def parse(stream, target_symbol, to_eof=False):
     (items, items_idx, items_set) = ([], {}, set())
 
     # Seed the initial items inventory with rules for `target_symbol`.
@@ -529,10 +561,10 @@ def parse(state, target_symbol, partial=False):
         _add_item(items, items_idx, items_set, target_symbol, rule, 0, 0)
 
     # Outer loop: over `data`.
-    i = 0                  # Position in `data`.
+    i = 0                  # Relative position in the stream.
     last_good_i = None     # `i` of the last complete parse of `target_symbol`.
     while True:
-        token = data[i] if i < len(data) else None
+        token = stream[i]
 
         # Initialize the items inventory for the next `i`,
         # because we will be adding to it on successful scans.
@@ -541,8 +573,7 @@ def parse(state, target_symbol, partial=False):
         # Load the items inventory for the current `i`.
         (items, items_idx, items_set) = chart[i]
         if len(items) == 0:
-            # This means that there were no successful scans at previous `i`,
-            # so we have a parse error (or a partial parse of `data`).
+            # This means that there were no successful scans at previous `i`.
             break
 
         # Inner loop: over items at the current `i`.
@@ -591,35 +622,33 @@ def parse(state, target_symbol, partial=False):
             if j == len(items):
                 break
 
-        if i == len(data):
+        if token is None:        # End of stream.
             break
         i += 1
 
-    if (last_good_i is not None) and (last_good_i == i or partial):
-        results = _find_results(data, target_symbol, chart, last_good_i,
-                                state.annotate_classes)
+    if (last_good_i is not None) and (last_good_i == i or not to_eof):
+        results = _find_results(stream, target_symbol, chart, last_good_i)
         for start_i, _, result, complaints, annotations in results:
             # There may be multiple valid parses in case of ambiguities,
             # but in practice we just want
             # the first parse that stretches to the beginning of the input.
             if start_i == 0:
-                state.pos += last_good_i
-                for notice_ident, context in complaints:
-                    state.complain(notice_ident, **context)
-                state.annotations.extend(annotations)
+                stream.skip(last_good_i)
+                stream.add_complaints(complaints)
+                stream.add_annotations(annotations)
                 return result
 
-    raise _build_parse_error(data, target_symbol, chart)
+    raise _build_parse_error(stream, target_symbol, chart)
 
 
-def _find_results(data, symbol, chart, end_i, annotate_classes,
-                  outer_parents=None):
+def _find_results(stream, symbol, chart, end_i, outer_parents=None):
     # The trivial base case is to find the parse result of a terminal.
     if isinstance(symbol, Terminal):
-        token = data[end_i - 1]
-        if symbol.match(token):
-            yield end_i - 1, None, token, [], []
-            return
+        if end_i > 0:
+            token = stream[end_i - 1]
+            if symbol.match(token):
+                yield end_i - 1, None, token, [], []
+        return
 
     # With that out of the way, the interesting story is nonterminals.
 
@@ -702,7 +731,7 @@ def _find_results(data, symbol, chart, end_i, annotate_classes,
                     result = nodes
 
                 # Finally, annotate if needed.
-                if isinstance(result, annotate_classes):
+                if isinstance(result, stream.annotate_classes):
                     all_annotations.append((start_i, end_i, result))
 
                 # And that's one complete parse for `target_symbol`
@@ -720,8 +749,7 @@ def _find_results(data, symbol, chart, end_i, annotate_classes,
                         inner_symbol = rule.symbols[-len(frames) - 1]
                     # Recursively get an iterator
                     # over possible results for this symbol.
-                    rs = _find_results(data, inner_symbol, chart, i,
-                                       annotate_classes, parents)
+                    rs = _find_results(stream, inner_symbol, chart, i, parents)
 
                 # Get the next result for this symbol.
                 r = next(rs, None)
@@ -782,25 +810,13 @@ def _find_results(data, symbol, chart, end_i, annotate_classes,
                                    complaints, annotations))
 
 
-class ParseError(Exception):
-
-    def __init__(self, symbol, i, found, expected):
-        super(ParseError, self).__init__(
-            'failed to parse %s: unexpected %r at octet position %r' %
-            (symbol, found, i))
-        self.symbol = symbol
-        self.i = i
-        self.found = found
-        self.expected = expected
-
-
-def _build_parse_error(data, target_symbol, chart):
+def _build_parse_error(stream, target_symbol, chart):
     # Find the last `i` that had some Earley items --
     # that is, the last `i` where we could still make sense of the input data.
     i, items = [(i, items)
                 for (i, (items, _, _)) in enumerate(chart)
                 if len(items) > 0][-1]
-    found = data[i] if i < len(data) else None   # `None` meaning "end of data"
+    found = stream[i]
 
     # What terminal symbols did we expect at that `i`?
     expected = OrderedDict()
@@ -816,7 +832,7 @@ def _build_parse_error(data, target_symbol, chart):
             # so if the input data just stopped there, that would work, too,
             expected[None] = None
 
-    return ParseError(target_symbol, i, found, expected.items())
+    return ParseError(stream.point + i, found, expected.items())
 
 
 def _find_pivots(chart, symbol, start, stack=None):

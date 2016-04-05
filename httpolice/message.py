@@ -12,10 +12,10 @@ import zlib
 import defusedxml
 import defusedxml.ElementTree
 
-from httpolice import parse
 from httpolice.blackboard import Blackboard, memoized_property
 from httpolice.header import HeadersView
 from httpolice.known import cc, header, media, media_type, tc, warn
+from httpolice.parse import ParseError, maybe, skip
 from httpolice.structure import FieldName, Unparseable, okay
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import CRLF
@@ -221,35 +221,32 @@ def body_charset(msg):
                 return value
 
 
-def parse_chunk(state):
-    size = rfc7230.chunk_size.parse(state, partial=True)
-    parse.maybe(rfc7230.chunk_ext).parse(state, partial=True)
-    CRLF(lax=True).parse(state, partial=True)
+def parse_chunk(stream):
+    size = stream.parse(rfc7230.chunk_size *
+                        skip(maybe(rfc7230.chunk_ext) * CRLF(lax=True)))
     if size == 0:
         return ''
     else:
-        data = state.consume(size)
-        CRLF(lax=True).parse(state, partial=True)
+        data = stream.consume_n_bytes(size)
+        stream.parse(CRLF(lax=True))
         return data
 
 
-def parse_chunked(msg, state):
+def parse_chunked(msg, stream):
     data = []
     try:
-        saved = state.save()
-        chunk = parse_chunk(state)
-        while chunk:
-            data.append(chunk)
-            chunk = parse_chunk(state)
-        trailer = rfc7230.trailer_part.parse(state, partial=True)
-        CRLF(lax=True).parse(state, partial=True)
-    except parse.ParseError, e:
-        state.restore(saved)
-        state.sane = False
+        with stream:
+            chunk = parse_chunk(stream)
+            while chunk:
+                data.append(chunk)
+                chunk = parse_chunk(stream)
+            trailer = stream.parse(rfc7230.trailer_part * skip(CRLF(lax=True)))
+    except ParseError, e:
+        stream.sane = False
         msg.complain(1005, error=e)
         msg.inner.body = Unparseable
     else:
-        state.dump_complaints(msg, u'chunked framing')
+        stream.dump_complaints(msg, u'chunked framing')
         msg.inner.body = ''.join(data)
         msg.inner.trailer_entries = trailer
         if trailer:

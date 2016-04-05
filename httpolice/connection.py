@@ -1,8 +1,9 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import message, parse, request, response, structure
+from httpolice import message, request, response, structure
 from httpolice.blackboard import Blackboard
 from httpolice.known import m, st, tc
+from httpolice.parse import ParseError, Stream, many, skip
 from httpolice.request import RequestView
 from httpolice.response import ResponseView
 from httpolice.structure import Unparseable
@@ -10,10 +11,8 @@ from httpolice.syntax import rfc7230
 from httpolice.syntax.common import CRLF
 
 
-_header_entries = (
-    parse.many(rfc7230.header_field * parse.skip(CRLF(lax=True))) *
-    parse.skip(CRLF(lax=True))
-)
+_header_entries = (many(rfc7230.header_field * skip(CRLF(lax=True))) *
+                   skip(CRLF(lax=True)))
 
 
 def analyze_streams(inbound, outbound, scheme=None):
@@ -100,48 +99,48 @@ def parse_streams(connection, inbound, outbound, scheme=None):
     _parse_responses(connection, requests, outbound)
 
 
-def _parse_requests(connection, stream, scheme=None):
-    state = parse.State(stream)
+def _parse_requests(connection, data, scheme=None):
+    stream = Stream(data)
     result = []
-    while state.sane and not state.is_eof():
-        req = _parse_request_heading(state, scheme)
+    while stream.sane and not stream.is_eof():
+        req = _parse_request_heading(stream, scheme)
         if req is Unparseable:
-            state.dump_complaints(connection, u'request heading')
+            stream.dump_complaints(connection, u'request heading')
         else:
             result.append(req)
-            _parse_request_body(req, state)
-    if not state.is_eof():
+            _parse_request_body(req, stream)
+    if not stream.is_eof():
         connection.complain(1007)
-    connection.unparsed_inbound = state.remaining()
+    connection.unparsed_inbound = stream.consume_rest()
     return result
 
 
-def _parse_request_heading(state, scheme=None):
+def _parse_request_heading(stream, scheme=None):
     try:
         ((method_, target, version_), entries) = \
-            (rfc7230.request_line * _header_entries).parse(state, partial=True)
-    except parse.ParseError, e:
-        state.sane = False
-        state.complain(1006, error=e)
+            stream.parse(rfc7230.request_line * _header_entries)
+    except ParseError, e:
+        stream.sane = False
+        stream.complain(1006, error=e)
         return Unparseable
     else:
         req = RequestView(structure.Request(scheme, method_, target, version_,
                                             entries))
-        state.dump_complaints(req, u'request heading')
+        stream.dump_complaints(req, u'request heading')
         return req
 
 
-def _parse_request_body(req, state):
+def _parse_request_body(req, stream):
     # RFC 7230 section 3.3.3.
 
     if req.headers.transfer_encoding:
         codings = list(req.headers.transfer_encoding)
         if codings.pop() == tc.chunked:
-            message.parse_chunked(req, state)
+            message.parse_chunked(req, stream)
         else:
             req.inner.body = Unparseable
             req.complain(1001)
-            state.sane = False
+            stream.sane = False
         while codings and (req.body is not Unparseable):
             message.decode_transfer_coding(req, codings.pop())
 
@@ -149,75 +148,75 @@ def _parse_request_body(req, state):
         n = req.headers.content_length.value
         if n is Unparseable:
             req.inner.body = Unparseable
-            state.sane = False
+            stream.sane = False
         else:
             try:
-                req.inner.body = state.consume(n)
-            except parse.ParseError:
+                req.inner.body = stream.consume_n_bytes(n)
+            except ParseError:
                 req.inner.body = Unparseable
                 req.complain(1004)
-                state.sane = False
+                stream.sane = False
 
     else:
         req.inner.body = None
 
 
-def _parse_responses(connection, requests, stream):
-    state = parse.State(stream)
-    while requests and state.sane and not state.is_eof():
+def _parse_responses(connection, requests, data):
+    stream = Stream(data)
+    while requests and stream.sane and not stream.is_eof():
         req = requests.pop(0)
         # Parse all responses corresponding to this request.
         # RFC 7230 section 3.3.
         responses = []
-        while state.sane:
-            resp = _parse_response_heading(req, state)
+        while stream.sane:
+            resp = _parse_response_heading(req, stream)
             if resp is Unparseable:
-                state.dump_complaints(connection, u'request heading')
+                stream.dump_complaints(connection, u'request heading')
             else:
                 responses.append(resp)
-                _parse_response_body(resp, state)
+                _parse_response_body(resp, stream)
                 if (not resp.status.informational) or \
                         (resp.status == st.switching_protocols):
                     # This is the final response for this request.
                     # Proceed to the next request.
                     connection.exchanges.append(Exchange(req, responses))
                     break
-    if not state.is_eof():
-        if state.sane:
+    if not stream.is_eof():
+        if stream.sane:
             connection.complain(1008)
         else:
             connection.complain(1010)
-    connection.unparsed_outbound = state.remaining()
+    connection.unparsed_outbound = stream.consume_rest()
 
 
-def _parse_response_heading(req, state):
+def _parse_response_heading(req, stream):
     try:
         ((version_, status, reason), entries) = \
-            (rfc7230.status_line * _header_entries).parse(state, partial=True)
-    except parse.ParseError, e:
-        state.complain(1009, error=e)
-        state.sane = False
+            stream.parse(rfc7230.status_line * _header_entries)
+    except ParseError, e:
+        stream.complain(1009, error=e)
+        stream.sane = False
         return Unparseable
     else:
         resp = ResponseView(req, structure.Response(req.inner, version_,
                                                     status, reason, entries))
-        state.dump_complaints(resp, u'response heading')
+        stream.dump_complaints(resp, u'response heading')
         return resp
 
 
-def _parse_response_body(resp, state):
+def _parse_response_body(resp, stream):
     req = resp.request
 
     # RFC 7230 section 3.3.3.
     if resp.status == st.switching_protocols:
         resp.inner.body = None
         resp.complain(1011)
-        state.sane = False
+        stream.sane = False
 
     elif req and req.method == m.CONNECT and resp.status.successful:
         resp.inner.body = None
         resp.complain(1012)
-        state.sane = False
+        stream.sane = False
 
     elif (resp.status.informational or
               resp.status in [st.no_content, st.not_modified] or
@@ -228,9 +227,9 @@ def _parse_response_body(resp, state):
         codings = list(resp.headers.transfer_encoding)
         if codings[-1] == tc.chunked:
             codings.pop()
-            message.parse_chunked(resp, state)
+            message.parse_chunked(resp, stream)
         else:
-            resp.inner.body = state.remaining()
+            resp.inner.body = stream.consume_rest()
         while codings and (resp.body is not Unparseable):
             message.decode_transfer_coding(resp, codings.pop())
 
@@ -238,14 +237,14 @@ def _parse_response_body(resp, state):
         n = resp.headers.content_length.value
         if n is Unparseable:
             resp.inner.body = Unparseable
-            state.sane = False
+            stream.sane = False
         else:
             try:
-                resp.inner.body = state.consume(n)
-            except parse.ParseError:
+                resp.inner.body = stream.consume_n_bytes(n)
+            except ParseError:
                 resp.inner.body = Unparseable
                 resp.complain(1004)
-                state.sane = False
+                stream.sane = False
 
     else:
-        resp.inner.body = state.remaining()
+        resp.inner.body = stream.consume_rest()

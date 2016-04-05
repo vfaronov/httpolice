@@ -90,14 +90,15 @@ class TestCommon(unittest.TestCase):
 class TestSyntax(unittest.TestCase):
 
     def assertParse(self, parser, text, result=None):
-        r = parser.parse(parse.State(text))
+        r = parse.Stream(text).parse(parser, to_eof=True)
         if result is Unparseable:
             self.assert_(r is Unparseable)
         elif result is not None:
             self.assertEqual(r, result)
 
     def assertNoParse(self, parser, text):
-        self.assertRaises(parse.ParseError, parser.parse, parse.State(text))
+        self.assertRaises(parse.ParseError, parse.Stream(text).parse,
+                          parser, to_eof=True)
 
     def test_parser_edge_cases(self):
         # Our parser implementation is general enough that
