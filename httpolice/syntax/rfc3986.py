@@ -12,6 +12,7 @@ from httpolice.parse import (
     string,
     string1,
     string_times,
+    subst,
 )
 from httpolice.syntax.common import ALPHA, DIGIT, HEXDIG
 
@@ -62,7 +63,7 @@ path_abempty = string('/' + segment)                                    > auto
 path_absolute = '/' + maybe_str(segment_nz + string('/' + segment))     > auto
 path_noscheme = segment_nz_nc + string('/' + segment)                   > auto
 path_rootless = segment_nz + string('/' + segment)                      > auto
-path_empty = empty                                                      > auto
+path_empty = subst('') << empty                                         > auto
 
 hier_part = ('//' + authority + path_abempty |
              path_absolute | path_rootless | path_empty)                > pivot
