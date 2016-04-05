@@ -27,7 +27,6 @@ from httpolice.structure import (
     CaseInsensitive,
     ConnectionOption,
     FieldName,
-    HeaderEntry,
     HTTPVersion,
     Method,
     Parametrized,
@@ -156,39 +155,16 @@ HTTP_version = HTTPVersion << HTTP_name + '/' + DIGIT + '.' + DIGIT     > pivot
 status_code = StatusCode << string_times(3, 3, DIGIT)                   > pivot
 reason_phrase = string(HTAB | SP | VCHAR | obs_text)                    > pivot
 
-request_line = (method * skip(SP) *
-                request_target * skip(SP) *
-                HTTP_version * skip(CRLF(lax=True)))                    > pivot
-
-status_line = (HTTP_version * skip(SP) *
-               status_code * skip(SP) *
-               reason_phrase * skip(CRLF(lax=True)))                    > pivot
-
 field_name = FieldName << token                                         > pivot
 field_vchar = VCHAR | obs_text                                          > auto
 
-@can_complain
-def _process_obs_fold(complain, _):
-    complain(1016)
-    return ' '
+obs_fold = CRLF + string1(SP | HTAB)                                    > auto
 
-obs_fold = _process_obs_fold << CRLF(lax=True) + string1(SP | HTAB)     > auto
-
-# We don't use the original RFC 7230 ``field-value`` and ``field-content``
-# because they are wrong (see RFC Errata ID: 4189)
-# and also very inefficient for an Earley parser.
-# The following rewritten versions are much faster
-# and seem to capture the behavior intended by the specification.
-
+# The original RFC 7230 ``field-content`` is wrong (see RFC Errata ID: 4189).
+# This version seems to capture the intended behavior.
 field_content = (field_vchar +
                  maybe_str(string(SP | HTAB | field_vchar) +
                            field_vchar))                                > auto
-field_value = recursive()                                               > auto
-field_value.rec = (maybe_str(field_content) |
-                   field_value + obs_fold + maybe_str(field_content))
-
-header_field = HeaderEntry << (field_name * skip(':' * OWS) *
-                               field_value * skip(OWS))                 > pivot
 
 def transfer_parameter(no_q=False):
     return Parametrized << (
@@ -231,8 +207,6 @@ chunk_ext_name = token                                                  > auto
 chunk_ext_val = token | quoted_string                                   > auto
 chunk_ext = many(skip(';') * chunk_ext_name *
                  maybe(skip('=') * chunk_ext_val))                      > pivot
-
-trailer_part = many(header_field * skip(CRLF(lax=True)))                > pivot
 
 Host = uri_host + maybe_str(':' + port)                                 > pivot
 

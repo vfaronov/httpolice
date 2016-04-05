@@ -1,14 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from httpolice.citation import RFC
-from httpolice.parse import (
-    auto,
-    can_complain,
-    fill_names,
-    named,
-    octet,
-    octet_range,
-)
+from httpolice.parse import auto, fill_names, octet, octet_range
 
 
 ALPHA = octet_range(0x41, 0x5A) | octet_range(0x61, 0x7A)               > auto
@@ -23,14 +16,6 @@ LF = octet(0x0A)                                                        > auto
 SP = octet(0x20)                                                        > auto
 VCHAR = octet_range(0x21, 0x7E)                                         > auto
 
-def CRLF(lax=False):
-    @can_complain
-    def _lf_without_cr(complain, s):
-        complain(1224)
-        return s
-    r = CR + LF
-    if lax:
-        r = r | (_lf_without_cr << LF)
-    return r > named('CRLF', RFC(5234))
+CRLF = CR + LF                                                          > auto
 
 fill_names(globals(), RFC(5234))

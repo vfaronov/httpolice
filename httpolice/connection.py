@@ -3,16 +3,12 @@
 from httpolice import message, request, response, structure
 from httpolice.blackboard import Blackboard
 from httpolice.known import m, st, tc
-from httpolice.parse import ParseError, Stream, many, skip
+from httpolice.parse import ParseError, Stream
 from httpolice.request import RequestView
 from httpolice.response import ResponseView
-from httpolice.structure import Unparseable
+from httpolice.structure import HTTPVersion, Method, StatusCode, Unparseable
 from httpolice.syntax import rfc7230
-from httpolice.syntax.common import CRLF
-
-
-_header_entries = (many(rfc7230.header_field * skip(CRLF(lax=True))) *
-                   skip(CRLF(lax=True)))
+from httpolice.syntax.common import SP
 
 
 def analyze_streams(inbound, outbound, scheme=None):
@@ -117,8 +113,14 @@ def _parse_requests(connection, data, scheme=None):
 
 def _parse_request_heading(stream, scheme=None):
     try:
-        ((method_, target, version_), entries) = \
-            stream.parse(rfc7230.request_line * _header_entries)
+        with stream:
+            method_ = Method(stream.consume_regex(rfc7230.method))
+            stream.consume_regex(SP)
+            target = stream.consume_regex('[^ \t]+', 'request target')
+            stream.consume_regex(SP)
+            version_ = HTTPVersion(stream.consume_regex(rfc7230.HTTP_version))
+            message.parse_line_ending(stream)
+            entries = message.parse_header_fields(stream)
     except ParseError, e:
         stream.sane = False
         stream.complain(1006, error=e)
@@ -191,8 +193,14 @@ def _parse_responses(connection, requests, data):
 
 def _parse_response_heading(req, stream):
     try:
-        ((version_, status, reason), entries) = \
-            stream.parse(rfc7230.status_line * _header_entries)
+        with stream:
+            version_ = HTTPVersion(stream.consume_regex(rfc7230.HTTP_version))
+            stream.consume_regex(SP)
+            status = StatusCode(stream.consume_regex(rfc7230.status_code))
+            stream.consume_regex(SP)
+            reason = stream.consume_regex(rfc7230.reason_phrase)
+            message.parse_line_ending(stream)
+            entries = message.parse_header_fields(stream)
     except ParseError, e:
         stream.complain(1009, error=e)
         stream.sane = False

@@ -2,6 +2,7 @@
 
 from collections import OrderedDict
 import operator
+import re
 
 from bitstring import BitArray, Bits
 
@@ -18,6 +19,8 @@ class Symbol(object):
         self.citation = citation
         self.is_pivot = is_pivot
         self._is_ephemeral = is_ephemeral
+        self._regex = None
+        self._compiled_regex = None
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__,
@@ -37,6 +40,19 @@ class Symbol(object):
             return (self.name is None)
         else:
             return self._is_ephemeral
+
+    def as_compiled_regex(self):
+        if self._compiled_regex is None:
+            self._compiled_regex = re.compile(self.as_regex())
+        return self._compiled_regex
+
+    def as_regex(self):
+        if self._regex is None:
+            self._regex = self.build_regex()
+        return self._regex
+
+    def build_regex(self):
+        raise NotImplementedError
 
     def group(self):
         raise NotImplementedError
@@ -97,11 +113,17 @@ class Terminal(Symbol):
         super(Terminal, self).__init__(name, citation, is_pivot=False)
         self.bits = bits if bits is not None else Bits(256)
 
-    def match(self, c):
-        return self.bits[ord(c)]
+    def chars(self):
+        return [chr(i) for (i, v) in enumerate(self.bits) if v]
+
+    def match(self, char):
+        return self.bits[ord(char)]
 
     def group(self):
         return self
+
+    def build_regex(self):
+        return '[' + ''.join(re.escape(char) for char in self.chars()) + ']'
 
     def as_rule(self):
         return Rule((self,))
@@ -137,6 +159,10 @@ class Nonterminal(Symbol):
     @property
     def rules(self):
         raise NotImplementedError
+
+    def build_regex(self):
+        return '(' + '|'.join(''.join(sym.as_regex() for sym in rule.symbols)
+                              for rule in self.rules) + ')'
 
     def as_rule(self):
         if self.is_ephemeral and len(self.rules) == 1:
@@ -217,6 +243,12 @@ class RepeatedNonterminal(Nonterminal):
                 r = r | _begin_list << self.inner
             self._rules = r.rules
         return self._rules
+
+    def build_regex(self):
+        if self.max_count is None:
+            return self.inner.as_regex() + '*'
+        else:
+            return self.inner.as_regex() + ('{0,%d}' % self.max_count)
 
 
 class Rule(object):
@@ -445,6 +477,9 @@ class Stream(object):
             (self.point, self.complaints, self.annotations) = frame
         return False
 
+    def peek(self, n):
+        return self.data[self.point:(self.point + n)]
+
     def __getitem__(self, i):
         if 0 <= i < len(self.data) - self.point:
             return self.data[self.point + i]
@@ -460,7 +495,7 @@ class Stream(object):
         self.point = min(self.point + n, len(self.data))
 
     def consume_n_bytes(self, n):
-        r = self.data[self.point:(self.point + n)]
+        r = self.peek(n)
         if len(r) < n:
             raise ParseError(point=self.point,
                              found=u'%d bytes' % len(r),
@@ -473,6 +508,26 @@ class Stream(object):
         r = self.data[self.point:]
         self.point = len(self.data)
         return r
+
+    def consume_regex(self, target, name=None):
+        if isinstance(target, Symbol):
+            regex = target.as_compiled_regex()
+        else:
+            regex = re.compile(target)
+        match = regex.match(self.data, self.point)
+        if match is None:
+            raise ParseError(self.point, found=self.peek(10) or None,
+                             expected=(target if name is None else name))
+        else:
+            r = match.group(0)
+            self.skip(len(r))
+            return r
+
+    def maybe_consume_regex(self, target):
+        try:
+            return self.consume_regex(target)
+        except ParseError:
+            return None
 
     def parse(self, target, to_eof=False):
         return parse(self, target.as_nonterminal(), to_eof)

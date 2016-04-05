@@ -16,9 +16,9 @@ from httpolice.blackboard import Blackboard, memoized_property
 from httpolice.header import HeadersView
 from httpolice.known import cc, header, media, media_type, tc, warn
 from httpolice.parse import ParseError, maybe, skip
-from httpolice.structure import FieldName, Unparseable, okay
+from httpolice.structure import HeaderEntry, FieldName, Unparseable, okay
 from httpolice.syntax import rfc7230
-from httpolice.syntax.common import CRLF
+from httpolice.syntax.common import CRLF, LF
 
 
 class MessageView(Blackboard):
@@ -221,14 +221,49 @@ def body_charset(msg):
                 return value
 
 
+def parse_line_ending(stream):
+    r = stream.maybe_consume_regex(CRLF)
+    if r is None:
+        r = stream.consume_regex(LF, u'line ending')
+        stream.complain(1224)
+    return r
+
+
+def parse_header_fields(stream):
+    entries = []
+    while True:
+        name = stream.maybe_consume_regex(rfc7230.field_name)
+        if name is None:
+            break
+        stream.consume_regex(':')
+        stream.consume_regex(rfc7230.OWS)
+        vs = []
+        while True:
+            v = stream.maybe_consume_regex(rfc7230.field_content)
+            if v is None:
+                if stream.maybe_consume_regex(rfc7230.obs_fold):
+                    stream.complain(1016)
+                    vs.append(' ')
+                else:
+                    break
+            else:
+                vs.append(v)
+        value = ''.join(vs)
+        stream.consume_regex(rfc7230.OWS)
+        parse_line_ending(stream)
+        entries.append(HeaderEntry(FieldName(name), value))
+    parse_line_ending(stream)
+    return entries
+
+
 def parse_chunk(stream):
-    size = stream.parse(rfc7230.chunk_size *
-                        skip(maybe(rfc7230.chunk_ext) * CRLF(lax=True)))
+    size = stream.parse(rfc7230.chunk_size * skip(maybe(rfc7230.chunk_ext)))
+    parse_line_ending(stream)
     if size == 0:
         return ''
     else:
         data = stream.consume_n_bytes(size)
-        stream.parse(CRLF(lax=True))
+        parse_line_ending(stream)
         return data
 
 
@@ -240,7 +275,7 @@ def parse_chunked(msg, stream):
             while chunk:
                 data.append(chunk)
                 chunk = parse_chunk(stream)
-            trailer = stream.parse(rfc7230.trailer_part * skip(CRLF(lax=True)))
+            trailer = parse_header_fields(stream)
     except ParseError, e:
         stream.sane = False
         msg.complain(1005, error=e)
