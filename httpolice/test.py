@@ -952,7 +952,7 @@ class TestResponse(unittest.TestCase):
         interesting_headers = [hdr for hdr in h if header.parser_for(hdr)]
         rng_state = random.getstate()
         n_failed = 0
-        for _ in range(50):
+        for _ in range(20):
             req = Request(random.choice(['http', 'https', 'foobar']),
                           random.choice(list(m)),
                           binary_garbage().decode('ascii', 'ignore'),
@@ -974,7 +974,9 @@ class TestResponse(unittest.TestCase):
                                            make_header_value())])
                      for _ in range(random.randint(1, 3))]
             try:
-                analyze_exchange(req, resps)
+                exch = analyze_exchange(req, resps)
+                TextReport.render([exch], StringIO())
+                HTMLReport.render([exch], StringIO())
             except Exception, e:
                 n_failed += 1
         if n_failed > 0:
