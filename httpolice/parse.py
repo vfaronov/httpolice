@@ -28,7 +28,7 @@ class Symbol(object):
             sealed = self
         else:
             sealed = SimpleNonterminal(rules=[Rule((self,))])
-        seal(sealed)
+        (sealed.name, sealed.citation, sealed.is_pivot) = seal
         return sealed
 
     @property
@@ -374,18 +374,10 @@ _AUTO = _AutoName()
 
 
 def named(name, citation=None, is_pivot=False):
-    def seal(symbol):
-        symbol.name = name
-        symbol.citation = citation
-        symbol.is_pivot = is_pivot
-    return seal
+    return (name, citation, is_pivot)
 
-def auto(symbol):
-    symbol.name = _AUTO
-
-def pivot(symbol):
-    symbol.name = _AUTO
-    symbol.is_pivot = True
+auto = named(_AUTO)
+pivot = named(_AUTO, is_pivot=True)
 
 def fill_names(scope, citation):
     for name, x in scope.items():
