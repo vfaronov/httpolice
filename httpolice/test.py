@@ -3,7 +3,9 @@
 from cStringIO import StringIO
 from datetime import datetime
 import os
+import pickle
 import random
+import string
 import unittest
 
 from httpolice import HTMLReport, TextReport, analyze_exchange, analyze_streams
@@ -59,6 +61,22 @@ def load_test_file(filename):
     expected = sorted(int(n) for n in line.split())
 
     return inb, outb, scheme, expected
+
+
+def random_token():
+    return ''.join(random.choice(string.ascii_letters + string.digits)
+                   for _ in range(random.randint(1, 10)))
+
+def binary_garbage():
+    return ''.join(chr(random.randint(0, 255)) for _ in range(10, 100))
+
+fuzzers = [random_token, binary_garbage,
+           lambda: ',', lambda: '"', lambda: '']
+
+def make_header_value():
+    return ' '.join(random.choice(fuzzers)()
+                    for _ in range(random.randint(0, 10)))
+
 
 
 class TestCommon(unittest.TestCase):
@@ -930,27 +948,41 @@ class TestResponse(unittest.TestCase):
             resp1.headers.strict_transport_security.includesubdomains, True)
 
     def test_fuzz(self):
-        # Make sure we don't raise exceptions on very wrong inputs.
+        # Make sure we don't raise exceptions even on very wrong inputs.
         interesting_headers = [hdr for hdr in h if header.parser_for(hdr)]
-        for _ in range(20):
+        rng_state = random.getstate()
+        n_failed = 0
+        for _ in range(50):
             req = Request(random.choice(['http', 'https', 'foobar']),
-                          random.choice(list(m)), os.urandom(10),
+                          random.choice(list(m)),
+                          binary_garbage(),
                           random.choice([http10, http11, u'HTTP/3.0']),
                           [HeaderEntry(random.choice(interesting_headers),
-                                       os.urandom(10)) for _ in range(5)],
-                          os.urandom(50),
+                                       make_header_value()) for _ in range(5)],
+                          binary_garbage(),
                           [HeaderEntry(random.choice(interesting_headers),
-                                       os.urandom(10))])
+                                       make_header_value())])
             resps = [Response(req,
                               random.choice([http10, http11, u'HTTP/3.0']),
-                              random.choice(list(st)), os.urandom(10),
+                              random.choice(list(st)),
+                              binary_garbage(),
                               [HeaderEntry(random.choice(interesting_headers),
-                                           os.urandom(10)) for _ in range(5)],
-                              os.urandom(50),
+                                           make_header_value())
+                               for _ in range(5)],
+                              binary_garbage(),
                               [HeaderEntry(random.choice(interesting_headers),
-                                           os.urandom(10))])
+                                           make_header_value())])
                      for _ in range(random.randint(1, 3))]
-            analyze_exchange(req, resps)
+            try:
+                analyze_exchange(req, resps)
+            except Exception, e:
+                n_failed += 1
+        if n_failed > 0:
+            filename = 'fuzz-rng-state.pickle'
+            with open(filename, 'w') as outf:
+                pickle.dump(rng_state, outf)
+            self.fail('%d exchanges caused errors; '
+                      'RNG state dumped into %s' % (n_failed, filename))
 
 
 class TestFromFiles(unittest.TestCase):
