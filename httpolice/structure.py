@@ -110,7 +110,7 @@ class Request(Message):
                                       body, trailer_entries)
         self.scheme = scheme if scheme is None else str(scheme)
         self.method = Method(method)
-        self.target = str(target)
+        self.target = unicode(target)
 
     def __repr__(self):
         return '<Request %s>' % self.method

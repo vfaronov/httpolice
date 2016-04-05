@@ -34,7 +34,8 @@ class RequestView(message.MessageView):
 
     def _target_parses_as(self, parser):
         try:
-            parse.Stream(self.target).parse(parser, to_eof=True)
+            parse.Stream(self.target.encode('ascii', 'replace')). \
+                parse(parser, to_eof=True)
         except parse.ParseError:
             return False
         else:

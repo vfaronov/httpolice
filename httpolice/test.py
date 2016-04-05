@@ -955,7 +955,7 @@ class TestResponse(unittest.TestCase):
         for _ in range(50):
             req = Request(random.choice(['http', 'https', 'foobar']),
                           random.choice(list(m)),
-                          binary_garbage(),
+                          binary_garbage().decode('ascii', 'ignore'),
                           random.choice([http10, http11, u'HTTP/3.0']),
                           [HeaderEntry(random.choice(interesting_headers),
                                        make_header_value()) for _ in range(5)],
