@@ -4,7 +4,7 @@
 
   <error id="1000">
     <title>Malformed <ref to="entry"/> header</title>
-    <explain>Parse error: <ref to="error"/></explain>
+    <ref to="error"/>
   </error>
 
   <error id="1001">
@@ -38,12 +38,12 @@
 
   <error id="1005">
     <title>Malformed <ref to="msg.headers.transfer_encoding"/>: <tc>chunked</tc></title>
-    <explain>Parse error: <ref to="error"/></explain>
+    <ref to="error"/>
   </error>
 
   <error id="1006">
     <title>Malformed request heading</title>
-    <explain>Parse error: <ref to="error"/></explain>
+    <ref to="error"/>
   </error>
 
   <debug id="1007">
@@ -58,7 +58,7 @@
 
   <error id="1009">
     <title>Malformed response heading</title>
-    <explain>Parse error: <ref to="error"/></explain>
+    <ref to="error"/>
   </error>
 
   <debug id="1010">
@@ -1183,8 +1183,8 @@
 
   <error id="1158">
     <title>Malformed <ref to="entry"/>: <ref to="directive"/></title>
-    <explain>When parsing the argument to the <ref to="directive"/> directive in this message’s <ref to="entry"/> header, the following error occurred:</explain>
-    <explain><ref to="error"/></explain>
+    <explain>The argument to the <ref to="directive"/> directive in this message’s <ref to="entry"/> header is malformed.</explain>
+    <ref to="error"/>
   </error>
 
   <error id="1159">

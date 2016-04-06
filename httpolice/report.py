@@ -11,10 +11,16 @@ from httpolice import known, message, notice
 from httpolice.citation import Citation
 from httpolice.connection import Connection, Exchange
 from httpolice.header import HeaderView
+from httpolice.parse import ParseError, Symbol
 from httpolice.request import RequestView
 from httpolice.response import ResponseView
 from httpolice.structure import HeaderEntry, Parametrized, Unparseable, okay
-from httpolice.util.text import has_nonprintable, nicely_join, printable
+from httpolice.util.text import (
+    format_chars,
+    has_nonprintable,
+    nicely_join,
+    printable,
+)
 
 
 ###############################################################################
@@ -106,6 +112,9 @@ def expand_piece(piece):
     if hasattr(piece, 'content'):
         return piece.content
 
+    elif isinstance(piece, Symbol):
+        return [piece.name, u' (', piece.citation, u')']
+
     elif isinstance(piece, Parametrized):
         return piece.item
 
@@ -114,6 +123,28 @@ def expand_piece(piece):
 
     else:
         return unicode(piece)
+
+
+def expand_parse_error(error):
+    paras = [[u'Parse error at byte offset %d.' % error.point]]
+    if error.found == '':
+        paras.append([u'Found end of data.'])
+    elif error.found is not None:
+        paras.append([u'Found: %s' % format_chars(error.found)])
+
+    for i, (option, as_part_of) in enumerate(error.expected):
+        if i == 0:
+            paras.append([u'Expected:'])
+            para = [option]
+        else:
+            para = [u'or ', option]
+        if as_part_of:
+            para.append(u' as part of ')
+            for j, parent in enumerate(as_part_of):
+                para.extend([u' or ', parent] if j > 0 else [parent])
+        paras.append(para)
+
+    return paras
 
 
 ###############################################################################
@@ -220,6 +251,10 @@ def piece_to_text(piece, ctx):
             return u'“%s” (%s)' % (quote, piece.info)
         else:
             return unicode(piece.info)
+
+    elif isinstance(piece, ParseError):
+        return u''.join(piece_to_text(para, ctx) + u'\n'
+                        for para in expand_parse_error(piece))
 
     elif isinstance(piece, unicode):
         return piece
@@ -421,6 +456,11 @@ def piece_to_html(piece, ctx):
             H.span(u': ')
             with H.q(cite=piece.info.url):
                 piece_to_html(quote, ctx)
+
+    elif isinstance(piece, ParseError):
+        for para in expand_parse_error(piece):
+            with H.p(_class='notice-para', __inline=True):
+                piece_to_html(para, ctx)
 
     elif isinstance(piece, Citation):
         with H.cite():

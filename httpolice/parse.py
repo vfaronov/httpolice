@@ -6,6 +6,8 @@ import re
 
 from bitstring import BitArray, Bits
 
+from httpolice.util.text import format_chars
+
 
 ###############################################################################
 # Combinators to construct a grammar suitable for the Earley algorithm.
@@ -484,7 +486,7 @@ class Stream(object):
         if 0 <= i < len(self.data) - self.point:
             return self.data[self.point + i]
         elif i == len(self.data) - self.point:
-            return None
+            return ''
         else:
             raise IndexError(i)
 
@@ -516,8 +518,9 @@ class Stream(object):
             regex = re.compile(target)
         match = regex.match(self.data, self.point)
         if match is None:
-            raise ParseError(self.point, found=self.peek(10) or None,
-                             expected=(target if name is None else name))
+            raise ParseError(
+                self.point, found=None,
+                expected=[(target if name is None else name, None)])
         else:
             r = match.group(0)
             self.skip(len(r))
@@ -660,7 +663,7 @@ def parse(stream, target_symbol, to_eof=False):
                 # Earley scan:
                 # copy this item to the next `i`,
                 # advancing its rule by 1 position.
-                if token is not None and next_symbol.match(token):
+                if token and next_symbol.match(token):
                     (items1, items_idx1, items_set1) = chart[i + 1]
                     _add_item(items1, items_idx1, items_set1,
                               symbol, rule, pos + 1, start)
@@ -669,7 +672,7 @@ def parse(stream, target_symbol, to_eof=False):
             if j == len(items):
                 break
 
-        if token is None:        # End of stream.
+        if not token:        # End of stream.
             break
         i += 1
 
@@ -870,14 +873,15 @@ def _build_parse_error(stream, target_symbol, chart):
     for (symbol, rule, pos, start) in items:
         next_symbol = rule.xsymbols[pos]
         if isinstance(next_symbol, Terminal):
+            chars = format_chars(next_symbol.chars())
             # And why did we expect it? As part of what nonterminals?
-            expected.setdefault(next_symbol, set()).update(
+            expected.setdefault(chars, set()).update(
                 _find_pivots(chart, symbol, start))
 
         if symbol is target_symbol and next_symbol is None:
             # This item indicates a complete parse of `target_symbol`,
             # so if the input data just stopped there, that would work, too,
-            expected[None] = None
+            expected[u'end of data'] = None
 
     return ParseError(stream.point + i, found, expected.items())
 
