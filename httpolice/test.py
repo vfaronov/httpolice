@@ -46,10 +46,10 @@ from httpolice.syntax import rfc3986, rfc7230, rfc7231, rfc7233
 
 def load_test_file(filename):
     if '.' in filename:
-        scheme = filename.split('.')[-1]
+        scheme = filename.split('.')[-1].decode('ascii')
     else:
-        scheme = 'http'
-    if scheme == 'noscheme':
+        scheme = u'http'
+    if scheme == u'noscheme':
         scheme = None
 
     with open(filename) as f:
@@ -172,8 +172,9 @@ class TestSyntax(unittest.TestCase):
         p = rfc7230.comment(include_parens=False)
         self.assertParse(p, '(foo (bar \\) baz "( qux)") xyzzy \\123 )',
                          u'foo (bar ) baz "( qux)") xyzzy 123 ')
-        self.assertParse(p, '(раз (два три) четыре пять)',
-                         u'раз (два три) четыре пять')
+        self.assertParse(p,
+                         u'(að láta (gera við) börn sín)'.encode('iso-8859-1'),
+                         u'að láta (gera við) börn sín')
         self.assertNoParse(p, '(foo "bar)" baz)')
 
     def test_transfer_coding(self):
@@ -501,7 +502,7 @@ class TestSyntax(unittest.TestCase):
 class TestRequest(unittest.TestCase):
 
     @staticmethod
-    def parse(inbound, scheme='http'):
+    def parse(inbound, scheme=u'http'):
         outbound = ('HTTP/1.1 400 Bad Request\r\n'
                     'Date: Thu, 28 Jan 2016 19:30:21 GMT\r\n'
                     'Content-Length: 0\r\n'
@@ -693,8 +694,8 @@ class TestRequest(unittest.TestCase):
         stream = ('OPTIONS * HTTP/1.1\r\n'
                   'Host: www.example.org\r\n'
                   '\r\n')
-        [req] = self.parse(stream, scheme='https')
-        self.assertEqual(req.effective_uri, 'https://www.example.org')
+        [req] = self.parse(stream, scheme=u'https')
+        self.assertEqual(req.effective_uri, u'https://www.example.org')
 
     def test_effective_uri_4(self):
         stream = ('GET myproto://www.example.org/index.html HTTP/1.1\r\n'
@@ -702,7 +703,7 @@ class TestRequest(unittest.TestCase):
                   '\r\n')
         [req] = self.parse(stream)
         self.assertEqual(req.effective_uri,
-                         'myproto://www.example.org/index.html')
+                         u'myproto://www.example.org/index.html')
 
     def test_cache_control(self):
         stream = ('GET / HTTP/1.1\r\n'
@@ -772,7 +773,7 @@ class TestResponse(unittest.TestCase):
         )
 
     @staticmethod
-    def parse(inbound, outbound, scheme='http'):
+    def parse(inbound, outbound, scheme=u'http'):
         conn = analyze_streams(inbound, outbound, scheme)
         TextReport.render([conn], StringIO())
         HTMLReport.render([conn], StringIO())
@@ -955,7 +956,7 @@ class TestResponse(unittest.TestCase):
         for _ in range(20):
             req = Request(random.choice(['http', 'https', 'foobar']),
                           random.choice(list(m)),
-                          binary_garbage().decode('ascii', 'ignore'),
+                          binary_garbage().decode('iso-8859-1'),
                           random.choice([http10, http11, u'HTTP/3.0']),
                           [HeaderEntry(random.choice(interesting_headers),
                                        make_header_value()) for _ in range(5)],
@@ -965,7 +966,7 @@ class TestResponse(unittest.TestCase):
             resps = [Response(req,
                               random.choice([http10, http11, u'HTTP/3.0']),
                               random.choice(list(st)),
-                              binary_garbage(),
+                              binary_garbage().decode('iso-8859-1'),
                               [HeaderEntry(random.choice(interesting_headers),
                                            make_header_value())
                                for _ in range(5)],

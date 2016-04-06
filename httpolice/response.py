@@ -288,7 +288,6 @@ def check_response_itself(resp):
                     resp.complain(1206, header=hdr)
                 for k, v in challenge.param or []:
                     if k == u'charset':
-                        v = v.decode('utf-8', 'replace')
                         if v.lower() != u'utf-8':
                             resp.complain(1208, header=hdr, charset=v)
                     elif k != u'realm':
@@ -567,5 +566,5 @@ def check_response_in_context(resp, req):
         resp.complain(1216)
 
     if resp.headers.strict_transport_security.is_present and \
-            req.scheme == 'http':
+            req.scheme == u'http':
         resp.complain(1221)

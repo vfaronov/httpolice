@@ -5,7 +5,7 @@ import operator
 from httpolice import known, parse
 from httpolice.known import cache_directive, h, header
 import httpolice.known.hsts_directive
-from httpolice.structure import Parametrized, Unparseable, okay
+from httpolice.structure import Parametrized, Quoted, Unparseable, okay
 
 
 class HeadersView(object):
@@ -237,7 +237,7 @@ class DirectivesView(ListHeaderView):
                 complain(1157)
                 argument = None
             elif parser is not None:
-                stream = parse.Stream(str(argument))
+                stream = parse.Stream(argument.encode('iso-8859-1'))
                 try:
                     argument = stream.parse(parser, to_eof=True)
                 except parse.ParseError, e:
@@ -264,19 +264,20 @@ class CacheControlView(DirectivesView, MultiHeaderView):
 
     def _process_directive(self, entry, directive_with_argument):
         directive, argument = directive_with_argument
+        quoted = unquoted = False
+        if isinstance(argument, Quoted):
+            argument = argument.item
+            quoted = True
+        elif argument is not None:
+            unquoted = True
 
         def complain(ident, **kwargs):
             self.message.complain(ident, entry=entry,
                                   directive=directive, **kwargs)
 
-        # Here we make use of the fact that `rfc7230.token` returns `unicode`
-        # whereas `rfc7230.quoted_string` returns `str`
-        # (because a ``<quoted-string>`` may contain non-ASCII characters).
-        if isinstance(argument, unicode) and \
-                cache_directive.quoted_string_preferred(directive):
+        if unquoted and cache_directive.quoted_string_preferred(directive):
             complain(1154)
-        if isinstance(argument, str) and \
-                cache_directive.token_preferred(directive):
+        if quoted and cache_directive.token_preferred(directive):
             complain(1155)
 
         return super(CacheControlView, self). \

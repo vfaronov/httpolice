@@ -21,7 +21,8 @@ def main():
         inbound_stream = f.read()
     with open(args.outbound) as f:
         outbound_stream = f.read()
-    result = analyze_streams(inbound_stream, outbound_stream, args.scheme)
+    result = analyze_streams(inbound_stream, outbound_stream,
+                             args.scheme.decode('ascii'))
     if args.html:
         report_cls = HTMLReport
     else:

@@ -179,14 +179,13 @@ class TextReport(Report):
                          (req.method, req.target, req.version))
 
     def _render_status_line(self, resp):
-        self._write_more(u'<< %s %d %s\n' % (
-            resp.version, resp.status,
-            resp.reason.decode('utf-8', 'replace')))
+        self._write_more(u'<< %s %d %s\n' %
+                         (resp.version, resp.status, resp.reason))
 
     def _render_message(self, msg):
         for entry in msg.header_entries:
             self._write(u'++ %s: %s\n' %
-                        (entry.name, entry.value.decode('ascii', 'ignore')))
+                        (entry.name, entry.value.decode('iso-8859-1')))
         if msg.body is Unparseable:
             self._write(u'\n++ (body is unparseable)\n')
         elif msg.body:
@@ -194,7 +193,7 @@ class TextReport(Report):
                         len(msg.body))
         for entry in msg.trailer_entries:
             self._write(u'++ %s: %s\n' %
-                        (entry.name, entry.value.decode('ascii', 'ignore')))
+                        (entry.name, entry.value.decode('iso-8859-1')))
         self._render_notices(msg)
 
     def _render_request(self, req):
@@ -302,7 +301,7 @@ class HTMLReport(Report):
         for piece in pieces:
             with H.span(_class='annotated-piece', **for_object(piece)):
                 if isinstance(piece, str):
-                    H.span(printable(piece.decode('utf-8', 'replace')))
+                    H.span(printable(piece.decode('iso-8859-1')))
                 else:
                     known_to_html(piece)
 
@@ -352,9 +351,7 @@ class HTMLReport(Report):
                 with H.span(**for_object(resp.status)):
                     known_to_html(resp.status)
                     H.span(u' ')
-                    H.span(
-                        printable(resp.reason.decode('utf-8', 'replace')),
-                        **for_object(resp.reason))
+                    H.span(printable(resp.reason), **for_object(resp.reason))
             self._render_message(resp)
 
     def _render_exchange(self, exch):

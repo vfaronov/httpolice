@@ -15,7 +15,7 @@ def analyze_streams(inbound, outbound, scheme=None):
     """
     :type inbound: str
     :type outbound: str
-    :type scheme: str | None
+    :type scheme: unicode | None
     """
     conn = Connection()
     parse_streams(conn, inbound, outbound, scheme=scheme)
@@ -116,7 +116,8 @@ def _parse_request_heading(stream, scheme=None):
         with stream:
             method_ = Method(stream.consume_regex(rfc7230.method))
             stream.consume_regex(SP)
-            target = stream.consume_regex('[^ \t]+', 'request target')
+            target = stream.consume_regex('[^ \t]+', 'request target'). \
+                decode('iso-8859-1')
             stream.consume_regex(SP)
             version_ = HTTPVersion(stream.consume_regex(rfc7230.HTTP_version))
             message.parse_line_ending(stream)
@@ -198,7 +199,8 @@ def _parse_response_heading(req, stream):
             stream.consume_regex(SP)
             status = StatusCode(stream.consume_regex(rfc7230.status_code))
             stream.consume_regex(SP)
-            reason = stream.consume_regex(rfc7230.reason_phrase)
+            reason = stream.consume_regex(rfc7230.reason_phrase). \
+                decode('iso-8859-1')
             message.parse_line_ending(stream)
             entries = message.parse_header_fields(stream)
     except ParseError, e:

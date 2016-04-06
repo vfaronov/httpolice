@@ -4,7 +4,6 @@ from httpolice.citation import RFC
 from httpolice.parse import (
     auto,
     can_complain,
-    decode,
     fill_names,
     literal,
     maybe,
@@ -48,7 +47,7 @@ byte_range_set = comma_list1(byte_range_spec | suffix_byte_range_spec)  > auto
 byte_ranges_specifier = RangeSpecifier << (
     bytes_unit * skip('=') * byte_range_set)                            > pivot
 
-other_range_set = decode << string1(VCHAR)                              > auto
+other_range_set = string1(VCHAR)                                        > auto
 other_ranges_specifier = RangeSpecifier << (
     other_range_unit * skip('=') * other_range_set)                     > pivot
 
@@ -75,7 +74,7 @@ def _well_formed2(complain, r):
 byte_content_range = _well_formed2 << (ContentRange << (
     bytes_unit * skip(SP) * (byte_range_resp | unsatisfied_range)))     > pivot
 
-other_range_resp = decode << string(CHAR)                               > pivot
+other_range_resp = string(CHAR)                                         > pivot
 other_content_range = ContentRange << (
     other_range_unit * skip(SP) * other_range_resp)                     > pivot
 

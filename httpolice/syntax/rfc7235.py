@@ -4,7 +4,6 @@ from httpolice.citation import RFC
 from httpolice.parse import (
     auto,
     can_complain,
-    decode,
     fill_names,
     maybe,
     pivot,
@@ -12,7 +11,12 @@ from httpolice.parse import (
     string,
     string1,
 )
-from httpolice.structure import AuthScheme, CaseInsensitive, Parametrized
+from httpolice.structure import (
+    AuthScheme,
+    CaseInsensitive,
+    Parametrized,
+    Quoted,
+)
 from httpolice.syntax.common import ALPHA, DIGIT, SP
 from httpolice.syntax.rfc7230 import (
     BWS,
@@ -24,22 +28,20 @@ from httpolice.syntax.rfc7230 import (
 
 
 auth_scheme = AuthScheme << token                                       > pivot
-token68 = decode << (
-    string1(ALPHA | DIGIT | '-' | '.' | '_' | '~' | '+' | '/') +
-    string('='))                                                        > pivot
+token68 = (string1(ALPHA | DIGIT | '-' | '.' | '_' | '~' | '+' | '/') +
+           string('='))                                                 > pivot
 
 @can_complain
 def _check_realm(complain, k, v):
-    k = CaseInsensitive(k)
-    # Rely on the fact that `token` returns `unicode`
-    # whereas `quoted_string` returns `str`
-    # (because the text inside a quoted string may be non-ASCII).
-    if k == u'realm' and isinstance(v, unicode):
+    if isinstance(v, Quoted):
+        v = v.item
+    elif k == u'realm':
         complain(1196)
     return (k, v)
 
-auth_param = _check_realm << (token * skip(BWS * '=' * BWS) *
-                              (token | quoted_string))                  > pivot
+auth_param = _check_realm << ((CaseInsensitive << token) *
+                              skip(BWS * '=' * BWS) *
+                              (token | Quoted << quoted_string))        > pivot
 
 def _empty_to_none(r):
     return r or None

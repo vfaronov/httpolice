@@ -4,7 +4,6 @@ from httpolice.citation import RFC
 from httpolice.parse import (
     auto,
     can_complain,
-    decode,
     fill_names,
     group,
     literal,
@@ -61,10 +60,10 @@ obs_text = octet_range(0x80, 0xFF)                                      > auto
 tchar = (literal('!') | '#' | '$' | '%' | '&' | "'" | '*' | '+' | '-' | '.' |
          '^' | '_' | '`' | '|' | '~' | DIGIT | ALPHA)                   > auto
 
-token = unicode << string1(tchar)                                       > auto
+token = string1(tchar)                                                  > auto
 
 def token_excluding(excluding):
-    return unicode << string_excluding(tchar, [''] + list(excluding))
+    return string_excluding(tchar, [''] + list(excluding))
 
 def quoted_pair(sensible_for):
     # In RFC 7230, ``<quoted-pair>`` is a single rule,
@@ -72,7 +71,7 @@ def quoted_pair(sensible_for):
     @can_complain
     def check_sensible(complain, c):
         if c not in sensible_for:
-            complain(1017, char=c.decode('ascii', 'replace'))
+            complain(1017, char=c)
         return c
     return (check_sensible << skip('\\') * (HTAB | SP | VCHAR | obs_text)
             > named('quoted-pair', RFC(7230)))
@@ -80,7 +79,7 @@ def quoted_pair(sensible_for):
 qdtext = (HTAB | SP | octet(0x21) | octet_range(0x23, 0x5B) |
           octet_range(0x5D, 0x7E) | obs_text)                           > auto
 quoted_string = (skip(DQUOTE) *
-                 string(qdtext | quoted_pair(sensible_for='"\\')) *
+                 string(qdtext | quoted_pair(sensible_for=u'"\\')) *
                  skip(DQUOTE))                                          > auto
 
 ctext = (HTAB | SP | octet_range(0x21, 0x27) | octet_range(0x2A, 0x5B) |
@@ -88,9 +87,8 @@ ctext = (HTAB | SP | octet_range(0x21, 0x27) | octet_range(0x2A, 0x5B) |
 
 def comment(include_parens=False):
     inner = recursive() > named('comment', RFC(7230))
-    inner.rec = '(' + string(ctext | quoted_pair(sensible_for='()\\') |
+    inner.rec = '(' + string(ctext | quoted_pair(sensible_for=u'()\\') |
                              inner) + ')'
-    inner = decode << inner
     if not include_parens:
         inner = (lambda s: s[1:-1]) << inner
     return inner > named('comment', RFC(7230))
@@ -222,7 +220,7 @@ Upgrade = comma_list1(protocol)                                         > pivot
 received_protocol = Versioned << (maybe(protocol_name * skip('/'), u'HTTP') *
                                   protocol_version)                     > pivot
 pseudonym = token                                                       > pivot
-received_by = (decode << uri_host + maybe_str(':' + port)) | pseudonym  > pivot
+received_by = uri_host + maybe_str(':' + port) | pseudonym              > pivot
 Via = comma_list1(received_protocol * skip(RWS) *
                   received_by *
                   maybe(skip(RWS) * comment(include_parens=False)))     > pivot

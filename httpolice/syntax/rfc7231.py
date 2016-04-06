@@ -8,7 +8,6 @@ from httpolice.parse import (
     auto,
     can_complain,
     octet,
-    decode,
     fill_names,
     literal,
     many,
@@ -243,6 +242,6 @@ Date = HTTP_date                                                        > pivot
 Location = URI_reference                                                > pivot
 Max_Forwards = int << string1(DIGIT)                                    > pivot
 Referer = absolute_URI | partial_URI                                    > pivot
-Vary = decode('*') | comma_list1(field_name)                            > pivot
+Vary = '*' | comma_list1(field_name)                                    > pivot
 
 fill_names(globals(), RFC(7231))

@@ -81,12 +81,12 @@ class RequestView(message.MessageView):
         else:
             return None
         if self.is_authority_form or self.is_asterisk_form:
-            path_and_query = ''
+            path_and_query = u''
         elif self.is_origin_form:
             path_and_query = self.target
         else:
             return None
-        return scheme + '://' + authority + path_and_query
+        return scheme + u'://' + authority + path_and_query
 
 
 def check_request(req):
@@ -158,9 +158,10 @@ def check_request(req):
         req.complain(1067)
 
     if req.headers.referer.is_okay:
-        if req.scheme == 'http' and \
-                urlparse.urlparse(req.headers.referer.value).scheme == 'https':
-            req.complain(1068)
+        if req.scheme == u'http':
+            parsed = urlparse.urlparse(req.headers.referer.value)
+            if parsed.scheme == u'https':
+                req.complain(1068)
 
     if req.headers.user_agent.is_absent:
         req.complain(1070)
@@ -234,7 +235,7 @@ def check_request(req):
         if hdr.is_okay:
             scheme, credentials = hdr.value
             if scheme == auth.basic:
-                if isinstance(credentials, unicode):
+                if isinstance(credentials, unicode):        # ``token68`` form
                     try:
                         credentials = base64.b64decode(credentials)
                     except Exception, e:

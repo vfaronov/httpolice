@@ -347,7 +347,7 @@ def maybe(inner, default=None):
     return inner | subst(default) << empty
 
 def maybe_str(inner):
-    return maybe(inner, '')
+    return maybe(inner, u'')
 
 
 def times(min_, max_, inner):
@@ -368,19 +368,19 @@ def times(min_, max_, inner):
             return min_rule + rest_rule
 
 def string_times(min_, max_, inner):
-    return ''.join << times(min_, max_, inner)
+    return u''.join << times(min_, max_, inner)
 
 def many(inner):
     return times(0, None, inner)
 
 def string(inner):
-    return ''.join << many(inner)
+    return u''.join << many(inner)
 
 def many1(inner):
     return times(1, None, inner)
 
 def string1(inner):
-    return ''.join << many1(inner)
+    return u''.join << many1(inner)
 
 
 def string_excluding(terminal, excluding):
@@ -395,7 +395,7 @@ def string_excluding(terminal, excluding):
         continuations = [s[1:] for s in excluding if s and s[0].lower() == c]
         r = r | literal(c) + string_excluding(terminal, continuations)
     if '' not in excluding:
-        r = r | subst('') << empty
+        r = r | subst(u'') << empty
     return r
 
 
@@ -423,14 +423,11 @@ def fill_names(scope, citation):
 ###############################################################################
 # Functions that are useful as semantic actions in parsing rules.
 
-def decode(s):
-    return s.decode('utf-8', 'replace')
-
 def _skip_args(*_):
     return _SKIP
 
 def _join_args(*args):
-    return ''.join(args)
+    return u''.join(args)
 
 def subst(r):
     def substitute(*_):
@@ -697,6 +694,7 @@ def _find_results(stream, symbol, chart, end_i, outer_parents=None):
         if end_i > 0:
             token = stream[end_i - 1]
             if symbol.match(token):
+                token = token.decode('iso-8859-1')
                 yield end_i - 1, None, token, [], []
         return
 

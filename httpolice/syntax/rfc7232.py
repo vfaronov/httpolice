@@ -4,9 +4,7 @@ from httpolice.citation import RFC
 from httpolice.parse import (
     auto,
     can_complain,
-    decode,
     fill_names,
-    literal,
     maybe,
     octet,
     octet_range,
@@ -35,8 +33,8 @@ entity_tag = EntityTag << maybe(weak, False) * opaque_tag               > pivot
 ETag = entity_tag                                                       > pivot
 Last_Modified = HTTP_date                                               > pivot
 
-If_Match = decode << literal('*') | comma_list1(entity_tag)             > pivot
-If_None_Match = decode << literal('*') | comma_list1(entity_tag)        > pivot
+If_Match = '*' | comma_list1(entity_tag)                                > pivot
+If_None_Match = '*' | comma_list1(entity_tag)                           > pivot
 If_Modified_Since = HTTP_date                                           > pivot
 If_Unmodified_Since = HTTP_date                                         > pivot
 

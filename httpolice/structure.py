@@ -49,6 +49,11 @@ class Versioned(namedtuple('Versioned', ('item', 'version'))):
             return unicode(self.item)
 
 
+class Quoted(namedtuple('Quoted', ('item',))):
+
+    __slots__ = ()
+
+
 class ProtocolString(unicode):
 
     __slots__ = ()
@@ -108,7 +113,7 @@ class Request(Message):
                  body=None, trailer_entries=None):
         super(Request, self).__init__(version, header_entries,
                                       body, trailer_entries)
-        self.scheme = scheme if scheme is None else str(scheme)
+        self.scheme = scheme if scheme is None else unicode(scheme)
         self.method = Method(method)
         self.target = unicode(target)
 
@@ -126,7 +131,7 @@ class Response(Message):
                                        body, trailer_entries)
         self.request = request
         self.status = StatusCode(status)
-        self.reason = reason if reason is None else str(reason)
+        self.reason = reason if reason is None else unicode(reason)
 
     def __repr__(self):
         return '<Response %d>' % self.status
