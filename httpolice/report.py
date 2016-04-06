@@ -8,152 +8,57 @@ import dominate
 import dominate.tags as H
 
 from httpolice import known, message, notice
+from httpolice.citation import Citation
 from httpolice.connection import Connection, Exchange
 from httpolice.header import HeaderView
 from httpolice.request import RequestView
 from httpolice.response import ResponseView
-from httpolice.structure import Parametrized, Unparseable, okay
+from httpolice.structure import HeaderEntry, Parametrized, Unparseable, okay
 from httpolice.util.text import has_nonprintable, nicely_join, printable
 
 
-def for_object(obj, extra_class=u''):
-    assert okay(obj)
-    return {
-        'class': u'%s %s' % (type(obj).__name__, extra_class),
-        'id': unicode(id(obj)),
-    }
+###############################################################################
+# Base code.
 
+class Report(object):
 
-def reference_targets(obj):
-    if isinstance(obj, HeaderView):
-        return [u'#' + unicode(id(entry)) for entry in obj.entries]
-    elif isinstance(obj, list):
-        # Support no. 1013, where we want to highlight all entries,
-        # not just the one which is ultimately selected by `SingleHeaderView`.
-        # Makes sense in general, so I'm inclined not to consider it a hack.
-        return [ref for item in obj for ref in reference_targets(item)]
-    else:
-        return [u'#' + unicode(id(obj))]
+    @classmethod
+    def render(cls, items, outfile):
+        report = cls(outfile)
+        for item in items:
+            report._render_item(item)
+        report._close()
 
+    def __init__(self, outfile):
+        self.outfile = outfile
 
-def notice_to_text(the_notice, ctx):
-    info = u'%d %s' % (the_notice.ident, the_notice.severity_short)
-    title = pieces_to_text(the_notice.title, ctx).strip()
-    explanation = u'\n'.join(pieces_to_text(para, ctx).strip()
-                             for para in the_notice.explanation)
-    return u'**** %s    %s\n%s\n' % (info, title, explanation)
-
-
-def pieces_to_text(pieces, ctx):
-    return u''.join(piece_to_text(p, ctx) for p in pieces)
-
-
-def piece_to_text(piece, ctx):
-    if isinstance(piece, notice.Ref):
-        return pieces_to_text(piece.get_contents(ctx), ctx)
-    elif isinstance(piece, notice.Citation):
-        quote = pieces_to_text(piece.contents, ctx).strip()
-        quote = re.sub(ur'\s+', u' ', quote)
-        if quote:
-            return u'“%s” (%s)' % (quote, piece.info)
+    def _render_item(self, item):
+        if isinstance(item, Connection):
+            self._render_connection(item)
+        elif isinstance(item, Exchange):
+            self._render_exchange(item)
+        elif isinstance(item, RequestView):
+            self._render_request(item)
+        elif isinstance(item, ResponseView):
+            self._render_response(item)
         else:
-            return piece_to_text(piece.info, ctx)
-    elif hasattr(piece, 'contents'):
-        return pieces_to_text(piece.contents, ctx)
-    elif isinstance(piece, Parametrized):
-        return piece_to_text(piece.item, ctx)
-    elif hasattr(piece, 'name'):
-        return piece_to_text(piece.name, ctx)
-    else:
-        return unicode(piece)
+            raise TypeError("don't know how to render a %s object" %
+                            type(item).__name__)
 
+    def _render_connection(self, conn):
+        raise NotImplementedError()
 
-def notice_to_html(the_notice, ctx, for_example=False):
-    with H.div(_class='notice notice-%s' % the_notice.severity):
-        with H.p(_class='notice-heading', __inline=True):
-            if not for_example:
-                with H.span(_class='notice-info'):
-                    H.span(unicode(the_notice.ident), _class='notice-ident')
-                    H.span(u' ')
-                    H.span(the_notice.severity_short, _class='notice-severity',
-                           title=the_notice.severity)
-                H.span(u' ')
-            with H.span(_class='notice-title'):
-                pieces_to_html(the_notice.title, ctx)
-        for para in the_notice.explanation:
-            with H.p(_class='notice-para', __inline=True):
-                pieces_to_html(para, ctx)
+    def _render_exchange(self, exch):
+        raise NotImplementedError()
 
+    def _render_request(self, req):
+        raise NotImplementedError()
 
-def pieces_to_html(pieces, ctx):
-    for p in pieces:
-        piece_to_html(p, ctx)
+    def _render_response(self, resp):
+        raise NotImplementedError()
 
-
-def piece_to_html(piece, ctx):
-    if isinstance(piece, notice.Ref):
-        target = piece.resolve(ctx)
-        with H.span(data_ref_to=u', '.join(reference_targets(target))):
-            pieces_to_html(piece.get_contents(ctx), ctx)
-    elif isinstance(piece, notice.Citation):
-        with H.cite():
-            H.a(unicode(piece.info), href=piece.info.url, target='_blank')
-        if piece.contents:
-            H.span(u': ')
-            with H.q(cite=piece.info.url):
-                pieces_to_html(piece.contents, ctx)
-    elif hasattr(piece, 'contents'):
-        pieces_to_html(piece.contents, ctx)
-    elif isinstance(piece, Parametrized):
-        piece_to_html(piece.item, ctx)
-    elif hasattr(piece, 'name'):
-        piece_to_html(piece.name, ctx)
-    elif known.is_known(piece):
-        render_known(piece)
-    else:
-        H.span(unicode(piece))
-
-
-def render_known(obj):
-    cls = u'known known-%s' % type(obj).__name__
-    cite = known.citation(obj)
-    title = known.title(obj, with_citation=True)
-    if cite:
-        elem = H.a(unicode(obj), _class=cls, href=cite.url, target='_blank')
-    else:
-        elem = H.span(unicode(obj), _class=cls)
-    if title:
-        with elem:
-            H.attr(title=title)
-
-
-def _include_stylesheet():
-    H.link(rel='stylesheet', href='report.css', type='text/css')
-
-
-def _include_scripts():
-    H.script(src='https://code.jquery.com/jquery-1.11.3.js',
-             type='text/javascript')
-    H.script(src='report.js', type='text/javascript')
-
-
-def render_notice_examples(examples):
-    doc = dominate.document(title=u'HTTPolice notice examples')
-    with doc.head:
-        H.meta(http_equiv='Content-Type', content='text/html; charset=utf-8')
-        _include_stylesheet()
-    with doc:
-        H.h1(u'HTTPolice notice examples')
-        with H.table(_class='notice-examples'):
-            H.thead(H.tr(H.th(u'ID'), H.th(u'severity'), H.th(u'example')))
-            with H.tbody():
-                for the_notice, ctx in examples:
-                    with H.tr():
-                        H.td(unicode(the_notice.ident))
-                        H.td(the_notice.severity)
-                        with H.td():
-                            notice_to_html(the_notice, ctx, for_example=True)
-    return doc.render().encode('utf-8')
+    def _close(self):
+        pass
 
 
 def displayable_body(msg):
@@ -197,46 +102,22 @@ def displayable_body(msg):
     return r, transforms
 
 
-class Report(object):
+def expand_piece(piece):
+    if hasattr(piece, 'content'):
+        return piece.content
 
-    @classmethod
-    def render(cls, items, outfile):
-        report = cls(outfile)
-        for item in items:
-            report._render_item(item)
-        report._close()
+    elif isinstance(piece, Parametrized):
+        return piece.item
 
-    def __init__(self, outfile):
-        self.outfile = outfile
+    elif isinstance(piece, (HeaderEntry, HeaderView)):
+        return piece.name
 
-    def _render_item(self, item):
-        if isinstance(item, Connection):
-            self._render_connection(item)
-        elif isinstance(item, Exchange):
-            self._render_exchange(item)
-        elif isinstance(item, RequestView):
-            self._render_request(item)
-        elif isinstance(item, ResponseView):
-            self._render_response(item)
-        else:
-            raise TypeError("don't know how to render a %s object" %
-                            type(item).__name__)
+    else:
+        return unicode(piece)
 
-    def _render_connection(self, conn):
-        raise NotImplementedError()
 
-    def _render_exchange(self, exch):
-        raise NotImplementedError()
-
-    def _render_request(self, req):
-        raise NotImplementedError()
-
-    def _render_response(self, resp):
-        raise NotImplementedError()
-
-    def _close(self):
-        pass
-
+###############################################################################
+# Plain text reports.
 
 class TextReport(Report):
 
@@ -279,7 +160,7 @@ class TextReport(Report):
             self._write(u'\n++ (body is unparseable)\n')
         elif msg.body:
             self._write(u'\n++ (%d bytes of payload body not shown)\n' %
-                       len(msg.body))
+                        len(msg.body))
         for entry in msg.trailer_entries:
             self._write(u'++ %s: %s\n' %
                         (entry.name, entry.value.decode('ascii', 'ignore')))
@@ -311,6 +192,44 @@ class TextReport(Report):
             self._write_more(
                 u'++ %d unparsed bytes remaining on the response stream\n' %
                 len(conn.unparsed_outbound))
+
+
+def notice_to_text(the_notice, ctx):
+    info = u'%d %s' % (the_notice.ident, the_notice.severity_short)
+    title = piece_to_text(the_notice.title, ctx).strip()
+    explanation = u''.join(piece_to_text(para, ctx).strip() + u'\n'
+                           for para in the_notice.explanation)
+    return u'**** %s    %s\n%s' % (info, title, explanation)
+
+
+def piece_to_text(piece, ctx):
+    if isinstance(piece, list):
+        return u''.join(piece_to_text(p, ctx) for p in piece)
+
+    elif isinstance(piece, notice.Paragraph):
+        return piece_to_text(piece.content, ctx) + u'\n'
+
+    elif isinstance(piece, notice.Ref):
+        target = piece.resolve_reference(ctx)
+        return piece_to_text(piece.content or target, ctx)
+
+    elif isinstance(piece, notice.Cite):
+        quote = piece.content
+        if quote:
+            quote = re.sub(ur'\s+', u' ', piece_to_text(quote, ctx)).strip()
+            return u'“%s” (%s)' % (quote, piece.info)
+        else:
+            return unicode(piece.info)
+
+    elif isinstance(piece, unicode):
+        return piece
+
+    else:
+        return piece_to_text(expand_piece(piece), ctx)
+
+
+###############################################################################
+# HTML reports.
 
 
 class HTMLReport(Report):
@@ -350,13 +269,13 @@ class HTMLReport(Report):
                 if isinstance(piece, str):
                     H.span(printable(piece.decode('utf-8', 'replace')))
                 else:
-                    render_known(piece)
+                    known_to_html(piece)
 
     def _render_header_entries(self, annotated_entries):
         for entry, annotated in annotated_entries:
             with H.div(__inline=True, **for_object(entry)):
                 with H.span(**for_object(entry.name)):
-                    render_known(entry.name)
+                    known_to_html(entry.name)
                 H.span(u': ')
                 self._render_annotated(annotated)
 
@@ -383,7 +302,7 @@ class HTMLReport(Report):
         with H.div(_class='review'):
             with H.div(_class='request-line', __inline=True):
                 with H.span(**for_object(req.method)):
-                    render_known(req.method)
+                    known_to_html(req.method)
                 H.span(u' ')
                 H.span(req.target, **for_object(req.target, 'request-target'))
                 H.span(u' ')
@@ -396,7 +315,7 @@ class HTMLReport(Report):
                 H.span(resp.version, **for_object(resp.version))
                 H.span(u' ')
                 with H.span(**for_object(resp.status)):
-                    render_known(resp.status)
+                    known_to_html(resp.status)
                     H.span(u' ')
                     H.span(
                         printable(resp.reason.decode('utf-8', 'replace')),
@@ -420,3 +339,117 @@ class HTMLReport(Report):
                 H.p('%d unparsed bytes remaining on the response stream' %
                     len(conn.unparsed_outbound),
                     _class=u'unparsed outbound')
+
+
+def _include_stylesheet():
+    H.link(rel='stylesheet', href='report.css', type='text/css')
+
+
+def _include_scripts():
+    H.script(src='https://code.jquery.com/jquery-1.11.3.js',
+             type='text/javascript')
+    H.script(src='report.js', type='text/javascript')
+
+
+def for_object(obj, extra_class=u''):
+    assert okay(obj)
+    return {
+        'class': u'%s %s' % (type(obj).__name__, extra_class),
+        'id': unicode(id(obj)),
+    }
+
+
+def reference_targets(obj):
+    if isinstance(obj, HeaderView):
+        return [u'#' + unicode(id(entry)) for entry in obj.entries]
+    elif isinstance(obj, list):
+        # Support no. 1013, where we want to highlight all entries,
+        # not just the one which is ultimately selected by `SingleHeaderView`.
+        # Makes sense in general, so I'm inclined not to consider it a hack.
+        return [ref for item in obj for ref in reference_targets(item)]
+    else:
+        return [u'#' + unicode(id(obj))]
+
+
+def known_to_html(obj):
+    cls = u'known known-%s' % type(obj).__name__
+    cite = known.citation(obj)
+    title = known.title(obj, with_citation=True)
+    if cite:
+        elem = H.a(unicode(obj), _class=cls, href=cite.url, target='_blank')
+    else:
+        elem = H.span(unicode(obj), _class=cls)
+    if title:
+        with elem:
+            H.attr(title=title)
+
+
+def notice_to_html(the_notice, ctx, for_example=False):
+    with H.div(_class='notice notice-%s' % the_notice.severity):
+        with H.p(_class='notice-heading', __inline=True):
+            if not for_example:
+                with H.span(_class='notice-info'):
+                    H.span(unicode(the_notice.ident), _class='notice-ident')
+                    H.span(u' ')
+                    H.span(the_notice.severity_short, _class='notice-severity',
+                           title=the_notice.severity)
+                H.span(u' ')
+            with H.span(_class='notice-title'):
+                piece_to_html(the_notice.title, ctx)
+        for para in the_notice.explanation:
+            piece_to_html(para, ctx)
+
+
+def piece_to_html(piece, ctx):
+    if isinstance(piece, list):
+        for p in piece:
+            piece_to_html(p, ctx)
+
+    elif isinstance(piece, notice.Paragraph):
+        with H.p(_class='notice-para', __inline=True):
+            piece_to_html(piece.content, ctx)
+
+    elif isinstance(piece, notice.Ref):
+        target = piece.resolve_reference(ctx)
+        with H.span(data_ref_to=u', '.join(reference_targets(target))):
+            piece_to_html(piece.content or target, ctx)
+
+    elif isinstance(piece, notice.Cite):
+        piece_to_html(piece.info, ctx)
+        quote = piece.content
+        if quote:
+            H.span(u': ')
+            with H.q(cite=piece.info.url):
+                piece_to_html(quote, ctx)
+
+    elif isinstance(piece, Citation):
+        with H.cite():
+            H.a(piece.title, href=piece.url, target='_blank')
+
+    elif known.is_known(piece):
+        known_to_html(piece)
+
+    elif isinstance(piece, unicode):
+        H.span(piece)
+
+    else:
+        piece_to_html(expand_piece(piece), ctx)
+
+
+def render_notice_examples(examples):
+    doc = dominate.document(title=u'HTTPolice notice examples')
+    with doc.head:
+        H.meta(http_equiv='Content-Type', content='text/html; charset=utf-8')
+        _include_stylesheet()
+    with doc:
+        H.h1(u'HTTPolice notice examples')
+        with H.table(_class='notice-examples'):
+            H.thead(H.tr(H.th(u'ID'), H.th(u'severity'), H.th(u'example')))
+            with H.tbody():
+                for the_notice, ctx in examples:
+                    with H.tr():
+                        H.td(unicode(the_notice.ident))
+                        H.td(the_notice.severity)
+                        with H.td():
+                            notice_to_html(the_notice, ctx, for_example=True)
+    return doc.render().encode('utf-8')

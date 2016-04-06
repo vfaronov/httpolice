@@ -1,12 +1,14 @@
 # -*- coding: utf-8; -*-
 
+import copy
+
 import lxml.etree
 import pkg_resources
 
 from httpolice import citation, structure
 
 
-protocol_items = {
+known_map = {
     'auth': structure.AuthScheme,
     'cache': structure.CacheDirective,
     'cc': structure.ContentCoding,
@@ -25,29 +27,46 @@ class Notice(lxml.etree.ElementBase):
     ident = property(lambda self: int(self.get('id')))
     severity = property(lambda self: self.tag)
     severity_short = property(lambda self: self.tag[0].upper())
-    title = property(lambda self: self.find('title').contents)
-    explanation = property(lambda self: [
-        [child] if child.tag == 'rfc' else child.contents
-        for child in self
-        if child.tag != 'title' and child.tag is not lxml.etree.Comment])
-
-
-class Text(lxml.etree.ElementBase):
+    title = property(lambda self: self.find('title').content)
 
     @property
-    def contents(self):
+    def explanation(self):
+        for child in self:
+            if isinstance(child, Title) or child.tag is lxml.etree.Comment:
+                continue
+            elif isinstance(child, (Paragraph, Ref)):
+                yield child
+            else:
+                # Assume that a wrapping ``<explain/>`` was omitted.
+                para = _parser.makeelement('explain')
+                para.append(copy.deepcopy(child))
+                yield para
+
+
+class Content(lxml.etree.ElementBase):
+
+    @property
+    def content(self):
         r = [self.text]
         for child in self:
             r.append(child)
             r.append(child.tail)
-        return [piece for piece in r if piece not in [None, u'']]
+        return [piece for piece in r if piece is not None and piece != u'']
 
 
-class Ref(Text):
+class Paragraph(Content):
 
-    get_contents = lambda self, ctx: self.contents or [self.resolve(ctx)]
+    pass
 
-    def resolve(self, ctx):
+
+class Title(Content):
+
+    pass
+
+
+class Ref(Content):
+
+    def resolve_reference(self, ctx):
         path = self.get('to').split('.')
         node = ctx[path.pop(0)]
         for attr_name in path:
@@ -55,14 +74,14 @@ class Ref(Text):
         return node
 
 
-class Citation(Text):
+class Cite(Content):
 
     @property
     def info(self):
         return citation.Citation(self.get('title'), self.get('url'))
 
 
-class RFC(Citation):
+class CiteRFC(Cite):
 
     @property
     def info(self):
@@ -75,9 +94,9 @@ class RFC(Citation):
         return citation.RFC(num, section=sect, errata=errata)
 
 
-class ProtocolItem(lxml.etree.ElementBase):
+class Known(lxml.etree.ElementBase):
 
-    contents = property(lambda self: [protocol_items[self.tag](self.text)])
+    content = property(lambda self: known_map[self.tag](self.text))
 
 
 def load_notices():
@@ -87,12 +106,13 @@ def load_notices():
     ns = lookup.get_namespace(None)
     for tag in ['error', 'comment', 'debug']:
         ns[tag] = Notice
-    ns['title'] = ns['explain'] = Text
+    ns['title'] = Title
+    ns['explain'] = Paragraph
     ns['ref'] = Ref
-    ns['cite'] = Citation
-    ns['rfc'] = RFC
-    for tag in protocol_items:
-        ns[tag] = ProtocolItem
+    ns['cite'] = Cite
+    ns['rfc'] = CiteRFC
+    for tag in known_map:
+        ns[tag] = Known
     notices_xml = pkg_resources.resource_stream('httpolice', 'notices.xml')
     tree = lxml.etree.parse(notices_xml, parser)
     r = {}
@@ -100,6 +120,6 @@ def load_notices():
         if isinstance(elem, Notice):
             assert elem.ident not in r
             r[elem.ident] = elem
-    return r
+    return r, parser
 
-notices = load_notices()
+(notices, _parser) = load_notices()
