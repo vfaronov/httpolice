@@ -5,6 +5,7 @@ from httpolice.known.base import KnownDict
 from httpolice.structure import FieldName
 from httpolice.syntax import (
     rfc5789,
+    rfc5988,
     rfc6797,
     rfc7230,
     rfc7231,
@@ -412,8 +413,10 @@ known = KnownDict([
   # Leaving undefined for now.
   'for_request': None,
   'for_response': True,
+  'parser': rfc5988.Link,
   'precondition': False,
-  'proactive_conneg': False},
+  'proactive_conneg': False,
+  'rule': MULTI},
  {'_': FieldName(u'Location'),
   '_citations': [RFC(7231, section=(7, 1, 2))],
   'bad_for_trailer': True,

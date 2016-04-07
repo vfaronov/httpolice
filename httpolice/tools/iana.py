@@ -17,6 +17,7 @@ from httpolice.structure import (
     MediaType,
     Method,
     RangeUnit,
+    RelationType,
     StatusCode,
     TransferCoding,
     UpgradeToken,
@@ -241,6 +242,19 @@ class AuthSchemeRegistry(Registry):
         return {
             '_': AuthScheme(record.find('iana:value', self.xmlns).text),
             '_citations': list(self.extract_citations(record)),
+        }
+
+
+class RelationTypeRegistry(Registry):
+
+    cls = RelationType
+    relative_url = 'link-relations/link-relations.xml'
+
+    def _from_record(self, record):
+        return {
+            '_': RelationType(record.find('iana:value', self.xmlns).text),
+            '_citations': list(
+                self.extract_citations(record.find('iana:spec', self.xmlns))),
         }
 
 

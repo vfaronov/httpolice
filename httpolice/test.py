@@ -30,6 +30,7 @@ from httpolice.structure import (
     ProductName,
     RangeSpecifier,
     RangeUnit,
+    RelationType,
     Request,
     Response,
     StatusCode,
@@ -41,7 +42,7 @@ from httpolice.structure import (
     http10,
     http11,
 )
-from httpolice.syntax import rfc3986, rfc7230, rfc7231, rfc7233
+from httpolice.syntax import rfc3986, rfc5988, rfc7230, rfc7231, rfc7233
 
 
 def load_test_file(filename):
@@ -497,6 +498,127 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, 'bytes */*')
         self.assertNoParse(p, 'bytes 42/1233')
         self.assertNoParse(p, 'bytes 42, 43, 44')
+
+    def test_link(self):
+        p = rfc5988.Link
+        self.assertParse(
+            p,
+            '<http://example.com/TheBook/chapter2>; rel="previous"; '
+            'title="previous chapter"',
+            [
+                Parametrized(
+                    u'http://example.com/TheBook/chapter2',
+                    [
+                        (u'rel', [RelationType(u'previous')]),
+                        (u'title', u'previous chapter'),
+                    ]
+                )
+            ],
+        )
+        self.assertParse(
+            p, '</>; rel="http://example.net/foo"',
+            [Parametrized(u'/', [(u'rel', [u'http://example.net/foo'])])]
+        )
+        self.assertParse(
+            p,
+            '</TheBook/chapter2>; '
+            'rel="previous"; title*=UTF-8\'de\'letztes%20Kapitel, '
+            '</TheBook/chapter4>; '
+            'rel="next"; title*=UTF-8\'de\'n%c3%a4chstes%20Kapitel',
+            [
+                Parametrized(
+                    u'/TheBook/chapter2',
+                    [
+                        (u'rel', [RelationType(u'previous')]),
+                        (u'title*', (u'UTF-8', u'de', u'letztes%20Kapitel')),
+                    ]
+                ),
+                Parametrized(
+                    u'/TheBook/chapter4',
+                    [
+                        (u'rel', [RelationType(u'next')]),
+                        (u'Title*', (u'UTF-8', u'de',
+                                     u'n%c3%a4chstes%20Kapitel')),
+                    ]
+                ),
+            ]
+        )
+        self.assertParse(
+            p,
+            '<http://example.org/>; '
+            'rel="start http://example.net/relation/other"',
+            [
+                Parametrized(
+                    u'http://example.org/',
+                    [
+                        (u'REL', [RelationType(u'NEXT'),
+                                  u'http://example.net/relation/other']),
+                    ]
+                ),
+            ]
+        )
+        self.assertParse(
+            p, '</>; rel=foo; type=text/plain; rel=bar; type=text/html',
+            [
+                Parametrized(
+                    u'/',
+                    [
+                        (u'rel', [RelationType(u'foo')]),
+                        (u'type', MediaType(u'text/plain')),
+                        (u'type', MediaType(u'text/html')),
+                    ]
+                ),
+            ]
+        )
+        self.assertParse(
+            p,
+            '</foo/bar?baz=qux#xyzzy>  ;  media = whatever man okay? ; '
+            'hreflang=en-US',
+            [
+                Parametrized(
+                    u'/foo/bar?baz=qux#xyzzy',
+                    [
+                        (u'media', u'whatever man okay?'),
+                        (u'hreflang', LanguageTag(u'en-US')),
+                    ]
+                ),
+            ]
+        )
+        self.assertParse(
+            p, '<foo>, <bar>, <>',
+            [
+                Parametrized(u'foo', []),
+                Parametrized(u'bar', []),
+                Parametrized(u'', []),
+            ]
+        )
+        self.assertParse(
+            p, "<urn:foo:bar:baz>; MyParam* = ISO-8859-1'en'whatever",
+            [
+                Parametrized(
+                    u'urn:foo:bar:baz',
+                    [
+                        (u'myparam*', (u'ISO-8859-1', u'en', u'whatever')),
+                    ]
+                ),
+            ]
+        )
+        self.assertParse(
+            p, '<#me>; coolest; man; ever!',
+            [
+                Parametrized(
+                    u'#me',
+                    [(u'coolest', None), (u'man', None), (u'ever!', None)]
+                ),
+            ]
+        )
+        self.assertNoParse(p, '</>; anchor=/index.html')
+        self.assertNoParse(p, '<http://пример.рф/>; rel=next')
+        self.assertNoParse(p, '</index.html>; title=Hello')
+        self.assertNoParse(p, '</index.html>; type="text/html;charset=utf-8"')
+        self.assertNoParse(p, "</>; title * = UTF-8''Hello")
+        self.assertNoParse(p, '</index.html>;')
+        self.assertNoParse(p, '</index.html>; rel=next;')
 
 
 class TestRequest(unittest.TestCase):

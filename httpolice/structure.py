@@ -304,3 +304,8 @@ class AuthScheme(CaseInsensitive):
 class HSTSDirective(CaseInsensitive):
 
     __slots__ = ()
+
+
+class RelationType(CaseInsensitive):
+
+    __slots__ = ()

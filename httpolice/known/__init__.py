@@ -10,6 +10,7 @@ from httpolice.known.media_type import known as media
 from httpolice.known.method import known as m
 from httpolice.known.product import known as prod
 from httpolice.known.range_unit import known as unit
+from httpolice.known.relation_type import known as rel
 from httpolice.known.status_code import known as st
 from httpolice.known.transfer_coding import known as tc
 from httpolice.known.upgrade_token import known as upgrade
@@ -25,6 +26,7 @@ classes = {
     structure.Method: m,
     structure.ProductName: prod,
     structure.RangeUnit: unit,
+    structure.RelationType: rel,
     structure.StatusCode: st,
     structure.TransferCoding: tc,
     structure.UpgradeToken: upgrade,
