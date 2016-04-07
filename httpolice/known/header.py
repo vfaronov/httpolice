@@ -162,7 +162,7 @@ known = KnownDict([
   'proactive_conneg': False,
   'rule': MULTI},
  {'_': FieldName(u'CalDAV-Timezones'),
-  '_citations': [],
+  '_citations': [RFC(7809, section=(7, 1))],
   'iana_status': 'standard'},
  {'_': FieldName(u'Close'),
   '_citations': [RFC(7230, section=(8, 1))],
