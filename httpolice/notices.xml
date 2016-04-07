@@ -1635,13 +1635,13 @@
     <explain>According to <rfc num="5988" sect="5"/>, the ‘<ref to="name"/>’ parameter must not occur more than once in a single link.</explain>
   </error>
 
-  <error id="1226">
+  <comment id="1226">
     <title>Deprecated ‘rev’ parameter in <ref to="place"/></title>
     <rfc num="5988" sect="5.3">
       "rev" is deprecated by this
    specification because it often confuses authors and readers; in most
    cases, using a separate relation type is preferable.
     </rfc>
-  </error>
+  </comment>
 
 </notices>
