@@ -48,7 +48,7 @@ class Report(object):
         elif isinstance(item, ResponseView):
             self._render_response(item)
         else:
-            raise TypeError("don't know how to render a %s object" %
+            raise TypeError(u"don't know how to render a %s object" %
                             type(item).__name__)
 
     def _render_connection(self, conn):
@@ -272,8 +272,8 @@ class HTMLReport(Report):
         super(HTMLReport, self).__init__(outfile)
         self.document = dominate.document(title=u'HTTPolice report')
         with self.document.head:
-            H.meta(http_equiv='Content-Type',
-                   content='text/html; charset=utf-8')
+            H.meta(http_equiv=u'Content-Type',
+                   content=u'text/html; charset=utf-8')
             _include_stylesheet()
             _include_scripts()
 
@@ -288,18 +288,18 @@ class HTMLReport(Report):
         with H.div(**for_object(item)):
             super(HTMLReport, self)._render_item(item)
             self._render_notices(item)
-            H.br(_class='item-separator')
+            H.br(_class=u'item-separator')
 
     def _render_notices(self, item):
         if item.complaints:
-            with H.div(_class='notices'):
+            with H.div(_class=u'notices'):
                 for notice_ident, context in item.complaints:
                     notice_data = notice.notices[notice_ident]
                     notice_to_html(notice_data, context)
 
     def _render_annotated(self, pieces):
         for piece in pieces:
-            with H.span(_class='annotated-piece', **for_object(piece)):
+            with H.span(_class=u'annotated-piece', **for_object(piece)):
                 if isinstance(piece, str):
                     H.span(printable(piece.decode('iso-8859-1')))
                 else:
@@ -318,34 +318,34 @@ class HTMLReport(Report):
 
         body, transforms = displayable_body(msg)
         if body is Unparseable:
-            with H.div(_class='review-block'):
-                H.p(u'Payload body is unavailable.', _class='hint')
+            with H.div(_class=u'review-block'):
+                H.p(u'Payload body is unavailable.', _class=u'hint')
         elif body:
-            with H.div(**for_object(msg.body, extra_class='review-block')):
+            with H.div(**for_object(msg.body, extra_class=u'review-block')):
                 if transforms:
                     H.p(u'Payload body after %s:' % nicely_join(transforms),
-                        _class='hint')
-                H.div(body, _class='payload-body')
+                        _class=u'hint')
+                H.div(body, _class=u'payload-body')
 
         if msg.trailer_entries:
-            with H.div(_class='review-block'):
-                H.p(u'Header fields from the chunked trailer:', _class='hint')
+            with H.div(_class=u'review-block'):
+                H.p(u'Header fields from the chunked trailer:', _class=u'hint')
                 self._render_header_entries(msg.annotated_trailer_entries)
 
     def _render_request(self, req):
-        with H.div(_class='review'):
-            with H.div(_class='request-line', __inline=True):
+        with H.div(_class=u'review'):
+            with H.div(_class=u'request-line', __inline=True):
                 with H.span(**for_object(req.method)):
                     known_to_html(req.method)
                 H.span(u' ')
-                H.span(req.target, **for_object(req.target, 'request-target'))
+                H.span(req.target, **for_object(req.target, u'request-target'))
                 H.span(u' ')
                 H.span(req.version, **for_object(req.version))
             self._render_message(req)
 
     def _render_response(self, resp):
-        with H.div(_class='review'):
-            with H.div(_class='status-line', __inline=True):
+        with H.div(_class=u'review'):
+            with H.div(_class=u'status-line', __inline=True):
                 H.span(resp.version, **for_object(resp.version))
                 H.span(u' ')
                 with H.span(**for_object(resp.status)):
@@ -362,32 +362,32 @@ class HTMLReport(Report):
     def _render_connection(self, conn):
         for exch in conn.exchanges:
             self._render_next_item(exch)
-        with H.div(_class='review'):
+        with H.div(_class=u'review'):
             if conn.unparsed_inbound:
-                H.p('%d unparsed bytes remaining on the request stream' %
+                H.p(u'%d unparsed bytes remaining on the request stream' %
                     len(conn.unparsed_inbound),
                     _class=u'unparsed inbound')
             if conn.unparsed_outbound:
-                H.p('%d unparsed bytes remaining on the response stream' %
+                H.p(u'%d unparsed bytes remaining on the response stream' %
                     len(conn.unparsed_outbound),
                     _class=u'unparsed outbound')
 
 
 def _include_stylesheet():
-    H.link(rel='stylesheet', href='report.css', type='text/css')
+    H.link(rel=u'stylesheet', href=u'report.css', type=u'text/css')
 
 
 def _include_scripts():
-    H.script(src='https://code.jquery.com/jquery-1.11.3.js',
-             type='text/javascript')
-    H.script(src='report.js', type='text/javascript')
+    H.script(src=u'https://code.jquery.com/jquery-1.11.3.js',
+             type=u'text/javascript')
+    H.script(src=u'report.js', type=u'text/javascript')
 
 
 def for_object(obj, extra_class=u''):
     assert okay(obj)
     return {
-        'class': u'%s %s' % (type(obj).__name__, extra_class),
-        'id': unicode(id(obj)),
+        u'class': u'%s %s' % (type(obj).__name__, extra_class),
+        u'id': unicode(id(obj)),
     }
 
 
@@ -408,7 +408,7 @@ def known_to_html(obj):
     cite = known.citation(obj)
     title = known.title(obj, with_citation=True)
     if cite:
-        elem = H.a(unicode(obj), _class=cls, href=cite.url, target='_blank')
+        elem = H.a(unicode(obj), _class=cls, href=cite.url, target=u'_blank')
     else:
         elem = H.span(unicode(obj), _class=cls)
     if title:
@@ -417,16 +417,17 @@ def known_to_html(obj):
 
 
 def notice_to_html(the_notice, ctx, for_example=False):
-    with H.div(_class='notice notice-%s' % the_notice.severity):
-        with H.p(_class='notice-heading', __inline=True):
+    with H.div(_class=u'notice notice-%s' % the_notice.severity):
+        with H.p(_class=u'notice-heading', __inline=True):
             if not for_example:
-                with H.span(_class='notice-info'):
-                    H.span(unicode(the_notice.ident), _class='notice-ident')
+                with H.span(_class=u'notice-info'):
+                    H.span(unicode(the_notice.ident), _class=u'notice-ident')
                     H.span(u' ')
-                    H.span(the_notice.severity_short, _class='notice-severity',
+                    H.span(the_notice.severity_short,
+                           _class=u'notice-severity',
                            title=the_notice.severity)
                 H.span(u' ')
-            with H.span(_class='notice-title'):
+            with H.span(_class=u'notice-title'):
                 piece_to_html(the_notice.title, ctx)
         for para in the_notice.explanation:
             piece_to_html(para, ctx)
@@ -438,7 +439,7 @@ def piece_to_html(piece, ctx):
             piece_to_html(p, ctx)
 
     elif isinstance(piece, notice.Paragraph):
-        with H.p(_class='notice-para', __inline=True):
+        with H.p(_class=u'notice-para', __inline=True):
             piece_to_html(piece.content, ctx)
 
     elif isinstance(piece, notice.Ref):
@@ -456,12 +457,12 @@ def piece_to_html(piece, ctx):
 
     elif isinstance(piece, ParseError):
         for para in expand_parse_error(piece):
-            with H.p(_class='notice-para', __inline=True):
+            with H.p(_class=u'notice-para', __inline=True):
                 piece_to_html(para, ctx)
 
     elif isinstance(piece, Citation):
         with H.cite():
-            H.a(piece.title, href=piece.url, target='_blank')
+            H.a(piece.title, href=piece.url, target=u'_blank')
 
     elif known.is_known(piece):
         known_to_html(piece)
@@ -476,11 +477,11 @@ def piece_to_html(piece, ctx):
 def render_notice_examples(examples):
     doc = dominate.document(title=u'HTTPolice notice examples')
     with doc.head:
-        H.meta(http_equiv='Content-Type', content='text/html; charset=utf-8')
+        H.meta(http_equiv=u'Content-Type', content=u'text/html; charset=utf-8')
         _include_stylesheet()
     with doc:
         H.h1(u'HTTPolice notice examples')
-        with H.table(_class='notice-examples'):
+        with H.table(_class=u'notice-examples'):
             H.thead(H.tr(H.th(u'ID'), H.th(u'severity'), H.th(u'example')))
             with H.tbody():
                 for the_notice, ctx in examples:

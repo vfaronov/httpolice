@@ -47,7 +47,7 @@ def extension_pragma(exclude_no_cache=False):
     return Parametrized << (
         (token_excluding(['no-cache']) if exclude_no_cache else token) *
         maybe(skip('=') * (token | quoted_string))
-    ) > named('extension-pragma', RFC(7234), is_pivot=True)
+    ) > named(u'extension-pragma', RFC(7234), is_pivot=True)
 
 pragma_directive = (CaseInsensitive << literal('no-cache') |
                     extension_pragma(exclude_no_cache=True))            > pivot

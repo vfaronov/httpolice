@@ -23,7 +23,7 @@ etagc = octet(0x21) | octet_range(0x23, 0x7E) | obs_text                > auto
 
 @can_complain
 def _no_backslashes(complain, s):
-    if '\\' in s:
+    if u'\\' in s:
         complain(1119)
     return s
 

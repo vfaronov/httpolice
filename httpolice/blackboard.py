@@ -5,7 +5,7 @@ import functools
 
 class Blackboard(object):
 
-    self_name = 'self'
+    self_name = u'self'
 
     def __init__(self):
         self.complaints = None

@@ -19,7 +19,7 @@ class KnownMethods(KnownDict):
 
     @classmethod
     def _name_for(cls, item):
-        return item['_'].replace('-', '_')
+        return item['_'].replace(u'-', u'_')
 
 
 known = KnownMethods([

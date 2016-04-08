@@ -34,13 +34,13 @@ def preprocess_response(resp):
 
 def start(context, argv):
     parser = argparse.ArgumentParser(
-        description='Run HTTPolice as a mitmdump script.',
-        prog='httpolice-mitmdump.py')
-    parser.add_argument('-H', '--html', action='store_true',
-                        help='render HTML report instead of plain text')
-    parser.add_argument('--only-with-notices', action='store_true',
-                        help='exclude exchanges that have no notices')
-    parser.add_argument('out_filename')
+        description=u'Run HTTPolice as a mitmdump script.',
+        prog=u'httpolice-mitmdump.py')
+    parser.add_argument(u'-H', u'--html', action=u'store_true',
+                        help=u'render HTML report instead of plain text')
+    parser.add_argument(u'--only-with-notices', action=u'store_true',
+                        help=u'exclude exchanges that have no notices')
+    parser.add_argument(u'out_filename')
     context.args = parser.parse_args(argv[1:])
     context.pairs = []
 

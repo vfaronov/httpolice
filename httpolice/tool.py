@@ -8,18 +8,18 @@ from httpolice import HTMLReport, TextReport, analyze_streams
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Run HTTPolice on two streams (inbound and outbound).')
-    parser.add_argument('-s', '--scheme', default='http',
-                        help='URI scheme of the protocol used on the streams, '
-                             'such as "http" (default) or "https"')
-    parser.add_argument('-H', '--html', action='store_true',
-                        help='render HTML report instead of plain text')
-    parser.add_argument('inbound')
-    parser.add_argument('outbound')
+        description=u'Run HTTPolice on two streams (inbound and outbound).')
+    parser.add_argument(u'-s', u'--scheme', default=u'http',
+                        help=u'URI scheme of the protocol used on the streams, '
+                             u'such as "http" (default) or "https"')
+    parser.add_argument(u'-H', u'--html', action=u'store_true',
+                        help=u'render HTML report instead of plain text')
+    parser.add_argument(u'inbound')
+    parser.add_argument(u'outbound')
     args = parser.parse_args()
-    with open(args.inbound) as f:
+    with open(args.inbound, 'rb') as f:
         inbound_stream = f.read()
-    with open(args.outbound) as f:
+    with open(args.outbound, 'rb') as f:
         outbound_stream = f.read()
     result = analyze_streams(inbound_stream, outbound_stream,
                              args.scheme.decode('ascii'))

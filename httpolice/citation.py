@@ -8,8 +8,8 @@ class Citation(object):
     __repr__ = lambda self: 'Citation(%r, %r)' % (self.title, self.url)
 
     def __init__(self, title, url):
-        self.title = title
-        self.url = url
+        self.title = unicode(title)
+        self.url = unicode(url)
 
     def __eq__(self, other):
         return isinstance(other, Citation) and \

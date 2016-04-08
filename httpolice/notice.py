@@ -25,8 +25,8 @@ known_map = {
 class Notice(lxml.etree.ElementBase):
 
     ident = property(lambda self: int(self.get('id')))
-    severity = property(lambda self: self.tag)
-    severity_short = property(lambda self: self.tag[0].upper())
+    severity = property(lambda self: self.tag.decode('ascii'))
+    severity_short = property(lambda self: self.severity[0].upper())
     title = property(lambda self: self.find('title').content)
 
     @property

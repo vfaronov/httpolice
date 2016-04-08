@@ -11,11 +11,11 @@ import httpolice.test
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Run HTTPolice on its own test file(s) '
-                    'and view the result as a report.')
-    parser.add_argument('-H', '--html', action='store_true',
-                        help='render HTML report instead of plain text')
-    parser.add_argument('prefix', nargs='*')
+        description=u'Run HTTPolice on its own test file(s) '
+                    u'and view the result as a report.')
+    parser.add_argument(u'-H', u'--html', action=u'store_true',
+                        help=u'render HTML report instead of plain text')
+    parser.add_argument(u'prefix', nargs=u'*')
     args = parser.parse_args()
     root = abspath(join(dirname(__file__), '..', 'test_data'))
     result = []

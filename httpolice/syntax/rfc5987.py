@@ -23,7 +23,7 @@ attr_char = (ALPHA | DIGIT |
 
 def parmname__excluding(exclude):
     return (string_excluding(attr_char, [''] + exclude)
-            > named('parmname', RFC(5987), is_pivot=True))
+            > named(u'parmname', RFC(5987), is_pivot=True))
 
 parmname = parmname__excluding([])
 

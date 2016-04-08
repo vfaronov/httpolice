@@ -74,7 +74,7 @@ def quoted_pair(sensible_for):
             complain(1017, char=c)
         return c
     return (check_sensible << skip('\\') * (HTAB | SP | VCHAR | obs_text)
-            > named('quoted-pair', RFC(7230)))
+            > named(u'quoted-pair', RFC(7230)))
 
 qdtext = (HTAB | SP | octet(0x21) | octet_range(0x23, 0x5B) |
           octet_range(0x5D, 0x7E) | obs_text)                           > auto
@@ -86,12 +86,12 @@ ctext = (HTAB | SP | octet_range(0x21, 0x27) | octet_range(0x2A, 0x5B) |
          octet_range(0x5D, 0x7E) | obs_text)                            > auto
 
 def comment(include_parens=False):
-    inner = recursive() > named('comment', RFC(7230))
+    inner = recursive() > named(u'comment', RFC(7230))
     inner.rec = '(' + string(ctext | quoted_pair(sensible_for=u'()\\') |
                              inner) + ')'
     if not include_parens:
         inner = (lambda s: s[1:-1]) << inner
-    return inner > named('comment', RFC(7230))
+    return inner > named(u'comment', RFC(7230))
 
 OWS = string(SP | HTAB)                                                 > auto
 
@@ -125,14 +125,14 @@ def comma_list(element):
         (subst([None, None]) << literal(',') |
          (lambda x: [x]) << group(element)) +
         many(skip(OWS * ',') * maybe(skip(OWS) * element))
-    ) > named('#rule', RFC(7230, section=(7,)))
+    ) > named(u'#rule', RFC(7230, section=(7,)))
 
 def comma_list1(element):
     return _collect_elements << (
         many(subst(None) << ',' * OWS) +
         ((lambda x: [x]) << group(element)) +
         many(skip(OWS * ',') * maybe(skip(OWS) * element))
-    ) > named('1#rule', RFC(7230, section=(7,)))
+    ) > named(u'1#rule', RFC(7230, section=(7,)))
 
 method = Method << token                                                > pivot
 
@@ -168,7 +168,7 @@ def transfer_parameter(no_q=False):
     return Parametrized << (
         (token_excluding(['q']) if no_q else token) *
         skip(BWS * '=' * BWS) * (token | quoted_string)
-    ) > named('transfer-parameter', RFC(7230), is_pivot=True)
+    ) > named(u'transfer-parameter', RFC(7230), is_pivot=True)
 
 _built_in_codings = ['chunked', 'compress', 'deflate', 'gzip']
 _empty_params = lambda c: Parametrized(c, [])
@@ -177,7 +177,7 @@ def transfer_extension(exclude=None, no_q=False):
     return Parametrized << (
         (TransferCoding << token_excluding(exclude or [])) *
         many(skip(OWS * ';' * OWS) * transfer_parameter(no_q))
-    ) > named('transfer-extension', RFC(7230), is_pivot=True)
+    ) > named(u'transfer-extension', RFC(7230), is_pivot=True)
 
 def transfer_coding(no_trailers=False, no_q=False):
     exclude = _built_in_codings
@@ -186,7 +186,7 @@ def transfer_coding(no_trailers=False, no_q=False):
     r = transfer_extension(exclude, no_q)
     for name in _built_in_codings:
         r = r | _empty_params << (TransferCoding << literal(name))
-    return r > named('transfer-coding', RFC(7230), is_pivot=True)
+    return r > named(u'transfer-coding', RFC(7230), is_pivot=True)
 
 Transfer_Encoding = comma_list1(transfer_coding())                      > pivot
 

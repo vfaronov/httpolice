@@ -301,7 +301,7 @@ class Rule(object):
         return Rule(self.symbols, wrapper_action)
 
 
-empty = SimpleNonterminal(name='empty', rules=[Rule(())], is_ephemeral=True)
+empty = SimpleNonterminal(name=u'empty', rules=[Rule(())], is_ephemeral=True)
 
 
 def octet_range(min_, max_):

@@ -66,7 +66,7 @@ relation_types = (
 
 def ext_name_star__excluding(exclude):
     return (parmname__excluding(exclude) + '*'
-            > named('ext-name-star', RFC(5988)))
+            > named(u'ext-name-star', RFC(5988)))
 
 _builtin_params = {
     'rel': relation_types,
@@ -96,7 +96,7 @@ def link_extension(exclude_builtin):
             (CaseInsensitive << ext_name_star__excluding(exclude2)) *
             skip(OWS * '=' * OWS) * ext_value
         )
-    ) > named('link-extension', RFC(5988), is_pivot=True)
+    ) > named(u'link-extension', RFC(5988), is_pivot=True)
 
 link_param = link_extension(exclude_builtin=True)
 for _name, _rule in _builtin_params.items():

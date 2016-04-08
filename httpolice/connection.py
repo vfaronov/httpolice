@@ -37,7 +37,7 @@ def analyze_exchange(request, responses):
 
 class Connection(Blackboard):
 
-    self_name = 'conn'
+    self_name = u'conn'
 
     def __init__(self, exchanges=None,
                  unparsed_inbound=None, unparsed_outbound=None):
@@ -58,7 +58,7 @@ class Connection(Blackboard):
 
 class Exchange(Blackboard):
 
-    self_name = 'exch'
+    self_name = u'exch'
 
     def __repr__(self):
         return 'Exchange(%r, %r)' % (self.request, self.responses)
@@ -116,7 +116,7 @@ def _parse_request_heading(stream, scheme=None):
         with stream:
             method_ = Method(stream.consume_regex(rfc7230.method))
             stream.consume_regex(SP)
-            target = stream.consume_regex('[^ \t]+', 'request target'). \
+            target = stream.consume_regex('[^ \t]+', u'request target'). \
                 decode('iso-8859-1')
             stream.consume_regex(SP)
             version_ = HTTPVersion(stream.consume_regex(rfc7230.HTTP_version))

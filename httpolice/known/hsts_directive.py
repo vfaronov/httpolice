@@ -22,10 +22,10 @@ def parser_for(name):
 
 
 known = KnownDict([
- {'_': HSTSDirective('includeSubDomains'),
+ {'_': HSTSDirective(u'includeSubDomains'),
   '_citations': [RFC(6797, section=(6, 1, 2))],
   'argument': NO},
- {'_': HSTSDirective('max-age'),
+ {'_': HSTSDirective(u'max-age'),
   '_citations': [RFC(6797, section=(6, 1, 1))],
   'argument': REQUIRED,
   'parser': rfc6797.max_age_value},

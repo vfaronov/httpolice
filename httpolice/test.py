@@ -53,7 +53,7 @@ def load_test_file(filename):
     if scheme == u'noscheme':
         scheme = None
 
-    with open(filename) as f:
+    with open(filename, 'rb') as f:
         data = f.read()
     header, data = data.split('======== BEGIN INBOUND STREAM ========\r\n')
     inb, outb = data.split('======== BEGIN OUTBOUND STREAM ========\r\n')
@@ -124,27 +124,27 @@ class TestSyntax(unittest.TestCase):
         # some of its branches are not being exercised by our regular tests,
         # so I had to come up with these contrived examples to test them.
 
-        p = parse.many(rfc7230.tchar)                       > parse.named('p')
-        p1 = '1' * p                                        > parse.named('p1')
-        p2 = '11' * p * parse.skip('\n')                    > parse.named('p2')
-        self.assertParse(p1 | p2, '11abc', ('1', ['1', 'a', 'b', 'c']))
-        self.assertParse(p1 | p2, '11abc\n', ('11', ['a', 'b', 'c']))
+        p = parse.many(rfc7230.tchar)                      > parse.named(u'p')
+        p1 = '1' * p                                       > parse.named(u'p1')
+        p2 = '11' * p * parse.skip('\n')                   > parse.named(u'p2')
+        self.assertParse(p1 | p2, '11abc', (u'1', [u'1', u'a', u'b', u'c']))
+        self.assertParse(p1 | p2, '11abc\n', (u'11', [u'a', u'b', u'c']))
 
-        p = parse.recursive()                               > parse.named('p')
+        p = parse.recursive()                              > parse.named(u'p')
         p.rec = (rfc7230.tchar * p |
                  parse.subst(None) << parse.empty)
-        self.assertParse(p, 'abc', ('a', ('b', ('c', None))))
+        self.assertParse(p, 'abc', (u'a', (u'b', (u'c', None))))
 
-        p = parse.literal('ab')                             > parse.named('p')
-        p0 = parse.subst('') << parse.empty | p             > parse.named('p0')
-        p1 = 'xab' * p0                                     > parse.named('p1')
-        p2 = 'x' * parse.string(p0) * '!'                   > parse.named('p2')
-        self.assertParse(p1 | p2, 'xabab', ('xab', 'ab'))
-        self.assertParse(p1 | p2, 'xabab!', ('x', 'abab', '!'))
+        p = parse.literal('ab')                            > parse.named(u'p')
+        p0 = parse.subst('') << parse.empty | p            > parse.named(u'p0')
+        p1 = 'xab' * p0                                    > parse.named(u'p1')
+        p2 = 'x' * parse.string(p0) * '!'                  > parse.named(u'p2')
+        self.assertParse(p1 | p2, 'xabab', (u'xab', u'ab'))
+        self.assertParse(p1 | p2, 'xabab!', (u'x', u'abab', u'!'))
 
-        p = parse.empty | parse.literal('a')                > parse.named('p')
-        p0 = p * 'x'                                        > parse.named('x')
-        self.assertParse(p0, 'x', 'x')
+        p = parse.empty | parse.literal('a')               > parse.named(u'p')
+        p0 = p * 'x'                                       > parse.named(u'x')
+        self.assertParse(p0, 'x', u'x')
 
     def test_comma_list(self):
         p = rfc7230.comma_list(rfc7230.token)
@@ -162,10 +162,11 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, '')
         self.assertNoParse(p, '  \t ')
         self.assertNoParse(p, ' , ,, , ,')
-        self.assertParse(p, 'foo', ['foo'])
-        self.assertParse(p, 'foo,bar', ['foo', 'bar'])
-        self.assertParse(p, 'foo, bar,', ['foo', 'bar'])
-        self.assertParse(p, ', ,,,foo, ,bar, baz, ,, ,', ['foo', 'bar', 'baz'])
+        self.assertParse(p, 'foo', [u'foo'])
+        self.assertParse(p, 'foo,bar', [u'foo', u'bar'])
+        self.assertParse(p, 'foo, bar,', [u'foo', u'bar'])
+        self.assertParse(p, ', ,,,foo, ,bar, baz, ,, ,',
+                         [u'foo', u'bar', u'baz'])
         self.assertNoParse(p, 'foo,"bar"')
         self.assertNoParse(p, 'foo;bar')
 
@@ -492,7 +493,7 @@ class TestSyntax(unittest.TestCase):
             ContentRange(unit.bytes, (None, 1234)))
         self.assertParse(
             p, 'pages 1, 3, 5-7',
-            ContentRange(RangeUnit(u'pages'), '1, 3, 5-7'))
+            ContentRange(RangeUnit(u'pages'), u'1, 3, 5-7'))
         self.assertNoParse(p, 'bytes 42-1233')
         self.assertNoParse(p, 'bytes *')
         self.assertNoParse(p, 'bytes */*')
@@ -902,16 +903,16 @@ class TestResponse(unittest.TestCase):
         return [exch.responses for exch in conn.exchanges]
 
     def test_analyze_exchange(self):
-        req = Request('http',
-                      'GET', '/', 'HTTP/1.1',
-                      [('Host', 'example.com')])
+        req = Request(u'http',
+                      u'GET', u'/', u'HTTP/1.1',
+                      [(u'Host', 'example.com')])
         self.assertEqual(repr(req), '<Request GET>')
         resp1 = Response(req,
-                         'HTTP/1.1', 123, 'Please wait', [])
+                         u'HTTP/1.1', 123, u'Please wait', [])
         self.assertEqual(repr(resp1), '<Response 123>')
         resp2 = Response(req,
-                         'HTTP/1.1', 200, 'OK',
-                         [('Content-Length', 14)],
+                         u'HTTP/1.1', 200, u'OK',
+                         [(u'Content-Length', 14)],
                          'Hello world!\r\n')
         exch = analyze_exchange(req, [resp1, resp2])
         self.assertEquals(repr(exch),
@@ -952,9 +953,9 @@ class TestResponse(unittest.TestCase):
         self.assert_(resp1_1.body is None)
 
         self.assertEquals(resp2_1.status, 100)
-        self.assertEquals(resp2_1.reason, 'Continue')
+        self.assertEquals(resp2_1.reason, u'Continue')
         self.assertEquals(resp2_2.status, 100)
-        self.assertEquals(resp2_2.reason, "Keep On Rollin' Baby")
+        self.assertEquals(resp2_2.reason, u"Keep On Rollin' Baby")
         self.assertEquals(resp2_3.status, 200)
         self.assertEquals(resp2_3.headers.content_length.value, 16)
         self.assertEquals(resp2_3.body, 'Hello world!\r\n\r\n')
@@ -1000,12 +1001,12 @@ class TestResponse(unittest.TestCase):
         [[resp1]] = self.parse(inbound, stream)
         self.assertEqual(
             resp1.headers.warning.value,
-            [WarningValue(WarnCode(123), u'-', 'something', None),
+            [WarningValue(WarnCode(123), u'-', u'something', None),
              WarningValue(WarnCode(234), u'[::0]:8080', 'something else',
                           datetime(2016, 1, 28, 8, 22, 4)),
              Unparseable,
-             WarningValue(WarnCode(456), u'baz', 'qux', None),
-             WarningValue(WarnCode(567), u'-', 'xyzzy', None)])
+             WarningValue(WarnCode(456), u'baz', u'qux', None),
+             WarningValue(WarnCode(567), u'-', u'xyzzy', None)])
         self.assertEqual(repr(resp1.headers.warning.value[0].code),
                          'WarnCode(123)')
         self.assert_(WarnCode(123) in resp1.headers.warning)
@@ -1031,18 +1032,18 @@ class TestResponse(unittest.TestCase):
             resp1.headers.www_authenticate.value,
             [
                 Parametrized(AuthScheme(u'Basic'),
-                             [(u'realm', 'my "magical" realm')]),
+                             [(u'realm', u'my "magical" realm')]),
                 Parametrized(AuthScheme(u'Foo'), None),
-                Parametrized(AuthScheme(u'Bar'), 'jgfCGSU8u=='),
+                Parametrized(AuthScheme(u'Bar'), u'jgfCGSU8u=='),
                 Parametrized(AuthScheme(u'Baz'), None),
                 Unparseable,
                 Parametrized(AuthScheme(u'Scheme1'), [(u'foo', u'bar'),
                                                       (u'baz', u'qux')]),
                 Parametrized(AuthScheme(u'Scheme2'), None),
                 Parametrized(AuthScheme(u'Newauth'),
-                             [(u'realm', 'apps'), (u'type', u'1'),
-                              (u'title', 'Login to "apps"')]),
-                Parametrized(AuthScheme(u'basic'), [(u'realm', 'simple')]),
+                             [(u'realm', u'apps'), (u'type', u'1'),
+                              (u'title', u'Login to "apps"')]),
+                Parametrized(AuthScheme(u'basic'), [(u'realm', u'simple')]),
             ]
         )
 
@@ -1076,7 +1077,7 @@ class TestResponse(unittest.TestCase):
         rng_state = random.getstate()
         n_failed = 0
         for _ in range(20):
-            req = Request(random.choice(['http', 'https', 'foobar']),
+            req = Request(random.choice([u'http', u'https', u'foobar']),
                           random.choice(list(m)),
                           binary_garbage().decode('iso-8859-1'),
                           random.choice([http10, http11, u'HTTP/3.0']),
@@ -1104,10 +1105,10 @@ class TestResponse(unittest.TestCase):
                 n_failed += 1
         if n_failed > 0:
             filename = 'fuzz-rng-state.pickle'
-            with open(filename, 'w') as outf:
+            with open(filename, 'wb') as outf:
                 pickle.dump(rng_state, outf)
-            self.fail('%d exchanges caused errors; '
-                      'RNG state dumped into %s' % (n_failed, filename))
+            self.fail(u'%d exchanges caused errors; '
+                      u'RNG state dumped into %s' % (n_failed, filename))
 
 
 class TestFromFiles(unittest.TestCase):
@@ -1148,7 +1149,7 @@ class TestFromFiles(unittest.TestCase):
         self.assertEquals(self.covered, set(notices))
         if self.examples is not None:
             self.assertEquals(self.covered, set(self.examples))
-            with open(self.examples_filename, 'w') as f:
+            with open(self.examples_filename, 'wb') as f:
                 f.write(render_notice_examples(
                     (notices[ident], ctx)
                     for ident, ctx in sorted(self.examples.items())

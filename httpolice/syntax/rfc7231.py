@@ -53,7 +53,7 @@ def parameter(exclude=None):
     return (
         (CaseInsensitive << (token_excluding(exclude) if exclude else token)) *
         skip('=') * (token | quoted_string)
-    ) > named('parameter', RFC(7231), is_pivot=True)
+    ) > named(u'parameter', RFC(7231), is_pivot=True)
 
 type_ = token                                                           > pivot
 subtype = token                                                         > pivot
@@ -84,7 +84,7 @@ def _to_date(complain, d, m, y):
     try:
         return date(y, m, d)
     except ValueError:
-        complain(1222, date='%d-%02d-%02d' % (y, m, d))
+        complain(1222, date=u'%d-%02d-%02d' % (y, m, d))
         return Unparseable
 
 day = int << string_times(2, 2, DIGIT)                                  > pivot
@@ -112,7 +112,7 @@ def _to_time(complain, h, m, s):
         # I can ignore this for now.
         return time(h, m, s)
     except ValueError:
-        complain(1223, time='%02d:%02d:%02d' % (h, m, s))
+        complain(1223, time=u'%02d:%02d:%02d' % (h, m, s))
         return Unparseable
 
 hour = int << string_times(2, 2, DIGIT)                                 > pivot
@@ -187,7 +187,7 @@ obs_date = (_obsolete_date << rfc850_date |
 def _check_day_of_week(complain, r):
     (claimed_dow, r) = r
     if r is not Unparseable and r.weekday() != claimed_dow:
-        complain(1108, date=r.strftime('%Y-%m-%d'),
+        complain(1108, date=r.strftime(u'%Y-%m-%d'),
                  claimed=calendar.day_name[claimed_dow],
                  actual=calendar.day_name[r.weekday()])
     return r
@@ -201,7 +201,7 @@ def media_range(no_q=False):
          MediaType << type_ + '/' + '*' |
          MediaType << type_ + '/' + subtype) *
         many(skip(OWS * ';' * OWS) * parameter(exclude=['q'] if no_q else []))
-    ) > named('media-range', RFC(7231), is_pivot=True)
+    ) > named(u'media-range', RFC(7231), is_pivot=True)
 
 qvalue = (float << '0' + maybe_str('.' + string_times(0, 3, DIGIT)) |
           float << '1' + maybe_str('.' + string_times(0, 3, '0')))      > pivot

@@ -23,7 +23,7 @@ from httpolice.syntax.common import CRLF, LF
 
 class MessageView(Blackboard):
 
-    self_name = 'msg'
+    self_name = u'msg'
 
     def __init__(self, inner):
         super(MessageView, self).__init__()

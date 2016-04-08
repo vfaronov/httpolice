@@ -85,14 +85,16 @@ known = KnownDict([
  {'_': MediaType(u'application/edifact'), '_citations': [RFC(1767)]},
  {'_': MediaType(u'application/edi-x12'), '_citations': [RFC(1767)]},
  {'_': MediaType(u'application/emma+xml'),
-  '_citations': [Citation(None, 'http://www.w3.org/TR/2007/CR-emma-20071211/#media-type-registration')]},
+  '_citations': [Citation(None,
+                          u'http://www.w3.org/TR/2007/CR-emma-20071211/'
+                          u'#media-type-registration')]},
  {'_': MediaType(u'application/encaprtp'), '_citations': [RFC(6849)]},
  {'_': MediaType(u'application/epp+xml'), '_citations': [RFC(5730)]},
  {'_': MediaType(u'application/example'), '_citations': [RFC(4735)]},
  {'_': MediaType(u'application/exi'),
   '_citations': [Citation(None,
-                          'http://www.w3.org/TR/2009/'
-                          'CR-exi-20091208/#mediaTypeRegistration')]},
+                          u'http://www.w3.org/TR/2009/'
+                          u'CR-exi-20091208/#mediaTypeRegistration')]},
  {'_': MediaType(u'application/fdt+xml'), '_citations': [RFC(6726)]},
  {'_': MediaType(u'application/fits'), '_citations': [RFC(4047)]},
  {'_': MediaType(u'application/font-tdpfr'), '_citations': [RFC(3073)]},
@@ -258,12 +260,12 @@ known = KnownDict([
  {'_': MediaType(u'application/soap+xml'), '_citations': [RFC(3902)]},
  {'_': MediaType(u'application/sparql-query'),
   '_citations': [Citation(None,
-                          'http://www.w3.org/TR/2007/'
-                          'CR-rdf-sparql-query-20070614/#mediaType')]},
+                          u'http://www.w3.org/TR/2007/'
+                          u'CR-rdf-sparql-query-20070614/#mediaType')]},
  {'_': MediaType(u'application/sparql-results+xml'),
   '_citations': [Citation(None,
-                          'http://www.w3.org/TR/2007/'
-                          'CR-rdf-sparql-XMLres-20070925/#mime')]},
+                          u'http://www.w3.org/TR/2007/'
+                          u'CR-rdf-sparql-XMLres-20070925/#mime')]},
  {'_': MediaType(u'application/spirits-event+xml'), '_citations': [RFC(3910)]},
  {'_': MediaType(u'application/sql'), '_citations': [RFC(6922)]},
  {'_': MediaType(u'application/srgs'), '_citations': [RFC(4267)]},
@@ -303,13 +305,13 @@ known = KnownDict([
  {'_': MediaType(u'application/whoispp-query'), '_citations': [RFC(2957)]},
  {'_': MediaType(u'application/whoispp-response'), '_citations': [RFC(2958)]},
  {'_': MediaType(u'application/widget'),
-  '_citations': [Citation('ISO/IEC 19757-2:2003/FDAM-1',
-                          'http://www.w3.org/TR/widgets/'
-                          '#media-type-registration-for-applicationw')]},
+  '_citations': [Citation(u'ISO/IEC 19757-2:2003/FDAM-1',
+                          u'http://www.w3.org/TR/widgets/'
+                          u'#media-type-registration-for-applicationw')]},
  {'_': MediaType(u'application/x-www-form-urlencoded'),
   '_citations': [Citation(None,
-                          'http://www.w3.org/TR/html/iana.html'
-                          '#application/x-www-form-urlencoded')],
+                          u'http://www.w3.org/TR/html/iana.html'
+                          u'#application/x-www-form-urlencoded')],
   'patch': False},
  {'_': MediaType(u'application/x400-bp'), '_citations': [RFC(1494)]},
  {'_': MediaType(u'application/xacml+xml'), '_citations': [RFC(7061)]},
@@ -325,8 +327,8 @@ known = KnownDict([
   '_citations': [RFC(6502)]},
  {'_': MediaType(u'application/xhtml+xml'),
   '_citations': [Citation(None,
-                          'http://www.w3.org/TR/'
-                          'html/iana.html#application/xhtml+xml')]},
+                          u'http://www.w3.org/TR/'
+                          u'html/iana.html#application/xhtml+xml')]},
  {'_': MediaType(u'application/xml'),
   '_citations': [RFC(7303)],
   'is_xml': True,
@@ -339,8 +341,8 @@ known = KnownDict([
  {'_': MediaType(u'application/xmpp+xml'), '_citations': [RFC(3923)]},
  {'_': MediaType(u'application/xslt+xml'),
   '_citations': [Citation(None,
-                          'http://www.w3.org/TR/2007/'
-                          'REC-xslt20-20070123/#media-type-registration')]},
+                          u'http://www.w3.org/TR/2007/'
+                          u'REC-xslt20-20070123/#media-type-registration')]},
  {'_': MediaType(u'application/xv+xml'), '_citations': [RFC(4374)]},
  {'_': MediaType(u'application/yang'), '_citations': [RFC(6020)]},
  {'_': MediaType(u'application/yin+xml'), '_citations': [RFC(6020)]},
@@ -458,10 +460,11 @@ known = KnownDict([
  {'_': MediaType(u'image/jpm'), '_citations': [RFC(3745)]},
  {'_': MediaType(u'image/jpx'), '_citations': [RFC(3745)]},
  {'_': MediaType(u'image/ktx'),
-  '_citations': [Citation(None, 'http://www.khronos.org/opengles/sdk/'
-                          'tools/KTX/file_format_spec/#mimeregistration')]},
+  '_citations': [Citation(None,
+                          u'http://www.khronos.org/opengles/sdk/'
+                          u'tools/KTX/file_format_spec/#mimeregistration')]},
  {'_': MediaType(u'image/svg+xml'),
-  '_citations': [Citation(None, 'http://www.w3.org/TR/SVG/mimereg.html')]},
+  '_citations': [Citation(None, u'http://www.w3.org/TR/SVG/mimereg.html')]},
  {'_': MediaType(u'image/t38'), '_citations': [RFC(3362)]},
  {'_': MediaType(u'image/tiff'), '_citations': [RFC(3302)]},
  {'_': MediaType(u'image/tiff-fx'), '_citations': [RFC(3950)]},
@@ -510,13 +513,13 @@ known = KnownDict([
   '_citations': [RFC(2421), RFC(2423)]},
  {'_': MediaType(u'multipart/x-mixed-replace'),
   '_citations': [Citation(None,
-                          'http://www.w3.org/TR/'
-                          'html/iana.html#multipart/x-mixed-replace')]},
+                          u'http://www.w3.org/TR/'
+                          u'html/iana.html#multipart/x-mixed-replace')]},
  {'_': MediaType(u'text/1d-interleaved-parityfec'), '_citations': [RFC(6015)]},
  {'_': MediaType(u'text/cache-manifest'),
   '_citations': [Citation(None,
-                          'http://www.w3.org/TR/'
-                          'html/iana.html#text/cache-manifest')]},
+                          u'http://www.w3.org/TR/'
+                          u'html/iana.html#text/cache-manifest')]},
  {'_': MediaType(u'text/calendar'), '_citations': [RFC(5545)]},
  {'_': MediaType(u'text/css'), '_citations': [RFC(2318)]},
  {'_': MediaType(u'text/csv'), '_citations': [RFC(4180), RFC(7111)]},
@@ -534,7 +537,7 @@ known = KnownDict([
  {'_': MediaType(u'text/grammar-ref-list'), '_citations': [RFC(6787)]},
  {'_': MediaType(u'text/html'),
   '_citations': [Citation(None,
-                          'http://www.w3.org/TR/html/iana.html#text/html')],
+                          u'http://www.w3.org/TR/html/iana.html#text/html')],
   'patch': False},
  {'_': MediaType(u'text/javascript'),
   '_citations': [RFC(4329)],

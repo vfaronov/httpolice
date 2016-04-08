@@ -10,12 +10,12 @@ import httpolice
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Run HTTPolice on streams collected by tcpick.')
-    parser.add_argument('-H', '--html', action='store_true',
-                        help='render HTML report instead of plain text')
-    parser.add_argument('--only-with-notices', action='store_true',
-                        help='exclude connections that have no notices')
-    parser.add_argument('streams_dir')
+        description=u'Run HTTPolice on streams collected by tcpick.')
+    parser.add_argument(u'-H', u'--html', action=u'store_true',
+                        help=u'render HTML report instead of plain text')
+    parser.add_argument(u'--only-with-notices', action=u'store_true',
+                        help=u'exclude connections that have no notices')
+    parser.add_argument(u'streams_dir')
     args = parser.parse_args()
 
     inputs = []
@@ -45,7 +45,7 @@ def main():
         with open(outbound) as f:
             outbound_stream = f.read()
         conn = httpolice.analyze_streams(inbound_stream, outbound_stream,
-                                         scheme='http')
+                                         scheme=u'http')
         if (not args.only_with_notices) or any(conn.collect_complaints()):
             result.append(conn)
 
