@@ -99,7 +99,7 @@ def link_extension(exclude_builtin):
     ) > named(u'link-extension', RFC(5988), is_pivot=True)
 
 link_param = link_extension(exclude_builtin=True)
-for _name, _rule in _builtin_params.items():
+for _name, _rule in _builtin_params.iteritems():
     link_param = link_param | ((CaseInsensitive << literal(_name)) *
                                skip(OWS * '=' * OWS) * _rule)
 link_param = link_param                                                 > pivot

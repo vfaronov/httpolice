@@ -260,10 +260,10 @@ class RelationTypeRegistry(Registry):
 
 def make_diff(here, there):
     not_here, mismatch, not_there = [], [], []
-    for key, entry in there.items():
+    for key, entry in there.iteritems():
         if key in here:
             entry_diff = {k: {'here': here[key].get(k), 'there': v}
-                          for k, v in entry.items()
+                          for k, v in entry.iteritems()
                           if not _info_match(k, here[key].get(k), v)}
             if entry_diff:
                 entry_diff['_'] = key

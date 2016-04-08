@@ -414,7 +414,7 @@ auto = named(_AUTO)
 pivot = named(_AUTO, is_pivot=True)
 
 def fill_names(scope, citation):
-    for name, x in scope.items():
+    for name, x in scope.iteritems():
         if isinstance(x, Symbol) and x.name is _AUTO:
             x.name = name.rstrip('_').replace('_', '-')
             x.citation = citation
@@ -881,7 +881,7 @@ def _build_parse_error(stream, target_symbol, chart):
             # so if the input data just stopped there, that would work, too,
             expected[u'end of data'] = None
 
-    return ParseError(stream.point + i, found, expected.items())
+    return ParseError(stream.point + i, found, list(expected.iteritems()))
 
 
 def _find_pivots(chart, symbol, start, stack=None):

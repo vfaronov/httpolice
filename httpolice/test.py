@@ -1152,7 +1152,7 @@ class TestFromFiles(unittest.TestCase):
             with open(self.examples_filename, 'wb') as f:
                 f.write(render_notice_examples(
                     (notices[ident], ctx)
-                    for ident, ctx in sorted(self.examples.items())
+                    for ident, ctx in sorted(self.examples.iteritems())
                 ))
 
 TestFromFiles.load_tests()
