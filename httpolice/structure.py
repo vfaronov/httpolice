@@ -16,6 +16,9 @@ class _Unparseable(object):
     def __eq__(self, other):
         return False
 
+    def __hash__(self):
+        return 1
+
 Unparseable = _Unparseable()
 
 
@@ -32,6 +35,9 @@ class Parametrized(namedtuple('Parametrized', ('item', 'param'))):
 
     def __ne__(self, other):
         return (self.item != other) and super(Parametrized, self).__ne__(other)
+
+    def __hash__(self):
+        return hash(self.item)
 
     @property
     def param_names(self):
@@ -286,6 +292,9 @@ class WarningValue(namedtuple('WarningValue',
 
     def __ne__(self, other):
         return self.code != other and super(WarningValue, self).__ne__(other)
+
+    def __hash__(self):
+        return hash(self.code)
 
 
 class WarnCode(int):

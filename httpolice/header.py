@@ -174,6 +174,7 @@ class SingleHeaderView(HeaderView):
     __ne__ = lambda self, other: self._compare(other, operator.ne)
     __ge__ = lambda self, other: self._compare(other, operator.ge)
     __gt__ = lambda self, other: self._compare(other, operator.gt)
+    __hash__ = None
 
 
 class ListHeaderView(HeaderView):
