@@ -34,10 +34,16 @@ class Parametrized(namedtuple('Parametrized', ('item', 'param'))):
     __slots__ = ()
 
     def __eq__(self, other):
-        return (self.item == other) or super(Parametrized, self).__eq__(other)
+        if isinstance(other, tuple):
+            return super(Parametrized, self).__eq__(other)
+        else:
+            return self.item == other
 
     def __ne__(self, other):
-        return (self.item != other) and super(Parametrized, self).__ne__(other)
+        if isinstance(other, tuple):
+            return super(Parametrized, self).__ne__(other)
+        else:
+            return self.item != other
 
     def __hash__(self):
         return hash(self.item)
@@ -295,10 +301,16 @@ class WarningValue(namedtuple('WarningValue',
     # (like with :class:`Parametrized`).
 
     def __eq__(self, other):
-        return self.code == other or super(WarningValue, self).__eq__(other)
+        if isinstance(other, tuple):
+            return super(WarningValue, self).__eq__(other)
+        else:
+            return self.code == other
 
     def __ne__(self, other):
-        return self.code != other and super(WarningValue, self).__ne__(other)
+        if isinstance(other, tuple):
+            return super(WarningValue, self).__ne__(other)
+        else:
+            return self.code != other
 
     def __hash__(self):
         return hash(self.code)

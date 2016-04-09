@@ -108,6 +108,9 @@ class TestCommon(unittest.TestCase):
             Parametrized(CaseInsensitive(u'foo'), [(u'bar', u'qux')]),
             Parametrized(CaseInsensitive(u'foo'), [(u'bar', u'xyzzy')]))
         self.assertNotEqual(
+            Parametrized(u'foo', [(u'bar', u'qux')]),
+            Parametrized(u'foo', [(u'bar', u'xyzzy')]))
+        self.assertNotEqual(
             Parametrized(CaseInsensitive(u'foo'), [(u'bar', u'qux')]),
             Parametrized(CaseInsensitive(u'bar'), [(u'bar', u'qux')]))
 
@@ -559,7 +562,7 @@ class TestSyntax(unittest.TestCase):
                 Parametrized(
                     u'http://example.org/',
                     [
-                        (u'REL', [RelationType(u'NEXT'),
+                        (u'REL', [RelationType(u'START'),
                                   u'http://example.net/relation/other']),
                     ]
                 ),
@@ -586,7 +589,7 @@ class TestSyntax(unittest.TestCase):
                 Parametrized(
                     u'/foo/bar?baz=qux#xyzzy',
                     [
-                        (u'media', u'whatever man okay?'),
+                        (u'media', u' whatever man okay?'),
                         (u'hreflang', LanguageTag(u'en-US')),
                     ]
                 ),
