@@ -1,16 +1,26 @@
 # -*- coding: utf-8; -*-
 
-from cStringIO import StringIO
 from datetime import datetime, timedelta
-import email
 import email.errors
 import gzip
+import io
 import json
-import urlparse
 import zlib
+
+try:
+    from email import message_from_bytes as parse_email_message
+except ImportError:                             # Python 2
+    from email import message_from_string as parse_email_message
+
+try:
+    from urllib.parse import parse_qs
+except ImportError:                             # Python 2
+    from urlparse import parse_qs
 
 import defusedxml
 import defusedxml.ElementTree
+from bitstring import Bits
+import six
 
 from httpolice.blackboard import Blackboard, memoized_property
 from httpolice.header import HeadersView
@@ -19,6 +29,18 @@ from httpolice.parse import ParseError, maybe, skip
 from httpolice.structure import HeaderEntry, FieldName, Unparseable, okay
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import CRLF, LF
+
+
+# This list is taken from the HTML specification --
+# http://www.w3.org/TR/html/forms.html#url-encoded-form-data --
+# as the exhaustive list of bytes that can be output
+# by a "conformant" URL encoder.
+
+URL_ENCODED_GOOD_BYTES = Bits(
+    1 if (x in [0x25, 0x26, 0x2A, 0x2B, 0x2D, 0x2E, 0x5F] or
+          0x30 <= x < 0x40 or 0x41 <= x < 0x5B or 0x61 <= x < 0x7B) else 0
+    for x in range(256)
+)
 
 
 class MessageView(Blackboard):
@@ -58,13 +80,13 @@ class MessageView(Blackboard):
             if coding in [cc.gzip, cc.x_gzip]:
                 try:
                     r = decode_gzip(r)
-                except Exception, e:
+                except Exception as e:
                     self.complain(1037, coding=coding, error=e)
                     r = Unparseable
             elif coding == cc.deflate:
                 try:
                     r = decode_deflate(r)
-                except Exception, e:
+                except Exception as e:
                     self.complain(1037, coding=coding, error=e)
                     r = Unparseable
             elif okay(coding):
@@ -86,8 +108,9 @@ class MessageView(Blackboard):
         if not ctype.is_okay or not media_type.is_json(ctype.value.item):
             return None
         try:
-            return json.loads(self.full_content)
-        except Exception, e:
+            s = self.full_content.decode('utf-8')
+            return json.loads(s)
+        except Exception as e:
             self.complain(1038, error=e)
             return Unparseable
 
@@ -102,7 +125,7 @@ class MessageView(Blackboard):
             return defusedxml.ElementTree.fromstring(self.full_content)
         except defusedxml.DefusedXmlException:
             return Unparseable
-        except Exception, e:
+        except Exception as e:
             self.complain(1039, error=e)
             return Unparseable
 
@@ -113,9 +136,9 @@ class MessageView(Blackboard):
         ctype = self.headers.content_type
         if not ctype.is_okay or not media_type.is_multipart(ctype.value.item):
             return None
-        multipart_code = ('Content-Type: ' + ctype.entries[0].value + '\r\n'
-                          '\r\n' + self.full_content)
-        parsed = email.message_from_string(multipart_code)
+        multipart_code = (b'Content-Type: ' + ctype.entries[0].value + b'\r\n'
+                          b'\r\n' + self.full_content)
+        parsed = parse_email_message(multipart_code)
         for defect in parsed.defects:
             if isinstance(defect, email.errors.NoBoundaryInMultipartDefect):
                 self.complain(1139)
@@ -130,18 +153,11 @@ class MessageView(Blackboard):
         if not (self.headers.content_type ==
                 media.application_x_www_form_urlencoded):
             return None
-        # This list is taken from the HTML specification --
-        # http://www.w3.org/TR/html/forms.html#url-encoded-form-data --
-        # as the exhaustive list of bytes that can be output
-        # by a "conformant" URL encoder.
-        good_bytes = ([0x25, 0x26, 0x2A, 0x2B, 0x2D, 0x2E, 0x5F] +
-                      range(0x30, 0x40) + range(0x41, 0x5B) +
-                      range(0x61, 0x7B))
-        for byte in self.full_content:
-            if ord(byte) not in good_bytes:
-                self.complain(1040, offending_value=hex(ord(byte)))
+        for byte in six.iterbytes(self.full_content):
+            if not URL_ENCODED_GOOD_BYTES[byte]:
+                self.complain(1040, offending_value=byte)
                 return Unparseable
-        return urlparse.parse_qs(self.full_content)
+        return parse_qs(self.full_content.decode('ascii'))
 
     @memoized_property
     def transformed(self):
@@ -235,7 +251,7 @@ def parse_header_fields(stream):
         name = stream.maybe_consume_regex(rfc7230.field_name)
         if name is None:
             break
-        stream.consume_regex(':')
+        stream.consume_regex(b':')
         stream.consume_regex(rfc7230.OWS)
         vs = []
         while True:
@@ -243,12 +259,12 @@ def parse_header_fields(stream):
             if v is None:
                 if stream.maybe_consume_regex(rfc7230.obs_fold):
                     stream.complain(1016)
-                    vs.append(' ')
+                    vs.append(b' ')
                 else:
                     break
             else:
-                vs.append(v)
-        value = ''.join(vs)
+                vs.append(v.encode('iso-8859-1'))       # back to bytes
+        value = b''.join(vs)
         stream.consume_regex(rfc7230.OWS)
         parse_line_ending(stream)
         entries.append(HeaderEntry(FieldName(name), value))
@@ -260,7 +276,7 @@ def parse_chunk(stream):
     size = stream.parse(rfc7230.chunk_size * skip(maybe(rfc7230.chunk_ext)))
     parse_line_ending(stream)
     if size == 0:
-        return ''
+        return b''
     else:
         data = stream.consume_n_bytes(size)
         parse_line_ending(stream)
@@ -276,13 +292,13 @@ def parse_chunked(msg, stream):
                 data.append(chunk)
                 chunk = parse_chunk(stream)
             trailer = parse_header_fields(stream)
-    except ParseError, e:
+    except ParseError as e:
         stream.sane = False
         msg.complain(1005, error=e)
         msg.inner.body = Unparseable
     else:
         stream.dump_complaints(msg, u'chunked framing')
-        msg.inner.body = ''.join(data)
+        msg.inner.body = b''.join(data)
         msg.inner.trailer_entries = trailer
         if trailer:
             msg.rebuild_headers()           # Rebuid the `HeadersView` cache
@@ -296,13 +312,13 @@ def decode_transfer_coding(msg, coding):
     elif coding in [tc.gzip, tc.x_gzip]:
         try:
             msg.inner.body = decode_gzip(msg.body)
-        except Exception, e:
+        except Exception as e:
             msg.complain(1027, coding=coding, error=e)
             msg.inner.body = Unparseable
     elif coding == tc.deflate:
         try:
             msg.inner.body = decode_deflate(msg.body)
-        except Exception, e:
+        except Exception as e:
             msg.complain(1027, coding=coding, error=e)
             msg.inner.body = Unparseable
     else:
@@ -311,7 +327,7 @@ def decode_transfer_coding(msg, coding):
 
 
 def decode_gzip(data):
-    return gzip.GzipFile(fileobj=StringIO(data)).read()
+    return gzip.GzipFile(fileobj=io.BytesIO(data)).read()
 
 
 def decode_deflate(data):

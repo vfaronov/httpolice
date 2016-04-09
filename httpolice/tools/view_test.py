@@ -7,6 +7,7 @@ import sys
 
 from httpolice import HTMLReport, TextReport, analyze_streams
 import httpolice.test
+from httpolice.util.seven import stdio_as_text
 
 
 def main():
@@ -25,7 +26,7 @@ def main():
                 httpolice.test.load_test_file(join(root, filename))
             result.append(analyze_streams(inbound, outbound, scheme))
     report_cls = HTMLReport if args.html else TextReport
-    report_cls.render(result, sys.stdout)
+    report_cls.render(result, stdio_as_text(sys.stdout))
 
 
 if __name__ == '__main__':

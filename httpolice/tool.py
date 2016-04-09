@@ -1,9 +1,11 @@
 # -*- coding: utf-8; -*-
 
 import argparse
+import io
 import sys
 
 from httpolice import HTMLReport, TextReport, analyze_streams
+from httpolice.util.seven import stdio_as_text
 
 
 def main():
@@ -17,9 +19,9 @@ def main():
     parser.add_argument(u'inbound')
     parser.add_argument(u'outbound')
     args = parser.parse_args()
-    with open(args.inbound, 'rb') as f:
+    with io.open(args.inbound, 'rb') as f:
         inbound_stream = f.read()
-    with open(args.outbound, 'rb') as f:
+    with io.open(args.outbound, 'rb') as f:
         outbound_stream = f.read()
     result = analyze_streams(inbound_stream, outbound_stream,
                              args.scheme.decode('ascii'))
@@ -27,7 +29,7 @@ def main():
         report_cls = HTMLReport
     else:
         report_cls = TextReport
-    report_cls.render([result], sys.stdout)
+    report_cls.render([result], stdio_as_text(sys.stdout))
 
 
 if __name__ == '__main__':

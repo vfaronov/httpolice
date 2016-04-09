@@ -6,6 +6,7 @@ import re
 
 import dominate
 import dominate.tags as H
+import six
 
 from httpolice import known, message, notice
 from httpolice.citation import Citation
@@ -122,15 +123,15 @@ def expand_piece(piece):
         return piece.name
 
     else:
-        return unicode(piece)
+        return six.text_type(piece)
 
 
 def expand_parse_error(error):
     paras = [[u'Parse error at byte offset %d.' % error.point]]
-    if error.found == '':
+    if error.found == b'':
         paras.append([u'Found end of data.'])
     elif error.found is not None:
-        paras.append([u'Found: %s' % format_chars(error.found)])
+        paras.append([u'Found: %s' % format_chars([error.found])])
 
     for i, (option, as_part_of) in enumerate(error.expected):
         if i == 0:
@@ -162,7 +163,7 @@ class TextReport(Report):
 
     def _write(self, s):
         self.written = True
-        self.outfile.write(s.encode('utf-8'))
+        self.outfile.write(s)
 
     def _write_more(self, s):
         if self.written:
@@ -246,16 +247,16 @@ def piece_to_text(piece, ctx):
     elif isinstance(piece, notice.Cite):
         quote = piece.content
         if quote:
-            quote = re.sub(ur'\s+', u' ', piece_to_text(quote, ctx)).strip()
+            quote = re.sub(u'\\s+', u' ', piece_to_text(quote, ctx)).strip()
             return u'“%s” (%s)' % (quote, piece.info)
         else:
-            return unicode(piece.info)
+            return six.text_type(piece.info)
 
     elif isinstance(piece, ParseError):
         return u''.join(piece_to_text(para, ctx) + u'\n'
                         for para in expand_parse_error(piece))
 
-    elif isinstance(piece, unicode):
+    elif isinstance(piece, six.text_type):
         return piece
 
     else:
@@ -278,7 +279,7 @@ class HTMLReport(Report):
             _include_scripts()
 
     def _close(self):
-        self.outfile.write(self.document.render().encode('utf-8'))
+        self.outfile.write(self.document.render())
 
     def _render_item(self, item):
         with self.document:
@@ -300,7 +301,7 @@ class HTMLReport(Report):
     def _render_annotated(self, pieces):
         for piece in pieces:
             with H.span(_class=u'annotated-piece', **for_object(piece)):
-                if isinstance(piece, str):
+                if isinstance(piece, bytes):
                     H.span(printable(piece.decode('iso-8859-1')))
                 else:
                     known_to_html(piece)
@@ -387,20 +388,20 @@ def for_object(obj, extra_class=u''):
     assert okay(obj)
     return {
         u'class': u'%s %s' % (type(obj).__name__, extra_class),
-        u'id': unicode(id(obj)),
+        u'id': six.text_type(id(obj)),
     }
 
 
 def reference_targets(obj):
     if isinstance(obj, HeaderView):
-        return [u'#' + unicode(id(entry)) for entry in obj.entries]
+        return [u'#' + six.text_type(id(entry)) for entry in obj.entries]
     elif isinstance(obj, list):
         # Support no. 1013, where we want to highlight all entries,
         # not just the one which is ultimately selected by `SingleHeaderView`.
         # Makes sense in general, so I'm inclined not to consider it a hack.
         return [ref for item in obj for ref in reference_targets(item)]
     else:
-        return [u'#' + unicode(id(obj))]
+        return [u'#' + six.text_type(id(obj))]
 
 
 def known_to_html(obj):
@@ -408,9 +409,10 @@ def known_to_html(obj):
     cite = known.citation(obj)
     title = known.title(obj, with_citation=True)
     if cite:
-        elem = H.a(unicode(obj), _class=cls, href=cite.url, target=u'_blank')
+        elem = H.a(six.text_type(obj), _class=cls, href=cite.url,
+                   target=u'_blank')
     else:
-        elem = H.span(unicode(obj), _class=cls)
+        elem = H.span(six.text_type(obj), _class=cls)
     if title:
         with elem:
             H.attr(title=title)
@@ -421,7 +423,8 @@ def notice_to_html(the_notice, ctx, for_example=False):
         with H.p(_class=u'notice-heading', __inline=True):
             if not for_example:
                 with H.span(_class=u'notice-info'):
-                    H.span(unicode(the_notice.ident), _class=u'notice-ident')
+                    H.span(six.text_type(the_notice.ident),
+                           _class=u'notice-ident')
                     H.span(u' ')
                     H.span(the_notice.severity_short,
                            _class=u'notice-severity',
@@ -467,7 +470,7 @@ def piece_to_html(piece, ctx):
     elif known.is_known(piece):
         known_to_html(piece)
 
-    elif isinstance(piece, unicode):
+    elif isinstance(piece, six.text_type):
         H.span(piece)
 
     else:
@@ -486,8 +489,8 @@ def render_notice_examples(examples):
             with H.tbody():
                 for the_notice, ctx in examples:
                     with H.tr():
-                        H.td(unicode(the_notice.ident))
+                        H.td(six.text_type(the_notice.ident))
                         H.td(the_notice.severity)
                         with H.td():
                             notice_to_html(the_notice, ctx, for_example=True)
-    return doc.render().encode('utf-8')
+    return doc.render()

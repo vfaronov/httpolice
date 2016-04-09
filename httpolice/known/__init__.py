@@ -39,7 +39,7 @@ def is_known(obj):
 
 
 def get_info(obj):
-    for cls, known in classes.iteritems():
+    for cls, known in classes.items():
         if isinstance(obj, cls):
             return known.get_info(obj)
 

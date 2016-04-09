@@ -2,29 +2,31 @@
 
 import string
 
+import six
+
 
 CHAR_NAMES = {
-    '\t': u'tab',
-    '\n': u'LF',
-    '\r': u'CR',
-    ' ': u'space',
-    '"': u'double quote (")',
-    "'": u"single quote (')",
-    ',': u'comma (,)',
-    '.': u'period (.)',
-    ';': u'semicolon (;)',
-    '-': u'dash (-)',
+    b'\t': u'tab',
+    b'\n': u'LF',
+    b'\r': u'CR',
+    b' ': u'space',
+    b'"': u'double quote (")',
+    b"'": u"single quote (')",
+    b',': u'comma (,)',
+    b'.': u'period (.)',
+    b';': u'semicolon (;)',
+    b'-': u'dash (-)',
 }
 
 
 def nicely_join(strings):
     """
-    >>> nicely_join([u'foo'])
-    u'foo'
-    >>> nicely_join([u'foo', u'bar baz'])
-    u'foo and bar baz'
-    >>> nicely_join([u'foo', u'bar baz', u'qux'])
-    u'foo, bar baz, and qux'
+    >>> print(nicely_join([u'foo']))
+    foo
+    >>> print(nicely_join([u'foo', u'bar baz']))
+    foo and bar baz
+    >>> print(nicely_join([u'foo', u'bar baz', u'qux']))
+    foo, bar baz, and qux
     """
     joined = u''
     for i, s in enumerate(strings):
@@ -55,31 +57,36 @@ def _char_ranges(chars, as_hex=False):
     if as_hex:
         show = lambda point: u'%#04x' % point
     else:
-        show = lambda point: chr(point).decode('ascii')
+        show = six.unichr
     return [
         (u'%s' % show(p1)) if p1 == p2 else (u'%s–%s' % (show(p1), show(p2)))
         for (p1, p2) in intervals]
 
 
 def format_chars(chars):
-    r"""
-    >>> format_chars('\x00\x04\x05\x06\x07 0123456789ABCDEF')
-    u'A\u2013F or 0\u20139 or space or 0x00 or 0x04\u20130x07'
+    u"""
+    >>> print(format_chars([b'\\x00', b'\\x04', b'\\x05', b'\\x06', b'\\x07',
+    ...                     b' ', b'0', b'1', b'2', b'3', b'4', b'5', b'6',
+    ...                     b'7', b'8', b'9', b'A', b'B', b'C', b'D', b'E',
+    ...                     b'F']))
+    A–F or 0–9 or space or 0x00 or 0x04–0x07
 
-    >>> format_chars('\t ')
-    u'tab or space'
+    >>> print(format_chars([b'\\t', b' ']))
+    tab or space
 
-    >>> format_chars("!#$%&'*+.0123456789abcdef")
-    u"a\u2013f or 0\u20139 or single quote (') or period (.) or !#$%&*+"
+    >>> print(format_chars([b'!', b'#', b'$', b'%', b'&', b"'", b'*', b'+',
+    ...                     b'.', b'0', b'1', b'2', b'3', b'4', b'5', b'6',
+    ...                     b'7', b'8', b'9', b'a', b'b', b'c', b'd', b'e']))
+    a–e or 0–9 or single quote (') or period (.) or !#$%&*+
 
-    >>> format_chars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
-    u'A\u2013Z or a\u2013z'
+    >>> print(format_chars([b'V', b'W', b'X', b'Y', b'Z', b'a', b'b', b'c']))
+    V–Z or a–c
     """
     (letters, digits, named, visible, other) = ([], [], [], [], [])
     for c in chars:
-        if c in string.ascii_letters:
+        if c.decode('iso-8859-1') in string.ascii_letters:
             letters.append(c)
-        elif c in string.digits:
+        elif c.decode('iso-8859-1') in string.digits:
             digits.append(c)
         elif c in CHAR_NAMES:
             named.append(c)

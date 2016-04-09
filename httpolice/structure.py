@@ -1,6 +1,9 @@
 # -*- coding: utf-8; -*-
 
 from collections import namedtuple
+import sys
+
+import six
 
 
 # Commonly useful structures for representing various elements of the protocol
@@ -52,7 +55,10 @@ class Versioned(namedtuple('Versioned', ('item', 'version'))):
         if self.version:
             return u'%s/%s' % self
         else:
-            return unicode(self.item)
+            return six.text_type(self.item)
+
+    if sys.version_info[0] >= 3:
+        __str__ = __unicode__
 
 
 class Quoted(namedtuple('Quoted', ('item',))):
@@ -60,12 +66,13 @@ class Quoted(namedtuple('Quoted', ('item',))):
     __slots__ = ()
 
 
-class ProtocolString(unicode):
+class ProtocolString(six.text_type):
 
     __slots__ = ()
 
     def __repr__(self):
-        return '%s(%s)' % (self.__class__.__name__, unicode.__repr__(self))
+        return '%s(%s)' % (self.__class__.__name__,
+                           six.text_type.__repr__(self))
 
 
 class CaseInsensitive(ProtocolString):
@@ -73,7 +80,7 @@ class CaseInsensitive(ProtocolString):
     __slots__ = ()
 
     def __eq__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, six.text_type):
             return self.lower() == other.lower()
         else:
             return False
@@ -106,7 +113,7 @@ class Message(object):
         self.version = HTTPVersion(version)
         self.header_entries = [HeaderEntry(k, v)
                                for k, v in header_entries]
-        self.body = body if body is None else str(body)
+        self.body = body if body is None else bytes(body)
         self.trailer_entries = [HeaderEntry(k, v)
                                 for k, v in trailer_entries or []]
 
@@ -119,9 +126,9 @@ class Request(Message):
                  body=None, trailer_entries=None):
         super(Request, self).__init__(version, header_entries,
                                       body, trailer_entries)
-        self.scheme = scheme if scheme is None else unicode(scheme)
+        self.scheme = scheme if scheme is None else six.text_type(scheme)
         self.method = Method(method)
-        self.target = unicode(target)
+        self.target = six.text_type(target)
 
     def __repr__(self):
         return '<Request %s>' % self.method
@@ -137,7 +144,7 @@ class Response(Message):
                                        body, trailer_entries)
         self.request = request
         self.status = StatusCode(status)
-        self.reason = reason if reason is None else unicode(reason)
+        self.reason = reason if reason is None else six.text_type(reason)
 
     def __repr__(self):
         return '<Response %d>' % self.status
@@ -177,7 +184,7 @@ class HeaderEntry(namedtuple('HeaderEntry', ('name', 'value'))):
 
     def __new__(cls, name, value):
         return super(HeaderEntry, cls).__new__(cls,
-                                               FieldName(name), str(value))
+                                               FieldName(name), bytes(value))
 
     def __repr__(self):
         return '<HeaderEntry %s>' % self.name

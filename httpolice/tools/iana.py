@@ -1,9 +1,16 @@
 # -*- coding: utf-8; -*-
 
+from __future__ import print_function
+
 import pprint
 import re
-import urllib2
-import urlparse
+
+try:
+    from urllib.request import Request, urlopen
+    from urllib.parse import urljoin
+except ImportError:                             # Python 2
+    from urllib2 import Request, urlopen
+    from urlparse import urljoin
 
 import lxml.etree
 
@@ -49,11 +56,11 @@ class Registry(object):
         return [(self.cls, entries)]
 
     def _get_xml(self, relative_url):
-        req = urllib2.Request(
-            urlparse.urljoin(self.base_url, relative_url),
+        req = Request(
+            urljoin(self.base_url, relative_url),
             headers={'Accept': 'text/xml, application/xml',
                      'User-Agent': 'HTTPolice-IANA-tool Python-urllib'})
-        return lxml.etree.parse(urllib2.urlopen(req))
+        return lxml.etree.parse(urlopen(req))
 
     def _from_record(self, record):
         raise NotImplementedError()
@@ -260,10 +267,10 @@ class RelationTypeRegistry(Registry):
 
 def make_diff(here, there):
     not_here, mismatch, not_there = [], [], []
-    for key, entry in there.iteritems():
+    for key, entry in there.items():
         if key in here:
             entry_diff = {k: {'here': here[key].get(k), 'there': v}
-                          for k, v in entry.iteritems()
+                          for k, v in entry.items()
                           if not _info_match(k, here[key].get(k), v)}
             if entry_diff:
                 entry_diff['_'] = key
@@ -299,9 +306,9 @@ def main():
                                    ('mismatch', mismatch),
                                    ('not there', not_there)]:
                 if updates:
-                    print '======== %s %s ========\n' % (cls.__name__, title)
+                    print('======== %s %s ========\n' % (cls.__name__, title))
                     pprint.pprint(updates)
-                    print '\n'
+                    print('\n')
 
 
 if __name__ == '__main__':

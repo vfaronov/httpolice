@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import io
 import os
 import sys
 
 import httpolice
+from httpolice.util.seven import stdio_as_text
 
 
 def main():
@@ -40,9 +42,9 @@ def main():
 
     result = []
     for inbound, outbound, _ in inputs:
-        with open(inbound) as f:
+        with io.open(inbound, 'rb') as f:
             inbound_stream = f.read()
-        with open(outbound) as f:
+        with io.open(outbound, 'rb') as f:
             outbound_stream = f.read()
         conn = httpolice.analyze_streams(inbound_stream, outbound_stream,
                                          scheme=u'http')
@@ -53,7 +55,7 @@ def main():
         report_cls = httpolice.HTMLReport
     else:
         report_cls = httpolice.TextReport
-    report_cls.render(result, sys.stdout)
+    report_cls.render(result, stdio_as_text(sys.stdout))
 
 if __name__ == '__main__':
     sys.exit(main())

@@ -13,9 +13,9 @@ from httpolice.syntax.common import SP
 
 def analyze_streams(inbound, outbound, scheme=None):
     """
-    :type inbound: str
-    :type outbound: str
-    :type scheme: unicode | None
+    :type inbound: bytes
+    :type outbound: bytes
+    :type scheme: six.text_type | None
     """
     conn = Connection()
     parse_streams(conn, inbound, outbound, scheme=scheme)
@@ -43,8 +43,8 @@ class Connection(Blackboard):
                  unparsed_inbound=None, unparsed_outbound=None):
         """
         :type exchanges: list[Exchange]
-        :type unparsed_inbound: str | None
-        :type unparsed_outbound: str | None
+        :type unparsed_inbound: bytes | None
+        :type unparsed_outbound: bytes | None
         """
         super(Connection, self).__init__()
         self.exchanges = exchanges or []
@@ -116,13 +116,12 @@ def _parse_request_heading(stream, scheme=None):
         with stream:
             method_ = Method(stream.consume_regex(rfc7230.method))
             stream.consume_regex(SP)
-            target = stream.consume_regex('[^ \t]+', u'request target'). \
-                decode('iso-8859-1')
+            target = stream.consume_regex(b'[^ \t]+', u'request target')
             stream.consume_regex(SP)
             version_ = HTTPVersion(stream.consume_regex(rfc7230.HTTP_version))
             message.parse_line_ending(stream)
             entries = message.parse_header_fields(stream)
-    except ParseError, e:
+    except ParseError as e:
         stream.sane = False
         stream.complain(1006, error=e)
         return Unparseable
@@ -199,11 +198,10 @@ def _parse_response_heading(req, stream):
             stream.consume_regex(SP)
             status = StatusCode(stream.consume_regex(rfc7230.status_code))
             stream.consume_regex(SP)
-            reason = stream.consume_regex(rfc7230.reason_phrase). \
-                decode('iso-8859-1')
+            reason = stream.consume_regex(rfc7230.reason_phrase)
             message.parse_line_ending(stream)
             entries = message.parse_header_fields(stream)
-    except ParseError, e:
+    except ParseError as e:
         stream.complain(1009, error=e)
         stream.sane = False
         return Unparseable

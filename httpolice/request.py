@@ -1,7 +1,13 @@
 # -*- coding: utf-8; -*-
 
 import base64
-import urlparse
+
+try:
+    from urllib.parse import urlparse
+except ImportError:                             # Python 2
+    from urlparse import urlparse
+
+import six
 
 from httpolice import message, parse
 from httpolice.blackboard import memoized_property
@@ -147,7 +153,7 @@ def check_request(req):
         req.complain(1062)
 
     if req.headers.expect.is_present:
-        if req.headers.expect == '100-continue':
+        if req.headers.expect == b'100-continue':
             if not req.body:
                 req.complain(1066)
         else:
@@ -159,7 +165,7 @@ def check_request(req):
 
     if req.headers.referer.is_okay:
         if req.scheme == u'http':
-            parsed = urlparse.urlparse(req.headers.referer.value)
+            parsed = urlparse(req.headers.referer.value)
             if parsed.scheme == u'https':
                 req.complain(1068)
 
@@ -235,22 +241,21 @@ def check_request(req):
         if hdr.is_okay:
             scheme, credentials = hdr.value
             if scheme == auth.basic:
-                if isinstance(credentials, unicode):        # ``token68`` form
+                if isinstance(credentials, six.text_type):   # ``token68`` form
                     try:
                         credentials = base64.b64decode(credentials)
-                    except Exception, e:
+                    except Exception as e:
                         req.complain(1210, header=hdr, error=e)
                     else:
                         # RFC 7617 section 2 requires that,
                         # whatever the encoding of the credentials,
                         # it must be ASCII-compatible,
                         # so we don't need to know it.
-                        if ':' not in credentials:
+                        if b':' not in credentials:
                             req.complain(1211, header=hdr)
-                        for c in credentials:
-                            if CTL.match(c):
-                                req.complain(1212, header=hdr,
-                                             char=hex(ord(c)))
+                        for c in six.iterbytes(credentials):
+                            if CTL.match(six.int2byte(c)):
+                                req.complain(1212, header=hdr, char=hex(c))
                 else:
                     req.complain(1209, header=hdr)
 

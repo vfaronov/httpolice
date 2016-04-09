@@ -10,6 +10,6 @@ HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 14
-Content-Location: https://example.com:443/index.html
+Content-Location: https://example.com/index.html
 
 Hello world!

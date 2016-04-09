@@ -5,6 +5,7 @@ import operator
 import re
 
 from bitstring import BitArray, Bits
+import six
 
 from httpolice.util.text import format_chars
 
@@ -91,7 +92,7 @@ class Symbol(object):
 
     def __rlshift__(self, func):
         if isinstance(func, type) and not (func is int or func is float or
-                                           func is unicode):
+                                           func is six.text_type):
             is_ephemeral = False
         else:
             is_ephemeral = None
@@ -116,7 +117,7 @@ class Terminal(Symbol):
         self.bits = bits if bits is not None else Bits(256)
 
     def chars(self):
-        return [chr(i) for (i, v) in enumerate(self.bits) if v]
+        return [six.int2byte(i) for (i, v) in enumerate(self.bits) if v]
 
     def match(self, char):
         return self.bits[ord(char)]
@@ -125,7 +126,7 @@ class Terminal(Symbol):
         return self
 
     def build_regex(self):
-        return '[' + ''.join(re.escape(char) for char in self.chars()) + ']'
+        return b'[' + b''.join(re.escape(char) for char in self.chars()) + b']'
 
     def as_rule(self):
         return Rule((self,))
@@ -163,8 +164,8 @@ class Nonterminal(Symbol):
         raise NotImplementedError
 
     def build_regex(self):
-        return '(' + '|'.join(''.join(sym.as_regex() for sym in rule.symbols)
-                              for rule in self.rules) + ')'
+        return b'(' + b'|'.join(b''.join(sym.as_regex() for sym in rule.symbols)
+                                for rule in self.rules) + b')'
 
     def as_rule(self):
         if self.is_ephemeral and len(self.rules) == 1:
@@ -248,9 +249,9 @@ class RepeatedNonterminal(Nonterminal):
 
     def build_regex(self):
         if self.max_count is None:
-            return self.inner.as_regex() + '*'
+            return self.inner.as_regex() + b'*'
         else:
-            return self.inner.as_regex() + ('{0,%d}' % self.max_count)
+            return self.inner.as_regex() + (b'{0,%d}' % self.max_count)
 
 
 class Rule(object):
@@ -384,7 +385,7 @@ def string1(inner):
 
 
 def string_excluding(terminal, excluding):
-    initials = set(s[0].lower() for s in excluding if s)
+    initials = set(s[0:1].lower() for s in excluding if s)
 
     free = terminal
     for c in initials:
@@ -392,7 +393,7 @@ def string_excluding(terminal, excluding):
 
     r = free + string(terminal)
     for c in initials:
-        continuations = [s[1:] for s in excluding if s and s[0].lower() == c]
+        continuations = [s[1:] for s in excluding if s and s[0:1].lower() == c]
         r = r | literal(c) + string_excluding(terminal, continuations)
     if '' not in excluding:
         r = r | subst(u'') << empty
@@ -414,7 +415,7 @@ auto = named(_AUTO)
 pivot = named(_AUTO, is_pivot=True)
 
 def fill_names(scope, citation):
-    for name, x in scope.iteritems():
+    for name, x in scope.items():
         if isinstance(x, Symbol) and x.name is _AUTO:
             x.name = name.rstrip('_').replace('_', '-')
             x.citation = citation
@@ -481,9 +482,9 @@ class Stream(object):
 
     def __getitem__(self, i):
         if 0 <= i < len(self.data) - self.point:
-            return self.data[self.point + i]
+            return self.data[(self.point + i):(self.point + i + 1)]
         elif i == len(self.data) - self.point:
-            return ''
+            return b''
         else:
             raise IndexError(i)
 
@@ -521,7 +522,7 @@ class Stream(object):
         else:
             r = match.group(0)
             self.skip(len(r))
-            return r
+            return r.decode('iso-8859-1')
 
     def maybe_consume_regex(self, target):
         try:
@@ -556,7 +557,7 @@ class Stream(object):
                 r.append(obj)
                 i = end
         r.append(self.data[i:])
-        return [chunk for chunk in r if chunk != '']
+        return [chunk for chunk in r if chunk != b'']
 
 
 class ParseError(Exception):
@@ -881,7 +882,7 @@ def _build_parse_error(stream, target_symbol, chart):
             # so if the input data just stopped there, that would work, too,
             expected[u'end of data'] = None
 
-    return ParseError(stream.point + i, found, list(expected.iteritems()))
+    return ParseError(stream.point + i, found, list(expected.items()))
 
 
 def _find_pivots(chart, symbol, start, stack=None):

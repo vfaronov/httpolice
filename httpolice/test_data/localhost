@@ -1,9 +1,4 @@
-# `urlnorm` has a `bug`__ that causes it to raise an exception
-# on authorities such as ``localhost``.
-# We don't work around this bug (yet),
-# but let's at least make sure that we don't traceback on these valid URLs.
-#
-# __ https://github.com/jehiah/urlnorm/issues/3
+
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1

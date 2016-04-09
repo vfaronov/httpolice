@@ -1,5 +1,10 @@
 # -*- coding: utf-8; -*-
 
+try:
+    from urlparse import urljoin, urlparse
+except ImportError:                                     # Python 2
+    from urllib.parse import urljoin, urlparse
+
 from httpolice import message
 from httpolice.blackboard import memoized_property
 from httpolice.known import (
@@ -21,9 +26,6 @@ from httpolice.known import (
 )
 from httpolice.known.status_code import NOT_AT_ALL, NOT_BY_DEFAULT
 from httpolice.structure import EntityTag, http10, http11, okay
-from httpolice.util.uri import url_equals
-
-import urlparse
 
 
 class ResponseView(message.MessageView):
@@ -180,7 +182,7 @@ def check_response_itself(resp):
     if headers.location.is_present:
         if status == st.created:
             if headers.location.is_okay and \
-                    urlparse.urlparse(headers.location.value).fragment:
+                    urlparse(headers.location.value).fragment:
                 resp.complain(1111)
         elif not status.redirection:
             resp.complain(1112)
@@ -353,9 +355,9 @@ def check_response_in_context(resp, req):
         resp.complain(1071)
 
     if resp.headers.content_location.is_okay and req.effective_uri:
-        absolute_content_location = urlparse.urljoin(
+        absolute_content_location = urljoin(
             req.effective_uri, resp.headers.content_location.value)
-        if url_equals(req.effective_uri, absolute_content_location):
+        if req.effective_uri == absolute_content_location:
             if req.method in [m.GET, m.HEAD] and resp.status in [
                     st.ok, st.non_authoritative_information,
                     st.no_content, st.partial_content,
@@ -365,9 +367,8 @@ def check_response_in_context(resp, req):
                 resp.complain(1060)
 
     if resp.headers.location.is_okay and req.effective_uri and req.scheme:
-        location = urlparse.urljoin(req.effective_uri,
-                                    resp.headers.location.value)
-        if url_equals(req.effective_uri, location):
+        location = urljoin(req.effective_uri, resp.headers.location.value)
+        if req.effective_uri == location:
             if resp.status in [st.multiple_choices, st.temporary_redirect,
                                st.permanent_redirect]:
                 resp.complain(1085)

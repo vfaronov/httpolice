@@ -1,15 +1,21 @@
 # -*- coding: utf-8; -*-
 
+import sys
+
+import six
+
 
 class Citation(object):
 
     __slots__ = ('title', 'url')
     __unicode__ = lambda self: self.title or self.url
+    if sys.version_info[0] >= 3:
+        __str__ = __unicode__
     __repr__ = lambda self: 'Citation(%r, %r)' % (self.title, self.url)
 
     def __init__(self, title, url):
-        self.title = unicode(title)
-        self.url = unicode(url)
+        self.title = six.text_type(title)
+        self.url = six.text_type(url)
 
     def __eq__(self, other):
         return isinstance(other, Citation) and \
@@ -56,7 +62,7 @@ class RFC(Citation):
         else:
             url = u'http://tools.ietf.org/html/rfc%d' % num
             if section or appendix:
-                section_text = u'.'.join(unicode(n)
+                section_text = u'.'.join(six.text_type(n)
                                          for n in section or appendix)
                 word1 = u'§' if section else u'appendix'
                 word2 = u'section' if section else u'appendix'

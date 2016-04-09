@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 import operator
+import sys
 
 from httpolice import known, parse
 from httpolice.known import cache_directive, h, header
@@ -94,7 +95,7 @@ class HeaderView(object):
                                       annotate_classes=known.classes)
                 try:
                     parsed = stream.parse(parser, to_eof=True)
-                except parse.ParseError, e:
+                except parse.ParseError as e:
                     self.message.complain(1000, entry=entry, error=e)
                     parsed = Unparseable
                 else:
@@ -134,8 +135,11 @@ class HeaderView(object):
     def is_okay(self):
         return okay(self.value)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.value)
+
+    if sys.version_info[0] < 3:
+        __nonzero__ = __bool__
 
 
 class UnknownHeaderView(HeaderView):
@@ -144,7 +148,7 @@ class UnknownHeaderView(HeaderView):
         # RFC 7230 section 3.2.2 permits combining field-values with a comma
         # even if we don't really know what the header is.
         entries, values = self._pre_parse()
-        self._value = ','.join(values) if values else None
+        self._value = b','.join(values) if values else None
         self._entries = entries
 
 
@@ -241,7 +245,7 @@ class DirectivesView(ListHeaderView):
                 stream = parse.Stream(argument.encode('iso-8859-1'))
                 try:
                     argument = stream.parse(parser, to_eof=True)
-                except parse.ParseError, e:
+                except parse.ParseError as e:
                     complain(1158, error=e)
                     argument = Unparseable
                 else:
