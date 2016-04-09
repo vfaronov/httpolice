@@ -14,8 +14,8 @@ class Citation(object):
     __repr__ = lambda self: 'Citation(%r, %r)' % (self.title, self.url)
 
     def __init__(self, title, url):
-        self.title = six.text_type(title)
-        self.url = six.text_type(url)
+        self.title = title
+        self.url = url
 
     def __eq__(self, other):
         return isinstance(other, Citation) and \
