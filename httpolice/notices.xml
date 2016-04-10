@@ -1554,8 +1554,8 @@
   <error id="1213">
     <title><ref to="msg.method"/> with <ref to="msg.headers.content_type"/>: <ref to="msg.headers.content_type.value"/></title>
     <explain>The <m>PATCH</m> method only makes sense with media types that define how to apply the patch. <ref to="msg.headers.content_type.value"/> is not such a media type.</explain>
+    <explain>See <rfc num="5789" errata="3169"/>.</explain>
     <explain>For example, <media>application/merge-patch+json</media> would be a suitable patch format for JSON.</explain>
-    <explain>See also <rfc num="5789" errata="3169"/>.</explain>
   </error>
 
   <comment id="1214">
@@ -1643,5 +1643,12 @@
    cases, using a separate relation type is preferable.
     </rfc>
   </comment>
+
+  <error id="1227">
+    <title><ref to="msg.headers.accept_patch"/>: <ref to="patch_type"/></title>
+    <explain>The <m>PATCH</m> method only makes sense with media types that define how to apply the patch. <ref to="patch_type"/> is not such a media type. But this response’s <ref to="msg.headers.accept_patch"/> header invites the client to send patches of type <ref to="patch_type"/>.</explain>
+    <explain>See <rfc num="5789" errata="3169"/>.</explain>
+    <explain>For example, <media>application/merge-patch+json</media> would be a suitable patch format for JSON.</explain>
+  </error>
 
 </notices>

@@ -311,6 +311,10 @@ def check_response_itself(resp):
                 resp.complain(1220, directive=direct)
             seen.add(direct)
 
+    for patch_type in headers.accept_patch.okay:
+        if media_type.is_patch(patch_type.item) == False:
+            resp.complain(1227, patch_type=patch_type.item)
+
 
 def check_response_in_context(resp, req):
     if resp.body and resp.headers.content_type.is_absent and \
