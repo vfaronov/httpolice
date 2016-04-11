@@ -5,7 +5,7 @@ GET / HTTP/1.1
 Host: example.com
 User-Agent: demo
 Upgrade: h2c
-HTTP2-Settings: AAQAAP//
+HTTP2-Settings: AAQAAP__
 Connection: upgrade, http2-settings
 
 ======== BEGIN OUTBOUND STREAM ========

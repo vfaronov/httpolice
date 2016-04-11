@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 import base64
+import string
 
 try:
     from urllib.parse import urlparse
@@ -276,3 +277,8 @@ def check_request(req):
     if req.headers.http2_settings and \
             u'HTTP2-Settings' not in req.headers.connection:
         req.complain(1230)
+
+    if req.headers.http2_settings.is_okay:
+        for c in req.headers.http2_settings.value:
+            if c not in string.ascii_letters + string.digits + '-_':
+                req.complain(1234, char=c)

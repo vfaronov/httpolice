@@ -1,12 +1,12 @@
-1050
+1234
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
 Host: example.com
 User-Agent: demo
 Upgrade: h2c
-HTTP2-Settings: AAQAAP__
-Connection: http2-settings
+HTTP2-Settings: AAQAAP__AA==
+Connection: upgrade, http2-settings
 
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 200 OK
