@@ -369,6 +369,7 @@ class TestSyntax(unittest.TestCase):
         self.assertParse(p, b'telnet://192.0.2.16:80/')
         self.assertParse(
             p, b'urn:oasis:names:specification:docbook:dtd:xml:4.1.2')
+        self.assertParse(p, b'http://[fe80::a%25en1]')      # RFC 6874
 
     def test_partial_uri(self):
         p = rfc7230.partial_URI

@@ -51,9 +51,15 @@ IPv6address = (
     maybe_str(string_times(0, 5, h16 + ':') + h16) + '::' + h16 |
     maybe_str(string_times(0, 6, h16 + ':') + h16) + '::'
     )                                                                   > pivot
+
 IPvFuture = ('v' + string1(HEXDIG) + '.' +
              string1(unreserved | sub_delims | ':'))                    > pivot
-IP_literal = '[' + (IPv6address | IPvFuture) + ']'                      > pivot
+
+# As updated by RFC 6874
+ZoneID = string1(unreserved | pct_encoded)                              > pivot
+IPv6addrz = IPv6address + '%25' + ZoneID                                > pivot
+IP_literal = '[' + (IPv6address | IPv6addrz | IPvFuture) + ']'          > pivot
+
 reg_name = string(unreserved | sub_delims | pct_encoded)                > pivot
 host = IP_literal | IPv4address | reg_name                              > pivot
 port = string(DIGIT)                                                    > pivot
