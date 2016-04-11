@@ -33,7 +33,7 @@ def main():
         outbound = os.path.join(args.streams_dir,
                                 name.replace('.serv.', '.clnt.'))
         if not os.path.exists(outbound):
-            sys.stderr.write('No outbound stream %s, skipping' %
+            sys.stderr.write('No outbound stream %s, skipping\n' %
                              os.path.basename(outbound))
             continue
         inputs.append((inbound, outbound, (os.stat(inbound).st_ctime, n)))
