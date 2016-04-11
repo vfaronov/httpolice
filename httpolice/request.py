@@ -267,8 +267,11 @@ def check_request(req):
     for proto in req.headers.upgrade.okay:
         if proto.item == u'h2':
             req.complain(1228)
-        if proto.item == upgrade.h2c and req.headers.http2_settings.is_absent:
-            req.complain(1231)
+        if proto.item == upgrade.h2c:
+            if req.scheme == u'https':
+                req.complain(1233)
+            if req.headers.http2_settings.is_absent:
+                req.complain(1231)
 
     if req.headers.http2_settings and \
             u'HTTP2-Settings' not in req.headers.connection:

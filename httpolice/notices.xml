@@ -1687,4 +1687,9 @@
     <explain>According to <rfc num="7540" sect="3.2.1"/>, the server must not upgrade to HTTP/2 unless the request has exactly one valid <h>HTTP2-Settings</h> header.</explain>
   </error>
 
+  <error id="1233">
+    <title>“<ref to="msg.headers.upgrade"/>: h2c” on an encrypted connection</title>
+    <explain>An “<h>Upgrade</h>: h2c” header is used to switch to HTTP/2 from a cleartext HTTP/1.1 connection. But this request was sent on an encrypted (TLS) connection. HTTP/2 over TLS is negotiated by other means. See <rfc num="7540" sect="3"/>.</explain>
+  </error>
+
 </notices>
