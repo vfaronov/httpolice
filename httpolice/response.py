@@ -22,6 +22,7 @@ from httpolice.known import (
     status_code,
     tc,
     unit,
+    upgrade,
     warn,
 )
 from httpolice.known.status_code import NOT_AT_ALL, NOT_BY_DEFAULT
@@ -355,6 +356,9 @@ def check_response_in_context(resp, req):
                 resp.complain(1049)
             elif proto.item == u'h2':
                 resp.complain(1229)
+            elif proto.item == upgrade.h2c:
+                if not req.headers.http2_settings.is_okay:
+                    resp.complain(1232)
         if req.version == http10:
             resp.complain(1051)
     elif resp.status.informational and req.version == http10:

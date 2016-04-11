@@ -23,6 +23,7 @@ from httpolice.known import (
     method,
     product,
     tc,
+    upgrade,
 )
 from httpolice.structure import EntityTag, Versioned, http11, okay
 from httpolice.syntax import rfc7230
@@ -263,5 +264,12 @@ def check_request(req):
         if media_type.is_patch(req.headers.content_type.value.item) == False:
             req.complain(1213)
 
-    if any(proto.item == u'h2' for proto in req.headers.upgrade.okay):
-        req.complain(1228)
+    for proto in req.headers.upgrade.okay:
+        if proto.item == u'h2':
+            req.complain(1228)
+        if proto.item == upgrade.h2c and req.headers.http2_settings.is_absent:
+            req.complain(1231)
+
+    if req.headers.http2_settings and \
+            u'HTTP2-Settings' not in req.headers.connection:
+        req.complain(1230)

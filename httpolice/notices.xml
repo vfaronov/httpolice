@@ -1663,4 +1663,28 @@
     </rfc>
   </error>
 
+  <error id="1230">
+    <title><ref to="msg.headers.http2_settings"/> without “<ref to="msg.headers.connection"/>: http2-settings”</title>
+    <rfc num="7540" sect="3.2.1">
+      Since the upgrade is only intended to apply to the immediate
+   connection, a client sending the <h>HTTP2-Settings</h> header field MUST
+   also send "HTTP2-Settings" as a connection option in the <h>Connection</h>
+   header field to prevent it from being forwarded (see Section 6.1 of
+   [RFC7230]).
+    </rfc>
+  </error>
+
+  <error id="1231">
+    <title>“<ref to="msg.headers.upgrade"/>: h2c” without <h>HTTP2-Settings</h></title>
+    <rfc num="7540" sect="3.2.1">
+      A request that upgrades from HTTP/1.1 to HTTP/2 MUST include exactly
+   one "HTTP2-Settings" header field.
+    </rfc>
+  </error>
+
+  <error id="1232">
+    <title><ref to="msg.headers.upgrade">Upgrading</ref> to HTTP/2 despite bad <ref to="msg.request.headers.http2_settings"/></title>
+    <explain>According to <rfc num="7540" sect="3.2.1"/>, the server must not upgrade to HTTP/2 unless the request has exactly one valid <h>HTTP2-Settings</h> header.</explain>
+  </error>
+
 </notices>

@@ -13,6 +13,7 @@ from httpolice.syntax import (
     rfc7233,
     rfc7234,
     rfc7235,
+    rfc7540,
 )
 
 
@@ -333,7 +334,13 @@ known = KnownDict([
   'rule': SINGLE},
  {'_': FieldName(u'HTTP2-Settings'),
   '_citations': [RFC(7540, section=(3, 2, 1))],
-  'iana_status': u'standard'},
+  'for_request': True,
+  'for_response': False,
+  'iana_status': u'standard',
+  'parser': rfc7540.HTTP2_Settings,
+  'precondition': False,
+  'proactive_conneg': False,
+  'rule': SINGLE},
  {'_': FieldName(u'IM'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'If'),
   '_citations': [RFC(4918, section=(10, 4))],
