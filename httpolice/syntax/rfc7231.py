@@ -45,13 +45,13 @@ from httpolice.syntax.rfc7230 import (
     partial_URI,
     quoted_string,
     token,
-    token_excluding,
+    token__excluding,
 )
 
 
 def parameter(exclude=None):
     return (
-        (CaseInsensitive << (token_excluding(exclude) if exclude else token)) *
+        (CaseInsensitive << token__excluding(exclude or [])) *
         skip('=') * (token | quoted_string)
     ) > named(u'parameter', RFC(7231), is_pivot=True)
 

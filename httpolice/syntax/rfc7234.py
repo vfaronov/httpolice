@@ -27,7 +27,7 @@ from httpolice.syntax.rfc7230 import (
     pseudonym,
     quoted_string,
     token,
-    token_excluding,
+    token__excluding,
     uri_host,
 )
 from httpolice.syntax.rfc7231 import HTTP_date
@@ -45,7 +45,7 @@ Expires = HTTP_date                                                     > pivot
 
 def extension_pragma(exclude_no_cache=False):
     return Parametrized << (
-        (token_excluding(['no-cache']) if exclude_no_cache else token) *
+        (token__excluding(['no-cache']) if exclude_no_cache else token) *
         maybe(skip('=') * (token | quoted_string))
     ) > named(u'extension-pragma', RFC(7234), is_pivot=True)
 

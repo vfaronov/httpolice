@@ -62,7 +62,7 @@ tchar = (literal('!') | '#' | '$' | '%' | '&' | "'" | '*' | '+' | '-' | '.' |
 
 token = string1(tchar)                                                  > auto
 
-def token_excluding(excluding):
+def token__excluding(excluding):
     return string_excluding(tchar, [''] + list(excluding))
 
 def quoted_pair(sensible_for):
@@ -166,7 +166,7 @@ field_content = (field_vchar +
 
 def transfer_parameter(no_q=False):
     return Parametrized << (
-        (token_excluding(['q']) if no_q else token) *
+        (token__excluding(['q']) if no_q else token) *
         skip(BWS * '=' * BWS) * (token | quoted_string)
     ) > named(u'transfer-parameter', RFC(7230), is_pivot=True)
 
@@ -175,7 +175,7 @@ _empty_params = lambda c: Parametrized(c, [])
 
 def transfer_extension(exclude=None, no_q=False):
     return Parametrized << (
-        (TransferCoding << token_excluding(exclude or [])) *
+        (TransferCoding << token__excluding(exclude or [])) *
         many(skip(OWS * ';' * OWS) * transfer_parameter(no_q))
     ) > named(u'transfer-extension', RFC(7230), is_pivot=True)
 
