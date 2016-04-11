@@ -350,9 +350,11 @@ def check_response_in_context(resp, req):
         resp.complain(1046)
 
     if resp.status == st.switching_protocols:
-        if any(proto not in req.headers.upgrade
-               for proto in resp.headers.upgrade):
-            resp.complain(1049)
+        for proto in resp.headers.upgrade.okay:
+            if proto not in req.headers.upgrade:
+                resp.complain(1049)
+            elif proto.item == u'h2':
+                resp.complain(1229)
         if req.version == http10:
             resp.complain(1051)
     elif resp.status.informational and req.version == http10:

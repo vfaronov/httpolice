@@ -262,3 +262,6 @@ def check_request(req):
     if req.method == m.PATCH and req.headers.content_type.is_okay:
         if media_type.is_patch(req.headers.content_type.value.item) == False:
             req.complain(1213)
+
+    if any(proto.item == u'h2' for proto in req.headers.upgrade.okay):
+        req.complain(1228)

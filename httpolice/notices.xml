@@ -1651,4 +1651,16 @@
     <explain>For example, <media>application/merge-patch+json</media> would be a suitable patch format for JSON.</explain>
   </error>
 
+  <error id="1228">
+    <title><ref to="msg.headers.upgrade"/>: h2</title>
+    <explain>This request’s <h>Upgrade</h> header includes the token ‘h2’, which normally refers to HTTP/2 over TLS. But HTTP/2 over TLS does not use the Upgrade mechanism, and cleartext HTTP/2 uses the ‘h2c’ token instead, so “Upgrade: h2” is wrong. See <rfc num="7540" sect="3"/>.</explain>
+  </error>
+
+  <error id="1229">
+    <title><ref to="msg.headers.upgrade">Upgrading</ref> to ‘h2’</title>
+    <rfc num="7540" sect="3.2">
+      A server MUST ignore an "h2" token in an <ref to="msg.request.headers.upgrade"><h>Upgrade</h></ref> header field.
+    </rfc>
+  </error>
+
 </notices>
