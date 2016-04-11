@@ -10,6 +10,6 @@ HTTP/1.1 401 Unauthorized
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 14
-WWW-Authenticate: Basic realm="example.com"
+WWW-Authenticate: Basic realm="example.com", Negotiate
 
 Hello world!
