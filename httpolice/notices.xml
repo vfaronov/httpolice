@@ -488,22 +488,6 @@
     <explain>This response includes the <ref to="header"/> header, which is defined for requests, but not for responses.</explain>
   </error>
 
-  <error id="1065">
-    <title><ref to="msg.headers.expect"/> is not ‘100-continue’</title>
-    <explain>The <ref to="msg.headers.expect"/> header can only contain the value ‘100-continue’. It does not support any other expectations.</explain>
-    <rfc num="7231" sect="5.1.1">
-      The <h>Expect</h> header field was added after the original
-      publication of HTTP/1.1 [RFC2068] as both the means to request an
-      interim <st>100</st> (Continue) response and the general mechanism for
-      indicating must-understand extensions.  However, the extension
-      mechanism has not been used by clients and the must-understand
-      requirements have not been implemented by many servers, rendering
-      the extension mechanism useless.  This specification has removed
-      the extension mechanism in order to simplify the definition and
-      processing of 100-continue.
-    </rfc>
-  </error>
-
   <error id="1066">
     <title>“<ref to="msg.headers.expect"/>: 100-continue” in a request with no payload</title>
     <rfc num="7231" sect="5.1.1">

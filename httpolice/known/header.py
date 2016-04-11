@@ -291,7 +291,7 @@ known = KnownDict([
   'for_request': True,
   'for_response': False,
   'iana_status': u'standard',
-  'parser': None,
+  'parser': rfc7231.Expect,
   'precondition': False,
   'proactive_conneg': False,
   'rule': SINGLE},

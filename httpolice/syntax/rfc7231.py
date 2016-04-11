@@ -243,5 +243,6 @@ Location = URI_reference                                                > pivot
 Max_Forwards = int << string1(DIGIT)                                    > pivot
 Referer = absolute_URI | partial_URI                                    > pivot
 Vary = '*' | comma_list1(field_name)                                    > pivot
+Expect = CaseInsensitive << literal('100-continue')                     > pivot
 
 fill_names(globals(), RFC(7231))

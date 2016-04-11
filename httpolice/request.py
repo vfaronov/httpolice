@@ -154,12 +154,8 @@ def check_request(req):
             req.headers.content_type.is_absent:
         req.complain(1062)
 
-    if req.headers.expect.is_present:
-        if req.headers.expect == b'100-continue':
-            if not req.body:
-                req.complain(1066)
-        else:
-            req.complain(1065)
+    if req.headers.expect == u'100-continue' and not req.body:
+        req.complain(1066)
 
     if req.headers.max_forwards.is_present and \
             req.method not in [m.OPTIONS, m.TRACE]:
