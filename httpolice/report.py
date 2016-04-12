@@ -330,7 +330,7 @@ class HTMLReport(Report):
 
         if msg.trailer_entries:
             with H.div(_class=u'review-block'):
-                H.p(u'Header fields from the chunked trailer:', _class=u'hint')
+                H.p(u'Header fields from the trailer part:', _class=u'hint')
                 self._render_header_entries(msg.annotated_trailer_entries)
 
     def _render_request(self, req):
