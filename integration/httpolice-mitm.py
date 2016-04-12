@@ -1,10 +1,10 @@
 # -*- coding: utf-8; -*-
 
 import argparse
+import io
 
 import httpolice
 from httpolice.known import h, st
-from httpolice.util.seven import open_as_text
 
 
 def strip_content_length(msg, only_if=None):
@@ -71,5 +71,5 @@ def done(context):
         report_cls = httpolice.HTMLReport
     else:
         report_cls = httpolice.TextReport
-    with open_as_text(context.args.out_filename, 'w') as outf:
+    with io.open(context.args.out_filename, 'wt', encoding='utf-8') as outf:
         report_cls.render(result, outf)

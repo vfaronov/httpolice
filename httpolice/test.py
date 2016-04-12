@@ -46,7 +46,6 @@ from httpolice.structure import (
     http11,
 )
 from httpolice.syntax import rfc3986, rfc5988, rfc7230, rfc7231, rfc7233
-from httpolice.util.seven import open_as_text
 
 
 def load_test_file(filename):
@@ -1162,7 +1161,7 @@ class TestFromFiles(unittest.TestCase):
         self.assertEqual(self.covered, set(notices))
         if self.examples is not None:
             self.assertEqual(self.covered, set(self.examples))
-            with open_as_text(self.examples_filename, 'w') as f:
+            with io.open(self.examples_filename, 'wt', encoding='utf-8') as f:
                 f.write(render_notice_examples(
                     (notices[ident], ctx)
                     for ident, ctx in sorted(self.examples.items())
