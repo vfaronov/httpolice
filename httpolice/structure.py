@@ -9,12 +9,12 @@ import six
 # Commonly useful structures for representing various elements of the protocol
 
 
-class _Unparseable(object):
+class _Unavailable(object):
 
     __slots__ = ()
 
     def __repr__(self):
-        return 'Unparseable'
+        return 'Unavailable'
 
     def __eq__(self, other):
         return False
@@ -22,11 +22,11 @@ class _Unparseable(object):
     def __hash__(self):
         return 1
 
-Unparseable = _Unparseable()
+Unavailable = _Unavailable()
 
 
 def okay(x):
-    return (x is not None) and (x is not Unparseable)
+    return (x is not None) and (x is not Unavailable)
 
 
 class Parametrized(namedtuple('Parametrized', ('item', 'param'))):

@@ -27,7 +27,7 @@ from httpolice.structure import (
     MediaType,
     Parametrized,
     ProductName,
-    Unparseable,
+    Unavailable,
     Versioned,
 )
 from httpolice.syntax.common import DIGIT, SP
@@ -85,7 +85,7 @@ def _to_date(complain, d, m, y):
         return date(y, m, d)
     except ValueError:
         complain(1222, date=u'%d-%02d-%02d' % (y, m, d))
-        return Unparseable
+        return Unavailable
 
 day = int << string_times(2, 2, DIGIT)                                  > pivot
 month = (subst(1) << octet(0x4A) * octet(0x61) * octet(0x6E)  |
@@ -113,7 +113,7 @@ def _to_time(complain, h, m, s):
         return time(h, m, s)
     except ValueError:
         complain(1223, time=u'%02d:%02d:%02d' % (h, m, s))
-        return Unparseable
+        return Unavailable
 
 hour = int << string_times(2, 2, DIGIT)                                 > pivot
 minute = int << string_times(2, 2, DIGIT)                               > pivot
@@ -124,8 +124,8 @@ time_of_day = _to_time << (hour * skip(':') *
                            second)                                      > pivot
 
 def _to_datetime(dow, d, t):
-    if d is Unparseable or t is Unparseable:
-        return (dow, Unparseable)
+    if d is Unavailable or t is Unavailable:
+        return (dow, Unavailable)
     else:
         return (dow, datetime(d.year, d.month, d.day,
                               t.hour, t.minute, t.second))
@@ -186,7 +186,7 @@ obs_date = (_obsolete_date << rfc850_date |
 @can_complain
 def _check_day_of_week(complain, r):
     (claimed_dow, r) = r
-    if r is not Unparseable and r.weekday() != claimed_dow:
+    if r is not Unavailable and r.weekday() != claimed_dow:
         complain(1108, date=r.strftime(u'%Y-%m-%d'),
                  claimed=calendar.day_name[claimed_dow],
                  actual=calendar.day_name[r.weekday()])

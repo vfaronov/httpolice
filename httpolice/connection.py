@@ -6,7 +6,7 @@ from httpolice.known import m, st, tc
 from httpolice.parse import ParseError, Stream
 from httpolice.request import RequestView
 from httpolice.response import ResponseView
-from httpolice.structure import HTTPVersion, Method, StatusCode, Unparseable
+from httpolice.structure import HTTPVersion, Method, StatusCode, Unavailable
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import SP
 
@@ -100,7 +100,7 @@ def _parse_requests(connection, data, scheme=None):
     result = []
     while stream.sane and not stream.is_eof():
         req = _parse_request_heading(stream, scheme)
-        if req is Unparseable:
+        if req is Unavailable:
             stream.dump_complaints(connection, u'request heading')
         else:
             result.append(req)
@@ -124,7 +124,7 @@ def _parse_request_heading(stream, scheme=None):
     except ParseError as e:
         stream.sane = False
         stream.complain(1006, error=e)
-        return Unparseable
+        return Unavailable
     else:
         req = RequestView(structure.Request(scheme, method_, target, version_,
                                             entries))
@@ -140,22 +140,22 @@ def _parse_request_body(req, stream):
         if codings.pop() == tc.chunked:
             message.parse_chunked(req, stream)
         else:
-            req.inner.body = Unparseable
+            req.inner.body = Unavailable
             req.complain(1001)
             stream.sane = False
-        while codings and (req.body is not Unparseable):
+        while codings and (req.body is not Unavailable):
             message.decode_transfer_coding(req, codings.pop())
 
     elif req.headers.content_length:
         n = req.headers.content_length.value
-        if n is Unparseable:
-            req.inner.body = Unparseable
+        if n is Unavailable:
+            req.inner.body = Unavailable
             stream.sane = False
         else:
             try:
                 req.inner.body = stream.consume_n_bytes(n)
             except ParseError:
-                req.inner.body = Unparseable
+                req.inner.body = Unavailable
                 req.complain(1004)
                 stream.sane = False
 
@@ -172,7 +172,7 @@ def _parse_responses(connection, requests, data):
         responses = []
         while stream.sane:
             resp = _parse_response_heading(req, stream)
-            if resp is Unparseable:
+            if resp is Unavailable:
                 stream.dump_complaints(connection, u'request heading')
             else:
                 responses.append(resp)
@@ -204,7 +204,7 @@ def _parse_response_heading(req, stream):
     except ParseError as e:
         stream.complain(1009, error=e)
         stream.sane = False
-        return Unparseable
+        return Unavailable
     else:
         resp = ResponseView(req, structure.Response(req.inner, version_,
                                                     status, reason, entries))
@@ -238,19 +238,19 @@ def _parse_response_body(resp, stream):
             message.parse_chunked(resp, stream)
         else:
             resp.inner.body = stream.consume_rest()
-        while codings and (resp.body is not Unparseable):
+        while codings and (resp.body is not Unavailable):
             message.decode_transfer_coding(resp, codings.pop())
 
     elif resp.headers.content_length.is_present:
         n = resp.headers.content_length.value
-        if n is Unparseable:
-            resp.inner.body = Unparseable
+        if n is Unavailable:
+            resp.inner.body = Unavailable
             stream.sane = False
         else:
             try:
                 resp.inner.body = stream.consume_n_bytes(n)
             except ParseError:
-                resp.inner.body = Unparseable
+                resp.inner.body = Unavailable
                 resp.complain(1004)
                 stream.sane = False
 

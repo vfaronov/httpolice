@@ -15,7 +15,7 @@ from httpolice.header import HeaderView
 from httpolice.parse import ParseError, Symbol
 from httpolice.request import RequestView
 from httpolice.response import ResponseView
-from httpolice.structure import HeaderEntry, Parametrized, Unparseable, okay
+from httpolice.structure import HeaderEntry, Parametrized, Unavailable, okay
 from httpolice.util.text import (
     format_chars,
     has_nonprintable,
@@ -187,7 +187,7 @@ class TextReport(Report):
         for entry in msg.header_entries:
             self._write(u'++ %s: %s\n' %
                         (entry.name, entry.value.decode('iso-8859-1')))
-        if msg.body is Unparseable:
+        if msg.body is Unavailable:
             self._write(u'\n++ (body is unparseable)\n')
         elif msg.body:
             self._write(u'\n++ (%d bytes of payload body not shown)\n' %
@@ -318,7 +318,7 @@ class HTMLReport(Report):
         self._render_header_entries(msg.annotated_header_entries)
 
         body, transforms = displayable_body(msg)
-        if body is Unparseable:
+        if body is Unavailable:
             with H.div(_class=u'review-block'):
                 H.p(u'Payload body is unavailable.', _class=u'hint')
         elif body:

@@ -6,7 +6,7 @@ import sys
 from httpolice import known, parse
 from httpolice.known import cache_directive, h, header
 import httpolice.known.hsts_directive
-from httpolice.structure import Parametrized, Quoted, Unparseable, okay
+from httpolice.structure import Parametrized, Quoted, Unavailable, okay
 
 
 class HeadersView(object):
@@ -97,7 +97,7 @@ class HeaderView(object):
                     parsed = stream.parse(parser, to_eof=True)
                 except parse.ParseError as e:
                     self.message.complain(1000, entry=entry, error=e)
-                    parsed = Unparseable
+                    parsed = Unavailable
                 else:
                     parsed = self._process_parsed(entry, parsed)
                     self.message.annotations[(from_trailer, i)] = \
@@ -211,8 +211,8 @@ class MultiHeaderView(ListHeaderView):
         entries, values = self._pre_parse()
         self._value = []
         for sub_values in values:
-            if sub_values is Unparseable:
-                self._value.append(Unparseable)
+            if sub_values is Unavailable:
+                self._value.append(Unavailable)
             else:
                 self._value.extend(sub_values)
         self._entries = entries
@@ -236,7 +236,7 @@ class DirectivesView(ListHeaderView):
         if argument is None:
             if self.knowledge_module.argument_required(directive):
                 complain(1156)
-                argument = Unparseable
+                argument = Unavailable
         else:
             if self.knowledge_module.no_argument(directive):
                 complain(1157)
@@ -247,7 +247,7 @@ class DirectivesView(ListHeaderView):
                     argument = stream.parse(parser, to_eof=True)
                 except parse.ParseError as e:
                     complain(1158, error=e)
-                    argument = Unparseable
+                    argument = Unavailable
                 else:
                     stream.dump_complaints(self.message, entry)
 

@@ -38,7 +38,7 @@ from httpolice.structure import (
     Response,
     StatusCode,
     TransferCoding,
-    Unparseable,
+    Unavailable,
     Versioned,
     WarnCode,
     WarningValue,
@@ -119,8 +119,8 @@ class TestSyntax(unittest.TestCase):
 
     def assertParse(self, parser, text, result=None):
         r = parse.Stream(text).parse(parser, to_eof=True)
-        if result is Unparseable:
-            self.assertIs(r, Unparseable)
+        if result is Unavailable:
+            self.assertIs(r, Unavailable)
         elif result is not None:
             self.assertEqual(r, result)
 
@@ -451,8 +451,8 @@ class TestSyntax(unittest.TestCase):
                          datetime(1994, 11, 6, 8, 49, 37))
         self.assertParse(p, b'Sun Nov 16 08:49:37 1994',
                          datetime(1994, 11, 16, 8, 49, 37))
-        self.assertParse(p, b'Sun Nov 36 08:49:37 1994', Unparseable)
-        self.assertParse(p, b'Sun Nov 16 28:49:37 1994', Unparseable)
+        self.assertParse(p, b'Sun Nov 36 08:49:37 1994', Unavailable)
+        self.assertParse(p, b'Sun Nov 16 28:49:37 1994', Unavailable)
         self.assertNoParse(p, b'Foo, 13 Jan 2016 24:09:06 GMT')
 
     def test_acceptable_ranges(self):
@@ -701,7 +701,7 @@ class TestRequest(unittest.TestCase):
         [req1] = self.parse(stream)
         self.assertEqual(req1.method, u'POST')
         self.assertEqual(req1.headers.content_length.value, 90)
-        self.assertIs(req1.body, Unparseable)
+        self.assertIs(req1.body, Unavailable)
 
     def test_unparseable_content_length(self):
         stream = (b'POST / HTTP/1.1\r\n'
@@ -710,7 +710,7 @@ class TestRequest(unittest.TestCase):
                   b'\r\n'
                   b'quux')
         [req1] = self.parse(stream)
-        self.assertIs(req1.body, Unparseable)
+        self.assertIs(req1.body, Unavailable)
 
     def test_unparseable_following_parseable(self):
         stream = (b'GET / HTTP/1.1\r\n'
@@ -755,10 +755,10 @@ class TestRequest(unittest.TestCase):
                   b'0\r\n'
                   b'\r\n')
         [req] = self.parse(stream)
-        self.assertIs(req.body, Unparseable)
+        self.assertIs(req.body, Unavailable)
         self.assertEqual(list(req.headers.transfer_encoding),
                          [Parametrized(u'foo', []),
-                          Unparseable,
+                          Unavailable,
                           Parametrized(u'gzip', []),
                           Parametrized(u'chunked', [])])
         self.assertEqual(req.annotations[(False, 1)],
@@ -809,7 +809,7 @@ class TestRequest(unittest.TestCase):
                   b'Host: example.com\r\n'
                   b'\r\n')
         [req] = self.parse(stream)
-        self.assertIs(req.body, Unparseable)
+        self.assertIs(req.body, Unavailable)
 
     def test_effective_uri_1(self):
         stream = (b'GET /pub/WWW/TheProject.html HTTP/1.1\r\n'
@@ -856,18 +856,18 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(req.headers.cache_control.value,
                          [Parametrized(cache.max_age, 3600),
                           Parametrized(cache.max_stale, 60),
-                          Unparseable,
+                          Unavailable,
                           Parametrized(CacheDirective(u'qux'), u'xyzzy 123'),
                           Parametrized(cache.no_transform, None),
                           Parametrized(CacheDirective(u'abcde'), None),
-                          Parametrized(cache.min_fresh, Unparseable),
+                          Parametrized(cache.min_fresh, Unavailable),
                           Parametrized(cache.no_store, None)])
         self.assertEqual(req.headers.pragma.value,
                          [u'no-cache',
                           (u'foo', None),
                           (u'bar', u'baz'),
                           (u'qux', u'xyzzy'),
-                          Unparseable])
+                          Unavailable])
 
         self.assertIn(cache.max_age, req.headers.cache_control)
         self.assertEqual(req.headers.cache_control.max_age, 3600)
@@ -889,7 +889,7 @@ class TestRequest(unittest.TestCase):
         self.assertIs(req.headers.cache_control.no_cache, None)
 
         self.assertIn(cache.min_fresh, req.headers.cache_control)
-        self.assertIs(req.headers.cache_control.min_fresh, Unparseable)
+        self.assertIs(req.headers.cache_control.min_fresh, Unavailable)
 
         self.assertIn(cache.no_store, req.headers.cache_control)
         self.assertEqual(req.headers.cache_control.no_store, True)
@@ -1017,7 +1017,7 @@ class TestResponse(unittest.TestCase):
             [WarningValue(WarnCode(123), u'-', u'something', None),
              WarningValue(WarnCode(234), u'[::0]:8080', u'something else',
                           datetime(2016, 1, 28, 8, 22, 4)),
-             Unparseable,
+             Unavailable,
              WarningValue(WarnCode(456), u'baz', u'qux', None),
              WarningValue(WarnCode(567), u'-', u'xyzzy', None)])
         self.assertEqual(repr(resp1.headers.warning.value[0].code),
@@ -1049,7 +1049,7 @@ class TestResponse(unittest.TestCase):
                 Parametrized(AuthScheme(u'Foo'), None),
                 Parametrized(AuthScheme(u'Bar'), u'jgfCGSU8u=='),
                 Parametrized(AuthScheme(u'Baz'), None),
-                Unparseable,
+                Unavailable,
                 Parametrized(AuthScheme(u'Scheme1'), [(u'foo', u'bar'),
                                                       (u'baz', u'qux')]),
                 Parametrized(AuthScheme(u'Scheme2'), None),
@@ -1075,7 +1075,7 @@ class TestResponse(unittest.TestCase):
             [
                 Parametrized(hsts.max_age, 15768000),
                 Parametrized(hsts.includesubdomains, None),
-                Parametrized(hsts.max_age, Unparseable),
+                Parametrized(hsts.max_age, Unavailable),
                 Parametrized(HSTSDirective(u'fooBar'), None),
             ]
         )

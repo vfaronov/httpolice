@@ -26,7 +26,7 @@ from httpolice.blackboard import Blackboard, memoized_property
 from httpolice.header import HeadersView
 from httpolice.known import cc, header, media, media_type, tc, warn
 from httpolice.parse import ParseError, maybe, skip
-from httpolice.structure import HeaderEntry, FieldName, Unparseable, okay
+from httpolice.structure import HeaderEntry, FieldName, Unavailable, okay
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import CRLF, LF
 
@@ -82,18 +82,18 @@ class MessageView(Blackboard):
                     r = decode_gzip(r)
                 except Exception as e:
                     self.complain(1037, coding=coding, error=e)
-                    r = Unparseable
+                    r = Unavailable
             elif coding == cc.deflate:
                 try:
                     r = decode_deflate(r)
                 except Exception as e:
                     self.complain(1037, coding=coding, error=e)
-                    r = Unparseable
+                    r = Unavailable
             elif okay(coding):
                 self.complain(1036, coding=coding)
-                r = Unparseable
+                r = Unavailable
             else:
-                r = Unparseable
+                r = Unavailable
         return r
 
     @property
@@ -112,7 +112,7 @@ class MessageView(Blackboard):
             return json.loads(s)
         except Exception as e:
             self.complain(1038, error=e)
-            return Unparseable
+            return Unavailable
 
     @memoized_property
     def xml_data(self):
@@ -124,10 +124,10 @@ class MessageView(Blackboard):
         try:
             return defusedxml.ElementTree.fromstring(self.full_content)
         except defusedxml.DefusedXmlException:
-            return Unparseable
+            return Unavailable
         except Exception as e:
             self.complain(1039, error=e)
-            return Unparseable
+            return Unavailable
 
     @memoized_property
     def multipart_data(self):
@@ -144,7 +144,7 @@ class MessageView(Blackboard):
                 self.complain(1139)
             elif isinstance(defect, email.errors.StartBoundaryNotFoundDefect):
                 self.complain(1140)
-        return parsed if parsed.is_multipart() else Unparseable
+        return parsed if parsed.is_multipart() else Unavailable
 
     @memoized_property
     def url_encoded_data(self):
@@ -156,7 +156,7 @@ class MessageView(Blackboard):
         for byte in six.iterbytes(self.full_content):
             if not URL_ENCODED_GOOD_BYTES[byte]:
                 self.complain(1040, offending_value=byte)
-                return Unparseable
+                return Unavailable
         return parse_qs(self.full_content.decode('ascii'))
 
     @memoized_property
@@ -295,7 +295,7 @@ def parse_chunked(msg, stream):
     except ParseError as e:
         stream.sane = False
         msg.complain(1005, error=e)
-        msg.inner.body = Unparseable
+        msg.inner.body = Unavailable
     else:
         stream.dump_complaints(msg, u'chunked framing')
         msg.inner.body = b''.join(data)
@@ -308,22 +308,22 @@ def decode_transfer_coding(msg, coding):
     if coding == tc.chunked:
         # The outermost chunked has already been peeled off at this point.
         msg.complain(1002)
-        msg.inner.body = Unparseable
+        msg.inner.body = Unavailable
     elif coding in [tc.gzip, tc.x_gzip]:
         try:
             msg.inner.body = decode_gzip(msg.body)
         except Exception as e:
             msg.complain(1027, coding=coding, error=e)
-            msg.inner.body = Unparseable
+            msg.inner.body = Unavailable
     elif coding == tc.deflate:
         try:
             msg.inner.body = decode_deflate(msg.body)
         except Exception as e:
             msg.complain(1027, coding=coding, error=e)
-            msg.inner.body = Unparseable
+            msg.inner.body = Unavailable
     else:
         msg.complain(1003, coding=coding)
-        msg.inner.body = Unparseable
+        msg.inner.body = Unavailable
 
 
 def decode_gzip(data):
