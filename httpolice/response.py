@@ -277,6 +277,9 @@ def check_response_itself(resp):
         resp.complain(1193,
                       directive1=cache.max_age, directive2=cache.no_cache)
 
+    if headers.vary != u'*' and h.host in headers.vary.value:
+        resp.complain(1235)
+
     if status == st.unauthorized and headers.www_authenticate.is_absent:
         resp.complain(1194)
 

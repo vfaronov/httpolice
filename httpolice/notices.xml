@@ -1681,4 +1681,10 @@
     <explain>According to <rfc num="7540" sect="3.2.1"/>, the <h>HTTP2-Settings</h> header must use the URL- and filename-safe Base64 encoding without padding. This means that it can only contain letters, digits, dash (-), and underscore (_). But in this request, it also contained the character <ref to="char"/>.</explain>
   </error>
 
+  <comment id="1235">
+    <title><ref to="msg.headers.vary"/>: <h>Host</h></title>
+    <explain>There is no need to include <h>Host</h> in the <h>Vary</h> header, because Host is part of the request URI, and therefore, every HTTP response implicitly varies by Host already. “Vary: Host” can only scare caches away from storing the response.</explain>
+    <explain>See <rfc num="7231" sect="7.1.4"/> and <rfc num="7234" sect="2"/>.</explain>
+  </comment>
+
 </notices>
