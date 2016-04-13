@@ -24,7 +24,7 @@ def main():
         if any(filename.startswith(prefix) for prefix in args.prefix):
             inbound, outbound, scheme, _ = \
                 httpolice.test.load_test_file(join(root, filename))
-            result.append(analyze_streams(inbound, outbound, scheme))
+            result.extend(analyze_streams(inbound, outbound, scheme))
     report_cls = HTMLReport if args.html else TextReport
     report_cls.render(result, stdio_as_text(sys.stdout))
 

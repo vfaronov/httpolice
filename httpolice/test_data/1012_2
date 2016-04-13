@@ -1,0 +1,16 @@
+1012 1007 1010
+
+======== BEGIN INBOUND STREAM ========
+CONNECT example.com:80 HTTP/1.1
+Host: example.com:80
+User-Agent: demo
+
+wfqwrfq3rf3f
+qrwfqrfq
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 204 No Content
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+
+mlkqmelk
+qwlkfnlnlkf
+

@@ -1,6 +1,12 @@
 # -*- coding: utf-8; -*-
 
+from collections import namedtuple
 import functools
+
+
+class Complaint(namedtuple('Complaint', ('notice_ident', 'context'))):
+
+    __slots__ = ()
 
 
 class Blackboard(object):
@@ -8,14 +14,12 @@ class Blackboard(object):
     self_name = u'self'
 
     def __init__(self):
-        self.complaints = None
+        self.complaints = []
         self.memoized = {}
 
     def complain(self, notice_ident, **kwargs):
-        if self.complaints is None:
-            self.complaints = []
         context = dict({self.self_name: self}, **kwargs)
-        complaint = (notice_ident, context)
+        complaint = Complaint(notice_ident, context)
         if complaint not in self.complaints:
             self.complaints.append(complaint)
 

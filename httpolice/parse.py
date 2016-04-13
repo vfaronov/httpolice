@@ -457,11 +457,10 @@ def can_complain(func):
 class Stream(object):
 
     def __init__(self, data, annotate_classes=None):
-        super(Stream, self).__init__()
         self._stack = []
         self.data = data
         self.point = 0
-        self.sane = True
+        self._sane = True
         self.complaints = []
         self.annotations = []
         self.annotate_classes = tuple(annotate_classes or ())
@@ -490,6 +489,14 @@ class Stream(object):
 
     def is_eof(self):
         return self.point == len(self.data)
+
+    @property
+    def sane(self):
+        return self._sane and not self.is_eof()
+
+    @sane.setter
+    def sane(self, value):
+        self._sane = value
 
     def skip(self, n):
         self.point = min(self.point + n, len(self.data))

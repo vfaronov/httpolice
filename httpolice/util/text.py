@@ -1,5 +1,6 @@
 # -*- coding: utf-8; -*-
 
+import io
 import string
 
 import six
@@ -99,6 +100,67 @@ def format_chars(chars):
               [u''.join(c.decode('ascii') for c in visible)] +
               _char_ranges(other, as_hex=True))
     return u' or '.join(piece for piece in pieces if piece)
+
+
+def force_unicode(x):
+    if isinstance(x, bytes):
+        return x.decode('iso-8859-1')
+    else:
+        return six.text_type(x)
+
+
+def force_bytes(x):
+    if isinstance(x, bytes):
+        return x
+    else:
+        return x.encode('iso-8859-1', 'replace')
+
+
+class WriteIfAny(io.StringIO):
+
+    """
+    >>> import sys
+    >>> with write_if_any(u'foo\\n', sys.stdout) as buf:
+    ...     pass
+    ... 
+    >>> with write_if_any(u'foo\\n', sys.stdout) as buf:
+    ...     n = buf.write(u'bar\\n')
+    ... 
+    foo
+    bar
+    """
+
+    def __init__(self, beginning, parent_file):
+        super(WriteIfAny, self).__init__()
+        self.beginning = beginning
+        self.parent_file = parent_file
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, _1, _2):
+        if exc_type is None:
+            value = self.getvalue()
+            if value:
+                self.parent_file.write(self.beginning + value)
+        return False
+
+
+write_if_any = WriteIfAny
+
+
+def ellipsize(s, max_length=60):
+    """
+    >>> print(ellipsize(u'lorem ipsum dolor sit amet', 40))
+    lorem ipsum dolor sit amet
+    >>> print(ellipsize(u'lorem ipsum dolor sit amet', 20))
+    lorem ipsum dolor...
+    """
+    if len(s) > max_length:
+        ellipsis = u'...'
+        return s[:(max_length - len(ellipsis))] + ellipsis
+    else:
+        return s
 
 
 # See also http://stackoverflow.com/a/25829509/200445

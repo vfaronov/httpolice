@@ -5,6 +5,8 @@ import sys
 
 import six
 
+from httpolice.util.text import force_bytes, force_unicode
+
 
 # Commonly useful structures for representing various elements of the protocol
 
@@ -110,16 +112,21 @@ class CaseInsensitive(ProtocolString):
 # Representations of specific protocol elements
 
 
+class Exchange(namedtuple('Exchange', ('request', 'responses'))):
+
+    __slots__ = ()
+
+
 class Message(object):
 
     __slots__ = ('version', 'header_entries', 'body', 'trailer_entries')
 
-    def __init__(self, version, header_entries,
-                 body=None, trailer_entries=None):
-        self.version = HTTPVersion(version)
+    def __init__(self, version, header_entries, body=None,
+                 trailer_entries=None):
+        self.version = HTTPVersion(force_unicode(version))
         self.header_entries = [HeaderEntry(k, v)
                                for k, v in header_entries]
-        self.body = body if body is None else bytes(body)
+        self.body = None if body is None else bytes(body)
         self.trailer_entries = [HeaderEntry(k, v)
                                 for k, v in trailer_entries or []]
 
@@ -132,9 +139,9 @@ class Request(Message):
                  body=None, trailer_entries=None):
         super(Request, self).__init__(version, header_entries,
                                       body, trailer_entries)
-        self.scheme = scheme if scheme is None else six.text_type(scheme)
-        self.method = Method(method)
-        self.target = six.text_type(target)
+        self.scheme = None if scheme is None else force_unicode(scheme)
+        self.method = Method(force_unicode(method))
+        self.target = force_unicode(target)
 
     def __repr__(self):
         return '<Request %s>' % self.method
@@ -142,15 +149,14 @@ class Request(Message):
 
 class Response(Message):
 
-    __slots__ = ('request', 'status', 'reason')
+    __slots__ = ('status', 'reason')
 
-    def __init__(self, request, version, status, reason, header_entries,
+    def __init__(self, version, status, reason, header_entries,
                  body=None, trailer_entries=None):
         super(Response, self).__init__(version, header_entries,
                                        body, trailer_entries)
-        self.request = request
         self.status = StatusCode(status)
-        self.reason = reason if reason is None else six.text_type(reason)
+        self.reason = None if reason is None else force_unicode(reason)
 
     def __repr__(self):
         return '<Response %d>' % self.status
@@ -190,7 +196,8 @@ class HeaderEntry(namedtuple('HeaderEntry', ('name', 'value'))):
 
     def __new__(cls, name, value):
         return super(HeaderEntry, cls).__new__(cls,
-                                               FieldName(name), bytes(value))
+                                               FieldName(force_unicode(name)),
+                                               force_bytes(value))
 
     def __repr__(self):
         return '<HeaderEntry %s>' % self.name

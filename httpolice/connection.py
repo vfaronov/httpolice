@@ -13,102 +13,120 @@ from httpolice.syntax.common import SP
 
 def analyze_streams(inbound, outbound, scheme=None):
     """
-    :type inbound: bytes
-    :type outbound: bytes
-    :type scheme: six.text_type | None
+    :type inbound: bytes | None
+    :type outbound: bytes | None
+    :type scheme: six.text_type | bytes | None
     """
-    conn = Connection()
-    parse_streams(conn, inbound, outbound, scheme=scheme)
-    check_connection(conn)
-    return conn
+    inbound = None if inbound is None else Stream(inbound)
+    outbound = None if outbound is None else Stream(outbound)
+    for exch in parse_streams(inbound, outbound, scheme=scheme):
+        check_exchange(exch)
+        yield exch
 
 
-def analyze_exchange(request, responses):
+def analyze_exchange(exch):
     """
-    :type request: structure.Request
-    :type responses: list[structure.Response]
+    :type exch: structure.Exchange
     """
-    req_view = RequestView(request)
-    resp_views = [ResponseView(req_view, resp) for resp in responses]
-    exch = Exchange(req_view, resp_views)
+    req_view = RequestView(exch.request) if exch.request else None
+    resp_views = [ResponseView(req_view, resp)
+                  for resp in exch.responses or []]
+    exch = ExchangeView(req_view, resp_views)
     check_exchange(exch)
     return exch
 
 
-class Connection(Blackboard):
-
-    self_name = u'conn'
-
-    def __init__(self, exchanges=None,
-                 unparsed_inbound=None, unparsed_outbound=None):
-        """
-        :type exchanges: list[Exchange]
-        :type unparsed_inbound: bytes | None
-        :type unparsed_outbound: bytes | None
-        """
-        super(Connection, self).__init__()
-        self.exchanges = exchanges or []
-        self.unparsed_inbound = unparsed_inbound
-        self.unparsed_outbound = unparsed_outbound
-
-    @property
-    def sub_nodes(self):
-        return self.exchanges
-
-
-class Exchange(Blackboard):
+class ExchangeView(Blackboard):
 
     self_name = u'exch'
 
     def __repr__(self):
-        return 'Exchange(%r, %r)' % (self.request, self.responses)
+        return 'ExchangeView(%r, %r)' % (self.request, self.responses)
 
     def __init__(self, req, resps):
         """
         :type req: RequestView
         :type resp: list[ResponseView]
         """
-        super(Exchange, self).__init__()
+        super(ExchangeView, self).__init__()
         assert all(resp.request is req for resp in resps)
         self.request = req
         self.responses = resps
 
     @property
     def sub_nodes(self):
-        yield self.request
+        if self.request:
+            yield self.request
         for resp in self.responses:
             yield resp
 
 
-def check_connection(conn):
-    for exch in conn.exchanges:
-        check_exchange(exch)
+def complaint_box(*args, **kwargs):
+    box = ExchangeView(None, [])
+    box.complain(*args, **kwargs)
+    return box
 
 
 def check_exchange(exch):
-    request.check_request(exch.request)
+    if exch.request:
+        request.check_request(exch.request)
     response.check_responses(exch.responses)
 
 
-def parse_streams(connection, inbound, outbound, scheme=None):
-    requests = _parse_requests(connection, inbound, scheme)
-    _parse_responses(connection, requests, outbound)
+def parse_streams(inbound, outbound, scheme=None):
+    """
+    :type inbound: Stream | None
+    :type outbound: Stream | None
+    :type scheme: six.text_type | bytes | None
+    """
+    while inbound and inbound.sane:
+        (req, req_box) = _parse_request(inbound, scheme)
+        (resps, resp_box) = ([], None)
+        switched = False
+        if req:
+            if outbound and outbound.sane:
+                (resps, resp_box) = _parse_responses(outbound, req)
+                if resps:
+                    if resps[-1].status == st.switching_protocols:
+                        switched = True
+                    if req.method == m.CONNECT and resps[-1].status.successful:
+                        switched = True
+            yield ExchangeView(req, resps)
+        if req_box:
+            yield req_box
+        if resp_box:
+            yield resp_box
+        if switched:
+            break
+
+    if inbound and not inbound.is_eof():
+        yield complaint_box(1007, nbytes=len(inbound.consume_rest()))
+
+    if outbound and outbound.sane:
+        if inbound:
+            # We had some requests, but we ran out of them.
+            # We'll still try to parse the remaining responses on their own.
+            yield complaint_box(1008)
+        while outbound.sane:
+            (resps, resp_box) = _parse_responses(outbound, None)
+            if resps:
+                yield ExchangeView(None, resps)
+            if resp_box:
+                yield resp_box
+
+    if outbound and not outbound.is_eof():
+        yield complaint_box(1010, nbytes=len(outbound.consume_rest()))
 
 
-def _parse_requests(connection, data, scheme=None):
-    stream = Stream(data)
-    result = []
-    while stream.sane and not stream.is_eof():
-        req = _parse_request_heading(stream, scheme)
-        if req is Unavailable:
-            stream.dump_complaints(connection, u'request heading')
-        else:
-            result.append(req)
-            _parse_request_body(req, stream)
-    if not stream.is_eof():
-        connection.complain(1007)
-    connection.unparsed_inbound = stream.consume_rest()
-    return result
+def _parse_request(stream, scheme=None):
+    req = _parse_request_heading(stream, scheme)
+    if req is Unavailable:
+        box = ExchangeView(None, [])
+        stream.dump_complaints(box, u'request heading')
+        return (None, box)
+    else:
+        _parse_request_body(req, stream)
+        return (req, None)
 
 
 def _parse_request_heading(stream, scheme=None):
@@ -163,32 +181,24 @@ def _parse_request_body(req, stream):
         req.inner.body = None
 
 
-def _parse_responses(connection, requests, data):
-    stream = Stream(data)
-    while requests and stream.sane and not stream.is_eof():
-        req = requests.pop(0)
-        # Parse all responses corresponding to this request.
+def _parse_responses(stream, req):
+    resps = []
+    while stream.sane:
+        # Parse all responses corresponding to one request.
         # RFC 7230 section 3.3.
-        responses = []
-        while stream.sane:
-            resp = _parse_response_heading(req, stream)
-            if resp is Unavailable:
-                stream.dump_complaints(connection, u'request heading')
-            else:
-                responses.append(resp)
-                _parse_response_body(resp, stream)
-                if (not resp.status.informational) or \
-                        (resp.status == st.switching_protocols):
-                    # This is the final response for this request.
-                    # Proceed to the next request.
-                    connection.exchanges.append(Exchange(req, responses))
-                    break
-    if not stream.is_eof():
-        if stream.sane:
-            connection.complain(1008)
+        resp = _parse_response_heading(req, stream)
+        if resp is Unavailable:
+            box = ExchangeView(None, [])
+            stream.dump_complaints(box, u'response heading')
+            return (resps, box)
         else:
-            connection.complain(1010)
-    connection.unparsed_outbound = stream.consume_rest()
+            resps.append(resp)
+            _parse_response_body(resp, stream)
+            if (not resp.status.informational) or \
+                    (resp.status == st.switching_protocols):
+                # This is the final response for this request.
+                break
+    return (resps, None)
 
 
 def _parse_response_heading(req, stream):
@@ -206,8 +216,8 @@ def _parse_response_heading(req, stream):
         stream.sane = False
         return Unavailable
     else:
-        resp = ResponseView(req, structure.Response(req.inner, version_,
-                                                    status, reason, entries))
+        resp = ResponseView(req, structure.Response(version_, status, reason,
+                                                    entries))
         stream.dump_complaints(resp, u'response heading')
         return resp
 

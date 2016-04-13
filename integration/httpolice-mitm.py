@@ -53,8 +53,7 @@ def response(context, flow):
                             flow.request.headers.fields,
                             flow.request.content)
     preprocess_request(req)
-    resp = httpolice.Response(req,
-                              flow.response.http_version,
+    resp = httpolice.Response(flow.response.http_version,
                               flow.response.status_code, flow.response.reason,
                               flow.response.headers.fields,
                               flow.response.content)
@@ -63,7 +62,7 @@ def response(context, flow):
 
 
 def done(context):
-    result = [httpolice.analyze_exchange(req, [resp])
+    result = [httpolice.analyze_exchange(httpolice.Exchange(req, [resp]))
               for req, resp in context.pairs]
     if context.args.only_with_notices:
         result = [exch for exch in result if any(exch.collect_complaints())]

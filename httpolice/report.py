@@ -10,17 +10,16 @@ import six
 
 from httpolice import known, message, notice
 from httpolice.citation import Citation
-from httpolice.connection import Connection, Exchange
 from httpolice.header import HeaderView
 from httpolice.parse import ParseError, Symbol
-from httpolice.request import RequestView
-from httpolice.response import ResponseView
 from httpolice.structure import HeaderEntry, Parametrized, Unavailable, okay
 from httpolice.util.text import (
+    ellipsize,
     format_chars,
     has_nonprintable,
     nicely_join,
     printable,
+    write_if_any,
 )
 
 
@@ -30,41 +29,18 @@ from httpolice.util.text import (
 class Report(object):
 
     @classmethod
-    def render(cls, items, outfile):
+    def render(cls, exchanges, outfile):
         report = cls(outfile)
-        for item in items:
-            report._render_item(item)
-        report._close()
+        report.render_exchanges(exchanges)
+        report.close()
 
     def __init__(self, outfile):
         self.outfile = outfile
 
-    def _render_item(self, item):
-        if isinstance(item, Connection):
-            self._render_connection(item)
-        elif isinstance(item, Exchange):
-            self._render_exchange(item)
-        elif isinstance(item, RequestView):
-            self._render_request(item)
-        elif isinstance(item, ResponseView):
-            self._render_response(item)
-        else:
-            raise TypeError(u"don't know how to render a %s object" %
-                            type(item).__name__)
-
-    def _render_connection(self, conn):
+    def render_exchanges(self, exchanges):
         raise NotImplementedError()
 
-    def _render_exchange(self, exch):
-        raise NotImplementedError()
-
-    def _render_request(self, req):
-        raise NotImplementedError()
-
-    def _render_response(self, resp):
-        raise NotImplementedError()
-
-    def _close(self):
+    def close(self):
         pass
 
 
@@ -148,89 +124,58 @@ def expand_parse_error(error):
     return paras
 
 
+def find_reason_phrase(response):
+    return response.reason or known.title(response.status) or u'(unknown)'
+
+
 ###############################################################################
 # Plain text reports.
 
 class TextReport(Report):
 
-    def __init__(self, outfile):
-        super(TextReport, self).__init__(outfile)
-        self.written = False
-
-    def _render_item(self, item):
-        self._write_more(u'================================\n')
-        super(TextReport, self)._render_item(item)
-
-    def _write(self, s):
-        self.written = True
-        self.outfile.write(s)
-
-    def _write_more(self, s):
-        if self.written:
-            self._write(u'\n')
-        self._write(s)
-
-    def _render_notices(self, node):
-        for notice_id, context in node.complaints or []:
-            the_notice = notice.notices[notice_id]
-            self._write_more(notice_to_text(the_notice, context))
-
-    def _render_request_line(self, req):
-        self._write_more(u'>> %s %s %s\n' %
-                         (req.method, req.target, req.version))
-
-    def _render_status_line(self, resp):
-        self._write_more(u'<< %s %d %s\n' %
-                         (resp.version, resp.status, resp.reason))
-
-    def _render_message(self, msg):
-        for entry in msg.header_entries:
-            self._write(u'++ %s: %s\n' %
-                        (entry.name, entry.value.decode('iso-8859-1')))
-        if msg.body is Unavailable:
-            self._write(u'\n++ (body is unparseable)\n')
-        elif msg.body:
-            self._write(u'\n++ (%d bytes of payload body not shown)\n' %
-                        len(msg.body))
-        for entry in msg.trailer_entries:
-            self._write(u'++ %s: %s\n' %
-                        (entry.name, entry.value.decode('iso-8859-1')))
-        self._render_notices(msg)
-
-    def _render_request(self, req):
-        self._render_request_line(req)
-        self._render_message(req)
-
-    def _render_response(self, resp):
-        self._render_status_line(resp)
-        self._render_message(resp)
-
-    def _render_exchange(self, exch):
-        self._render_request(exch.request)
-        for resp in exch.responses:
-            self._render_response(resp)
-        self._render_notices(exch)
-
-    def _render_connection(self, conn):
-        for exch in conn.exchanges:
-            self._render_exchange(exch)
-        self._render_notices(conn)
-        if conn.unparsed_inbound:
-            self._write_more(
-                u'++ %d unparsed bytes remaining on the request stream\n' %
-                len(conn.unparsed_inbound))
-        if conn.unparsed_outbound:
-            self._write_more(
-                u'++ %d unparsed bytes remaining on the response stream\n' %
-                len(conn.unparsed_outbound))
+    def render_exchanges(self, exchanges):
+        req_i = resp_i = 1
+        f1 = self.outfile
+        for exch in exchanges:
+            with write_if_any(exchange_marker(exch, req_i), f1) as f2:
+                if exch.request:
+                    req_i += 1
+                    for complaint in exch.request.collect_complaints():
+                        write_complaint_line(complaint, f2)
+                for resp in exch.responses:
+                    with write_if_any(response_marker(resp, resp_i), f2) as f3:
+                        resp_i += 1
+                        for complaint in resp.collect_complaints():
+                            write_complaint_line(complaint, f3)
+                for complaint in exch.complaints:
+                    write_complaint_line(complaint, f2)
 
 
-def notice_to_text(the_notice, ctx):
-    info = u'%d %s' % (the_notice.ident, the_notice.severity_short)
-    title = piece_to_text(the_notice.title, ctx).strip()
-    explanation = u''.join(piece_to_text(para, ctx).strip() + u'\n'
-                           for para in the_notice.explanation)
-    return u'**** %s    %s\n%s' % (info, title, explanation)
+def exchange_marker(exchange, req_i):
+    if exchange.request:
+        marker = u'------------ request %d : %s %s' % (
+            req_i,
+            printable(exchange.request.method),
+            printable(exchange.request.target))
+    elif exchange.responses:
+        marker = u'------------ unknown request'
+    else:
+        marker = u'------------'
+    return ellipsize(marker) + u'\n'
+
+
+def response_marker(response, resp_i):
+    return ellipsize(u'------------ response %d : %d %s' % (
+                        resp_i,
+                        response.status,
+                        printable(find_reason_phrase(response)))) + u'\n'
+
+
+def write_complaint_line(complaint, f):
+    the_notice = notice.notices[complaint.notice_ident]
+    title = piece_to_text(the_notice.title, complaint.context).strip()
+    f.write(u'%s %d %s\n' % (the_notice.severity_short, the_notice.ident,
+                             title))
 
 
 def piece_to_text(piece, ctx):
@@ -278,25 +223,26 @@ class HTMLReport(Report):
             _include_stylesheet()
             _include_scripts()
 
-    def _close(self):
+    def close(self):
         self.outfile.write(self.document.render())
 
-    def _render_item(self, item):
-        with self.document:
-            self._render_next_item(item)
+    def render_exchanges(self, exchanges):
+        with self.document.body:
+            for exch in exchanges:
+                with H.div(**for_object(exch)):
+                    if exch.request:
+                        self._render_request(exch.request)
+                    for resp in exch.responses:
+                        self._render_response(resp)
+                    self._render_complaints(exch)
+                    H.br(_class=u'item-separator')
 
-    def _render_next_item(self, item):
-        with H.div(**for_object(item)):
-            super(HTMLReport, self)._render_item(item)
-            self._render_notices(item)
-            H.br(_class=u'item-separator')
-
-    def _render_notices(self, item):
-        if item.complaints:
+    def _render_complaints(self, obj):
+        if obj.complaints:
             with H.div(_class=u'notices'):
-                for notice_ident, context in item.complaints:
-                    notice_data = notice.notices[notice_ident]
-                    notice_to_html(notice_data, context)
+                for complaint in obj.complaints:
+                    the_notice = notice.notices[complaint.notice_ident]
+                    notice_to_html(the_notice, complaint.context)
 
     def _render_annotated(self, pieces):
         for piece in pieces:
@@ -309,8 +255,7 @@ class HTMLReport(Report):
     def _render_header_entries(self, annotated_entries):
         for entry, annotated in annotated_entries:
             with H.div(__inline=True, **for_object(entry)):
-                with H.span(**for_object(entry.name)):
-                    known_to_html(entry.name)
+                known_to_html(entry.name)
                 H.span(u': ')
                 self._render_annotated(annotated)
 
@@ -339,39 +284,24 @@ class HTMLReport(Report):
                 with H.span(**for_object(req.method)):
                     known_to_html(req.method)
                 H.span(u' ')
-                H.span(req.target, **for_object(req.target, u'request-target'))
+                H.span(printable(req.target),
+                       **for_object(req.target, u'request-target'))
                 H.span(u' ')
-                H.span(req.version, **for_object(req.version))
+                H.span(printable(req.version), **for_object(req.version))
             self._render_message(req)
+        self._render_complaints(req)
 
     def _render_response(self, resp):
         with H.div(_class=u'review'):
             with H.div(_class=u'status-line', __inline=True):
-                H.span(resp.version, **for_object(resp.version))
+                H.span(printable(resp.version), **for_object(resp.version))
                 H.span(u' ')
                 with H.span(**for_object(resp.status)):
                     known_to_html(resp.status)
                     H.span(u' ')
-                    H.span(printable(resp.reason), **for_object(resp.reason))
+                    H.span(printable(find_reason_phrase(resp)))
             self._render_message(resp)
-
-    def _render_exchange(self, exch):
-        self._render_next_item(exch.request)
-        for resp in exch.responses:
-            self._render_next_item(resp)
-
-    def _render_connection(self, conn):
-        for exch in conn.exchanges:
-            self._render_next_item(exch)
-        with H.div(_class=u'review'):
-            if conn.unparsed_inbound:
-                H.p(u'%d unparsed bytes remaining on the request stream' %
-                    len(conn.unparsed_inbound),
-                    _class=u'unparsed inbound')
-            if conn.unparsed_outbound:
-                H.p(u'%d unparsed bytes remaining on the response stream' %
-                    len(conn.unparsed_outbound),
-                    _class=u'unparsed outbound')
+        self._render_complaints(resp)
 
 
 def _include_stylesheet():
@@ -406,13 +336,13 @@ def reference_targets(obj):
 
 def known_to_html(obj):
     cls = u'known known-%s' % type(obj).__name__
+    text = printable(six.text_type(obj))
     cite = known.citation(obj)
     title = known.title(obj, with_citation=True)
     if cite:
-        elem = H.a(six.text_type(obj), _class=cls, href=cite.url,
-                   target=u'_blank')
+        elem = H.a(text, _class=cls, href=cite.url, target=u'_blank')
     else:
-        elem = H.span(six.text_type(obj), _class=cls)
+        elem = H.span(text, _class=cls)
     if title:
         with elem:
             H.attr(title=title)

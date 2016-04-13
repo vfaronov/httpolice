@@ -11,7 +11,13 @@ import unittest
 
 import six
 
-from httpolice import HTMLReport, TextReport, analyze_exchange, analyze_streams
+from httpolice import (
+    Exchange,
+    HTMLReport,
+    TextReport,
+    analyze_exchange,
+    analyze_streams,
+)
 from httpolice import parse
 from httpolice.known import cache, cc, h, header, hsts, m, media, st, tc, unit
 from httpolice.notice import notices
@@ -640,10 +646,10 @@ class TestRequest(unittest.TestCase):
                     b'Date: Thu, 28 Jan 2016 19:30:21 GMT\r\n'
                     b'Content-Length: 0\r\n'
                     b'\r\n') * 10        # Enough to cover all requests
-        conn = analyze_streams(inbound, outbound, scheme=scheme)
-        TextReport.render([conn], StringIO())
-        HTMLReport.render([conn], StringIO())
-        return [exch.request for exch in conn.exchanges]
+        exchanges = list(analyze_streams(inbound, outbound, scheme=scheme))
+        TextReport.render(exchanges, StringIO())
+        HTMLReport.render(exchanges, StringIO())
+        return [exch.request for exch in exchanges if exch.request]
 
     def test_parse_requests(self):
         stream = (b'GET /foo/bar/baz?qux=xyzzy HTTP/1.1\r\n'
@@ -909,26 +915,24 @@ class TestResponse(unittest.TestCase):
 
     @staticmethod
     def parse(inbound, outbound, scheme=u'http'):
-        conn = analyze_streams(inbound, outbound, scheme)
-        TextReport.render([conn], StringIO())
-        HTMLReport.render([conn], StringIO())
-        return [exch.responses for exch in conn.exchanges]
+        exchanges = list(analyze_streams(inbound, outbound, scheme))
+        TextReport.render(exchanges, StringIO())
+        HTMLReport.render(exchanges, StringIO())
+        return [exch.responses for exch in exchanges if exch.responses]
 
     def test_analyze_exchange(self):
         req = Request(u'http',
                       u'GET', u'/', u'HTTP/1.1',
                       [(u'Host', b'example.com')])
         self.assertEqual(repr(req), '<Request GET>')
-        resp1 = Response(req,
-                         u'HTTP/1.1', 123, u'Please wait', [])
+        resp1 = Response(u'HTTP/1.1', 123, u'Please wait', [])
         self.assertEqual(repr(resp1), '<Response 123>')
-        resp2 = Response(req,
-                         u'HTTP/1.1', 200, u'OK',
-                         [(u'Content-Length', 14)],
+        resp2 = Response(u'HTTP/1.1', 200, u'OK',
+                         [(u'Content-Length', b'14')],
                          b'Hello world!\r\n')
-        exch = analyze_exchange(req, [resp1, resp2])
+        exch = analyze_exchange(Exchange(req, [resp1, resp2]))
         self.assertEqual(repr(exch),
-                         'Exchange(<RequestView GET>, '
+                         'ExchangeView(<RequestView GET>, '
                          '[<ResponseView 123>, <ResponseView 200>])')
         self.assertTrue(isinstance(exch.request.method, Method))
         self.assertTrue(isinstance(exch.request.version, HTTPVersion))
@@ -985,8 +989,9 @@ class TestResponse(unittest.TestCase):
                   b'\r\n'
                   b'HTTP/1.1 101 Switching Protocols\r\n'
                   b'\r\n')
-        [[resp]] = self.parse(inbound, stream)
-        self.assertEqual(resp.body, b'Hello world!\r\n\r\n')
+        [[resp1], [resp2]] = self.parse(inbound, stream)
+        self.assertEqual(resp1.body, b'Hello world!\r\n\r\n')
+        self.assertEqual(resp2.status, 101)
 
     def test_parse_responses_bad_framing(self):
         self.assertEqual(self.parse(self.req(m.POST), b'HTTP/1.1 ...'), [])
@@ -1098,8 +1103,7 @@ class TestResponse(unittest.TestCase):
                           binary_garbage(),
                           [HeaderEntry(random.choice(interesting_headers),
                                        make_header_value())])
-            resps = [Response(req,
-                              random.choice([http10, http11, u'HTTP/3.0']),
+            resps = [Response(random.choice([http10, http11, u'HTTP/3.0']),
                               random.choice(list(st)),
                               binary_garbage().decode('iso-8859-1'),
                               [HeaderEntry(random.choice(interesting_headers),
@@ -1110,7 +1114,7 @@ class TestResponse(unittest.TestCase):
                                            make_header_value())])
                      for _ in range(random.randint(1, 3))]
             try:
-                exch = analyze_exchange(req, resps)
+                exch = analyze_exchange(Exchange(req, resps))
                 TextReport.render([exch], StringIO())
                 HTMLReport.render([exch], StringIO())
             except Exception as e:
@@ -1145,17 +1149,18 @@ class TestFromFiles(unittest.TestCase):
 
     def run_test(self, filename, scheme=None):
         inb, outb, scheme, expected = load_test_file(filename)
-        conn = analyze_streams(inb, outb, scheme)
+        exchanges = list(analyze_streams(inb, outb, scheme))
         buf = StringIO()
-        TextReport.render([conn], buf)
-        actual = sorted(int(ln[5:9]) for ln in buf.getvalue().splitlines()
-                        if ln.startswith('**** '))
+        TextReport.render(exchanges, buf)
+        actual = sorted(int(ln[2:6]) for ln in buf.getvalue().splitlines()
+                        if not ln.startswith(u'------------'))
         self.covered.update(actual)
         self.assertEqual(expected, actual)
-        HTMLReport.render([conn], StringIO())
+        HTMLReport.render(exchanges, StringIO())
         if self.examples is not None:
-            for ident, ctx in conn.collect_complaints():
-                self.examples.setdefault(ident, ctx)
+            for exch in exchanges:
+                for ident, ctx in exch.collect_complaints():
+                    self.examples.setdefault(ident, ctx)
 
     def test_all_notices_covered(self):
         self.assertEqual(self.covered, set(notices))

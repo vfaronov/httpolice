@@ -26,10 +26,6 @@ q {
     background-color: #FFF0BF;
 }
 
-.RequestView, .ResponseView {
-    margin-bottom: 2em;
-}
-
 .request-line, .status-line, .HeaderEntry {
     font-family: monospace;
     padding: 0.3em 0;
@@ -68,6 +64,7 @@ q {
     float: left;
     width: 57%;
     padding-right: 1em;
+    margin-bottom: 2em;
 }
 
 .notices {

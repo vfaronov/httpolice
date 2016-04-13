@@ -39,23 +39,25 @@ def main():
         inputs.append((inbound, outbound, (os.stat(inbound).st_ctime, n)))
 
     inputs.sort(key=lambda entry: entry[2])
-
-    result = []
-    for inbound, outbound, _ in inputs:
-        with io.open(inbound, 'rb') as f:
-            inbound_stream = f.read()
-        with io.open(outbound, 'rb') as f:
-            outbound_stream = f.read()
-        conn = httpolice.analyze_streams(inbound_stream, outbound_stream,
-                                         scheme=u'http')
-        if (not args.only_with_notices) or any(conn.collect_complaints()):
-            result.append(conn)
+    exchanges = _generate_exchanges(inputs, args.only_with_notices)
 
     if args.html:
         report_cls = httpolice.HTMLReport
     else:
         report_cls = httpolice.TextReport
-    report_cls.render(result, stdio_as_text(sys.stdout))
+    report_cls.render(exchanges, stdio_as_text(sys.stdout))
+
+def _generate_exchanges(inputs, only_with_notices=False):
+    for inbound, outbound, _ in inputs:
+        with io.open(inbound, 'rb') as f:
+            inbound_stream = f.read()
+        with io.open(outbound, 'rb') as f:
+            outbound_stream = f.read()
+        exchanges = httpolice.analyze_streams(inbound_stream, outbound_stream,
+                                              scheme=u'http')
+        for exch in exchanges:
+            if args.only_with_notices or any(exch.collect_complaints()):
+                yield exch
 
 if __name__ == '__main__':
     sys.exit(main())
