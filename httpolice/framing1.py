@@ -26,8 +26,6 @@ def analyze_streams(inbound, outbound, scheme=None):
     :type outbound: bytes | None
     :type scheme: six.text_type | bytes | None
     """
-    inbound = None if inbound is None else Stream(inbound)
-    outbound = None if outbound is None else Stream(outbound)
     for exch in parse_streams(inbound, outbound, scheme=scheme):
         check_exchange(exch)
         yield exch
@@ -35,10 +33,12 @@ def analyze_streams(inbound, outbound, scheme=None):
 
 def parse_streams(inbound, outbound, scheme=None):
     """
-    :type inbound: Stream | None
-    :type outbound: Stream | None
+    :type inbound: bytes | None
+    :type outbound: bytes | None
     :type scheme: six.text_type | bytes | None
     """
+    inbound = None if inbound is None else Stream(inbound)
+    outbound = None if outbound is None else Stream(outbound)
     while inbound and inbound.sane:
         (req, req_box) = _parse_request(inbound, scheme)
         (resps, resp_box) = ([], None)

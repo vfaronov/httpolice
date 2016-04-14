@@ -17,6 +17,7 @@ from httpolice import (
     analyze_streams,
 )
 from httpolice import parse
+from httpolice.inputs.streams import parse_combined
 from httpolice.known import cache, cc, h, header, hsts, m, media, st, tc, unit
 from httpolice.notice import notices
 from httpolice.reports import html_report, text_report
@@ -51,26 +52,6 @@ from httpolice.structure import (
     http11,
 )
 from httpolice.syntax import rfc3986, rfc5988, rfc7230, rfc7231, rfc7233
-
-
-def load_test_file(filename):
-    if '.' in filename:
-        scheme = filename.split('.')[-1]
-    else:
-        scheme = u'http'
-    if scheme == u'noscheme':
-        scheme = None
-
-    with io.open(filename, 'rb') as f:
-        data = f.read()
-    header, data = data.split(b'======== BEGIN INBOUND STREAM ========\r\n')
-    inb, outb = data.split(b'======== BEGIN OUTBOUND STREAM ========\r\n')
-    header = header.decode('utf-8')
-    lines = [ln for ln in header.splitlines() if not ln.startswith('#')]
-    line = lines[0]
-    expected = sorted(int(n) for n in line.split())
-
-    return inb, outb, scheme, expected
 
 
 def random_token():
@@ -1147,8 +1128,11 @@ class TestFromFiles(unittest.TestCase):
         setattr(cls, 'test_%s' % test_name, test)
 
     def run_test(self, filename, scheme=None):
-        inb, outb, scheme, expected = load_test_file(filename)
-        exchanges = list(analyze_streams(inb, outb, scheme))
+        (inbound, outbound, scheme, preamble) = parse_combined(filename)
+        lines = [ln for ln in preamble.splitlines() if not ln.startswith(u'#')]
+        line = lines[0]
+        expected = sorted(int(n) for n in line.split())
+        exchanges = list(analyze_streams(inbound, outbound, scheme))
         buf = StringIO()
         text_report(exchanges, buf)
         actual = sorted(int(ln[2:6]) for ln in buf.getvalue().splitlines()

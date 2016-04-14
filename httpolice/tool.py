@@ -1,34 +1,33 @@
 # -*- coding: utf-8; -*-
 
 import argparse
-import io
 import sys
 
-from httpolice import analyze_streams
-from httpolice.reports import html_report, text_report
+from httpolice import inputs, reports
+from httpolice.exchange import check_exchange
 from httpolice.util.seven import stdio_as_text
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description=u'Run HTTPolice on two streams (inbound and outbound).')
-    parser.add_argument(u'-s', u'--scheme', default=u'http',
-                        help=u'URI scheme of the protocol used on the streams, '
-                             u'such as "http" (default) or "https"')
-    parser.add_argument(u'-H', u'--html', action=u'store_true',
-                        help=u'render HTML report instead of plain text')
-    parser.add_argument(u'inbound')
-    parser.add_argument(u'outbound')
+        description=u'Run HTTPolice on input files.')
+    parser.add_argument(u'-i', u'--input', choices=inputs.formats)
+    parser.add_argument(u'-o', u'--output', choices=reports.formats,
+                        default=u'text')
+    parser.add_argument(u'path', nargs='+')
     args = parser.parse_args()
-    with io.open(args.inbound, 'rb') as f:
-        inbound_stream = f.read()
-    with io.open(args.outbound, 'rb') as f:
-        outbound_stream = f.read()
-    result = analyze_streams(inbound_stream, outbound_stream,
-                             args.scheme.decode('ascii'))
-    report = html_report if args.html else text_report
-    report([result], stdio_as_text(sys.stdout))
-
+    input_ = inputs.formats[args.input]
+    report = reports.formats[args.output]
+    stdout = stdio_as_text(sys.stdout)
+    def generate_exchanges():
+        for exch in input_(args.path):
+            check_exchange(exch)
+            yield exch
+    try:
+        report(generate_exchanges(), stdout)
+    except RuntimeError as exc:
+        sys.stderr.write('FATAL: %s\n' % exc)
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
