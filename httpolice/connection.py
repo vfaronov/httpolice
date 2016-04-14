@@ -99,7 +99,7 @@ def parse_streams(inbound, outbound, scheme=None):
         if switched:
             break
 
-    if inbound and not inbound.is_eof():
+    if inbound and not inbound.eof:
         yield complaint_box(1007, nbytes=len(inbound.consume_rest()))
 
     if outbound and outbound.sane:
@@ -114,7 +114,7 @@ def parse_streams(inbound, outbound, scheme=None):
             if resp_box:
                 yield resp_box
 
-    if outbound and not outbound.is_eof():
+    if outbound and not outbound.eof:
         yield complaint_box(1010, nbytes=len(outbound.consume_rest()))
 
 

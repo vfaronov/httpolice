@@ -487,12 +487,13 @@ class Stream(object):
         else:
             raise IndexError(i)
 
-    def is_eof(self):
+    @property
+    def eof(self):
         return self.point == len(self.data)
 
     @property
     def sane(self):
-        return self._sane and not self.is_eof()
+        return self._sane and not self.eof
 
     @sane.setter
     def sane(self, value):
