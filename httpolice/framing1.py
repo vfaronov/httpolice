@@ -1,14 +1,23 @@
 # -*- coding: utf-8; -*-
 
-from httpolice import message, request, response, structure
-from httpolice.blackboard import Blackboard
+from httpolice.codings import decode_deflate, decode_gzip
+from httpolice.exchange import ExchangeView, check_exchange, complaint_box
 from httpolice.known import m, st, tc
-from httpolice.parse import ParseError, Stream
+from httpolice.parse import ParseError, Stream, maybe, skip
 from httpolice.request import RequestView
 from httpolice.response import ResponseView
-from httpolice.structure import HTTPVersion, Method, StatusCode, Unavailable
+from httpolice.structure import (
+    FieldName,
+    HTTPVersion,
+    HeaderEntry,
+    Method,
+    Request,
+    Response,
+    StatusCode,
+    Unavailable,
+)
 from httpolice.syntax import rfc7230
-from httpolice.syntax.common import SP
+from httpolice.syntax.common import CRLF, LF, SP
 
 
 def analyze_streams(inbound, outbound, scheme=None):
@@ -22,55 +31,6 @@ def analyze_streams(inbound, outbound, scheme=None):
     for exch in parse_streams(inbound, outbound, scheme=scheme):
         check_exchange(exch)
         yield exch
-
-
-def analyze_exchange(exch):
-    """
-    :type exch: structure.Exchange
-    """
-    req_view = RequestView(exch.request) if exch.request else None
-    resp_views = [ResponseView(req_view, resp)
-                  for resp in exch.responses or []]
-    exch = ExchangeView(req_view, resp_views)
-    check_exchange(exch)
-    return exch
-
-
-class ExchangeView(Blackboard):
-
-    self_name = u'exch'
-
-    def __repr__(self):
-        return 'ExchangeView(%r, %r)' % (self.request, self.responses)
-
-    def __init__(self, req, resps):
-        """
-        :type req: RequestView
-        :type resp: list[ResponseView]
-        """
-        super(ExchangeView, self).__init__()
-        assert all(resp.request is req for resp in resps)
-        self.request = req
-        self.responses = resps
-
-    @property
-    def sub_nodes(self):
-        if self.request:
-            yield self.request
-        for resp in self.responses:
-            yield resp
-
-
-def complaint_box(*args, **kwargs):
-    box = ExchangeView(None, [])
-    box.complain(*args, **kwargs)
-    return box
-
-
-def check_exchange(exch):
-    if exch.request:
-        request.check_request(exch.request)
-    response.check_responses(exch.responses)
 
 
 def parse_streams(inbound, outbound, scheme=None):
@@ -134,15 +94,14 @@ def _parse_request_heading(stream, scheme=None):
             target = stream.consume_regex(b'[^ \t]+', u'request target')
             stream.consume_regex(SP)
             version_ = HTTPVersion(stream.consume_regex(rfc7230.HTTP_version))
-            message.parse_line_ending(stream)
-            entries = message.parse_header_fields(stream)
+            _parse_line_ending(stream)
+            entries = _parse_header_fields(stream)
     except ParseError as e:
         stream.sane = False
         stream.complain(1006, error=e)
         return Unavailable
     else:
-        req = RequestView(structure.Request(scheme, method_, target, version_,
-                                            entries))
+        req = RequestView(Request(scheme, method_, target, version_, entries))
         stream.dump_complaints(req, u'request heading')
         return req
 
@@ -153,13 +112,13 @@ def _parse_request_body(req, stream):
     if req.headers.transfer_encoding:
         codings = list(req.headers.transfer_encoding)
         if codings.pop() == tc.chunked:
-            message.parse_chunked(req, stream)
+            _parse_chunked(req, stream)
         else:
             req.inner.body = Unavailable
             req.complain(1001)
             stream.sane = False
         while codings and (req.body is not Unavailable):
-            message.decode_transfer_coding(req, codings.pop())
+            _decode_transfer_coding(req, codings.pop())
 
     elif req.headers.content_length:
         n = req.headers.content_length.value
@@ -206,15 +165,14 @@ def _parse_response_heading(req, stream):
             status = StatusCode(stream.consume_regex(rfc7230.status_code))
             stream.consume_regex(SP)
             reason = stream.consume_regex(rfc7230.reason_phrase)
-            message.parse_line_ending(stream)
-            entries = message.parse_header_fields(stream)
+            _parse_line_ending(stream)
+            entries = _parse_header_fields(stream)
     except ParseError as e:
         stream.complain(1009, error=e)
         stream.sane = False
         return Unavailable
     else:
-        resp = ResponseView(req, structure.Response(version_, status, reason,
-                                                    entries))
+        resp = ResponseView(req, Response(version_, status, reason, entries))
         stream.dump_complaints(resp, u'response heading')
         return resp
 
@@ -242,11 +200,11 @@ def _parse_response_body(resp, stream):
         codings = list(resp.headers.transfer_encoding)
         if codings[-1] == tc.chunked:
             codings.pop()
-            message.parse_chunked(resp, stream)
+            _parse_chunked(resp, stream)
         else:
             resp.inner.body = stream.consume_rest()
         while codings and (resp.body is not Unavailable):
-            message.decode_transfer_coding(resp, codings.pop())
+            _decode_transfer_coding(resp, codings.pop())
 
     elif resp.headers.content_length.is_present:
         n = resp.headers.content_length.value
@@ -263,3 +221,92 @@ def _parse_response_body(resp, stream):
 
     else:
         resp.inner.body = stream.consume_rest()
+
+
+def _parse_line_ending(stream):
+    r = stream.maybe_consume_regex(CRLF)
+    if r is None:
+        r = stream.consume_regex(LF, u'line ending')
+        stream.complain(1224)
+    return r
+
+
+def _parse_header_fields(stream):
+    entries = []
+    while True:
+        name = stream.maybe_consume_regex(rfc7230.field_name)
+        if name is None:
+            break
+        stream.consume_regex(b':')
+        stream.consume_regex(rfc7230.OWS)
+        vs = []
+        while True:
+            v = stream.maybe_consume_regex(rfc7230.field_content)
+            if v is None:
+                if stream.maybe_consume_regex(rfc7230.obs_fold):
+                    stream.complain(1016)
+                    vs.append(b' ')
+                else:
+                    break
+            else:
+                vs.append(v.encode('iso-8859-1'))       # back to bytes
+        value = b''.join(vs)
+        stream.consume_regex(rfc7230.OWS)
+        _parse_line_ending(stream)
+        entries.append(HeaderEntry(FieldName(name), value))
+    _parse_line_ending(stream)
+    return entries
+
+
+def _decode_transfer_coding(msg, coding):
+    if coding == tc.chunked:
+        # The outermost chunked has already been peeled off at this point.
+        msg.complain(1002)
+        msg.inner.body = Unavailable
+    elif coding in [tc.gzip, tc.x_gzip]:
+        try:
+            msg.inner.body = decode_gzip(msg.body)
+        except Exception as e:
+            msg.complain(1027, coding=coding, error=e)
+            msg.inner.body = Unavailable
+    elif coding == tc.deflate:
+        try:
+            msg.inner.body = decode_deflate(msg.body)
+        except Exception as e:
+            msg.complain(1027, coding=coding, error=e)
+            msg.inner.body = Unavailable
+    else:
+        msg.complain(1003, coding=coding)
+        msg.inner.body = Unavailable
+
+
+def _parse_chunk(stream):
+    size = stream.parse(rfc7230.chunk_size * skip(maybe(rfc7230.chunk_ext)))
+    _parse_line_ending(stream)
+    if size == 0:
+        return b''
+    else:
+        data = stream.consume_n_bytes(size)
+        _parse_line_ending(stream)
+        return data
+
+
+def _parse_chunked(msg, stream):
+    data = []
+    try:
+        with stream:
+            chunk = _parse_chunk(stream)
+            while chunk:
+                data.append(chunk)
+                chunk = _parse_chunk(stream)
+            trailer = _parse_header_fields(stream)
+    except ParseError as e:
+        stream.sane = False
+        msg.complain(1005, error=e)
+        msg.inner.body = Unavailable
+    else:
+        stream.dump_complaints(msg, u'chunked framing')
+        msg.inner.body = b''.join(data)
+        msg.inner.trailer_entries = trailer
+        if trailer:
+            msg.rebuild_headers()           # Rebuid the `HeadersView` cache

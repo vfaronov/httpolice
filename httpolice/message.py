@@ -2,10 +2,7 @@
 
 from datetime import datetime, timedelta
 import email.errors
-import gzip
-import io
 import json
-import zlib
 
 try:
     from email import message_from_bytes as parse_email_message
@@ -23,12 +20,10 @@ from bitstring import Bits
 import six
 
 from httpolice.blackboard import Blackboard, memoized_property
+from httpolice.codings import decode_deflate, decode_gzip
 from httpolice.header import HeadersView
 from httpolice.known import cc, header, media, media_type, tc, warn
-from httpolice.parse import ParseError, maybe, skip
-from httpolice.structure import HeaderEntry, FieldName, Unavailable, okay
-from httpolice.syntax import rfc7230
-from httpolice.syntax.common import CRLF, LF
+from httpolice.structure import FieldName, Unavailable, okay
 
 
 # This list is taken from the HTML specification --
@@ -235,100 +230,3 @@ def body_charset(msg):
         for name, value in msg.headers.content_type.value.param:
             if name == u'charset':
                 return value
-
-
-def parse_line_ending(stream):
-    r = stream.maybe_consume_regex(CRLF)
-    if r is None:
-        r = stream.consume_regex(LF, u'line ending')
-        stream.complain(1224)
-    return r
-
-
-def parse_header_fields(stream):
-    entries = []
-    while True:
-        name = stream.maybe_consume_regex(rfc7230.field_name)
-        if name is None:
-            break
-        stream.consume_regex(b':')
-        stream.consume_regex(rfc7230.OWS)
-        vs = []
-        while True:
-            v = stream.maybe_consume_regex(rfc7230.field_content)
-            if v is None:
-                if stream.maybe_consume_regex(rfc7230.obs_fold):
-                    stream.complain(1016)
-                    vs.append(b' ')
-                else:
-                    break
-            else:
-                vs.append(v.encode('iso-8859-1'))       # back to bytes
-        value = b''.join(vs)
-        stream.consume_regex(rfc7230.OWS)
-        parse_line_ending(stream)
-        entries.append(HeaderEntry(FieldName(name), value))
-    parse_line_ending(stream)
-    return entries
-
-
-def parse_chunk(stream):
-    size = stream.parse(rfc7230.chunk_size * skip(maybe(rfc7230.chunk_ext)))
-    parse_line_ending(stream)
-    if size == 0:
-        return b''
-    else:
-        data = stream.consume_n_bytes(size)
-        parse_line_ending(stream)
-        return data
-
-
-def parse_chunked(msg, stream):
-    data = []
-    try:
-        with stream:
-            chunk = parse_chunk(stream)
-            while chunk:
-                data.append(chunk)
-                chunk = parse_chunk(stream)
-            trailer = parse_header_fields(stream)
-    except ParseError as e:
-        stream.sane = False
-        msg.complain(1005, error=e)
-        msg.inner.body = Unavailable
-    else:
-        stream.dump_complaints(msg, u'chunked framing')
-        msg.inner.body = b''.join(data)
-        msg.inner.trailer_entries = trailer
-        if trailer:
-            msg.rebuild_headers()           # Rebuid the `HeadersView` cache
-
-
-def decode_transfer_coding(msg, coding):
-    if coding == tc.chunked:
-        # The outermost chunked has already been peeled off at this point.
-        msg.complain(1002)
-        msg.inner.body = Unavailable
-    elif coding in [tc.gzip, tc.x_gzip]:
-        try:
-            msg.inner.body = decode_gzip(msg.body)
-        except Exception as e:
-            msg.complain(1027, coding=coding, error=e)
-            msg.inner.body = Unavailable
-    elif coding == tc.deflate:
-        try:
-            msg.inner.body = decode_deflate(msg.body)
-        except Exception as e:
-            msg.complain(1027, coding=coding, error=e)
-            msg.inner.body = Unavailable
-    else:
-        msg.complain(1003, coding=coding)
-        msg.inner.body = Unavailable
-
-
-def decode_gzip(data):
-    return gzip.GzipFile(fileobj=io.BytesIO(data)).read()
-
-
-def decode_deflate(data):
-    return zlib.decompress(data)
