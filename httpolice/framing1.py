@@ -20,17 +20,6 @@ from httpolice.syntax import rfc7230
 from httpolice.syntax.common import CRLF, LF, SP
 
 
-def analyze_streams(inbound, outbound, scheme=None):
-    """
-    :type inbound: bytes | None
-    :type outbound: bytes | None
-    :type scheme: six.text_type | bytes | None
-    """
-    for exch in parse_streams(inbound, outbound, scheme=scheme):
-        check_exchange(exch)
-        yield exch
-
-
 def parse_streams(inbound, outbound, scheme=None):
     """
     :type inbound: bytes | None

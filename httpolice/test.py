@@ -11,13 +11,10 @@ import unittest
 
 import six
 
-from httpolice import (
-    Exchange,
-    analyze_exchange,
-    analyze_streams,
-)
 from httpolice import parse
-from httpolice.inputs.streams import parse_combined
+from httpolice.exchange import analyze_exchange, check_exchange
+from httpolice.framing1 import parse_streams
+from httpolice.inputs.streams import combined_input, parse_combined
 from httpolice.known import cache, cc, h, header, hsts, m, media, st, tc, unit
 from httpolice.notice import notices
 from httpolice.reports import html_report, text_report
@@ -28,6 +25,7 @@ from httpolice.structure import (
     CaseInsensitive,
     ContentCoding,
     ContentRange,
+    Exchange,
     FieldName,
     HeaderEntry,
     HSTSDirective,
@@ -626,7 +624,9 @@ class TestRequest(unittest.TestCase):
                     b'Date: Thu, 28 Jan 2016 19:30:21 GMT\r\n'
                     b'Content-Length: 0\r\n'
                     b'\r\n') * 10        # Enough to cover all requests
-        exchanges = list(analyze_streams(inbound, outbound, scheme=scheme))
+        exchanges = list(parse_streams(inbound, outbound, scheme=scheme))
+        for exch in exchanges:
+            check_exchange(exch)
         text_report(exchanges, StringIO())
         html_report(exchanges, StringIO())
         return [exch.request for exch in exchanges if exch.request]
@@ -895,7 +895,9 @@ class TestResponse(unittest.TestCase):
 
     @staticmethod
     def parse(inbound, outbound, scheme=u'http'):
-        exchanges = list(analyze_streams(inbound, outbound, scheme))
+        exchanges = list(parse_streams(inbound, outbound, scheme))
+        for exch in exchanges:
+            check_exchange(exch)
         text_report(exchanges, StringIO())
         html_report(exchanges, StringIO())
         return [exch.responses for exch in exchanges if exch.responses]
@@ -1128,11 +1130,13 @@ class TestFromFiles(unittest.TestCase):
         setattr(cls, 'test_%s' % test_name, test)
 
     def run_test(self, filename, scheme=None):
-        (inbound, outbound, scheme, preamble) = parse_combined(filename)
+        (_, _, _, preamble) = parse_combined(filename)
         lines = [ln for ln in preamble.splitlines() if not ln.startswith(u'#')]
         line = lines[0]
         expected = sorted(int(n) for n in line.split())
-        exchanges = list(analyze_streams(inbound, outbound, scheme))
+        exchanges = list(combined_input([filename]))
+        for exch in exchanges:
+            check_exchange(exch)
         buf = StringIO()
         text_report(exchanges, buf)
         actual = sorted(int(ln[2:6]) for ln in buf.getvalue().splitlines()
