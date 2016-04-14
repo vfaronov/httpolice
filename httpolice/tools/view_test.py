@@ -5,7 +5,8 @@ from os import listdir
 from os.path import abspath, dirname, join
 import sys
 
-from httpolice import HTMLReport, TextReport, analyze_streams
+from httpolice import analyze_streams
+from httpolice.reports import html_report, text_report
 import httpolice.test
 from httpolice.util.seven import stdio_as_text
 
@@ -25,8 +26,8 @@ def main():
             inbound, outbound, scheme, _ = \
                 httpolice.test.load_test_file(join(root, filename))
             result.extend(analyze_streams(inbound, outbound, scheme))
-    report_cls = HTMLReport if args.html else TextReport
-    report_cls.render(result, stdio_as_text(sys.stdout))
+    report = html_report if args.html else text_report
+    report(result, stdio_as_text(sys.stdout))
 
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@ import argparse
 import io
 
 import httpolice
+import httpolice.reports
 from httpolice.known import h, st
 
 
@@ -67,8 +68,8 @@ def done(context):
     if context.args.only_with_notices:
         result = [exch for exch in result if any(exch.collect_complaints())]
     if context.args.html:
-        report_cls = httpolice.HTMLReport
+        report = httpolice.reports.html_report
     else:
-        report_cls = httpolice.TextReport
+        report = httpolice.reports.text_report
     with io.open(context.args.out_filename, 'wt', encoding='utf-8') as outf:
-        report_cls.render(result, outf)
+        report(result, outf)

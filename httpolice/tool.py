@@ -4,7 +4,8 @@ import argparse
 import io
 import sys
 
-from httpolice import HTMLReport, TextReport, analyze_streams
+from httpolice import analyze_streams
+from httpolice.reports import html_report, text_report
 from httpolice.util.seven import stdio_as_text
 
 
@@ -25,11 +26,8 @@ def main():
         outbound_stream = f.read()
     result = analyze_streams(inbound_stream, outbound_stream,
                              args.scheme.decode('ascii'))
-    if args.html:
-        report_cls = HTMLReport
-    else:
-        report_cls = TextReport
-    report_cls.render([result], stdio_as_text(sys.stdout))
+    report = html_report if args.html else text_report
+    report([result], stdio_as_text(sys.stdout))
 
 
 if __name__ == '__main__':

@@ -7,6 +7,7 @@ import os
 import sys
 
 import httpolice
+import httpolice.reports
 from httpolice.util.seven import stdio_as_text
 
 
@@ -57,10 +58,10 @@ def main():
     exchanges = _generate_exchanges(inputs, args.only_with_notices)
 
     if args.html:
-        report_cls = httpolice.HTMLReport
+        report = httpolice.reports.html_report
     else:
-        report_cls = httpolice.TextReport
-    report_cls.render(exchanges, stdio_as_text(sys.stdout))
+        report = httpolice.reports.text_report
+    report(exchanges, stdio_as_text(sys.stdout))
 
 def _generate_exchanges(inputs, only_with_notices=False):
     for (inbound_path, outbound_path) in inputs:

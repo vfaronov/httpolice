@@ -13,15 +13,14 @@ import six
 
 from httpolice import (
     Exchange,
-    HTMLReport,
-    TextReport,
     analyze_exchange,
     analyze_streams,
 )
 from httpolice import parse
 from httpolice.known import cache, cc, h, header, hsts, m, media, st, tc, unit
 from httpolice.notice import notices
-from httpolice.report import render_notice_examples
+from httpolice.reports import html_report, text_report
+from httpolice.reports.html import render_notice_examples
 from httpolice.structure import (
     AuthScheme,
     CacheDirective,
@@ -647,8 +646,8 @@ class TestRequest(unittest.TestCase):
                     b'Content-Length: 0\r\n'
                     b'\r\n') * 10        # Enough to cover all requests
         exchanges = list(analyze_streams(inbound, outbound, scheme=scheme))
-        TextReport.render(exchanges, StringIO())
-        HTMLReport.render(exchanges, StringIO())
+        text_report(exchanges, StringIO())
+        html_report(exchanges, StringIO())
         return [exch.request for exch in exchanges if exch.request]
 
     def test_parse_requests(self):
@@ -916,8 +915,8 @@ class TestResponse(unittest.TestCase):
     @staticmethod
     def parse(inbound, outbound, scheme=u'http'):
         exchanges = list(analyze_streams(inbound, outbound, scheme))
-        TextReport.render(exchanges, StringIO())
-        HTMLReport.render(exchanges, StringIO())
+        text_report(exchanges, StringIO())
+        html_report(exchanges, StringIO())
         return [exch.responses for exch in exchanges if exch.responses]
 
     def test_analyze_exchange(self):
@@ -1115,8 +1114,8 @@ class TestResponse(unittest.TestCase):
                      for _ in range(random.randint(1, 3))]
             try:
                 exch = analyze_exchange(Exchange(req, resps))
-                TextReport.render([exch], StringIO())
-                HTMLReport.render([exch], StringIO())
+                text_report([exch], StringIO())
+                html_report([exch], StringIO())
             except Exception as e:
                 n_failed += 1
         if n_failed > 0:
@@ -1151,12 +1150,12 @@ class TestFromFiles(unittest.TestCase):
         inb, outb, scheme, expected = load_test_file(filename)
         exchanges = list(analyze_streams(inb, outb, scheme))
         buf = StringIO()
-        TextReport.render(exchanges, buf)
+        text_report(exchanges, buf)
         actual = sorted(int(ln[2:6]) for ln in buf.getvalue().splitlines()
                         if not ln.startswith(u'------------'))
         self.covered.update(actual)
         self.assertEqual(expected, actual)
-        HTMLReport.render(exchanges, StringIO())
+        html_report(exchanges, StringIO())
         if self.examples is not None:
             for exch in exchanges:
                 for ident, ctx in exch.collect_complaints():
