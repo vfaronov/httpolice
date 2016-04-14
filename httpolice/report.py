@@ -202,7 +202,7 @@ def piece_to_text(piece, ctx):
                         for para in expand_parse_error(piece))
 
     elif isinstance(piece, six.text_type):
-        return piece
+        return printable(piece)
 
     else:
         return piece_to_text(expand_piece(piece), ctx)
@@ -401,7 +401,7 @@ def piece_to_html(piece, ctx):
         known_to_html(piece)
 
     elif isinstance(piece, six.text_type):
-        H.span(piece)
+        H.span(printable(piece))
 
     else:
         piece_to_html(expand_piece(piece), ctx)
