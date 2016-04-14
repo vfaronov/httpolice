@@ -82,22 +82,19 @@ def parse_streams(inbound, outbound, scheme=None):
     while inbound and inbound.sane:
         (req, req_box) = _parse_request(inbound, scheme)
         (resps, resp_box) = ([], None)
-        switched = False
         if req:
             if outbound and outbound.sane:
                 (resps, resp_box) = _parse_responses(outbound, req)
                 if resps:
                     if resps[-1].status == st.switching_protocols:
-                        switched = True
+                        inbound.sane = False
                     if req.method == m.CONNECT and resps[-1].status.successful:
-                        switched = True
+                        inbound.sane = False
             yield ExchangeView(req, resps)
         if req_box:
             yield req_box
         if resp_box:
             yield resp_box
-        if switched:
-            break
 
     if inbound and not inbound.eof:
         yield complaint_box(1007, nbytes=len(inbound.consume_rest()))
