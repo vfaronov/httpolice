@@ -703,26 +703,34 @@ known = KnownDict([
                           u'http://www.w3.org/2006/appformats/')],
   'iana_status': u'deprecated'},
  {'_': FieldName(u'Access-Control-Allow-Credentials'),
-  '_citations': [Citation(u'W3C Web Application Formats Working Group',
-                          u'http://www.w3.org/2006/appformats/')]},
+  '_citations': [Citation(u'W3C Cross-Origin Resource Sharing',
+                          u'https://www.w3.org/TR/cors/'
+                          u'#access-control-allow-credentials-'
+                          u'response-header')]},
  {'_': FieldName(u'Access-Control-Allow-Headers'),
-  '_citations': [Citation(u'W3C Web Application Formats Working Group',
-                          u'http://www.w3.org/2006/appformats/')]},
+  '_citations': [Citation(u'W3C Cross-Origin Resource Sharing',
+                          u'https://www.w3.org/TR/cors/'
+                          u'#access-control-allow-headers-response-header')]},
  {'_': FieldName(u'Access-Control-Allow-Methods'),
-  '_citations': [Citation(u'W3C Web Application Formats Working Group',
-                          u'http://www.w3.org/2006/appformats/')]},
+  '_citations': [Citation(u'W3C Cross-Origin Resource Sharing',
+                          u'https://www.w3.org/TR/cors/'
+                          u'#access-control-allow-methods-response-header')]},
  {'_': FieldName(u'Access-Control-Allow-Origin'),
-  '_citations': [Citation(u'W3C Web Application Formats Working Group',
-                          u'http://www.w3.org/2006/appformats/')]},
+  '_citations': [Citation(u'W3C Cross-Origin Resource Sharing',
+                          u'https://www.w3.org/TR/cors/'
+                          u'#access-control-allow-origin-response-header')]},
  {'_': FieldName(u'Access-Control-Max-Age'),
-  '_citations': [Citation(u'W3C Web Application Formats Working Group',
-                          u'http://www.w3.org/2006/appformats/')]},
+  '_citations': [Citation(u'W3C Cross-Origin Resource Sharing',
+                          u'https://www.w3.org/TR/cors/'
+                          u'#access-control-max-age-response-header')]},
  {'_': FieldName(u'Access-Control-Request-Method'),
-  '_citations': [Citation(u'W3C Web Application Formats Working Group',
-                          u'http://www.w3.org/2006/appformats/')]},
+  '_citations': [Citation(u'W3C Cross-Origin Resource Sharing',
+                          u'https://www.w3.org/TR/cors/'
+                          u'#access-control-request-method-request-header')]},
  {'_': FieldName(u'Access-Control-Request-Headers'),
-  '_citations': [Citation(u'W3C Web Application Formats Working Group',
-                          u'http://www.w3.org/2006/appformats/')]},
+  '_citations': [Citation(u'W3C Cross-Origin Resource Sharing',
+                          u'https://www.w3.org/TR/cors/'
+                          u'#access-control-request-headers-request-header')]},
  {'_': FieldName(u'Compliance'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Content-Transfer-Encoding'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Cost'), '_citations': [RFC(4229)]},
