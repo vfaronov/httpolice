@@ -242,11 +242,9 @@ class MediaType(CaseInsensitive):
     __slots__ = ()
 
 
-class UpgradeToken(CaseInsensitive):
+class UpgradeToken(ProtocolString):
 
-    # RFC 7230 doesn't say that upgrade tokens are case-insensitive.
-    # But RFC 6455 does say that for the ``WebSocket`` token,
-    # and it would make a lot of sense in general.
+    # https://github.com/httpwg/http11bis/issues/8
 
     __slots__ = ()
 

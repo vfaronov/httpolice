@@ -1,0 +1,19 @@
+1049 1011 1010
+
+# See https://github.com/httpwg/http11bis/issues/8
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Upgrade: FSTR/2
+Connection: upgrade
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 101 Switching Protocols
+Upgrade: Fstr/2
+Connection: upgrade
+
+nfwjne
+wfrkjnwekjfn
+welknlknfrwlen
