@@ -121,12 +121,12 @@ class Message(object):
 
     __slots__ = ('version', 'header_entries', 'body', 'trailer_entries')
 
-    def __init__(self, version, header_entries, body=None,
-                 trailer_entries=None):
-        self.version = HTTPVersion(force_unicode(version))
+    def __init__(self, version, header_entries, body, trailer_entries=None):
+        self.version = (HTTPVersion(force_unicode(version))
+                        if okay(version) else None)
         self.header_entries = [HeaderEntry(k, v)
                                for k, v in header_entries]
-        self.body = None if body is None else bytes(body)
+        self.body = bytes(body) if okay(body) else body
         self.trailer_entries = [HeaderEntry(k, v)
                                 for k, v in trailer_entries or []]
 
@@ -136,10 +136,10 @@ class Request(Message):
     __slots__ = ('scheme', 'method', 'target')
 
     def __init__(self, scheme, method, target, version, header_entries,
-                 body=None, trailer_entries=None):
+                 body, trailer_entries=None):
         super(Request, self).__init__(version, header_entries,
                                       body, trailer_entries)
-        self.scheme = None if scheme is None else force_unicode(scheme)
+        self.scheme = force_unicode(scheme) if okay(scheme) else None
         self.method = Method(force_unicode(method))
         self.target = force_unicode(target)
 
@@ -152,11 +152,11 @@ class Response(Message):
     __slots__ = ('status', 'reason')
 
     def __init__(self, version, status, reason, header_entries,
-                 body=None, trailer_entries=None):
+                 body, trailer_entries=None):
         super(Response, self).__init__(version, header_entries,
                                        body, trailer_entries)
         self.status = StatusCode(status)
-        self.reason = None if reason is None else force_unicode(reason)
+        self.reason = force_unicode(reason) if okay(reason) else None
 
     def __repr__(self):
         return '<Response %d>' % self.status
@@ -169,6 +169,7 @@ class HTTPVersion(ProtocolString):
 
 http10 = HTTPVersion(u'HTTP/1.0')
 http11 = HTTPVersion(u'HTTP/1.1')
+http2 = HTTPVersion(u'HTTP/2')
 
 
 class Method(ProtocolString):

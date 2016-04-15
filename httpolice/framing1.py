@@ -84,13 +84,14 @@ def _parse_request_heading(stream, scheme=None):
             stream.consume_regex(SP)
             version_ = HTTPVersion(stream.consume_regex(rfc7230.HTTP_version))
             _parse_line_ending(stream)
-            entries = _parse_header_fields(stream)
+            entries = parse_header_fields(stream)
     except ParseError as e:
         stream.sane = False
         stream.complain(1006, error=e)
         return Unavailable
     else:
-        req = RequestView(Request(scheme, method_, target, version_, entries))
+        req = RequestView(Request(scheme, method_, target, version_, entries,
+                                  body=Unavailable))
         stream.dump_complaints(req, u'request heading')
         return req
 
@@ -155,13 +156,14 @@ def _parse_response_heading(req, stream):
             stream.consume_regex(SP)
             reason = stream.consume_regex(rfc7230.reason_phrase)
             _parse_line_ending(stream)
-            entries = _parse_header_fields(stream)
+            entries = parse_header_fields(stream)
     except ParseError as e:
         stream.complain(1009, error=e)
         stream.sane = False
         return Unavailable
     else:
-        resp = ResponseView(req, Response(version_, status, reason, entries))
+        resp = ResponseView(req, Response(version_, status, reason, entries,
+                                          body=Unavailable))
         stream.dump_complaints(resp, u'response heading')
         return resp
 
@@ -220,7 +222,7 @@ def _parse_line_ending(stream):
     return r
 
 
-def _parse_header_fields(stream):
+def parse_header_fields(stream):
     entries = []
     while True:
         name = stream.maybe_consume_regex(rfc7230.field_name)
@@ -288,7 +290,7 @@ def _parse_chunked(msg, stream):
             while chunk:
                 data.append(chunk)
                 chunk = _parse_chunk(stream)
-            trailer = _parse_header_fields(stream)
+            trailer = parse_header_fields(stream)
     except ParseError as e:
         stream.sane = False
         msg.complain(1005, error=e)

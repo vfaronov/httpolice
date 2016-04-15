@@ -905,13 +905,15 @@ class TestResponse(unittest.TestCase):
     def test_analyze_exchange(self):
         req = Request(u'http',
                       u'GET', u'/', u'HTTP/1.1',
-                      [(u'Host', b'example.com')])
+                      [(u'Host', b'example.com')],
+                      None)
         self.assertEqual(repr(req), '<Request GET>')
-        resp1 = Response(u'HTTP/1.1', 123, u'Please wait', [])
+        resp1 = Response(u'HTTP/1.1', 123, u'Please wait', [], None)
         self.assertEqual(repr(resp1), '<Response 123>')
         resp2 = Response(u'HTTP/1.1', 200, u'OK',
                          [(u'Content-Length', b'14')],
-                         b'Hello world!\r\n')
+                         b'Hello world!\r\n',
+                         None)
         exch = analyze_exchange(Exchange(req, [resp1, resp2]))
         self.assertEqual(repr(exch),
                          'ExchangeView(<RequestView GET>, '

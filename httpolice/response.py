@@ -6,7 +6,7 @@ except ImportError:                                     # Python 2
     from urllib.parse import urljoin, urlparse
 
 from httpolice import message
-from httpolice.blackboard import memoized_property
+from httpolice.blackboard import derived_property
 from httpolice.known import (
     auth,
     cache,
@@ -41,15 +41,12 @@ class ResponseView(message.MessageView):
     status = property(lambda self: self.inner.status)
     reason = property(lambda self: self.inner.reason)
 
-    @property
-    def full_content(self):
-        if self.status == st.partial_content and \
-                not self.headers.content_type == media.multipart_byteranges:
-            return None
-        else:
-            return super(ResponseView, self).full_content
+    @derived_property
+    def content_is_full(self):
+        return self.status != st.partial_content or \
+            self.headers.content_type == media.multipart_byteranges
 
-    @memoized_property
+    @derived_property
     def from_cache(self):
         if self.headers.age.is_present:
             self.complain(1168)
@@ -60,7 +57,7 @@ class ResponseView(message.MessageView):
                 return True
         return None
 
-    @memoized_property
+    @derived_property
     def heuristic_expiration(self):
         if not self.from_cache:
             return self.from_cache
@@ -76,7 +73,7 @@ class ResponseView(message.MessageView):
             return True
         return None
 
-    @memoized_property
+    @derived_property
     def stale(self):
         for code in [warn.response_is_stale, warn.revalidation_failed]:
             if code in self.headers.warning:
@@ -96,7 +93,7 @@ class ResponseView(message.MessageView):
                     return True
         return None
 
-    @memoized_property
+    @derived_property
     def transformed(self):
         if self.status == st.non_authoritative_information:
             self.complain(1190)

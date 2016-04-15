@@ -35,11 +35,16 @@ class Blackboard(object):
             yield c
 
 
-def memoized_property(getter):
+def derived_property(getter):
     @property
     @functools.wraps(getter)
-    def inner_getter(self):
+    def prop(self):
         if getter.__name__ not in self.memoized:
             self.memoized[getter.__name__] = getter(self)
         return self.memoized[getter.__name__]
-    return inner_getter
+
+    @prop.setter
+    def prop(self, value):
+        self.memoized[getter.__name__] = value
+
+    return prop

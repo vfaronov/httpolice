@@ -1,5 +1,6 @@
 # -*- coding: utf-8; -*-
 
+import codecs
 from datetime import datetime, timedelta
 import email.errors
 import json
@@ -19,7 +20,7 @@ import defusedxml.ElementTree
 from bitstring import Bits
 import six
 
-from httpolice.blackboard import Blackboard, memoized_property
+from httpolice.blackboard import Blackboard, derived_property
 from httpolice.codings import decode_deflate, decode_gzip
 from httpolice.header import HeadersView
 from httpolice.known import cc, header, media, media_type, tc, warn
@@ -66,7 +67,7 @@ class MessageView(Blackboard):
     def rebuild_headers(self):
         self.headers = HeadersView(self)
 
-    @memoized_property
+    @derived_property
     def decoded_body(self):
         r = self.body
         codings = list(self.headers.content_encoding)
@@ -91,48 +92,82 @@ class MessageView(Blackboard):
                 r = Unavailable
         return r
 
-    @property
-    def full_content(self):
-        return self.decoded_body
+    @derived_property
+    def guessed_charset(self):
+        charset = 'utf-8'
+        if self.headers.content_type.is_okay:
+            for (name, value) in self.headers.content_type.value.param:
+                if name == u'charset':
+                    charset = value
 
-    @memoized_property
+        try:
+            codec = codecs.lookup(charset)
+        except LookupError:
+            return Unavailable
+        charset = codec.name
+
+        if okay(self.decoded_body):
+            try:
+                self.decoded_body.decode(charset)
+            except UnicodeError:
+                return Unavailable
+        return charset
+
+    @derived_property
+    def unicode_body(self):
+        if not okay(self.decoded_body):
+            return self.decoded_body
+        if not okay(self.guessed_charset):
+            return self.guessed_charset
+        return self.decoded_body.decode(self.guessed_charset)
+
+    @derived_property
+    def content_is_full(self):
+        return True
+
+    @derived_property
     def json_data(self):
-        if not okay(self.full_content):
-            return self.full_content
+        if not okay(self.unicode_body):
+            return self.unicode_body
+        if not self.content_is_full:
+            return Unavailable
         ctype = self.headers.content_type
         if not ctype.is_okay or not media_type.is_json(ctype.value.item):
             return None
         try:
-            s = self.full_content.decode('utf-8')
-            return json.loads(s)
+            return json.loads(self.unicode_body)
         except Exception as e:
             self.complain(1038, error=e)
             return Unavailable
 
-    @memoized_property
+    @derived_property
     def xml_data(self):
-        if not okay(self.full_content):
-            return self.full_content
+        if not okay(self.decoded_body):
+            return self.decoded_body
+        if not self.content_is_full:
+            return Unavailable
         ctype = self.headers.content_type
         if not ctype.is_okay or not media_type.is_xml(ctype.value.item):
             return None
         try:
-            return defusedxml.ElementTree.fromstring(self.full_content)
+            return defusedxml.ElementTree.fromstring(self.decoded_body)
         except defusedxml.DefusedXmlException:
             return Unavailable
         except Exception as e:
             self.complain(1039, error=e)
             return Unavailable
 
-    @memoized_property
+    @derived_property
     def multipart_data(self):
-        if not okay(self.full_content):
-            return self.full_content
+        if not okay(self.decoded_body):
+            return self.decoded_body
+        if not self.content_is_full:
+            return Unavailable
         ctype = self.headers.content_type
         if not ctype.is_okay or not media_type.is_multipart(ctype.value.item):
             return None
         multipart_code = (b'Content-Type: ' + ctype.entries[0].value + b'\r\n'
-                          b'\r\n' + self.full_content)
+                          b'\r\n' + self.decoded_body)
         parsed = parse_email_message(multipart_code)
         for defect in parsed.defects:
             if isinstance(defect, email.errors.NoBoundaryInMultipartDefect):
@@ -141,20 +176,22 @@ class MessageView(Blackboard):
                 self.complain(1140)
         return parsed if parsed.is_multipart() else Unavailable
 
-    @memoized_property
+    @derived_property
     def url_encoded_data(self):
-        if not okay(self.full_content):
-            return self.full_content
+        if not okay(self.decoded_body):
+            return self.decoded_body
+        if not self.content_is_full:
+            return Unavailable
         if not (self.headers.content_type ==
                 media.application_x_www_form_urlencoded):
             return None
-        for byte in six.iterbytes(self.full_content):
+        for byte in six.iterbytes(self.decoded_body):
             if not URL_ENCODED_GOOD_BYTES[byte]:
                 self.complain(1040, offending_value=byte)
                 return Unavailable
-        return parse_qs(self.full_content.decode('ascii'))
+        return parse_qs(self.decoded_body.decode('ascii'))
 
-    @memoized_property
+    @derived_property
     def transformed(self):
         if warn.transformation_applied in self.headers.warning:
             self.complain(1189)
@@ -223,10 +260,3 @@ def check_message(msg):
     for pragma in msg.headers.pragma.okay:
         if pragma != u'no-cache':
             msg.complain(1160, pragma=pragma.item)
-
-
-def body_charset(msg):
-    if msg.headers.content_type.is_okay:
-        for name, value in msg.headers.content_type.value.param:
-            if name == u'charset':
-                return value

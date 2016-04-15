@@ -11,7 +11,7 @@ except ImportError:                             # Python 2
 import six
 
 from httpolice import message, parse
-from httpolice.blackboard import memoized_property
+from httpolice.blackboard import derived_property
 from httpolice.known import (
     auth,
     cache,
@@ -49,22 +49,22 @@ class RequestView(message.MessageView):
         else:
             return True
 
-    @memoized_property
+    @derived_property
     def is_origin_form(self):
         return self._target_parses_as(rfc7230.origin_form)
 
-    @memoized_property
+    @derived_property
     def is_asterisk_form(self):
         return self._target_parses_as(rfc7230.asterisk_form)
 
-    @memoized_property
+    @derived_property
     def is_authority_form(self):
         return (
             self._target_parses_as(rfc7230.authority_form) and
             # ``*`` can be parsed as an ``<authority>``.
             not self.is_asterisk_form)
 
-    @memoized_property
+    @derived_property
     def is_absolute_form(self):
         return (
             self._target_parses_as(rfc7230.absolute_form) and
@@ -73,7 +73,7 @@ class RequestView(message.MessageView):
             # and a ``<path-rootless>`` of ``80``.
             not self.is_authority_form)
 
-    @memoized_property
+    @derived_property
     def effective_uri(self):
         # RFC 7230 section 5.5.
         if self.is_absolute_form:

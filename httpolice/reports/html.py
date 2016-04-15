@@ -1,13 +1,12 @@
 # -*- coding: utf-8; -*-
 
-import codecs
 import json
 
 import dominate
 import dominate.tags as H
 import six
 
-from httpolice import known, message, notice
+from httpolice import known, notice
 from httpolice.citation import Citation
 from httpolice.parse import ParseError
 from httpolice.header import HeaderView
@@ -115,8 +114,9 @@ def _render_request(req):
             H.span(u' ')
             H.span(printable(req.target),
                    **_for_object(req.target, u'request-target'))
-            H.span(u' ')
-            H.span(printable(req.version), **_for_object(req.version))
+            if okay(req.version):
+                H.span(u' ')
+                H.span(printable(req.version), **_for_object(req.version))
         _render_message(req)
     _render_complaints(req)
 
@@ -124,8 +124,9 @@ def _render_request(req):
 def _render_response(resp):
     with H.div(_class=u'review'):
         with H.div(_class=u'status-line', __inline=True):
-            H.span(printable(resp.version), **_for_object(resp.version))
-            H.span(u' ')
+            if okay(resp.version):
+                H.span(printable(resp.version), **_for_object(resp.version))
+                H.span(u' ')
             with H.span(**_for_object(resp.status)):
                 _known_to_html(resp.status)
                 H.span(u' ')
@@ -145,11 +146,13 @@ def _include_scripts():
 
 
 def _for_object(obj, extra_class=u''):
-    assert okay(obj)
-    return {
-        u'class': u'%s %s' % (type(obj).__name__, extra_class),
-        u'id': six.text_type(id(obj)),
-    }
+    if okay(obj):
+        return {
+            u'class': u'%s %s' % (type(obj).__name__, extra_class),
+            u'id': six.text_type(id(obj)),
+        }
+    else:
+        return {u'class': extra_class}
 
 
 def _reference_targets(obj):
@@ -238,41 +241,38 @@ def _piece_to_html(piece, ctx):
 
 
 def _displayable_body(msg):
-    r = msg.body
-    transforms = []
-    if not okay(r):
-        return r, transforms
-
-    r = r.decode('utf-8', 'replace')
-    if msg.headers.transfer_encoding:
-        transforms.append(u'removing Transfer-Encoding')
-
-    if okay(msg.decoded_body):
-        r = msg.decoded_body.decode('utf-8', 'replace')
-        if msg.headers.content_encoding:
-            transforms.append(u'removing Content-Encoding')
+    removing_te = [u'removing Transfer-Encoding'] \
+        if msg.headers.transfer_encoding else []
+    removing_ce = [u'removing Content-Encoding'] \
+        if msg.headers.content_encoding else []
+    decoding_charset = [u'decoding from %s' % msg.guessed_charset] \
+        if okay(msg.guessed_charset) and msg.guessed_charset != 'utf-8' else []
+    pretty_printing = [u'pretty-printing']
 
     if okay(msg.json_data):
         r = json.dumps(msg.json_data, indent=2, ensure_ascii=False)
-        transforms.append(u'pretty-printing')
+        transforms = \
+            removing_te + removing_ce + decoding_charset + pretty_printing
+    elif okay(msg.unicode_body):
+        r = msg.unicode_body
+        transforms = removing_te + removing_ce + decoding_charset
     elif okay(msg.decoded_body):
-        charset = message.body_charset(msg) or 'UTF-8'
-        try:
-            codec = codecs.lookup(charset)
-        except LookupError:
-            codec = codecs.lookup('utf-8')
-        r = msg.decoded_body.decode(codec.name, 'replace')
-        if codec.name != 'utf-8':
-            transforms.append(u'decoding from %s' % charset)
+        r = msg.decoded_body.decode('utf-8', 'replace')
+        transforms = removing_te + removing_ce
+    elif okay(msg.body):
+        r = msg.body.decode('utf-8', 'replace')
+        transforms = removing_te
+    else:
+        return msg.body, []
 
     limit = 5000
     if len(r) > limit:
         r = r[:limit]
-        transforms.append(u'taking the first %d characters' % limit)
+        transforms += [u'taking the first %d characters' % limit]
 
     if has_nonprintable(r):
-        transforms.append(u'replacing non-printable characters '
-                          u'with the \ufffd sign')
         r = printable(r)
+        transforms += [u'replacing non-printable characters '
+                       u'with the \ufffd sign']
 
     return r, transforms
