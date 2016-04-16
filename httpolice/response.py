@@ -347,7 +347,10 @@ def check_response_in_context(resp, req):
             resp.complain(1033)
 
     if req.is_absolute_form and resp.headers.via.is_absent and \
-            resp.status.successful:
+            resp.status.successful and resp.version == http11:
+        # HTTP/2 allows clients to use (its equivalent of) the absolute form
+        # when talking directly to the servers, not just proxies.
+        # So we only check this for HTTP/1.1.
         resp.complain(1046)
 
     if resp.status == st.switching_protocols:
