@@ -27,7 +27,8 @@ from httpolice.structure import (
 
 def har_input(paths):
     for path in paths:
-        with io.open(path, 'rt', encoding='utf-8') as f:
+        # According to the spec, HAR files are UTF-8 with an optional BOM.
+        with io.open(path, 'rt', encoding='utf-8-sig') as f:
             try:
                 data = json.load(f)
             except ValueError as exc:
