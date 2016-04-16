@@ -4,6 +4,7 @@ import json
 
 import dominate
 import dominate.tags as H
+import pkg_resources
 import six
 
 from httpolice import known, notice
@@ -17,6 +18,12 @@ from httpolice.reports.common import (
 )
 from httpolice.structure import Unavailable, okay
 from httpolice.util.text import has_nonprintable, nicely_join, printable
+
+
+js_code = pkg_resources.resource_stream('httpolice.reports', 'html.js'). \
+    read().decode('utf-8')
+css_code = pkg_resources.resource_stream('httpolice.reports', 'html.css'). \
+    read().decode('utf-8')
 
 
 def html_report(exchanges, outfile):
@@ -136,13 +143,13 @@ def _render_response(resp):
 
 
 def _include_stylesheet():
-    H.link(rel=u'stylesheet', href=u'report.css', type=u'text/css')
+    H.style(type=u'text/css').add_raw_string(css_code)
 
 
 def _include_scripts():
     H.script(src=u'https://code.jquery.com/jquery-1.11.3.js',
              type=u'text/javascript')
-    H.script(src=u'report.js', type=u'text/javascript')
+    H.script(type=u'text/javascript').add_raw_string(js_code)
 
 
 def _for_object(obj, extra_class=u''):
