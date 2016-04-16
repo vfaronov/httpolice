@@ -25,8 +25,8 @@ def main():
             yield exch
     try:
         report(generate_exchanges(), stdout)
-    except RuntimeError as exc:
-        sys.stderr.write('FATAL: %s\n' % exc)
+    except (OSError, RuntimeError) as exc:
+        sys.stderr.write('Error: %s\n' % exc)
         sys.exit(1)
 
 if __name__ == '__main__':
