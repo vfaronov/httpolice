@@ -580,5 +580,5 @@ def check_response_in_context(resp, req):
         resp.complain(1216)
 
     if resp.headers.strict_transport_security.is_present and \
-            req.scheme == u'http':
+            req.is_tls == False:
         resp.complain(1221)

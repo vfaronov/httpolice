@@ -96,6 +96,14 @@ class RequestView(message.MessageView):
             return None
         return scheme + u'://' + authority + path_and_query
 
+    @derived_property
+    def is_tls(self):
+        if self.scheme == u'http':
+            return False
+        elif self.scheme == u'https':
+            return True
+        return None
+
 
 def check_request(req):
     message.check_message(req)
@@ -162,7 +170,7 @@ def check_request(req):
         req.complain(1067)
 
     if req.headers.referer.is_okay:
-        if req.scheme == u'http':
+        if req.is_tls == False:
             parsed = urlparse(req.headers.referer.value)
             if parsed.scheme == u'https':
                 req.complain(1068)
@@ -265,7 +273,7 @@ def check_request(req):
         if proto.item == u'h2':
             req.complain(1228)
         if proto.item == upgrade.h2c:
-            if req.scheme == u'https':
+            if req.is_tls:
                 req.complain(1233)
             if req.headers.http2_settings.is_absent:
                 req.complain(1231)
