@@ -1,7 +1,6 @@
 # -*- coding: utf-8; -*-
 
-__version__ = '0.1.0.dev1'
-
+from httpolice.__metadata__ import version as __version__
 from httpolice.exchange import analyze_exchange
 from httpolice.structure import Exchange, Request, Response
 

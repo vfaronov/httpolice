@@ -20,10 +20,10 @@ from httpolice.structure import Unavailable, okay
 from httpolice.util.text import has_nonprintable, nicely_join, printable
 
 
-js_code = pkg_resources.resource_stream('httpolice.reports', 'html.js'). \
-    read().decode('utf-8')
-css_code = pkg_resources.resource_stream('httpolice.reports', 'html.css'). \
-    read().decode('utf-8')
+css_code = pkg_resources.resource_string('httpolice.reports', 'html.css'). \
+    decode('utf-8')
+js_code = pkg_resources.resource_string('httpolice.reports', 'html.js'). \
+    decode('utf-8')
 
 
 def html_report(exchanges, outfile):

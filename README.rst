@@ -1,22 +1,16 @@
-**HTTPolice** is a Python library and a suite of tools
-for checking HTTP requests and responses according to the standards.
+HTTPolice is a **lint for HTTP requests and responses**.
+It checks them for conformance to standards and best practices.
 
-HTTP is a complex protocol that features many elements
-(like headers and status codes) and intricate rules on their usage.
-Developers often get parts of it slightly wrong.
-Usually these mistakes are benign, but sometimes
-they turn into logical bugs and interoperability problems.
+As a command-line tool, it can read `HAR files`__ or raw HTTP/1.x TCP streams.
 
-HTTPolice is like a **“lint” for your HTTP messages**.
-For example, if you are building a Web service,
-you can instrument your existing tests with HTTPolice
-to get instant feedback when your service responds
-with a malformed header or an inappropriate status code.
+__ https://en.wikipedia.org/wiki/.har
 
-HTTPolice was partly inspired by `REDbot`__, another QA tool for HTTP.
+Or you can use it as a Python library (for Python 2.7 and 3.4+).
+
+HTTPolice was partly inspired by `REDbot`__, another QA tool for the Web.
 But the approach is different: instead of actively testing your server,
-HTTPolice passively analyzes whatever messages you feed into it.
-This makes it possible to use HTTPolice on requests and responses
-captured from a real process or test suite.
+HTTPolice just analyzes anything you feed into it.
+Thus, it can be used on requests and responses captured
+from a real process or test suite.
 
 __ https://redbot.org/
