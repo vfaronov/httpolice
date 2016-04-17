@@ -59,20 +59,19 @@ def _process_request(data, creator):
 
     parsed = urlparse(data['url'])
     scheme = parsed.scheme
+
+    # With HAR, we can't tell if the request was to a proxy or to a server.
+    # So we force most requests into the "origin form" of the target,
+    # unless the request has no ``Host`` header,
+    # in which case we use the "absolute form" just for the user's convenience
+    # (otherwise they wouldn't be able to see the target host).
+    # To prevent this distinction from having an effect on the proxy logic,
+    # we explicitly set `RequestView.is_to_proxy` to `None` later.
     if any(name == h.host for (name, _) in header_entries):
-        # If there's a ``Host`` header, assume HTTP/1.x's usual "origin form".
         target = parsed.path
         if parsed.query:
             target += u'?' + parsed.query
     else:
-        # With no ``Host``, assume the "absolute form".
-        # In HTTP/1.x, the absolute form is reserved for requests to proxies,
-        # but this is no longer so in HTTP/2.
-        # This means that our checks cannot rely on the distinction
-        # between the origin form and the absolute form.
-        # So we choose the absolute form here simply because
-        # it will be more understandable in the report
-        # (otherwise how would the user know the host of the request?).
         target = data['url']
     body = None if data['bodySize'] == 0 else Unavailable
 
@@ -98,6 +97,7 @@ def _process_request(data, creator):
                               header_entries, body=body))
     if text is not None:
         req.unicode_body = text
+    req.is_to_proxy = None                      # See above.
     return req
 
 

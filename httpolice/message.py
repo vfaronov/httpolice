@@ -192,7 +192,7 @@ class MessageView(Blackboard):
         return parse_qs(self.decoded_body.decode('ascii'))
 
     @derived_property
-    def transformed(self):
+    def transformed_by_proxy(self):
         if warn.transformation_applied in self.headers.warning:
             self.complain(1189)
             return True
@@ -251,7 +251,7 @@ def check_message(msg):
         if okay(warning.date) and msg.headers.date != warning.date:
             msg.complain(1164, code=warning.code)
 
-    if msg.transformed:
+    if msg.transformed_by_proxy:
         if warn.transformation_applied not in msg.headers.warning:
             msg.complain(1191)
         if msg.headers.cache_control.no_transform:

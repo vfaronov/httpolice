@@ -26,7 +26,7 @@ from httpolice.known import (
     tc,
     upgrade,
 )
-from httpolice.structure import EntityTag, Versioned, http11, okay
+from httpolice.structure import EntityTag, Versioned, http10, http11, okay
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import CTL
 
@@ -102,6 +102,21 @@ class RequestView(message.MessageView):
             return False
         elif self.scheme == u'https':
             return True
+        return None
+
+    @derived_property
+    def is_to_proxy(self):
+        # In HTTP/1.x, the absolute form of the request target
+        # is reserved for requests to proxies,
+        # but this is no longer true in HTTP/2
+        # (which has its own equivalent of the absolute form
+        # with the ``:authority`` pseudo-header).
+        if self.version in [http10, http11]:
+            if self.is_absolute_form:
+                self.complain(1236)
+                return True
+            else:
+                return False
         return None
 
 

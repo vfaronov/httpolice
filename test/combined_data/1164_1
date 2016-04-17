@@ -1,7 +1,7 @@
-1164 1183 1168 1189
+1236 1164 1183 1168 1189
 
 ======== BEGIN INBOUND STREAM ========
-GET / HTTP/1.1
+GET http://example.com/ HTTP/1.1
 Host: example.com
 User-Agent: demo
 

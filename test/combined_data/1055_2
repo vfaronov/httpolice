@@ -1,4 +1,4 @@
-1055
+1236 1055
 
 ======== BEGIN INBOUND STREAM ========
 GET http://example.com/articles/123/ HTTP/1.1
