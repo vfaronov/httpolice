@@ -11,6 +11,7 @@ except ImportError:                             # Python 2
 
 from httpolice import framing1
 from httpolice.exchange import Exchange
+from httpolice.inputs.common import pop_pseudo_headers
 from httpolice.known import h, media, st
 from httpolice.parse import ParseError, Stream
 from httpolice.request import Request
@@ -143,7 +144,7 @@ def _process_response(data, req, creator):
 def _process_message(data):
     header_entries = [(FieldName(d['name']), d['value'])
                       for d in data['headers']]
-    pseudo_headers = _pop_pseudo_headers(header_entries)
+    pseudo_headers = pop_pseudo_headers(header_entries)
     if data['httpVersion'] == u'HTTP/2.0':          # Used by Firefox.
         version = http2
     elif data['httpVersion'] == u'unknown':         # Used by Chrome.
@@ -151,18 +152,3 @@ def _process_message(data):
     else:
         version = data['httpVersion']
     return (version, header_entries, pseudo_headers)
-
-
-def _pop_pseudo_headers(entries):
-    # Pseudo-headers, as used in HTTP/2 and SPDY (?)
-    # and exported for them by Chrome.
-    i = 0
-    r = {}
-    while i < len(entries):
-        (name, value) = entries[i]
-        if name.startswith(u':'):
-            r[name] = value
-            del entries[i]
-        else:
-            i += 1
-    return r

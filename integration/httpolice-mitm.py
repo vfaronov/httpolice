@@ -5,7 +5,9 @@ import io
 
 import httpolice
 import httpolice.reports
+from httpolice.inputs.common import pop_pseudo_headers
 from httpolice.known import h, st
+from httpolice.structure import http2
 
 
 def strip_content_length(msg, only_if=None):
@@ -19,16 +21,26 @@ def strip_content_length(msg, only_if=None):
 
 
 def preprocess_message(msg):
+    if msg.version == u'HTTP/2.0':
+        msg.version = http2
     if any(entry.name == h.transfer_encoding for entry in msg.header_entries):
         strip_content_length(msg)
 
 
 def preprocess_request(req):
     preprocess_message(req)
+    if req.version == http2:
+        pseudo_headers = pop_pseudo_headers(req.header_entries)
+        # Reconstruct HTTP/2's equivalent of
+        # the "absolute form" of request target (RFC 7540 Section 8.1.2.3).
+        if u':authority' in pseudo_headers and req.headers.host.is_absent:
+            req.target = (req.scheme + u'://' + pseudo_headers[u':authority'] +
+                          pseudo_headers[u':path'])
 
 
 def preprocess_response(resp):
     preprocess_message(resp)
+    pop_pseudo_headers(resp.header_entries)
     if resp.status.informational or \
             resp.status in [st.no_content, st.not_modified]:
         strip_content_length(resp, only_if='0')
