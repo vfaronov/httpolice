@@ -24,7 +24,14 @@ from httpolice.blackboard import Blackboard, derived_property
 from httpolice.codings import decode_deflate, decode_gzip
 from httpolice.header import HeadersView
 from httpolice.known import cc, header, media, media_type, tc, warn
-from httpolice.structure import FieldName, Unavailable, okay
+from httpolice.structure import (
+    HTTPVersion,
+    HeaderEntry,
+    FieldName,
+    Unavailable,
+    okay,
+)
+from httpolice.util.text import force_unicode
 
 
 # This list is taken from the HTML specification --
@@ -39,20 +46,21 @@ URL_ENCODED_GOOD_BYTES = Bits(
 )
 
 
-class MessageView(Blackboard):
+class Message(Blackboard):
 
     self_name = u'msg'
 
-    def __init__(self, inner):
-        super(MessageView, self).__init__()
-        self.inner = inner
+    def __init__(self, version, header_entries, body, trailer_entries=None):
+        super(Message, self).__init__()
+        self.version = (HTTPVersion(force_unicode(version))
+                        if version is not None else None)
+        self.header_entries = [HeaderEntry(k, v)
+                               for k, v in header_entries]
+        self.body = bytes(body) if okay(body) else body
+        self.trailer_entries = [HeaderEntry(k, v)
+                                for k, v in trailer_entries or []]
         self.rebuild_headers()
         self.annotations = {}
-
-    version = property(lambda self: self.inner.version)
-    header_entries = property(lambda self: self.inner.header_entries)
-    body = property(lambda self: self.inner.body)
-    trailer_entries = property(lambda self: self.inner.trailer_entries)
 
     @property
     def annotated_header_entries(self):

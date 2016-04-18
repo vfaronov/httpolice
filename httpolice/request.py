@@ -26,19 +26,24 @@ from httpolice.known import (
     tc,
     upgrade,
 )
-from httpolice.structure import EntityTag, Versioned, http10, http11
+from httpolice.structure import EntityTag, Method, Versioned, http10, http11
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import CTL
+from httpolice.util.text import force_unicode
 
 
-class RequestView(message.MessageView):
+class Request(message.Message):
+
+    def __init__(self, scheme, method, target, version, header_entries,
+                 body, trailer_entries=None):
+        super(Request, self).__init__(version, header_entries, body,
+                                      trailer_entries)
+        self.scheme = force_unicode(scheme) if scheme is not None else None
+        self.method = Method(force_unicode(method))
+        self.target = force_unicode(target)
 
     def __repr__(self):
-        return '<RequestView %s>' % self.method
-
-    scheme = property(lambda self: self.inner.scheme)
-    method = property(lambda self: self.inner.method)
-    target = property(lambda self: self.inner.target)
+        return '<Request %s>' % self.method
 
     def _target_parses_as(self, parser):
         try:

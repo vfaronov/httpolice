@@ -11,7 +11,7 @@ import unittest
 import six
 from six.moves import StringIO
 
-from httpolice import Exchange, Request, Response, analyze_exchange
+from httpolice import Exchange, Request, Response, check_exchange
 from httpolice.known import h, header, m
 from httpolice.structure import http10, http11, http2
 from httpolice.reports import html_report, text_report
@@ -71,7 +71,8 @@ class TestFuzz(unittest.TestCase):
             for _ in range(random.randint(1, 3))
         ]
         try:
-            exch = analyze_exchange(Exchange(req, resps))
+            exch = Exchange(req, resps)
+            check_exchange(exch)
             text_report([exch], StringIO())
             html_report([exch], StringIO())
         except Exception:

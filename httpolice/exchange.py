@@ -4,20 +4,21 @@ from httpolice import request, response
 from httpolice.blackboard import Blackboard
 
 
-class ExchangeView(Blackboard):
+class Exchange(Blackboard):
 
     self_name = u'exch'
 
     def __repr__(self):
-        return 'ExchangeView(%r, %r)' % (self.request, self.responses)
+        return 'Exchange(%r, %r)' % (self.request, self.responses)
 
     def __init__(self, req, resps):
         """
-        :type req: RequestView
-        :type resp: list[ResponseView]
+        :type req: Request | None
+        :type resp: list[Response]
         """
-        super(ExchangeView, self).__init__()
-        assert all(resp.request is req for resp in resps)
+        super(Exchange, self).__init__()
+        for resp in resps:
+            resp.request = req
         self.request = req
         self.responses = resps
 
@@ -30,21 +31,9 @@ class ExchangeView(Blackboard):
 
 
 def complaint_box(*args, **kwargs):
-    box = ExchangeView(None, [])
+    box = Exchange(None, [])
     box.complain(*args, **kwargs)
     return box
-
-
-def analyze_exchange(exch):
-    """
-    :type exch: structure.Exchange
-    """
-    req_view = request.RequestView(exch.request) if exch.request else None
-    resp_views = [response.ResponseView(req_view, resp)
-                  for resp in exch.responses or []]
-    exch = ExchangeView(req_view, resp_views)
-    check_exchange(exch)
-    return exch
 
 
 def check_exchange(exch):

@@ -1,18 +1,16 @@
 # -*- coding: utf-8; -*-
 
 from httpolice.codings import decode_deflate, decode_gzip
-from httpolice.exchange import ExchangeView, check_exchange, complaint_box
+from httpolice.exchange import Exchange, complaint_box
 from httpolice.known import m, st, tc
 from httpolice.parse import ParseError, Stream, maybe, skip
-from httpolice.request import RequestView
-from httpolice.response import ResponseView
+from httpolice.request import Request
+from httpolice.response import Response
 from httpolice.structure import (
     FieldName,
     HTTPVersion,
     HeaderEntry,
     Method,
-    Request,
-    Response,
     StatusCode,
     Unavailable,
     okay,
@@ -40,7 +38,7 @@ def parse_streams(inbound, outbound, scheme=None):
                         inbound.sane = False
                     if req.method == m.CONNECT and resps[-1].status.successful:
                         inbound.sane = False
-            yield ExchangeView(req, resps)
+            yield Exchange(req, resps)
         if req_box:
             yield req_box
         if resp_box:
@@ -57,7 +55,7 @@ def parse_streams(inbound, outbound, scheme=None):
         while outbound.sane:
             (resps, resp_box) = _parse_responses(outbound, None)
             if resps:
-                yield ExchangeView(None, resps)
+                yield Exchange(None, resps)
             if resp_box:
                 yield resp_box
 
@@ -68,7 +66,7 @@ def parse_streams(inbound, outbound, scheme=None):
 def _parse_request(stream, scheme=None):
     req = _parse_request_heading(stream, scheme)
     if req is Unavailable:
-        box = ExchangeView(None, [])
+        box = Exchange(None, [])
         stream.dump_complaints(box, u'request heading')
         return (None, box)
     else:
@@ -91,8 +89,7 @@ def _parse_request_heading(stream, scheme=None):
         stream.complain(1006, error=e)
         return Unavailable
     else:
-        req = RequestView(Request(scheme, method_, target, version_, entries,
-                                  body=None))
+        req = Request(scheme, method_, target, version_, entries, body=None)
         stream.dump_complaints(req, u'request heading')
         return req
 
@@ -105,7 +102,7 @@ def _parse_request_body(req, stream):
         if codings.pop() == tc.chunked:
             _parse_chunked(req, stream)
         else:
-            req.inner.body = Unavailable
+            req.body = Unavailable
             req.complain(1001)
             stream.sane = False
         while codings and (req.body is not Unavailable):
@@ -114,18 +111,18 @@ def _parse_request_body(req, stream):
     elif req.headers.content_length:
         n = req.headers.content_length.value
         if n is Unavailable:
-            req.inner.body = Unavailable
+            req.body = Unavailable
             stream.sane = False
         else:
             try:
-                req.inner.body = stream.consume_n_bytes(n)
+                req.body = stream.consume_n_bytes(n)
             except ParseError:
-                req.inner.body = Unavailable
+                req.body = Unavailable
                 req.complain(1004)
                 stream.sane = False
 
     else:
-        req.inner.body = b''
+        req.body = b''
 
 
 def _parse_responses(stream, req):
@@ -135,7 +132,7 @@ def _parse_responses(stream, req):
         # RFC 7230 section 3.3.
         resp = _parse_response_heading(req, stream)
         if resp is Unavailable:
-            box = ExchangeView(None, [])
+            box = Exchange(None, [])
             stream.dump_complaints(box, u'response heading')
             return (resps, box)
         else:
@@ -163,8 +160,8 @@ def _parse_response_heading(req, stream):
         stream.sane = False
         return Unavailable
     else:
-        resp = ResponseView(req, Response(version_, status, reason, entries,
-                                          body=None))
+        resp = Response(version_, status, reason, entries, body=None)
+        resp.request = req
         stream.dump_complaints(resp, u'response heading')
         return resp
 
@@ -174,19 +171,19 @@ def _parse_response_body(resp, stream):
 
     # RFC 7230 section 3.3.3.
     if resp.status == st.switching_protocols:
-        resp.inner.body = b''
+        resp.body = b''
         resp.complain(1011)
         stream.sane = False
 
     elif req and req.method == m.CONNECT and resp.status.successful:
-        resp.inner.body = b''
+        resp.body = b''
         resp.complain(1012)
         stream.sane = False
 
     elif (resp.status.informational or
               resp.status in [st.no_content, st.not_modified] or
               (req and req.method == m.HEAD)):
-        resp.inner.body = b''
+        resp.body = b''
 
     elif resp.headers.transfer_encoding:
         codings = list(resp.headers.transfer_encoding)
@@ -194,25 +191,25 @@ def _parse_response_body(resp, stream):
             codings.pop()
             _parse_chunked(resp, stream)
         else:
-            resp.inner.body = stream.consume_rest()
+            resp.body = stream.consume_rest()
         while codings and okay(resp.body):
             _decode_transfer_coding(resp, codings.pop())
 
     elif resp.headers.content_length.is_present:
         n = resp.headers.content_length.value
         if n is Unavailable:
-            resp.inner.body = Unavailable
+            resp.body = Unavailable
             stream.sane = False
         else:
             try:
-                resp.inner.body = stream.consume_n_bytes(n)
+                resp.body = stream.consume_n_bytes(n)
             except ParseError:
-                resp.inner.body = Unavailable
+                resp.body = Unavailable
                 resp.complain(1004)
                 stream.sane = False
 
     else:
-        resp.inner.body = stream.consume_rest()
+        resp.body = stream.consume_rest()
 
 
 def _parse_line_ending(stream):
@@ -254,22 +251,22 @@ def _decode_transfer_coding(msg, coding):
     if coding == tc.chunked:
         # The outermost chunked has already been peeled off at this point.
         msg.complain(1002)
-        msg.inner.body = Unavailable
+        msg.body = Unavailable
     elif coding in [tc.gzip, tc.x_gzip]:
         try:
-            msg.inner.body = decode_gzip(msg.body)
+            msg.body = decode_gzip(msg.body)
         except Exception as e:
             msg.complain(1027, coding=coding, error=e)
-            msg.inner.body = Unavailable
+            msg.body = Unavailable
     elif coding == tc.deflate:
         try:
-            msg.inner.body = decode_deflate(msg.body)
+            msg.body = decode_deflate(msg.body)
         except Exception as e:
             msg.complain(1027, coding=coding, error=e)
-            msg.inner.body = Unavailable
+            msg.body = Unavailable
     else:
         msg.complain(1003, coding=coding)
-        msg.inner.body = Unavailable
+        msg.body = Unavailable
 
 
 def _parse_chunk(stream):
@@ -295,10 +292,10 @@ def _parse_chunked(msg, stream):
     except ParseError as e:
         stream.sane = False
         msg.complain(1005, error=e)
-        msg.inner.body = Unavailable
+        msg.body = Unavailable
     else:
         stream.dump_complaints(msg, u'chunked framing')
-        msg.inner.body = b''.join(data)
-        msg.inner.trailer_entries = trailer
+        msg.body = b''.join(data)
+        msg.trailer_entries = trailer
         if trailer:
             msg.rebuild_headers()           # Rebuid the `HeadersView` cache

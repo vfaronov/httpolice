@@ -10,19 +10,12 @@ except ImportError:                             # Python 2
     from urlparse import urlparse
 
 from httpolice import framing1
-from httpolice.exchange import ExchangeView
+from httpolice.exchange import Exchange
 from httpolice.known import h, media, st
 from httpolice.parse import ParseError, Stream
-from httpolice.request import RequestView
-from httpolice.response import ResponseView
-from httpolice.structure import (
-    FieldName,
-    Request,
-    Response,
-    Unavailable,
-    http11,
-    http2,
-)
+from httpolice.request import Request
+from httpolice.response import Response
+from httpolice.structure import FieldName, Unavailable, http11, http2
 
 
 def har_input(paths):
@@ -45,7 +38,7 @@ def har_input(paths):
 def _process_entry(data, creator):
     req = _process_request(data['request'], creator)
     resp = _process_response(data['response'], req, creator)
-    return ExchangeView(req, [resp] if resp is not None else [])
+    return Exchange(req, [resp] if resp is not None else [])
 
 
 def _process_request(data, creator):
@@ -66,7 +59,7 @@ def _process_request(data, creator):
     # in which case we use the "absolute form" just for the user's convenience
     # (otherwise they wouldn't be able to see the target host).
     # To prevent this distinction from having an effect on the proxy logic,
-    # we explicitly set `RequestView.is_to_proxy` to `None` later.
+    # we explicitly set `Request.is_to_proxy` to `None` later.
     if any(name == h.host for (name, _) in header_entries):
         target = parsed.path
         if parsed.query:
@@ -104,8 +97,7 @@ def _process_request(data, creator):
                 header_entries.extend(more_entries)
                 text = actual_text
 
-    req = RequestView(Request(scheme, method, target, version,
-                              header_entries, body=body))
+    req = Request(scheme, method, target, version, header_entries, body)
     if text is not None:
         req.unicode_body = text
     req.is_to_proxy = None                      # See above.
@@ -139,8 +131,7 @@ def _process_response(data, req, creator):
         # Helps with SPDY in Chrome.
         version = None
 
-    resp = ResponseView(req, Response(version, status, reason, header_entries,
-                                      body=body))
+    resp = Response(version, status, reason, header_entries, body=body)
     if data['content'].get('text') and status != st.not_modified:
         if data['content'].get('encoding', u'').lower() == u'base64':
             resp.decoded_body = base64.b64decode(data['content']['text'])

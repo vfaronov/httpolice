@@ -58,8 +58,7 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(req1.header_entries[1].value, b'bar, baz')
         self.assertEqual(req1.body, b'')
         self.assertEqual(repr(req1.header_entries[1]), '<HeaderEntry X-Foo>')
-        self.assertEqual(repr(req1), '<RequestView GET>')
-        self.assertEqual(repr(req1.inner), '<Request GET>')
+        self.assertEqual(repr(req1), '<Request GET>')
 
         self.assertEqual(req2.method, u'POST')
         self.assertEqual(req2.target, u'/foo/bar/')

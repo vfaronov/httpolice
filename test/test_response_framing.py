@@ -5,20 +5,19 @@ import unittest
 
 from six.moves import StringIO
 
-from httpolice.exchange import analyze_exchange, check_exchange
+from httpolice.exchange import Exchange, check_exchange
 from httpolice.framing1 import parse_streams
 from httpolice.known import hsts, m
 from httpolice.reports import html_report, text_report
+from httpolice.request import Request
+from httpolice.response import Response
 from httpolice.structure import (
     AuthScheme,
-    Exchange,
     FieldName,
     HSTSDirective,
     HTTPVersion,
     Method,
     Parametrized,
-    Request,
-    Response,
     StatusCode,
     Unavailable,
     WarnCode,
@@ -46,31 +45,6 @@ class TestResponse(unittest.TestCase):
         text_report(exchanges, StringIO())
         html_report(exchanges, StringIO())
         return [exch.responses for exch in exchanges if exch.responses]
-
-    def test_analyze_exchange(self):
-        req = Request(u'http',
-                      u'GET', u'/', u'HTTP/1.1',
-                      [(u'Host', b'example.com')],
-                      None)
-        self.assertEqual(repr(req), '<Request GET>')
-        resp1 = Response(u'HTTP/1.1', 123, u'Please wait', [], None)
-        self.assertEqual(repr(resp1), '<Response 123>')
-        resp2 = Response(u'HTTP/1.1', 200, u'OK',
-                         [(u'Content-Length', b'14')],
-                         b'Hello world!\r\n',
-                         None)
-        exch = analyze_exchange(Exchange(req, [resp1, resp2]))
-        self.assertEqual(repr(exch),
-                         'ExchangeView(<RequestView GET>, '
-                         '[<ResponseView 123>, <ResponseView 200>])')
-        self.assertTrue(isinstance(exch.request.method, Method))
-        self.assertTrue(isinstance(exch.request.version, HTTPVersion))
-        self.assertTrue(isinstance(exch.request.header_entries[0].name,
-                                   FieldName))
-        self.assertTrue(isinstance(exch.responses[0].version, HTTPVersion))
-        self.assertTrue(isinstance(exch.responses[0].status, StatusCode))
-        self.assertTrue(isinstance(exch.responses[1].header_entries[0].name,
-                                   FieldName))
 
     def test_parse_responses(self):
         inbound = self.req(m.HEAD) + self.req(m.POST) + self.req(m.POST)

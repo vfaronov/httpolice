@@ -26,20 +26,22 @@ from httpolice.known import (
     warn,
 )
 from httpolice.known.status_code import NOT_AT_ALL, NOT_BY_DEFAULT
-from httpolice.structure import EntityTag, http10, http11, okay
+from httpolice.structure import EntityTag, StatusCode, http10, http11, okay
+from httpolice.util.text import force_unicode
 
 
-class ResponseView(message.MessageView):
+class Response(message.Message):
 
-    def __init__(self, request, inner):
-        super(ResponseView, self).__init__(inner)
-        self.request = request
+    def __init__(self, version, status, reason, header_entries,
+                 body, trailer_entries=None):
+        super(Response, self).__init__(version, header_entries,
+                                       body, trailer_entries)
+        self.status = StatusCode(status)
+        self.reason = force_unicode(reason) if reason is not None else None
+        self.request = None
 
     def __repr__(self):
-        return '<ResponseView %d>' % self.status
-
-    status = property(lambda self: self.inner.status)
-    reason = property(lambda self: self.inner.reason)
+        return '<Response %d>' % self.status
 
     @derived_property
     def content_is_full(self):
@@ -102,7 +104,7 @@ class ResponseView(message.MessageView):
         if self.status == st.non_authoritative_information:
             self.complain(1190)
             return True
-        return super(ResponseView, self).transformed_by_proxy
+        return super(Response, self).transformed_by_proxy
 
 
 def check_responses(resps):

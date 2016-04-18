@@ -112,56 +112,6 @@ class CaseInsensitive(ProtocolString):
 # Representations of specific protocol elements
 
 
-class Exchange(namedtuple('Exchange', ('request', 'responses'))):
-
-    __slots__ = ()
-
-
-class Message(object):
-
-    __slots__ = ('version', 'header_entries', 'body', 'trailer_entries')
-
-    def __init__(self, version, header_entries, body, trailer_entries=None):
-        self.version = HTTPVersion(force_unicode(version)) \
-            if version is not None else None
-        self.header_entries = [HeaderEntry(k, v)
-                               for k, v in header_entries]
-        self.body = bytes(body) if okay(body) else body
-        self.trailer_entries = [HeaderEntry(k, v)
-                                for k, v in trailer_entries or []]
-
-
-class Request(Message):
-
-    __slots__ = ('scheme', 'method', 'target')
-
-    def __init__(self, scheme, method, target, version, header_entries,
-                 body, trailer_entries=None):
-        super(Request, self).__init__(version, header_entries,
-                                      body, trailer_entries)
-        self.scheme = force_unicode(scheme) if scheme is not None else None
-        self.method = Method(force_unicode(method))
-        self.target = force_unicode(target)
-
-    def __repr__(self):
-        return '<Request %s>' % self.method
-
-
-class Response(Message):
-
-    __slots__ = ('status', 'reason')
-
-    def __init__(self, version, status, reason, header_entries,
-                 body, trailer_entries=None):
-        super(Response, self).__init__(version, header_entries,
-                                       body, trailer_entries)
-        self.status = StatusCode(status)
-        self.reason = force_unicode(reason) if reason is not None else None
-
-    def __repr__(self):
-        return '<Response %d>' % self.status
-
-
 class HTTPVersion(ProtocolString):
 
     __slots__ = ()

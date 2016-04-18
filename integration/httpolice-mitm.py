@@ -44,7 +44,7 @@ def start(context, argv):
                         help=u'exclude exchanges that have no notices')
     parser.add_argument(u'out_filename')
     context.args = parser.parse_args(argv[1:])
-    context.pairs = []
+    context.exchanges = []
 
 
 def response(context, flow):
@@ -59,17 +59,18 @@ def response(context, flow):
                               flow.response.headers.fields,
                               flow.response.content)
     preprocess_response(resp)
-    context.pairs.append((req, resp))
+    context.exchanges.append(httpolice.Exchange(req, [resp]))
 
 
 def done(context):
-    result = [httpolice.analyze_exchange(httpolice.Exchange(req, [resp]))
-              for req, resp in context.pairs]
+    for exch in context.exchanges:
+        httpolice.check_exchange(exch)
     if context.args.only_with_notices:
-        result = [exch for exch in result if any(exch.collect_complaints())]
+        context.exchanges = [exch for exch in context.exchanges
+                             if any(exch.collect_complaints())]
     if context.args.html:
         report = httpolice.reports.html_report
     else:
         report = httpolice.reports.text_report
     with io.open(context.args.out_filename, 'wt', encoding='utf-8') as outf:
-        report(result, outf)
+        report(context.exchanges, outf)
