@@ -73,7 +73,18 @@ def _process_request(data, creator):
             target += u'?' + parsed.query
     else:
         target = data['url']
-    body = None if data['bodySize'] == 0 else Unavailable
+
+    if data['bodySize'] == 0:
+        # No body, or a body of length 0 (which we do not distinguish).
+        body = b''
+    elif data['bodySize'] > 0:
+        # A message body was present, but we cannot recover it,
+        # because message body is the body *with* ``Content-Encoding``,
+        # and HAR does not include that.
+        body = Unavailable
+    else:
+        # Unknown. Maybe there was a body, maybe there wasn't.
+        body = None
 
     text = None
     post = data.get('postData')
@@ -107,11 +118,18 @@ def _process_response(data, req, creator):
     (version, header_entries, _) = _process_message(data)
     status = data['status']
     reason = data['statusText']
-    if data['bodySize'] == 0 or status == st.not_modified:
-        # Firefox includes a body with 304.
-        body = None
-    else:
+
+    # The logic for body is similar to that for requests (see above),
+    # except that
+    # (1) Firefox also includes a body with 304 responses;
+    # (2) browsers may set ``bodySize = -1`` even when ``content.size >= 0``.
+    if data['bodySize'] == 0 or data['content']['size'] == 0 or \
+            status == st.not_modified:
+        body = b''
+    elif data['bodySize'] > 0 or data['content']['size'] > 0:
         body = Unavailable
+    else:
+        body = None
 
     if version == http11 and creator == u'Firefox' and \
             any(name == u'x-firefox-spdy' for (name, _) in header_entries):

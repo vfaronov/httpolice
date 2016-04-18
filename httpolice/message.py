@@ -103,22 +103,22 @@ class MessageView(Blackboard):
         try:
             codec = codecs.lookup(charset)
         except LookupError:
-            return Unavailable
+            return None
         charset = codec.name
 
         if okay(self.decoded_body):
             try:
                 self.decoded_body.decode(charset)
             except UnicodeError:
-                return Unavailable
+                return None
         return charset
 
     @derived_property
     def unicode_body(self):
         if not okay(self.decoded_body):
             return self.decoded_body
-        if not okay(self.guessed_charset):
-            return self.guessed_charset
+        if self.guessed_charset is None:
+            return Unavailable
         return self.decoded_body.decode(self.guessed_charset)
 
     @derived_property
@@ -127,12 +127,12 @@ class MessageView(Blackboard):
 
     @derived_property
     def json_data(self):
+        ctype = self.headers.content_type
+        if not ctype.is_okay or not media_type.is_json(ctype.value.item):
+            return None
         if not okay(self.unicode_body):
             return self.unicode_body
         if not self.content_is_full:
-            return Unavailable
-        ctype = self.headers.content_type
-        if not ctype.is_okay or not media_type.is_json(ctype.value.item):
             return None
         try:
             return json.loads(self.unicode_body)
@@ -142,12 +142,12 @@ class MessageView(Blackboard):
 
     @derived_property
     def xml_data(self):
+        ctype = self.headers.content_type
+        if not ctype.is_okay or not media_type.is_xml(ctype.value.item):
+            return None
         if not okay(self.decoded_body):
             return self.decoded_body
         if not self.content_is_full:
-            return Unavailable
-        ctype = self.headers.content_type
-        if not ctype.is_okay or not media_type.is_xml(ctype.value.item):
             return None
         try:
             return defusedxml.ElementTree.fromstring(self.decoded_body)
@@ -159,12 +159,12 @@ class MessageView(Blackboard):
 
     @derived_property
     def multipart_data(self):
+        ctype = self.headers.content_type
+        if not ctype.is_okay or not media_type.is_multipart(ctype.value.item):
+            return None
         if not okay(self.decoded_body):
             return self.decoded_body
         if not self.content_is_full:
-            return Unavailable
-        ctype = self.headers.content_type
-        if not ctype.is_okay or not media_type.is_multipart(ctype.value.item):
             return None
         multipart_code = (b'Content-Type: ' + ctype.entries[0].value + b'\r\n'
                           b'\r\n' + self.decoded_body)
@@ -178,12 +178,12 @@ class MessageView(Blackboard):
 
     @derived_property
     def url_encoded_data(self):
+        if not (self.headers.content_type ==
+                media.application_x_www_form_urlencoded):
+            return None
         if not okay(self.decoded_body):
             return self.decoded_body
         if not self.content_is_full:
-            return Unavailable
-        if not (self.headers.content_type ==
-                media.application_x_www_form_urlencoded):
             return None
         for byte in six.iterbytes(self.decoded_body):
             if not URL_ENCODED_GOOD_BYTES[byte]:
@@ -207,7 +207,9 @@ def check_message(msg):
         if header.deprecated(hdr.name):
             msg.complain(1197, header=hdr)
 
-    # Force checking the payload for various content types.
+    # Force checking the payload according to various rules.
+    _ = msg.decoded_body
+    _ = msg.unicode_body
     _ = msg.json_data
     _ = msg.xml_data
     _ = msg.multipart_data

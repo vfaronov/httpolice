@@ -95,19 +95,21 @@ class TestResponse(unittest.TestCase):
         self.assertEqual(resp1_1.status, 200)
         self.assertEqual(repr(resp1_1.status), 'StatusCode(200)')
         self.assertEqual(resp1_1.headers.content_length.value, 16)
-        self.assertIs(resp1_1.body, None)
+        self.assertEqual(resp1_1.body, b'')
 
         self.assertEqual(resp2_1.status, 100)
         self.assertEqual(resp2_1.reason, u'Continue')
+        self.assertEqual(resp2_1.body, b'')
         self.assertEqual(resp2_2.status, 100)
         self.assertEqual(resp2_2.reason, u"Keep On Rollin' Baby")
+        self.assertEqual(resp2_2.body, b'')
         self.assertEqual(resp2_3.status, 200)
         self.assertEqual(resp2_3.headers.content_length.value, 16)
         self.assertEqual(resp2_3.body, b'Hello world!\r\n\r\n')
 
         self.assertEqual(resp3_1.status, 101)
         self.assertEqual(resp3_1.header_entries[0].value, b'wololo')
-        self.assertIs(resp3_1.body, None)
+        self.assertEqual(resp3_1.body, b'')
 
     def test_parse_responses_not_enough_requests(self):
         inbound = self.req(m.POST)

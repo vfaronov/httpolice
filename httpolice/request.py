@@ -26,7 +26,7 @@ from httpolice.known import (
     tc,
     upgrade,
 )
-from httpolice.structure import EntityTag, Versioned, http10, http11, okay
+from httpolice.structure import EntityTag, Versioned, http10, http11
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import CTL
 
@@ -177,7 +177,7 @@ def check_request(req):
             req.headers.content_type.is_absent:
         req.complain(1062)
 
-    if req.headers.expect == u'100-continue' and not req.body:
+    if req.headers.expect == u'100-continue' and req.body == b'':
         req.complain(1066)
 
     if req.headers.max_forwards.is_present and \

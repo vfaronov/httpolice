@@ -56,6 +56,7 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(req1.header_entries[0].value, b'example.com')
         self.assertEqual(req1.header_entries[1].name, u'X-Foo')
         self.assertEqual(req1.header_entries[1].value, b'bar, baz')
+        self.assertEqual(req1.body, b'')
         self.assertEqual(repr(req1.header_entries[1]), '<HeaderEntry X-Foo>')
         self.assertEqual(repr(req1), '<RequestView GET>')
         self.assertEqual(repr(req1.inner), '<Request GET>')
@@ -74,6 +75,7 @@ class TestRequest(unittest.TestCase):
 
         self.assertEqual(req3.method, u'OPTIONS')
         self.assertEqual(req3.target, u'*')
+        self.assertEqual(req3.body, b'')
 
     def test_unparseable_framing(self):
         self.assertEqual(self.parse(b'GET ...'), [])
@@ -106,7 +108,7 @@ class TestRequest(unittest.TestCase):
                   b'Host: example.com\r\n')
         [req1] = self.parse(stream)
         self.assertEqual(req1.method, u'GET')
-        self.assertIs(req1.body, None)
+        self.assertEqual(req1.body, b'')
 
     def test_funny_headers(self):
         stream = (b'GET / HTTP/1.1\r\n'

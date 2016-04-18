@@ -397,11 +397,12 @@
     <explain>The <ref to="header"/> header provides representation metadata, but there can be no representation associated with a <ref to="msg.status"/> response. The header should probably be removed.</explain>
   </error>
 
-  <error id="1053">
+  <comment id="1053">
     <title><ref to="header"/> in a request with no payload</title>
     <explain>The <ref to="header"/> header provides representation metadata. It would make sense in a request with a payload, but this one has no payload.</explain>
     <explain>See also <rfc num="7231" sect="3.1"/>.</explain>
-  </error>
+    <!-- This is a comment because we do not actually distinguish between "no payload" and "payload of length 0", while RFC 7230 does. It's not unthinkable to include something like a ``Content-Language`` in a POST request with a payload of length 0. -->
+  </comment>
 
   <error id="1054">
     <title><ref to="msg.headers.trailer"/> header in a message with no chunked body</title>
@@ -493,6 +494,7 @@
       A client MUST NOT generate a 100-continue expectation in a request
       that does not include a message body.
     </rfc>
+    <!-- Even though we don't really distinguish between "no body" and "body of length 0", it doesn't make sense to expect 100 (Continue) to a request with a ``Content-Length: 0``, for example. -->
   </error>
 
   <comment id="1067">

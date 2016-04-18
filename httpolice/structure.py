@@ -122,8 +122,8 @@ class Message(object):
     __slots__ = ('version', 'header_entries', 'body', 'trailer_entries')
 
     def __init__(self, version, header_entries, body, trailer_entries=None):
-        self.version = (HTTPVersion(force_unicode(version))
-                        if okay(version) else None)
+        self.version = HTTPVersion(force_unicode(version)) \
+            if version is not None else None
         self.header_entries = [HeaderEntry(k, v)
                                for k, v in header_entries]
         self.body = bytes(body) if okay(body) else body
@@ -139,7 +139,7 @@ class Request(Message):
                  body, trailer_entries=None):
         super(Request, self).__init__(version, header_entries,
                                       body, trailer_entries)
-        self.scheme = force_unicode(scheme) if okay(scheme) else None
+        self.scheme = force_unicode(scheme) if scheme is not None else None
         self.method = Method(force_unicode(method))
         self.target = force_unicode(target)
 
@@ -156,7 +156,7 @@ class Response(Message):
         super(Response, self).__init__(version, header_entries,
                                        body, trailer_entries)
         self.status = StatusCode(status)
-        self.reason = force_unicode(reason) if okay(reason) else None
+        self.reason = force_unicode(reason) if reason is not None else None
 
     def __repr__(self):
         return '<Response %d>' % self.status

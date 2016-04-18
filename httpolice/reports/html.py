@@ -97,13 +97,17 @@ def _render_message(msg):
     _render_header_entries(msg.annotated_header_entries)
 
     body, transforms = _displayable_body(msg)
+    if body is None:
+        with H.div(_class=u'review-block'):
+            H.p(u'Body is unknown.', _class=u'hint')
     if body is Unavailable:
         with H.div(_class=u'review-block'):
-            H.p(u'Payload body is unavailable.', _class=u'hint')
+            H.p(u'Body is present, but not available for inspection.',
+                _class=u'hint')
     elif body:
         with H.div(**_for_object(msg.body, extra_class=u'review-block')):
             if transforms:
-                H.p(u'Payload body after %s:' % nicely_join(transforms),
+                H.p(u'Body after %s:' % nicely_join(transforms),
                     _class=u'hint')
             H.div(body, _class=u'payload-body')
 
@@ -121,7 +125,7 @@ def _render_request(req):
             H.span(u' ')
             H.span(printable(req.target),
                    **_for_object(req.target, u'request-target'))
-            if okay(req.version):
+            if req.version is not None:
                 H.span(u' ')
                 H.span(printable(req.version), **_for_object(req.version))
         _render_message(req)
@@ -131,7 +135,7 @@ def _render_request(req):
 def _render_response(resp):
     with H.div(_class=u'review'):
         with H.div(_class=u'status-line', __inline=True):
-            if okay(resp.version):
+            if resp.version is not None:
                 H.span(printable(resp.version), **_for_object(resp.version))
                 H.span(u' ')
             with H.span(**_for_object(resp.status)):
@@ -253,7 +257,7 @@ def _displayable_body(msg):
     removing_ce = [u'removing Content-Encoding'] \
         if msg.headers.content_encoding else []
     decoding_charset = [u'decoding from %s' % msg.guessed_charset] \
-        if okay(msg.guessed_charset) and msg.guessed_charset != 'utf-8' else []
+        if msg.guessed_charset and msg.guessed_charset != 'utf-8' else []
     pretty_printing = [u'pretty-printing']
 
     if okay(msg.json_data):

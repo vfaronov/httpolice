@@ -25,6 +25,8 @@ class TestHARInput(unittest.TestCase):
                          u'https://http2bin.org/encoding/utf8')
         self.assertFalse(exchanges[1].responses[0].reason)
 
+        self.assertEqual(exchanges[4].responses[0].body, b'')
+
         self.assertIs(exchanges[10].request.body, Unavailable)
         self.assertIs(exchanges[10].request.decoded_body, Unavailable)
         self.assertEqual(exchanges[10].request.unicode_body,
@@ -46,9 +48,9 @@ class TestHARInput(unittest.TestCase):
         self.assertEqual(exchanges[0].responses[0].json_data['url'],
                          u'https://http2bin.org/get')
 
-        self.assertIs(exchanges[5].responses[0].body, None)
-        self.assertIs(exchanges[5].responses[0].decoded_body, None)
-        self.assertIs(exchanges[5].responses[0].unicode_body, None)
+        self.assertEqual(exchanges[5].responses[0].body, b'')
+        self.assertEqual(exchanges[5].responses[0].decoded_body, b'')
+        self.assertEqual(exchanges[5].responses[0].unicode_body, u'')
 
         self.assertIs(exchanges[7].responses[0].body, Unavailable)
         self.assertEqual(len(exchanges[7].responses[0].decoded_body), 1024)

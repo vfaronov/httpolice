@@ -15,6 +15,7 @@ from httpolice.structure import (
     Response,
     StatusCode,
     Unavailable,
+    okay,
 )
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import CRLF, LF, SP
@@ -91,7 +92,7 @@ def _parse_request_heading(stream, scheme=None):
         return Unavailable
     else:
         req = RequestView(Request(scheme, method_, target, version_, entries,
-                                  body=Unavailable))
+                                  body=None))
         stream.dump_complaints(req, u'request heading')
         return req
 
@@ -124,7 +125,7 @@ def _parse_request_body(req, stream):
                 stream.sane = False
 
     else:
-        req.inner.body = None
+        req.inner.body = b''
 
 
 def _parse_responses(stream, req):
@@ -163,7 +164,7 @@ def _parse_response_heading(req, stream):
         return Unavailable
     else:
         resp = ResponseView(req, Response(version_, status, reason, entries,
-                                          body=Unavailable))
+                                          body=None))
         stream.dump_complaints(resp, u'response heading')
         return resp
 
@@ -173,19 +174,19 @@ def _parse_response_body(resp, stream):
 
     # RFC 7230 section 3.3.3.
     if resp.status == st.switching_protocols:
-        resp.inner.body = None
+        resp.inner.body = b''
         resp.complain(1011)
         stream.sane = False
 
     elif req and req.method == m.CONNECT and resp.status.successful:
-        resp.inner.body = None
+        resp.inner.body = b''
         resp.complain(1012)
         stream.sane = False
 
     elif (resp.status.informational or
               resp.status in [st.no_content, st.not_modified] or
               (req and req.method == m.HEAD)):
-        resp.inner.body = None
+        resp.inner.body = b''
 
     elif resp.headers.transfer_encoding:
         codings = list(resp.headers.transfer_encoding)
@@ -194,7 +195,7 @@ def _parse_response_body(resp, stream):
             _parse_chunked(resp, stream)
         else:
             resp.inner.body = stream.consume_rest()
-        while codings and (resp.body is not Unavailable):
+        while codings and okay(resp.body):
             _decode_transfer_coding(resp, codings.pop())
 
     elif resp.headers.content_length.is_present:

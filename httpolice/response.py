@@ -43,8 +43,12 @@ class ResponseView(message.MessageView):
 
     @derived_property
     def content_is_full(self):
-        return self.status != st.partial_content or \
-            self.headers.content_type == media.multipart_byteranges
+        if self.status == st.not_modified:
+            return False
+        if self.status == st.partial_content and \
+                self.headers.content_type != media.multipart_byteranges:
+            return False
+        return True
 
     @derived_property
     def from_cache(self):
@@ -406,7 +410,7 @@ def check_response_in_context(resp, req):
             resp.headers.location.is_absent:
         resp.complain(1073)
 
-    if req.method != m.HEAD and not resp.body:
+    if req.method != m.HEAD and resp.body == b'':
         if resp.status == st.multiple_choices:
             resp.complain(1077)
         elif resp.status == st.see_other:
@@ -447,10 +451,20 @@ def check_response_in_context(resp, req):
             req.headers.content_length.is_okay:
         resp.complain(1097)
 
-    if not req.body:
+    if req.body == b'':
         if resp.status == st.payload_too_large:
             resp.complain(1098)
-        elif resp.status == st.unsupported_media_type:
+
+        # We must be careful here because we do not distinguish between
+        # a request with *no body* and a request with a *body of length 0*
+        # (even though RFC 7230 does).
+        # For example, consider a POST request with ``Content-Length: 0``
+        # and a ``Content-Type`` that the server does not like.
+        # It makes perfect sense for the server to look at the ``Content-Type``
+        # and respond with 415 (Unsupported Media Type),
+        # ignoring the fact that the body is empty.
+        if resp.status == st.unsupported_media_type and \
+                req.headers.content_type.is_absent:
             resp.complain(1099)
 
     if resp.status == st.expectation_failed and req.headers.expect.is_absent:
@@ -467,7 +481,7 @@ def check_response_in_context(resp, req):
     if resp.status == st.upgrade_required and not resp.headers.upgrade:
         resp.complain(1101)
 
-    if resp.status == st.http_version_not_supported and \
+    if resp.status == st.http_version_not_supported and resp.version and \
             resp.version == req.version:
         resp.complain(1105)
 
