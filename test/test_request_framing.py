@@ -2,7 +2,7 @@
 
 import unittest
 
-from six.moves import StringIO
+import six
 
 from httpolice.exchange import check_exchange
 from httpolice.framing1 import parse_streams
@@ -28,8 +28,8 @@ class TestRequest(unittest.TestCase):
         exchanges = list(parse_streams(inbound, outbound, scheme=scheme))
         for exch in exchanges:
             check_exchange(exch)
-        text_report(exchanges, StringIO())
-        html_report(exchanges, StringIO())
+        text_report(exchanges, six.BytesIO())
+        html_report(exchanges, six.BytesIO())
         return [exch.request for exch in exchanges if exch.request]
 
     def test_parse_requests(self):

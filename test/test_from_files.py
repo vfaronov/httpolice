@@ -10,7 +10,7 @@ import json
 import os
 import unittest
 
-from six.moves import StringIO
+import six
 
 from httpolice.exchange import check_exchange
 from httpolice.inputs.har import har_input
@@ -40,13 +40,14 @@ class TestFromFiles(unittest.TestCase):
             exchanges = list(combined_input([file_path]))
         for exch in exchanges:
             check_exchange(exch)
-        buf = StringIO()
+        buf = six.BytesIO()
         text_report(exchanges, buf)
-        actual = sorted(int(ln[2:6]) for ln in buf.getvalue().splitlines()
-                        if not ln.startswith(u'------------'))
+        actual = sorted(int(ln[2:6].decode('ascii'))
+                        for ln in buf.getvalue().splitlines()
+                        if not ln.startswith(b'------------'))
         self.covered.update(actual)
         self.assertEqual(expected, actual)
-        html_report(exchanges, StringIO())
+        html_report(exchanges, six.BytesIO())
         if self.examples is not None:
             for exch in exchanges:
                 for ident, ctx in exch.collect_complaints():

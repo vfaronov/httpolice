@@ -25,16 +25,17 @@ js_code = pkg_resources.resource_string('httpolice.reports', 'html.js'). \
     decode('utf-8')
 
 
-def html_report(exchanges, outfile):
+def html_report(exchanges, buf):
+    encoding = 'utf-8'
     document = dominate.document(title=u'HTTPolice report')
     with document.head:
         H.meta(http_equiv=u'Content-Type',
-               content=u'text/html; charset=utf-8')
+               content=u'text/html; charset=%s' % encoding)
         _include_stylesheet()
         _include_scripts()
     with document:
         _render_exchanges(exchanges)
-    outfile.write(document.render())
+    buf.write(document.render().encode(encoding))
 
 
 def render_notice_examples(examples):

@@ -1,5 +1,6 @@
 # -*- coding: utf-8; -*-
 
+import codecs
 import re
 
 import six
@@ -10,13 +11,19 @@ from httpolice.reports.common import (
     expand_piece,
     find_reason_phrase,
 )
-from httpolice.util.text import ellipsize, printable, write_if_any
+from httpolice.util.text import (
+    detypographize,
+    ellipsize,
+    printable,
+    write_if_any,
+)
 
 
-def text_report(exchanges, outfile):
+def text_report(exchanges, buf):
     req_i = resp_i = 1
+    f1 = codecs.getwriter('utf-8')(buf)
     for exch in exchanges:
-        with write_if_any(_exchange_marker(exch, req_i), outfile) as f2:
+        with write_if_any(_exchange_marker(exch, req_i), f1) as f2:
             if exch.request:
                 req_i += 1
                 for complaint in exch.request.collect_complaints():
@@ -52,7 +59,8 @@ def _response_marker(response, resp_i):
 
 def _write_complaint_line(complaint, f):
     the_notice = notice.notices[complaint.notice_ident]
-    title = _piece_to_text(the_notice.title, complaint.context).strip()
+    title = detypographize(
+        _piece_to_text(the_notice.title, complaint.context).strip())
     f.write(u'%s %d %s\n' % (the_notice.severity_short, the_notice.ident,
                              title))
 

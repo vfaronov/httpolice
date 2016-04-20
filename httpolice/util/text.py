@@ -163,6 +163,17 @@ def ellipsize(s, max_length=60):
         return s
 
 
+def detypographize(s):
+    """
+    >>> print(detypographize(u'“Foo bar—baz ‘qux’—xyzzy”: A–Z'))
+    "Foo bar--baz 'qux'--xyzzy": A-Z
+    """
+    return (s.
+            replace(u'“', u'"').replace(u'”', u'"').
+            replace(u'‘', u"'").replace(u'’', u"'").
+            replace(u'—', u'--').replace(u'–', u'-'))
+
+
 # See also http://stackoverflow.com/a/25829509/200445
 nonprintable = set([chr(_i) for _i in range(128)]) - set(string.printable)
 printable = lambda s: s.translate({ord(c): u'\ufffd' for c in nonprintable})

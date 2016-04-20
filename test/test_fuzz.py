@@ -9,7 +9,6 @@ import string
 import unittest
 
 import six
-from six.moves import StringIO
 
 from httpolice import Exchange, Request, Response, check_exchange
 from httpolice.known import h, header, m
@@ -73,8 +72,8 @@ class TestFuzz(unittest.TestCase):
         try:
             exch = Exchange(req, resps)
             check_exchange(exch)
-            text_report([exch], StringIO())
-            html_report([exch], StringIO())
+            text_report([exch], six.BytesIO())
+            html_report([exch], six.BytesIO())
         except Exception:
             # Dump the state of the random generator,
             # so that the problem can be reproduced.
