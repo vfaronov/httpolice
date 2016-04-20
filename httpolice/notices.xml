@@ -1686,4 +1686,21 @@
     <!-- This used to be part of no. 1193, but strictly speaking ``max-age`` does not contradict ``no-cache``, similarly ``s-maxage`` vs. ``private``, etc. -->
   </comment>
 
+  <error id="1239">
+    <title><ref to="msg.body">Payload</ref> in a response to <ref to="msg.request.method"/></title>
+    <rfc num="7231" sect="4.3.2">
+      The <m>HEAD</m> method is identical to <m>GET</m> except that the server MUST NOT
+   send a message body in the response
+    </rfc>
+  </error>
+
+  <error id="1240">
+    <title><ref to="msg.status"/> response with a <ref to="msg.body">payload</ref></title>
+    <rfc num="7231" sect="6.3.5">
+      The 204 (No Content) status code indicates that the server has
+   successfully fulfilled the request and that there is no additional
+   content to send in the response payload body.
+    </rfc>
+  </error>
+
 </notices>

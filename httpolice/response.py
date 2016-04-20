@@ -148,6 +148,9 @@ def check_response_itself(resp):
     if status == st.switching_protocols and headers.upgrade.is_absent:
         resp.complain(1048)
 
+    if status == st.no_content and body:
+        resp.complain(1240)
+
     if status == st.reset_content and body:
         resp.complain(1076)
 
@@ -345,6 +348,9 @@ def check_response_in_context(resp, req):
             resp.complain(1025)
         if u'close' not in resp.headers.connection:
             resp.complain(1047)
+
+    if req.method == m.HEAD and resp.body:
+        resp.complain(1239)
 
     if req.version == http11 and (not req.headers.host.is_okay or
                                   len(req.headers.enumerate(h.host)) > 1):
