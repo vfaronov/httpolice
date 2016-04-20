@@ -10,6 +10,6 @@ HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 14
-Cache-Control: max-age=3600,  no-cache="X-Foo, X-Bar"
+Cache-Control: s-maxage=3600, private="X-Foo, X-Bar"
 
 Hello world!

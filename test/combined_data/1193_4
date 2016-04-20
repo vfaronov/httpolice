@@ -1,4 +1,4 @@
-1193
+
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
@@ -10,6 +10,6 @@ HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 14
-Cache-Control: no-store, private="X-Secret-Header"
+Cache-Control: max-age=3600,  no-cache="X-Foo, X-Bar"
 
 Hello world!

@@ -1695,4 +1695,10 @@
     <explain>It seems like this response was transformed by a proxy, but the request was not directed to a proxy. Something is wrong here.</explain>
   </error>
 
+  <comment id="1238">
+    <title><ref to="directive1"/> together with <ref to="directive2"/></title>
+    <explain>This response’s <ref to="msg.headers.cache_control"/> header includes both the <ref to="directive1"/> and the <ref to="directive2"/> directives. But <ref to="directive1"/> makes no difference when <ref to="directive2"/> is present.</explain>
+    <!-- This used to be part of no. 1193, but strictly speaking ``max-age`` does not contradict ``no-cache``, similarly ``s-maxage`` vs. ``private``, etc. -->
+  </comment>
+
 </notices>
