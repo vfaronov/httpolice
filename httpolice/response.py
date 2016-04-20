@@ -199,11 +199,12 @@ def check_response_itself(resp):
 
     if status == st.not_modified:
         for hdr in headers:
-            if hdr.name == h.etag:
+            # RFC 7232 says "Last-Modified might be useful
+            # if the response does not have an ETag field",
+            # but really it doesn't hurt even if there is an ETag,
+            # and this is widely seen in practice.
+            if hdr.name in [h.etag, h.last_modified]:
                 continue
-            elif hdr.name == h.last_modified:
-                if headers.etag.is_present:
-                    resp.complain(1127, header=hdr)
             elif header.is_representation_metadata(hdr.name):
                 resp.complain(1127, header=hdr)
 
