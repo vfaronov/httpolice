@@ -3,6 +3,7 @@
 import argparse
 import sys
 
+import httpolice
 from httpolice import inputs, reports
 from httpolice.exchange import check_exchange
 
@@ -10,6 +11,8 @@ from httpolice.exchange import check_exchange
 def main():
     parser = argparse.ArgumentParser(
         description=u'Run HTTPolice on input files.')
+    parser.add_argument(u'--version', action='version',
+                        version=u'HTTPolice %s' % httpolice.__version__)
     parser.add_argument(u'-i', u'--input', choices=inputs.formats,
                         required=True)
     parser.add_argument(u'-o', u'--output', choices=reports.formats,
