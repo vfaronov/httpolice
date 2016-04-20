@@ -5,9 +5,8 @@ import re
 import six
 
 from httpolice import notice
-from httpolice.parse import ParseError
 from httpolice.reports.common import (
-    expand_parse_error,
+    expand_error,
     expand_piece,
     find_reason_phrase,
 )
@@ -77,9 +76,9 @@ def _piece_to_text(piece, ctx):
         else:
             return six.text_type(piece.info)
 
-    elif isinstance(piece, ParseError):
+    elif isinstance(piece, Exception):
         return u''.join(_piece_to_text(para, ctx) + u'\n'
-                        for para in expand_parse_error(piece))
+                        for para in expand_error(piece))
 
     elif isinstance(piece, six.text_type):
         return printable(piece)

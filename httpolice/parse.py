@@ -343,6 +343,11 @@ def skip(x):
 def group(x):
     return as_symbol(x).group()
 
+def mark(symbol):
+    def mark_action(x):
+        return (symbol, x)
+    return mark_action << symbol
+
 
 def maybe(inner, default=None):
     return inner | subst(default) << empty

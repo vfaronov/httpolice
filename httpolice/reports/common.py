@@ -4,7 +4,7 @@ import six
 
 from httpolice import known
 from httpolice.header import HeaderView
-from httpolice.parse import Symbol
+from httpolice.parse import ParseError, Symbol
 from httpolice.structure import HeaderEntry, Parametrized
 from httpolice.util.text import format_chars
 
@@ -24,6 +24,13 @@ def expand_piece(piece):
 
     else:
         return six.text_type(piece)
+
+
+def expand_error(error):
+    if isinstance(error, ParseError):
+        return expand_parse_error(error)
+    else:
+        return [expand_piece(error)]
 
 
 def expand_parse_error(error):

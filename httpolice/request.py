@@ -26,8 +26,14 @@ from httpolice.known import (
     tc,
     upgrade,
 )
+from httpolice.parse import ParseError, Stream, mark
 from httpolice.structure import EntityTag, Method, Versioned, http10, http11
-from httpolice.syntax import rfc7230
+from httpolice.syntax.rfc7230 import (
+    absolute_form,
+    asterisk_form,
+    authority_form,
+    origin_form,
+)
 from httpolice.syntax.common import CTL
 from httpolice.util.text import force_unicode
 
@@ -55,50 +61,54 @@ class Request(message.Message):
             return True
 
     @derived_property
-    def is_origin_form(self):
-        return self._target_parses_as(rfc7230.origin_form)
+    def target_form(self):
+        try:
+            target = self.target.encode('iso-8859-1')
+        except UnicodeError as e:
+            self.complain(1045, error=e)
+            return None
 
-    @derived_property
-    def is_asterisk_form(self):
-        return self._target_parses_as(rfc7230.asterisk_form)
+        if self.method == m.CONNECT:
+            parser = mark(authority_form)
+        elif self.method == m.OPTIONS:
+            parser = (mark(origin_form) | mark(asterisk_form) |
+                      mark(absolute_form))
+        else:
+            parser = mark(origin_form) | mark(absolute_form)
 
-    @derived_property
-    def is_authority_form(self):
-        return (
-            self._target_parses_as(rfc7230.authority_form) and
-            # ``*`` can be parsed as an ``<authority>``.
-            not self.is_asterisk_form)
+        try:
+            (symbol, _) = Stream(target).parse(parser, to_eof=True)
+        except ParseError as e:
+            self.complain(1045, error=e)
+            return None
 
-    @derived_property
-    def is_absolute_form(self):
-        return (
-            self._target_parses_as(rfc7230.absolute_form) and
-            # ``example.com:80`` can be parsed as an ``<absolute-URI>``
-            # with a ``<scheme>`` of ``example.com``
-            # and a ``<path-rootless>`` of ``80``.
-            not self.is_authority_form)
+        return symbol
 
     @derived_property
     def effective_uri(self):
         # RFC 7230 section 5.5.
-        if self.is_absolute_form:
+        if self.target_form is absolute_form:
             return self.target
+
         if self.scheme:
             scheme = self.scheme
         else:           # Let's not annoy the user with wrong guesses.
             return None
-        if self.is_authority_form:
+
+        if self.target_form is authority_form:
             authority = self.target
         elif self.headers.host.is_okay:
             authority = self.headers.host.value
         else:
             return None
-        if self.is_authority_form or self.is_asterisk_form:
+
+        if self.target_form in [authority_form, asterisk_form]:
             path_and_query = u''
-        elif self.is_origin_form:
+        elif self.target_form is origin_form:
             path_and_query = self.target
         else:
             return None
+
         return scheme + u'://' + authority + path_and_query
 
     @derived_property
@@ -117,7 +127,7 @@ class Request(message.Message):
         # (which has its own equivalent of the absolute form
         # with the ``:authority`` pseudo-header).
         if self.version in [http10, http11]:
-            if self.is_absolute_form:
+            if self.target_form is absolute_form:
                 self.complain(1236)
                 return True
             else:
@@ -127,6 +137,8 @@ class Request(message.Message):
 
 def check_request(req):
     message.check_message(req)
+
+    _ = req.target_form                 # Force check.
 
     if req.body and req.headers.content_type.is_absent:
         req.complain(1041)
@@ -150,17 +162,6 @@ def check_request(req):
         req.complain(1031)
     if req.headers.host.is_present and req.header_entries[0].name != h.host:
         req.complain(1032)
-
-    if req.method == m.CONNECT:
-        if not req.is_authority_form:
-            req.complain(1043)
-    elif req.method == m.OPTIONS:
-        if not req.is_origin_form and not req.is_asterisk_form \
-                and not req.is_absolute_form:
-            req.complain(1044)
-    else:
-        if not req.is_origin_form and not req.is_absolute_form:
-            req.complain(1045)
 
     for hdr in req.headers:
         if header.is_for_request(hdr.name) == False:

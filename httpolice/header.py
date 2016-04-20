@@ -6,7 +6,8 @@ import sys
 from httpolice import known, parse
 from httpolice.known import cache_directive, h, header
 import httpolice.known.hsts_directive
-from httpolice.structure import Parametrized, Quoted, Unavailable, okay
+from httpolice.structure import Parametrized, Unavailable, okay
+from httpolice.syntax.rfc7230 import quoted_string, token
 
 
 class HeadersView(object):
@@ -268,22 +269,21 @@ class CacheControlView(DirectivesView, MultiHeaderView):
     knowledge_module = cache_directive
 
     def _process_directive(self, entry, directive_with_argument):
-        directive, argument = directive_with_argument
-        quoted = unquoted = False
-        if isinstance(argument, Quoted):
-            argument = argument.item
-            quoted = True
-        elif argument is not None:
-            unquoted = True
+        (directive, argument) = directive_with_argument
+        if argument is not None:
+            (symbol, argument) = argument
 
-        def complain(ident, **kwargs):
-            self.message.complain(ident, entry=entry,
-                                  directive=directive, **kwargs)
+            def complain(ident, **kwargs):
+                self.message.complain(ident, entry=entry,
+                                      directive=directive, **kwargs)
 
-        if unquoted and cache_directive.quoted_string_preferred(directive):
-            complain(1154)
-        if quoted and cache_directive.token_preferred(directive):
-            complain(1155)
+            if cache_directive.quoted_string_preferred(directive) and \
+                    symbol is not quoted_string:
+                complain(1154)
+
+            if cache_directive.token_preferred(directive) and \
+                    symbol is not token:
+                complain(1155)
 
         return super(CacheControlView, self). \
             _process_directive(entry, (directive, argument))

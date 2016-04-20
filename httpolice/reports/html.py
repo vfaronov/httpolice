@@ -9,10 +9,9 @@ import six
 
 from httpolice import known, notice
 from httpolice.citation import Citation
-from httpolice.parse import ParseError
 from httpolice.header import HeaderView
 from httpolice.reports.common import (
-    expand_parse_error,
+    expand_error,
     expand_piece,
     find_reason_phrase,
 )
@@ -232,8 +231,8 @@ def _piece_to_html(piece, ctx):
             with H.q(cite=piece.info.url):
                 _piece_to_html(quote, ctx)
 
-    elif isinstance(piece, ParseError):
-        for para in expand_parse_error(piece):
+    elif isinstance(piece, Exception):
+        for para in expand_error(piece):
             with H.p(_class=u'notice-para', __inline=True):
                 _piece_to_html(para, ctx)
 

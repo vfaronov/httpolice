@@ -4,6 +4,7 @@ from httpolice.citation import RFC
 from httpolice.parse import (
     fill_names,
     literal,
+    mark,
     maybe,
     maybe_str,
     named,
@@ -16,7 +17,6 @@ from httpolice.structure import (
     CacheDirective,
     CaseInsensitive,
     Parametrized,
-    Quoted,
     WarnCode,
     WarningValue,
 )
@@ -38,7 +38,7 @@ Age = delta_seconds                                                     > pivot
 
 cache_directive = Parametrized << (
     (CacheDirective << token) *
-    maybe(skip('=') * (token | Quoted << quoted_string)))               > pivot
+    maybe(skip('=') * (mark(token) | mark(quoted_string))))             > pivot
 Cache_Control = comma_list1(cache_directive)                            > pivot
 
 Expires = HTTP_date                                                     > pivot

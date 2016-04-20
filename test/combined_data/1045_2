@@ -1,13 +1,15 @@
-1043 1012 1010
+1045
 
 ======== BEGIN INBOUND STREAM ========
-CONNECT / HTTP/1.1
+OPTIONS example.com HTTP/1.1
 Host: example.com
 User-Agent: demo
+Content-Length: 0
 
 ======== BEGIN OUTBOUND STREAM ========
-HTTP/1.1 204 No Content
+HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
 
-flkqnwrfjwejrf
-fnelrfjerf
+Hello world!

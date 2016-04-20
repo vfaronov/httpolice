@@ -27,6 +27,7 @@ from httpolice.known import (
 )
 from httpolice.known.status_code import NOT_AT_ALL, NOT_BY_DEFAULT
 from httpolice.structure import EntityTag, StatusCode, http10, http11, okay
+from httpolice.syntax.rfc7230 import asterisk_form
 from httpolice.util.text import force_unicode
 
 
@@ -432,7 +433,7 @@ def check_response_in_context(resp, req):
         elif resp.status.server_error:
             resp.complain(1104)
 
-    if req.method == m.OPTIONS and req.is_asterisk_form and \
+    if req.method == m.OPTIONS and req.target_form is asterisk_form and \
             resp.status in [st.multiple_choices, st.moved_permanently,
                             st.found, st.temporary_redirect,
                             st.permanent_redirect]:

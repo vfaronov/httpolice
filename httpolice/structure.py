@@ -69,11 +69,6 @@ class Versioned(namedtuple('Versioned', ('item', 'version'))):
         __str__ = __unicode__
 
 
-class Quoted(namedtuple('Quoted', ('item',))):
-
-    __slots__ = ()
-
-
 class ProtocolString(six.text_type):
 
     __slots__ = ()

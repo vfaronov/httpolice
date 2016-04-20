@@ -1,10 +1,9 @@
-1044
+1045
 
 ======== BEGIN INBOUND STREAM ========
-OPTIONS example.com HTTP/1.1
+GET /foo?bar=[baz;qux] HTTP/1.1
 Host: example.com
 User-Agent: demo
-Content-Length: 0
 
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 200 OK

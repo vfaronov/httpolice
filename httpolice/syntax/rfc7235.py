@@ -5,18 +5,14 @@ from httpolice.parse import (
     auto,
     can_complain,
     fill_names,
+    mark,
     maybe,
     pivot,
     skip,
     string,
     string1,
 )
-from httpolice.structure import (
-    AuthScheme,
-    CaseInsensitive,
-    Parametrized,
-    Quoted,
-)
+from httpolice.structure import AuthScheme, CaseInsensitive, Parametrized
 from httpolice.syntax.common import ALPHA, DIGIT, SP
 from httpolice.syntax.rfc7230 import (
     BWS,
@@ -33,15 +29,14 @@ token68 = (string1(ALPHA | DIGIT | '-' | '.' | '_' | '~' | '+' | '/') +
 
 @can_complain
 def _check_realm(complain, k, v):
-    if isinstance(v, Quoted):
-        v = v.item
-    elif k == u'realm':
+    (symbol, v) = v
+    if k == u'realm' and symbol is not quoted_string:
         complain(1196)
     return (k, v)
 
 auth_param = _check_realm << ((CaseInsensitive << token) *
                               skip(BWS * '=' * BWS) *
-                              (token | Quoted << quoted_string))        > pivot
+                              (mark(token) | mark(quoted_string)))      > pivot
 
 def _empty_to_none(r):
     return r or None
