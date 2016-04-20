@@ -34,7 +34,7 @@ class Notice(lxml.etree.ElementBase):
         for child in self:
             if isinstance(child, Title) or child.tag is lxml.etree.Comment:
                 continue
-            elif isinstance(child, (Paragraph, Ref)):
+            elif isinstance(child, (Paragraph, ExceptionDetails, Ref)):
                 yield child
             else:
                 # Assume that a wrapping ``<explain/>`` was omitted.
@@ -64,14 +64,19 @@ class Title(Content):
     pass
 
 
-class Ref(Content):
+class Ref(lxml.etree.ElementBase):
 
-    def resolve_reference(self, ctx):
-        path = self.get('to').split('.')
-        node = ctx[path.pop(0)]
-        for attr_name in path:
-            node = getattr(node, attr_name)
-        return node
+    reference = property(lambda self: self.get('to').split('.'))
+
+
+class Var(Ref):
+
+    reference = property(lambda self: self.get('ref').split('.'))
+
+
+class ExceptionDetails(lxml.etree.ElementBase):
+
+    pass
 
 
 class Cite(Content):
@@ -108,6 +113,8 @@ def load_notices():
         ns[tag] = Notice
     ns['title'] = Title
     ns['explain'] = Paragraph
+    ns['exception'] = ExceptionDetails
+    ns['var'] = Var
     ns['ref'] = Ref
     ns['cite'] = Cite
     ns['rfc'] = CiteRFC

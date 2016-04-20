@@ -228,30 +228,24 @@ class DirectivesView(ListHeaderView):
 
     def _process_directive(self, entry, directive_with_argument):
         directive, argument = directive_with_argument
-
-        def complain(ident, **kwargs):
-            self.message.complain(ident, entry=entry,
-                                  directive=directive, **kwargs)
-
         parser = self.knowledge_module.parser_for(directive)
         if argument is None:
             if self.knowledge_module.argument_required(directive):
-                complain(1156)
+                self.message.complain(1156, directive=directive)
                 argument = Unavailable
         else:
             if self.knowledge_module.no_argument(directive):
-                complain(1157)
+                self.message.complain(1157, directive=directive)
                 argument = None
             elif parser is not None:
                 stream = parse.Stream(argument.encode('iso-8859-1'))
                 try:
                     argument = stream.parse(parser, to_eof=True)
                 except parse.ParseError as e:
-                    complain(1158, error=e)
+                    self.message.complain(1158, directive=directive, error=e)
                     argument = Unavailable
                 else:
                     stream.dump_complaints(self.message, entry)
-
         return Parametrized(directive, argument)
 
     def __getattr__(self, key):
@@ -273,17 +267,13 @@ class CacheControlView(DirectivesView, MultiHeaderView):
         if argument is not None:
             (symbol, argument) = argument
 
-            def complain(ident, **kwargs):
-                self.message.complain(ident, entry=entry,
-                                      directive=directive, **kwargs)
-
             if cache_directive.quoted_string_preferred(directive) and \
                     symbol is not quoted_string:
-                complain(1154)
+                self.message.complain(1154, directive=directive)
 
             if cache_directive.token_preferred(directive) and \
                     symbol is not token:
-                complain(1155)
+                self.message.complain(1155, directive=directive)
 
         return super(CacheControlView, self). \
             _process_directive(entry, (directive, argument))

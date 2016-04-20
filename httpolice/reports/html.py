@@ -7,13 +7,14 @@ import dominate.tags as H
 import pkg_resources
 import six
 
-from httpolice import known, notice
+from httpolice import known, notice, structure
 from httpolice.citation import Citation
 from httpolice.header import HeaderView
 from httpolice.reports.common import (
     expand_error,
     expand_piece,
     find_reason_phrase,
+    resolve_reference,
 )
 from httpolice.structure import Unavailable, okay
 from httpolice.util.text import has_nonprintable, nicely_join, printable
@@ -178,6 +179,30 @@ def _reference_targets(obj):
         return [u'#' + six.text_type(id(obj))]
 
 
+def _magic_references(piece, ctx):
+    if piece.get('ref') == u'no':
+        return []
+    obj = piece.content
+    msg = ctx.get('msg')
+    if not msg:
+        return []
+
+    if isinstance(obj, structure.FieldName) and msg.headers[obj].is_present:
+        return [msg.headers[obj]]
+
+    if isinstance(obj, structure.Method):
+        if getattr(msg, 'method', None) == obj:
+            return [msg.method]
+        if getattr(msg, 'request', None) and msg.request.method == obj:
+            return [msg.request.method]
+
+    if isinstance(obj, structure.StatusCode):
+        if getattr(msg, 'status', None) == obj:
+            return [msg.status]
+
+    return []
+
+
 def _known_to_html(obj):
     cls = u'known known-%s' % type(obj).__name__
     text = printable(six.text_type(obj))
@@ -219,10 +244,14 @@ def _piece_to_html(piece, ctx):
         with H.p(_class=u'notice-para', __inline=True):
             _piece_to_html(piece.content, ctx)
 
-    elif isinstance(piece, notice.Ref):
-        target = piece.resolve_reference(ctx)
+    elif isinstance(piece, notice.Var):
+        target = resolve_reference(ctx, piece.reference)
         with H.span(data_ref_to=u', '.join(_reference_targets(target))):
-            _piece_to_html(piece.content or target, ctx)
+            _piece_to_html(target, ctx)
+
+    elif isinstance(piece, notice.Ref):
+        target = resolve_reference(ctx, piece.reference)
+        H.span(u'', data_ref_to=u', '.join(_reference_targets(target)))
 
     elif isinstance(piece, notice.Cite):
         _piece_to_html(piece.info, ctx)
@@ -232,14 +261,19 @@ def _piece_to_html(piece, ctx):
             with H.q(cite=piece.info.url):
                 _piece_to_html(quote, ctx)
 
-    elif isinstance(piece, Exception):
-        for para in expand_error(piece):
+    elif isinstance(piece, notice.ExceptionDetails):
+        for para in expand_error(ctx['error']):
             with H.p(_class=u'notice-para', __inline=True):
                 _piece_to_html(para, ctx)
 
     elif isinstance(piece, Citation):
         with H.cite():
             H.a(piece.title, href=piece.url, target=u'_blank')
+
+    elif isinstance(piece, notice.Known):
+        magic = _magic_references(piece, ctx)
+        with H.span(data_ref_to=u', '.join(_reference_targets(magic))):
+            _piece_to_html(piece.content, ctx)
 
     elif known.is_known(piece):
         _known_to_html(piece)

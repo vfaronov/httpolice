@@ -29,9 +29,10 @@ from httpolice.structure import (
     HeaderEntry,
     FieldName,
     Unavailable,
+    http11,
     okay,
 )
-from httpolice.util.text import force_unicode
+from httpolice.util.text import force_unicode, format_chars
 
 
 # This list is taken from the HTML specification --
@@ -195,7 +196,7 @@ class Message(Blackboard):
             return None
         for byte in six.iterbytes(self.decoded_body):
             if not URL_ENCODED_GOOD_BYTES[byte]:
-                self.complain(1040, offending_value=byte)
+                self.complain(1040, char=format_chars([six.int2byte(byte)]))
                 return Unavailable
         return parse_qs(self.decoded_body.decode('ascii'))
 
@@ -223,8 +224,9 @@ def check_message(msg):
     _ = msg.multipart_data
     _ = msg.url_encoded_data
 
-    if msg.headers.trailer.is_present and \
+    if msg.version == http11 and msg.headers.trailer.is_present and \
             tc.chunked not in msg.headers.transfer_encoding:
+        # HTTP/2 supports trailers but has no notion of "chunked".
         msg.complain(1054)
 
     for entry in msg.trailer_entries:

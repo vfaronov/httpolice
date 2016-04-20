@@ -9,6 +9,14 @@ from httpolice.structure import HeaderEntry, Parametrized
 from httpolice.util.text import format_chars
 
 
+def resolve_reference(ctx, path):
+    path = list(path)
+    node = ctx[path.pop(0)]
+    for attr_name in path:
+        node = getattr(node, attr_name)
+    return node
+
+
 def expand_piece(piece):
     if hasattr(piece, 'content'):
         return piece.content

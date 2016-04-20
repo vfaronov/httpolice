@@ -10,6 +10,7 @@ from httpolice.reports.common import (
     expand_error,
     expand_piece,
     find_reason_phrase,
+    resolve_reference,
 )
 from httpolice.util.text import (
     detypographize,
@@ -72,9 +73,12 @@ def _piece_to_text(piece, ctx):
     elif isinstance(piece, notice.Paragraph):
         return _piece_to_text(piece.content, ctx) + u'\n'
 
+    elif isinstance(piece, notice.Var):
+        target = resolve_reference(ctx, piece.reference)
+        return _piece_to_text(target, ctx)
+
     elif isinstance(piece, notice.Ref):
-        target = piece.resolve_reference(ctx)
-        return _piece_to_text(piece.content or target, ctx)
+        return u''
 
     elif isinstance(piece, notice.Cite):
         quote = piece.content
@@ -84,9 +88,9 @@ def _piece_to_text(piece, ctx):
         else:
             return six.text_type(piece.info)
 
-    elif isinstance(piece, Exception):
+    elif isinstance(piece, notice.ExceptionDetails):
         return u''.join(_piece_to_text(para, ctx) + u'\n'
-                        for para in expand_error(piece))
+                        for para in expand_error(ctx['error']))
 
     elif isinstance(piece, six.text_type):
         return printable(piece)

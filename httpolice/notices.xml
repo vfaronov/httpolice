@@ -3,12 +3,12 @@
 <notices>
 
   <error id="1000">
-    <title>Malformed <ref to="entry"/> header</title>
-    <ref to="error"/>
+    <title>Malformed <var ref="entry"/> header</title>
+    <exception/>
   </error>
 
   <error id="1001">
-    <title>Final <ref to="msg.headers.transfer_encoding"/> is not <tc>chunked</tc></title>
+    <title>Final <h>Transfer-Encoding</h> is not <tc>chunked</tc></title>
     <rfc num="7230" sect="3.3.1">
       If any transfer coding
    other than <tc>chunked</tc> is applied to a request payload body, the sender
@@ -18,7 +18,7 @@
   </error>
 
   <error id="1002">
-    <title><ref to="msg.headers.transfer_encoding"/> contains <tc>chunked</tc> more than once</title>
+    <title><h>Transfer-Encoding</h> contains <tc>chunked</tc> more than once</title>
     <rfc num="7230" sect="3.3.1">
       A sender MUST
    NOT apply <tc>chunked</tc> more than once to a message body (i.e., chunking an
@@ -27,28 +27,28 @@
   </error>
 
   <debug id="1003">
-    <title>Not decoding <ref to="msg.headers.transfer_encoding"/>: <ref to="coding"/></title>
-    <explain>HTTPolice does not know how to decode the <ref to="coding"/> transfer coding. (This doesn’t mean that it’s wrong.)</explain>
+    <title>Not decoding <h>Transfer-Encoding</h>: <var ref="coding"/></title>
+    <explain>HTTPolice does not know how to decode the <var ref="coding"/> transfer coding. (This doesn’t mean that it’s wrong.)</explain>
   </debug>
 
   <error id="1004">
-    <title>Incomplete message according to <ref to="msg.headers.content_length"/></title>
-    <explain>This message’s <ref to="msg.headers.content_length"/> header indicates that the body is <ref to="msg.headers.content_length.value"/> bytes long, but there are fewer bytes remaining on the stream.</explain>
+    <title>Incomplete message according to <h>Content-Length</h></title>
+    <explain>This message’s <h>Content-Length</h> header indicates that the body is <var ref="msg.headers.content_length.value"/> bytes long, but there are fewer bytes remaining on the stream.</explain>
   </error>
 
   <error id="1005">
-    <title>Malformed <ref to="msg.headers.transfer_encoding"/>: <tc>chunked</tc></title>
-    <ref to="error"/>
+    <title>Malformed <h>Transfer-Encoding</h>: <tc>chunked</tc></title>
+    <exception/>
   </error>
 
   <error id="1006">
     <title>Malformed request heading</title>
-    <ref to="error"/>
+    <exception/>
   </error>
 
   <debug id="1007">
     <title>Stop parsing request stream</title>
-    <explain>Due to previous notices, the remaining <ref to="nbytes"/> bytes on the request stream cannot be parsed.</explain>
+    <explain>Due to previous notices, the remaining <var ref="nbytes"/> bytes on the request stream cannot be parsed.</explain>
   </debug>
 
   <error id="1008">
@@ -58,85 +58,85 @@
 
   <error id="1009">
     <title>Malformed response heading</title>
-    <ref to="error"/>
+    <exception/>
   </error>
 
   <debug id="1010">
     <title>Stop parsing response stream</title>
-    <explain>Due to previous notices, the remaining <ref to="nbytes"/> bytes on the response stream cannot be parsed.</explain>
+    <explain>Due to previous notices, the remaining <var ref="nbytes"/> bytes on the response stream cannot be parsed.</explain>
   </debug>
 
   <debug id="1011">
     <title>Switching protocols</title>
-    <explain>The <ref to="msg.status"/> status code means that the connection is switching to a different protocol. HTTPolice will not parse the remainder of the streams.</explain>
+    <explain>The <st>101</st> status code means that the connection is switching to a different protocol. HTTPolice will not parse the rest of the streams.</explain>
   </debug>
 
   <debug id="1012">
     <title>Switching to a tunnel</title>
-    <explain>A <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request means that the connection is becoming a tunnel. HTTPolice will not parse the remainder of the streams.</explain>
+    <explain>A <var ref="msg.status"/> response to a <m>CONNECT</m> request means that the connection is becoming a tunnel. HTTPolice will not parse the remainder of the streams.</explain>
   </debug>
 
   <error id="1013">
-    <title><ref to="entries">Multiple</ref> <ref to="header"/> headers</title>
+    <title>Multiple <var ref="header"/> headers</title>
     <rfc num="7230" sect="3.2.2">
       A sender MUST NOT generate multiple header fields with the same field
    name in a message unless either the entire field value for that
    header field is defined as a comma-separated list [i.e., #(values)]
    or the header field is a well-known exception (as noted below).
     </rfc>
+    <ref to="entries"/>
   </error>
 
   <comment id="1014">
-    <title>RWS is not a single space in <ref to="place"/></title>
-    <explain>The syntax of <ref to="place"/> includes the rule named RWS. It should be generated as just a single space, but here it was <ref to="num"/> characters. See <rfc num="7230" sect="3.2.3"/>.</explain>
+    <title>RWS is not a single space in <var ref="place"/></title>
+    <explain>The syntax of <var ref="place"/> includes the rule named RWS. It should be produced as just a single space, but here it was <var ref="num"/> characters. See <rfc num="7230" sect="3.2.3"/>.</explain>
   </comment>
 
   <error id="1015">
-    <title>Bad whitespace (BWS) in <ref to="place"/></title>
-    <explain>The syntax of <ref to="place"/> includes the rule named BWS, which is whitespace allowed for historical reasons; current implementations must omit it. See <rfc num="7230" sect="3.2.3"/>.</explain>
+    <title>Bad whitespace (BWS) in <var ref="place"/></title>
+    <explain>The syntax of <var ref="place"/> includes the rule named BWS, which is whitespace allowed for historical reasons; it must not be produced by current implementations. See <rfc num="7230" sect="3.2.3"/>.</explain>
   </error>
 
   <error id="1016">
-    <title>Obsolete line folding in header fields</title>
-    <explain>This message uses line folding (the ‘obs-fold’ rule) to split one header field over several physical lines, but this is deprecated and prohibited in most contexts. See <rfc num="7230" sect="3.2.4"/>.</explain>
+    <title>Obsolete line folding in headers</title>
+    <explain>This message uses line folding (the “obs-fold” rule) to split one header field over several physical lines, but this is deprecated and prohibited in most cases. See <rfc num="7230" sect="3.2.4"/>.</explain>
   </error>
 
   <comment id="1017">
-    <title>Superfluous escaping in <ref to="place"/></title>
-    <explain>This message uses the ‘quoted-pair’ rule to escape the character <ref to="char"/> in a context where this escaping is unnecessary and should not be used. See <rfc num="7230" sect="3.2.6"/>.</explain>
-    <explain>If a literal backslash \ was intended here, it should itself be escaped as \\.</explain>
+    <title>Strange escaping in <var ref="place"/></title>
+    <explain>This message uses the “quoted-pair” rule to escape the character <var ref="char"/> in a context where this escaping is unnecessary and should not be used. See <rfc num="7230" sect="3.2.6"/>.</explain>
+    <explain>If a literal backslash \ was intended here, it must itself be escaped as \\.</explain>
   </comment>
 
   <error id="1018">
-    <title><ref to="msg.headers.transfer_encoding"/> in a <ref to="msg.status"/> response</title>
+    <title><h>Transfer-Encoding</h> in a <var ref="msg.status"/> response</title>
     <rfc num="7230" sect="3.3.1">
-      A server MUST NOT send a <h>Transfer-Encoding</h> header field in any
+      A server MUST NOT send a Transfer-Encoding header field in any
    response with a status code of 1xx (Informational) or 204 (No
    Content).
     </rfc>
   </error>
 
   <error id="1019">
-    <title><ref to="msg.headers.transfer_encoding"/> in a <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request</title>
+    <title><h>Transfer-Encoding</h> in a <var ref="msg.status"/> response to <m>CONNECT</m></title>
     <rfc num="7230" sect="3.3.1">
-      A server MUST NOT send a <h>Transfer-Encoding</h> header field in
-   any 2xx (Successful) response to a <m>CONNECT</m> request (Section 4.3.6 of
-   [RFC7231]).
+      A server MUST NOT send a Transfer-Encoding header field in
+   any 2xx (Successful) response to a CONNECT request
     </rfc>
   </error>
 
   <error id="1020">
-    <title>Message with both <ref to="msg.headers.transfer_encoding"/> and <ref to="msg.headers.content_length"/></title>
+    <title><h>Transfer-Encoding</h> together with <h>Content-Length</h></title>
     <rfc num="7230" sect="3.3.2">
-      A sender MUST NOT send a <h>Content-Length</h> header field in any message
-   that contains a <h>Transfer-Encoding</h> header field.
+      A sender MUST NOT send a Content-Length header field in any message
+   that contains a Transfer-Encoding header field.
     </rfc>
   </error>
 
   <comment id="1021">
-    <title><ref to="msg.method"/> request with no <h>Content-Length</h></title>
+    <title><var ref="msg.method"/> request without <h>Content-Length</h></title>
     <rfc num="7230" sect="3.3.2">
-      A user agent SHOULD send a <h>Content-Length</h> in a request message when
+      A user agent SHOULD send a Content-Length in a request message when
    no <h>Transfer-Encoding</h> is sent and the request method defines a meaning
    for an enclosed payload body.  For example, a Content-Length header
    field is normally sent in a <m>POST</m> request even when the value is 0
@@ -145,76 +145,70 @@
   </comment>
 
   <comment id="1022">
-    <title><ref to="msg.method"/> request with <ref to="msg.headers.content_length"/> but no body</title>
+    <title><var ref="msg.method"/> request with <h>Content-Length</h> but no body</title>
     <rfc num="7230" sect="3.3.2">
       A user agent SHOULD NOT send a
-   <h>Content-Length</h> header field when the request message does not contain
+   Content-Length header field when the request message does not contain
    a payload body and the method semantics do not anticipate such a
    body.
     </rfc>
   </comment>
 
   <error id="1023">
-    <title><ref to="msg.headers.content_length"/> in a <ref to="msg.status"/> response</title>
+    <title><h>Content-Length</h> in a <var ref="msg.status"/> response</title>
     <rfc num="7230" sect="3.3.2">
-      A server MUST NOT send a <h>Content-Length</h> header field in any response
-   with a status code of 1xx (Informational) or <st>204</st> (No Content).
+      A server MUST NOT send a Content-Length header field in any response
+   with a status code of 1xx (Informational) or 204 (No Content).
     </rfc>
   </error>
 
   <error id="1024">
-    <title><ref to="msg.headers.content_length"/> in a <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request</title>
+    <title><h>Content-Length</h> in a <var ref="msg.status"/> response to <m>CONNECT</m></title>
     <rfc num="7230" sect="3.3.2">
       A
-   server MUST NOT send a <h>Content-Length</h> header field in any 2xx
-   (Successful) response to a <m>CONNECT</m> request (Section 4.3.6 of
+   server MUST NOT send a Content-Length header field in any 2xx
+   (Successful) response to a CONNECT request (Section 4.3.6 of
    [RFC7231]).
     </rfc>
   </error>
 
   <comment id="1025">
     <title>Response delimited only by closing the connection</title>
-    <explain>This response has no <h>Content-Length</h> header and no “<h>Transfer-Encoding</h>: <tc>chunked</tc>” that would delimit its body. Therefore, the body is assumed to consist of everything the server sends until closing the connection.</explain>
-    <rfc num="7230" sect="3.3.3">
-      Since there is no way to distinguish a successfully completed,
-   close-delimited message from a partially received message interrupted
-   by network failure, a server SHOULD generate encoding or
-   length-delimited messages whenever possible.  The close-delimiting
-   feature exists primarily for backwards compatibility with HTTP/1.0.
-    </rfc>
+    <explain>This response has no <h>Content-Length</h> header and no “<h>Transfer-Encoding</h>: <tc>chunked</tc>” that would delimit its body. Therefore, the body is assumed to consist of everything the server sends until closing the connection. But then the client cannot be sure that it received the entire response (that there were no network failures).</explain>
+    <explain>See <rfc num="7230" sect="3.3.3"/>.</explain>
   </comment>
 
   <error id="1026">
-    <title><ref to="entry"/> in a trailer</title>
+    <title><var ref="entry"/> in a trailer</title>
     <rfc num="7230" sect="4.1.2">
       A sender MUST NOT generate a trailer that contains a field necessary
-   for message framing (e.g., <h>Transfer-Encoding</h> and <h>Content-Length</h>),
-   routing (e.g., <h>Host</h>), request modifiers (e.g., controls and
+   for message framing (e.g., <h ref="no">Transfer-Encoding</h> and <h ref="no">Content-Length</h>),
+   routing (e.g., <h ref="no">Host</h>), request modifiers (e.g., controls and
    conditionals in Section 5 of [RFC7231]), authentication (e.g., see
    [RFC7235] and [RFC6265]), response control data (e.g., see Section
    7.1 of [RFC7231]), or determining how to process the payload (e.g.,
-   <h>Content-Encoding</h>, <h>Content-Type</h>, <h>Content-Range</h>, and <h>Trailer</h>).
+   <h ref="no">Content-Encoding</h>, <h ref="no">Content-Type</h>, <h ref="no">Content-Range</h>, and <h ref="no">Trailer</h>).
     </rfc>
   </error>
 
   <error id="1027">
-    <title>Could not decode <ref to="msg.headers.transfer_encoding"/>: <ref to="coding"/></title>
-    <explain>Error: <ref to="error"/></explain>
+    <title>Could not decode <h>Transfer-Encoding</h>: <var ref="coding"/></title>
+    <exception/>
   </error>
 
   <error id="1028">
-    <title><ref to="msg.headers.te"/>: <tc>chunked</tc></title>
+    <title><h>TE</h>: <tc>chunked</tc></title>
     <rfc num="7230" sect="4.3">
       A client MUST NOT send
-   the <tc>chunked</tc> transfer coding name in <h>TE</h>; chunked is always acceptable
+   the chunked transfer coding name in TE; chunked is always acceptable
    for HTTP/1.1 recipients.
     </rfc>
   </error>
 
   <error id="1029">
-    <title><ref to="msg.headers.te"/> without “<ref to="msg.headers.connection"/>: TE”</title>
+    <title><h>TE</h> without “<h>Connection</h>: TE”</title>
     <rfc num="7230" sect="4.3">
-      Since the <h>TE</h> header field only applies to the immediate connection, a
+      Since the TE header field only applies to the immediate connection, a
    sender of TE MUST also send a "TE" connection option within the
    <h>Connection</h> header field (Section 6.1) in order to prevent the TE
    field from being forwarded by intermediaries that do not support its
@@ -223,9 +217,9 @@
   </error>
 
   <comment id="1030">
-    <title><ref to="header"/> was not announced in the <ref to="msg.headers.trailer"/> header</title>
+    <title><var ref="header"/> was not announced in the <h>Trailer</h> header</title>
     <rfc num="7230" sect="4.4">
-      When a message includes a message body encoded with the <tc>chunked</tc>
+      When a message includes a message body encoded with the chunked
    transfer coding and the sender desires to send metadata in the form
    of trailer fields at the end of the message, the sender SHOULD
    generate a <h>Trailer</h> header field before the message body to indicate
@@ -234,34 +228,36 @@
   </comment>
 
   <error id="1031">
-    <title>Request without a <h>Host</h> header</title>
+    <title>No <h>Host</h> header</title>
     <rfc num="7230" sect="5.4">
-      A client MUST send a <h>Host</h> header field in all <ref to="msg.version">HTTP/1.1</ref> request
+      A client MUST send a Host header field in all HTTP/1.1 request
    messages.
     </rfc>
   </error>
 
   <comment id="1032">
-    <title><ref to="msg.headers.host"/> is not the first header</title>
+    <title><h>Host</h> is not the first header</title>
     <rfc num="7230" sect="5.4">
-      Since the <h>Host</h> field-value is critical information for handling a
+      Since the Host field-value is critical information for handling a
    request, a user agent SHOULD generate Host as the first header field
    following the request-line.
     </rfc>
   </comment>
 
   <error id="1033">
-    <title><ref to="msg.status"/> response to a request with a bad <ref to="msg.request.headers.host"/> header</title>
+    <title><var ref="msg.status"/> response to a request with a bad <h ref="no">Host</h> header</title>
     <rfc num="7230" sect="5.4">
       A server MUST respond with a <st>400</st> (Bad Request) status code to any
-   <ref to="msg.request.version">HTTP/1.1</ref> request message that lacks a <h>Host</h> header field and to any
+   HTTP/1.1 request message that lacks a Host header field and to any
    request message that contains more than one Host header field or a
    Host header field with an invalid field-value.
     </rfc>
+    <ref to="msg.request.version"/>
+    <ref to="msg.request.headers.host"/>
   </error>
 
   <error id="1034">
-    <title><ref to="header"/> listed in the <ref to="msg.headers.connection"/> header</title>
+    <title><h>Connection</h>: <var ref="header"/></title>
     <rfc num="7230" sect="5.4">
       A sender MUST NOT send a connection option corresponding to a header
    field that is intended for all recipients of the payload.  For
@@ -271,50 +267,54 @@
   </error>
 
   <comment id="1035">
-    <title>Using deprecated media type <ref to="msg.headers.content_type.value"/></title>
-    <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is of type <ref to="msg.headers.content_type.value"/>, which is listed as “deprecated” or “obsoleted” in the <cite title="IANA media types registry" url="http://www.iana.org/assignments/media-types/media-types.xml"/>.</explain>
+    <title>Deprecated media type <var ref="msg.headers.content_type.value"/></title>
+    <explain>According to <h>Content-Type</h>, this message’s body is of type <var ref="msg.headers.content_type.value"/>, which is listed as “deprecated” or “obsoleted” in the <cite title="IANA media types registry" url="http://www.iana.org/assignments/media-types/media-types.xml"/>.</explain>
   </comment>
 
   <debug id="1036">
-    <title>Not decoding <ref to="msg.headers.content_encoding"/>: <ref to="coding"/></title>
-    <explain>HTTPolice does not know how to decode the <ref to="coding"/> content coding. (This doesn’t mean that it’s wrong.)</explain>
+    <title>Not decoding <h>Content-Encoding</h>: <var ref="coding"/></title>
+    <explain>HTTPolice does not know how to decode the <var ref="coding"/> content coding. (This doesn’t mean that it’s wrong.)</explain>
   </debug>
 
   <error id="1037">
-    <title>Could not decode <ref to="msg.headers.content_encoding"/>: <ref to="coding"/></title>
-    <explain>Error: <ref to="error"/></explain>
+    <title>Could not decode <h>Content-Encoding</h>: <var ref="coding"/></title>
+    <exception/>
   </error>
 
   <error id="1038">
-    <title>Bad JSON <ref to="msg.body">payload</ref></title>
-    <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is JSON, but HTTPolice tried to parse it as JSON and got the following error:</explain>
-    <explain><ref to="error"/></explain>
+    <title>Bad JSON body</title>
+    <explain>According to <h>Content-Type</h>, this message’s body is JSON, but HTTPolice tried to parse it as JSON and got the following error:</explain>
+    <exception/>
+    <ref to="msg.body"/>
   </error>
 
   <error id="1039">
-    <title>Bad XML <ref to="msg.body">payload</ref></title>
-    <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is XML, but HTTPolice tried to parse it as XML and got the following error:</explain>
-    <explain><ref to="error"/></explain>
+    <title>Bad XML body</title>
+    <explain>According to <h>Content-Type</h>, this message’s body is XML, but HTTPolice tried to parse it as XML and got the following error:</explain>
+    <exception/>
+    <ref to="msg.body"/>
   </error>
 
   <error id="1040">
-    <title>Bad URL-encoded <ref to="msg.body">payload</ref></title>
-    <explain>According to <ref to="msg.headers.content_type"/>, this message’s payload is URL-encoded. But it doesn’t look like a proper URL-encoded string, as defined by <cite title="HTML5" url="http://www.w3.org/TR/html/forms.html#url-encoded-form-data"/>, because it contains a byte with the value <ref to="offending_value"/>.</explain>
-    <explain>This often means that the <ref to="msg.headers.content_type"/> header is wrong.</explain>
+    <title>Bad URL-encoded body</title>
+    <explain>According to <h>Content-Type</h>, this message’s body is URL-encoded. But it doesn’t look like a proper URL-encoded string, as defined by <cite title="HTML5" url="http://www.w3.org/TR/html/forms.html#url-encoded-form-data"/>, because it contains the character: <var ref="char"/>.</explain>
+    <explain>This often means that the <h>Content-Type</h> header is wrong.</explain>
+    <ref to="msg.body"/>
   </error>
 
   <comment id="1041">
-    <title><ref to="msg.body">Payload</ref> with no <h>Content-Type</h></title>
+    <title>Body without <h>Content-Type</h></title>
     <rfc num="7231" sect="3.1.1.5">
       A sender that generates a message containing a payload body SHOULD
-   generate a <h>Content-Type</h> header field in that message unless the
+   generate a Content-Type header field in that message unless the
    intended media type of the enclosed representation is unknown to the
    sender.
     </rfc>
+    <ref to="msg.body"/>
   </comment>
 
   <comment id="1042">
-    <title>More than one ‘<ref to="param"/>’ parameter in <ref to="msg.headers.content_type"/></title>
+    <title>More than one ‘<var ref="param"/>’ parameter in <h>Content-Type</h></title>
     <rfc num="6838" sect="4.3">
       It is an error for a specific
    parameter to be specified more than once.
@@ -323,43 +323,44 @@
   </comment>
 
   <error id="1045">
-    <title>Bad <ref to="msg.target">request target</ref></title>
-    <ref to="error"/>
+    <title>Bad request target</title>
+    <exception/>
     <explain>See also <rfc num="7230" sect="5.3"/>.</explain>
+    <ref to="msg.target"/>
   </error>
 
   <error id="1046">
-    <title>No <h>Via</h> header in a proxied response</title>
+    <title>Proxied response without <h>Via</h></title>
     <explain>According to <rfc num="7230" sect="5.7.1"/>, a proxy must add a <h>Via</h> header to each response that it forwards.</explain>
   </error>
 
   <comment id="1047">
-    <title>No “<ref to="msg.headers.connection"/>: close” in a close-delimited response</title>
-    <explain>This response has no <h>Content-Length</h> header and no “<h>Transfer-Encoding</h>: <tc>chunked</tc>” that would delimit its body. Therefore, the body is assumed to consist of everything the server sends until closing the connection.</explain>
-    <explain>But the server neglected to send a ‘close’ option in the <h>Connection</h> header, as specified in <rfc num="7230" sect="6.3"/> and <rfc num="7230" sect="6.6"/>.</explain>
+    <title>Close-delimited response without “<h>Connection</h>: close”</title>
+    <explain>When a response is delimited only by closing the connection, it should have a <h>Connection</h> header with a ‘close’ option. See <rfc num="7230" sect="6.3"/> and <rfc num="7230" sect="6.6"/>.</explain>
   </comment>
 
   <error id="1048">
-    <title><ref to="msg.status"/> response with no <h>Upgrade</h> header</title>
+    <title><st>101</st> response with no <h>Upgrade</h> header</title>
     <rfc num="7230" sect="6.7">
-      A server that sends a <st>101</st> (Switching Protocols) response MUST send an
+      A server that sends a 101 (Switching Protocols) response MUST send an
    <h>Upgrade</h> header field to indicate the new protocol(s) to which the
-   connection is being switched; if multiple protocol layers are being
-   switched, the sender MUST list the protocols in layer-ascending
-   order.
+   connection is being switched
     </rfc>
   </error>
 
   <error id="1049">
-    <title><ref to="msg.status">Switching</ref> to a <ref to="msg.headers.upgrade">protocol</ref> that was not <ref to="msg.request.headers.upgrade">requested</ref></title>
+    <title>Switching to a protocol that was not requested</title>
     <rfc num="7230" sect="6.7">
       A server MUST NOT switch to a protocol that was not indicated
-   by the client in the corresponding request's <h>Upgrade</h> header field.
+   by the client in the corresponding request's <h ref="no">Upgrade</h> header field.
     </rfc>
+    <ref to="msg.status"/>
+    <ref to="msg.headers.upgrade"/>
+    <ref to="msg.request.headers.upgrade"/>
   </error>
 
   <error id="1050">
-    <title><ref to="msg.headers.upgrade"/> header without “<ref to="msg.headers.connection"/>: upgrade”</title>
+    <title><h>Upgrade</h> header without “<h>Connection</h>: upgrade”</title>
     <rfc num="7230" sect="6.7">
       When <h>Upgrade</h> is sent, the sender MUST also send a <h>Connection</h> header
    field (Section 6.1) that contains an "upgrade" connection option, in
@@ -369,112 +370,118 @@
   </error>
 
   <error id="1051">
-    <title><ref to="msg.status"/> response to an <ref to="msg.request.version"/> request</title>
+    <title><st>101</st> response to an HTTP/1.0 request</title>
     <rfc num="7230" sect="6.7">
       A
-   server MUST ignore an <h>Upgrade</h> header field that is received in an
+   server MUST ignore an <h ref="no">Upgrade</h> header field that is received in an
    HTTP/1.0 request.
     </rfc>
+    <ref to="msg.request.version"/>
   </error>
 
   <error id="1052">
-    <title><ref to="header"/> in a <ref to="msg.status"/> response</title>
-    <explain>The <ref to="header"/> header provides representation metadata, but there can be no representation associated with a <ref to="msg.status"/> response. The header should probably be removed.</explain>
+    <title><var ref="header"/> in a <var ref="msg.status"/> response</title>
+    <explain>The <var ref="header"/> header provides representation metadata, but there can be no representation associated with a <var ref="msg.status"/> response. The header should probably be removed.</explain>
   </error>
 
   <comment id="1053">
-    <title><ref to="header"/> in a request with no payload</title>
-    <explain>The <ref to="header"/> header provides representation metadata. It would make sense in a request with a payload, but this one has no payload.</explain>
+    <title><var ref="header"/> in a request with no body</title>
+    <explain>The <var ref="header"/> header provides representation metadata. It would make sense in a request with a body, but this one has no body.</explain>
     <explain>See also <rfc num="7231" sect="3.1"/>.</explain>
     <!-- This is a comment because we do not actually distinguish between "no payload" and "payload of length 0", while RFC 7230 does. It's not unthinkable to include something like a ``Content-Language`` in a POST request with a payload of length 0. -->
   </comment>
 
   <error id="1054">
-    <title><ref to="msg.headers.trailer"/> header in a message with no chunked body</title>
-    <explain>The <ref to="msg.headers.trailer"/> header announces what other headers will be sent in the trailer part of a <tc>chunked</tc> message. It doesn’t make sense for this message because it <ref to="msg.headers.transfer_encoding">does not use</ref> the chunked transfer coding.</explain>
+    <title><h>Trailer</h> header with no chunked body</title>
+    <explain>The <h>Trailer</h> header announces what other headers will be sent in the trailer part of a <tc>chunked</tc> message. It doesn’t make sense here because this message does not use the chunked transfer coding.</explain>
     <explain>See also <rfc num="7230" sect="4.1.2"/>.</explain>
+    <ref to="msg.headers.transfer_encoding"/>
     <!-- It would be more interesting to check that the header announced by ``Trailer`` is actually present there, but I don't think this is feasible, because many/most implementations (which are going to supply us with parsed messages) don't provide access to the trailer part at all. -->
   </error>
 
   <comment id="1055">
-    <title>Unnecessary <ref to="msg.headers.content_location"/></title>
-    <explain>This is a <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request. By definition, its payload is a representation of the requested resource. But it also contains a <ref to="msg.headers.content_location"/> header that points to the same URI as the request URI. In this case, the header provides no additional information.</explain>
+    <title>Unnecessary <h>Content-Location</h></title>
+    <explain>This is a <var ref="msg.status"/> response to a <var ref="msg.request.method"/> request. By definition, its body is a representation of the requested resource. But it also has a <h>Content-Location</h> header that points to the same URI as the request URI. In this case, the header provides no additional information.</explain>
     <explain>See also <rfc num="7231" sect="3.1.4.1"/>.</explain>
   </comment>
 
   <comment id="1056">
-    <title><ref to="msg.method"/> request with a <ref to="msg.body">payload</ref></title>
+    <title><m>GET</m> request with a body</title>
     <rfc num="7231" sect="4.3.1">
-      A payload within a <m>GET</m> request message has no defined semantics;
+      A payload within a GET request message has no defined semantics;
    sending a payload body on a GET request might cause some existing
    implementations to reject the request.
     </rfc>
+    <ref to="msg.body"/>
   </comment>
 
   <comment id="1057">
-    <title><ref to="msg.method"/> request with a <ref to="msg.body">payload</ref></title>
+    <title><m>HEAD</m> request with a body</title>
     <rfc num="7231" sect="4.3.2">
-      A payload within a <m>HEAD</m> request message has no defined semantics;
+      A payload within a HEAD request message has no defined semantics;
    sending a payload body on a HEAD request might cause some existing
    implementations to reject the request.
     </rfc>
   </comment>
 
   <error id="1058">
-    <title><ref to="msg.status"/> response to a <ref to="msg.request.method"/> request with <ref to="msg.request.headers.content_range"/></title>
+    <title><var ref="msg.status"/> response to a <m>PUT</m> request with <h ref="no">Content-Range</h></title>
     <rfc num="7231" sect="4.3.4">
-      An origin server that allows <m>PUT</m> on a given target resource MUST send
+      An origin server that allows PUT on a given target resource MUST send
    a <st>400</st> (Bad Request) response to a PUT request that contains a
-   <h>Content-Range</h> header field (Section 4.2 of [RFC7233]), since the
+   <h ref="no">Content-Range</h> header field (Section 4.2 of [RFC7233]), since the
    payload is likely to be partial content that has been mistakenly PUT
    as a full representation.
     </rfc>
+    <ref to="msg.request.headers.content_range"/>
   </error>
 
   <comment id="1059">
-    <title><ref to="msg.method"/> request with a <ref to="msg.body">payload</ref></title>
+    <title><m>DELETE</m> request with a body</title>
     <rfc num="7231" sect="4.3.5">
-      A payload within a <m>DELETE</m> request message has no defined semantics;
+      A payload within a DELETE request message has no defined semantics;
    sending a payload body on a DELETE request might cause some existing
    implementations to reject the request.
     </rfc>
+    <ref to="msg.body"/>
   </comment>
 
   <error id="1060">
-    <title>Strange <ref to="msg.headers.content_location"/> in a response to a <ref to="msg.request.method"/> request</title>
-    <explain>This is an ostensibly successful (<ref to="msg.status"/>) response to a <ref to="msg.request.method"/> request. However, according to its <ref to="msg.headers.content_location"/> header, it carries a representation of the target resource—the one that should have been deleted. This probably means that either the Content-Location is wrong, or the request did not actually succeed.</explain>
+    <title>Strange <h>Content-Location</h> in response to <m>DELETE</m></title>
+    <explain>This is an ostensibly successful (<var ref="msg.status"/>) response to a <m>DELETE</m> request. However, according to its <h>Content-Location</h> header, it carries a representation of the target resource—the one that should have been deleted. Either the Content-Location is wrong, or the request did not actually succeed.</explain>
   </error>
 
   <comment id="1061">
-    <title><ref to="msg.method"/> request with a <ref to="msg.body">payload</ref></title>
+    <title><m>CONNECT</m> request with a body</title>
     <rfc num="7231" sect="4.3.6">
-      A payload within a <m>CONNECT</m> request message has no defined semantics;
+      A payload within a CONNECT request message has no defined semantics;
    sending a payload body on a CONNECT request might cause some existing
    implementations to reject the request.
     </rfc>
+    <ref to="msg.body"/>
   </comment>
 
   <error id="1062">
-    <title><ref to="msg.method"/> request with a payload but no <h>Content-Type</h></title>
+    <title><m>OPTIONS</m> request with a body but no <h>Content-Type</h></title>
     <rfc num="7231" sect="4.3.7">
-      A client that generates an <m>OPTIONS</m> request containing a payload body
+      A client that generates an OPTIONS request containing a payload body
    MUST send a valid <h>Content-Type</h> header field describing the
    representation media type.
     </rfc>
   </error>
 
   <error id="1063">
-    <title><ref to="header"/> is a response header</title>
-    <explain>This request includes the <ref to="header"/> header, which is defined for responses, but not for requests.</explain>
+    <title>Request with a <var ref="header"/> header</title>
+    <explain>This request has the <var ref="header"/> header, which is only defined for responses.</explain>
   </error>
 
   <error id="1064">
-    <title><ref to="header"/> is a request header</title>
-    <explain>This response includes the <ref to="header"/> header, which is defined for requests, but not for responses.</explain>
+    <title>Response with a <var ref="header"/> header</title>
+    <explain>This response has the <var ref="header"/> header, which is only defined for requests.</explain>
   </error>
 
   <error id="1066">
-    <title>“<ref to="msg.headers.expect"/>: 100-continue” in a request with no payload</title>
+    <title>“<h>Expect</h>: 100-continue” with no body</title>
     <rfc num="7231" sect="5.1.1">
       A client MUST NOT generate a 100-continue expectation in a request
       that does not include a message body.
@@ -483,88 +490,90 @@
   </error>
 
   <comment id="1067">
-    <title><ref to="msg.headers.max_forwards"/> header in a <ref to="msg.method"/> request</title>
-    <explain>The <ref to="msg.headers.max_forwards"/> header is only defined for <m>OPTIONS</m> and <m>TRACE</m> requests. <rfc num="7231" sect="5.1.2">A recipient MAY ignore a Max-Forwards header field received with any other request methods.</rfc></explain>
+    <title><h>Max-Forwards</h> header in a <var ref="msg.method"/> request</title>
+    <explain>The <h>Max-Forwards</h> header is only defined for <m>OPTIONS</m> and <m>TRACE</m> requests. <rfc num="7231" sect="5.1.2">A recipient MAY ignore a Max-Forwards header field received with any other request methods.</rfc></explain>
   </comment>
 
   <error id="1068">
-    <title><ref to="msg.headers.referer"/> with an ‘https:’ scheme sent in an unsecured request</title>
+    <title><h>Referer</h> with ‘https:’ in an unsecured request</title>
     <rfc num="7231" sect="5.5.2">
-      A user agent MUST NOT send a <h>Referer</h> header field in an
+      A user agent MUST NOT send a Referer header field in an
    unsecured HTTP request if the referring page was received with a
    secure protocol.
     </rfc>
   </error>
 
   <comment id="1070">
-    <title>Request without a <h>User-Agent</h> header</title>
+    <title>No <h>User-Agent</h> header</title>
     <rfc num="7231" sect="5.5.3">
-      A user agent SHOULD send a <h>User-Agent</h> field in each request
+      A user agent SHOULD send a User-Agent field in each request
    unless specifically configured not to do so.
     </rfc>
   </comment>
 
   <error id="1071">
-    <title><ref to="msg.status"/> response to an <ref to="msg.request.version"/> request</title>
+    <title><var ref="msg.status"/> response to an HTTP/1.0 request</title>
     <rfc num="7231" sect="6.2">
       Since HTTP/1.0 did not define any 1xx status codes, a
    server MUST NOT send a 1xx response to an HTTP/1.0 client.
     </rfc>
+    <ref to="msg.request.version"/>
   </error>
 
   <error id="1072">
-    <title><ref to="msg.status"/> response to an <ref to="msg.request.method"/> request</title>
-    <explain>The <ref to="msg.request.method"/> method is defined to be safe (read-only). But the <st>201</st> status code indicates that a new resource was created. Either one is wrong here.</explain>
+    <title><st>201</st> response to <var ref="msg.request.method"/></title>
+    <explain>The <var ref="msg.request.method"/> method is defined as safe (read-only). But the <st>201</st> status code means that a new resource was created. Either one is wrong here.</explain>
   </error>
 
   <comment id="1073">
     <title>Possibly missing <h>Location</h> header</title>
-    <explain>This <ref to="msg.status"/> response indicates that a new resource was created. Because there is no <h>Location</h> header in the response, it is assumed that the created resource is the same as the request target (<rfc num="7231" sect="6.3.2"/>). But <ref to="msg.request.method"/> requests are usually intended to create a sub-resource of the target resource. Therefore, it’s likely that this response needs an explicit <h>Location</h>.</explain>
+    <explain>This <st>201</st> response indicates that a new resource was created. Because there is no <h>Location</h> header in the response, it is assumed that the created resource is the same as the request target (<rfc num="7231" sect="6.3.2"/>). But <m>POST</m> requests are usually intended to create a sub-resource of the target. It’s likely that this response needs an explicit <h>Location</h>.</explain>
   </comment>
 
   <error id="1074">
-    <title><ref to="msg.status"/> response to a <ref to="msg.request.method"/> request</title>
-    <explain>The <ref to="msg.request.method"/> method is defined to be safe (read-only). But the <st>202</st> status code means that the server started some kind of processing operation. Either one is wrong here.</explain>
+    <title><st>202</st> response to <var ref="msg.request.method"/></title>
+    <explain>The <var ref="msg.request.method"/> method is defined as safe (read-only). But the <st>202</st> status code means that the server started some kind of processing operation. Either one is wrong here.</explain>
   </error>
 
   <error id="1076">
-    <title><ref to="msg.status"/> response with a <ref to="msg.body">payload</ref></title>
+    <title><st>205</st> response with a body</title>
     <rfc num="7231" sect="6.3.6">
-      Since the <st>205</st> status code implies that no additional content will be
+      Since the 205 status code implies that no additional content will be
    provided, a server MUST NOT generate a payload in a 205 response.
     </rfc>
+    <ref to="msg.body"/>
   </error>
 
   <comment id="1077">
-    <title><ref to="msg.status"/> response with no payload</title>
+    <title><st>300</st> response with no body</title>
     <rfc num="7231" sect="6.4.1">
       For request methods other than <m>HEAD</m>, the server SHOULD generate a
-   payload in the <st>300</st> response containing a list of representation
+   payload in the 300 response containing a list of representation
    metadata and URI reference(s) from which the user or user agent can
    choose the one most preferred.
     </rfc>
   </comment>
 
   <comment id="1078">
-    <title><ref to="msg.status"/> response with no <h>Location</h> header</title>
+    <title><st>301</st> response with no <h>Location</h> header</title>
     <rfc num="7231" sect="6.4.2">
-      The server SHOULD generate a <h>Location</h> header field in the response
+      The server SHOULD generate a Location header field in the response
    containing a preferred URI reference for the new permanent URI.
     </rfc>
   </comment>
 
   <comment id="1079">
-    <title><ref to="msg.status"/> response with no <h>Location</h> header</title>
+    <title><st>302</st> response with no <h>Location</h> header</title>
     <rfc num="7231" sect="6.4.3">
-      The server SHOULD generate a <h>Location</h> header field in the response
+      The server SHOULD generate a Location header field in the response
    containing a URI reference for the different URI.
     </rfc>
   </comment>
 
   <error id="1080">
-    <title><ref to="msg.status"/> response with no <h>Location</h> header</title>
+    <title><st>303</st> response with no <h>Location</h> header</title>
     <rfc num="7231" sect="6.4.4">
-      The <st>303</st> (See Other) status code indicates that the server is
+      The 303 (See Other) status code indicates that the server is
    redirecting the user agent to a different resource, as indicated by a
    URI in the <h>Location</h> header field, which is intended to provide an
    indirect response to the original request.
@@ -572,51 +581,53 @@
   </error>
 
   <comment id="1081">
-    <title><ref to="msg.status"/> response with no payload</title>
+    <title><st>303</st> response with no body</title>
     <rfc num="7231" sect="6.4.4">
-      Except for responses to a <m>HEAD</m> request, the representation of a <st>303</st>
+      Except for responses to a <m>HEAD</m> request, the representation of a 303
    response ought to contain a short hypertext note with a hyperlink to
-   the same URI reference provided in the <h>Location</h> header field.
+   the same URI reference provided in the <h ref="no">Location</h> header field.
     </rfc>
   </comment>
 
   <error id="1082">
-    <title>Using deprecated status code <ref to="msg.status"/></title>
+    <title>Deprecated status code <st>305</st></title>
     <rfc num="7231" sect="6.4.5">
-      The <st>305</st> (Use Proxy) status code was defined in a previous version of
+      The 305 (Use Proxy) status code was defined in a previous version of
    this specification and is now deprecated (Appendix B).
     </rfc>
   </error>
 
   <error id="1083">
-    <title>Using reserved status code <ref to="msg.status"/></title>
+    <title>Reserved status code <st>306</st></title>
     <rfc num="7231" sect="6.4.6">
-      The <st>306</st> status code was defined in a previous version of this
+      The 306 status code was defined in a previous version of this
    specification, is no longer used, and the code is reserved.
     </rfc>
   </error>
 
   <comment id="1084">
-    <title><ref to="msg.status"/> response with no <h>Location</h> header</title>
+    <title><st>307</st> response with no <h>Location</h> header</title>
     <rfc num="7231" sect="6.4.7">
-      The server SHOULD generate a <h>Location</h> header field in the response
+      The server SHOULD generate a Location header field in the response
    containing a URI reference for the different URI.
     </rfc>
   </comment>
 
   <error id="1085">
     <title>Redirection to the same URI</title>
-    <explain>This <ref to="msg.status"/> response includes a <ref to="msg.headers.location"/> header that points to the same URI as the <ref to="msg.request.target">request URI</ref>. So the resource redirects to itself.</explain>
+    <explain>This <var ref="msg.status"/> response includes a <h>Location</h> header that points to the same URI as the request URI. So the resource redirects to itself.</explain>
+    <ref to="msg.request.target"/>
   </error>
 
   <error id="1086">
-    <title><ref to="msg.status"/> response to a <ref to="msg.request.target">server-wide</ref> <ref to="msg.request.method"/> request</title>
-    <explain>The <ref to="msg.status"/> status code means that the target resource can be found at a different URI. But this was an “<m>OPTIONS</m> *” request—it targets the entire server, not any particular resource. So the <ref to="msg.status"/> status code makes no sense here.</explain>
+    <title><var ref="msg.status"/> response to a server-wide <m>OPTIONS</m> request</title>
+    <explain>The <var ref="msg.status"/> status code means that the target resource can be found at a different URI. But this was an “ <m>OPTIONS</m> * ” request—it targets the entire server, not any particular resource. So the <var ref="msg.status"/> status code makes no sense here.</explain>
     <explain>Perhaps the <st>303</st> status code would fit better.</explain>
+    <ref to="msg.request.target"/>
   </error>
 
   <comment id="1087">
-    <title><ref to="msg.status"/> response with no payload</title>
+    <title><var ref="msg.status"/> response with no body</title>
     <rfc num="7231" sect="6.5">
       Except when responding to a <m>HEAD</m> request, the
    server SHOULD send a representation containing an explanation of the
@@ -626,35 +637,35 @@
   </comment>
 
   <error id="1088">
-    <title>Using reserved status code <ref to="msg.status"/></title>
+    <title>Reserved status code <st>402</st></title>
     <rfc num="7231" sect="6.5.2">
-      The <st>402</st> (Payment Required) status code is reserved for future use.
+      The 402 (Payment Required) status code is reserved for future use.
     </rfc>
   </error>
 
   <error id="1089">
-    <title><ref to="msg.status"/> response with no <h>Allow</h> header</title>
+    <title><st>405</st> response with no <h>Allow</h> header</title>
     <rfc num="7231" sect="6.5.5">
       The origin server MUST generate an
-   <h>Allow</h> header field in a <st>405</st> response containing a list of the target
+   <h>Allow</h> header field in a 405 response containing a list of the target
    resource's currently supported methods.
     </rfc>
   </error>
 
   <error id="1090">
-    <title>Wrong use of status code <ref to="msg.status"/></title>
-    <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers, such as <h>Accept</h>. But this request has no such headers.</explain>
+    <title>Wrong use of status code <st>406</st></title>
+    <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers, such as <h ref="no">Accept</h>. But this request has no such headers.</explain>
     <explain>See also <rfc num="7231" sect="5.3"/>.</explain>
   </error>
 
   <comment id="1091">
-    <title>Probably wrong use of status code <ref to="msg.status"/></title>
-    <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers, such as <h>Accept</h>. But this request has no such headers, unless it’s an extension header not known to HTTPolice.</explain>
+    <title>Probably wrong use of status code <st>406</st></title>
+    <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers, such as <h ref="no">Accept</h>. But this request has no such headers, unless it’s an extension header unknown to HTTPolice.</explain>
     <explain>See also <rfc num="7231" sect="5.3"/>.</explain>
   </comment>
 
   <comment id="1092">
-    <title><ref to="msg.status"/> response with no payload</title>
+    <title><st>406</st> response with no body</title>
     <rfc num="7231" sect="6.5.6">
       The server SHOULD generate a payload containing a list of available
    representation characteristics and corresponding resource identifiers
@@ -664,30 +675,30 @@
   </comment>
 
   <comment id="1093">
-    <title><ref to="msg.headers.user_agent"/> contains no actual product</title>
-    <explain>This request’s <h>User-Agent</h> header contains only the name of the underlying library, which isn’t very useful for identifying the request. It might be a good idea to include the name of the actual product.</explain>
-    <explain>For example: “My-Product/1.0 <ref to="library"/>”.</explain>
+    <title><h>User-Agent</h> contains no actual product</title>
+    <explain>This request’s <h>User-Agent</h> header contains only the name of the underlying library, which isn’t very useful for identifying the request. It may be a good idea to include the name of the actual product.</explain>
+    <explain>For example: “My-Product/1.0 <var ref="library"/>”.</explain>
     <explain>Or simply “My-Product/1.0” or “My-Product”.</explain>
     <explain>See <rfc num="7231" sect="5.5.3"/>.</explain>
   </comment>
 
   <comment id="1094">
-    <title><ref to="msg.status"/> response without “<ref to="msg.headers.connection"/>: close”</title>
+    <title><st>408</st> response without “<h>Connection</h>: close”</title>
     <rfc num="7231" sect="6.5.7">
       A server SHOULD send the "close" connection option
-   (Section 6.1 of [RFC7230]) in the response, since <st>408</st> implies that
+   (Section 6.1 of [RFC7230]) in the response, since 408 implies that
    the server has decided to close the connection rather than continue
    waiting.
     </rfc>
   </comment>
 
   <error id="1095">
-    <title><ref to="msg.status"/> response to a <ref to="msg.request.method"/> request</title>
-    <explain>The <st>409</st> status code means that the request conflicted with the current state of the resource. But a <ref to="msg.request.method"/> request is, by definition, safe (read-only): it must not affect the state in any way, so there can be no conflict. The 409 status code is probably wrong here.</explain>
+    <title><st>409</st> response to a <var ref="msg.request.method"/> request</title>
+    <explain>The <st>409</st> status code means that the request conflicted with the current state of the resource. But a <var ref="msg.request.method"/> request is, by definition, safe (read-only): it must not affect the state, so there can be no conflict.</explain>
   </error>
 
   <comment id="1096">
-    <title><ref to="msg.status"/> response with no payload</title>
+    <title><st>409</st> response with no body</title>
     <rfc num="7231" sect="6.5.8">
       The server
    SHOULD generate a payload that includes enough information for a user
@@ -696,61 +707,64 @@
   </comment>
 
   <error id="1097">
-    <title><ref to="msg.status"/> response to a request with <ref to="msg.request.headers.content_length"/></title>
-    <explain>The <st>411</st> status code means that the server wants to see a <h>Content-Length</h> header in the request. But this request did, in fact, include a valid Content-Length of <ref to="msg.request.headers.content_length.value"/>.</explain>
+    <title><st>411</st> response to a request with <h ref="no">Content-Length</h></title>
+    <explain>The <st>411</st> status code means that the server wants to see a <h ref="no">Content-Length</h> header in the request. But this request did, in fact, include a valid Content-Length of <var ref="msg.request.headers.content_length.value"/>.</explain>
+    <ref to="msg.request.headers.content_length"/>
   </error>
 
   <error id="1098">
-    <title><ref to="msg.status"/> response to a request with no payload</title>
+    <title><st>413</st> response to a request with no body</title>
     <rfc num="7231" sect="6.5.11">
-      The <st>413</st> (Payload Too Large) status code indicates that the server is
+      The 413 (Payload Too Large) status code indicates that the server is
    refusing to process a request because the request payload is larger
    than the server is willing or able to process.
     </rfc>
   </error>
 
   <error id="1099">
-    <title><ref to="msg.status"/> response to a request with no payload</title>
+    <title><st>415</st> response to a request with no body</title>
     <rfc num="7231" sect="6.5.13">
-      The <st>415</st> (Unsupported Media Type) status code indicates that the
+      The 415 (Unsupported Media Type) status code indicates that the
    origin server is refusing to service the request because the payload
    is in a format not supported by this method on the target resource.
     </rfc>
   </error>
 
   <error id="1100">
-    <title><ref to="msg.status"/> response to a request with no <h>Expect</h></title>
+    <title><st>417</st> response to a request with no <h ref="no">Expect</h></title>
     <rfc num="7231" sect="6.5.14">
-      The <st>417</st> (Expectation Failed) status code indicates that the
-   expectation given in the request's <h>Expect</h> header field
+      The 417 (Expectation Failed) status code indicates that the
+   expectation given in the request's <h ref="no">Expect</h> header field
    (Section 5.1.1) could not be met by at least one of the inbound
    servers.
     </rfc>
   </error>
 
   <error id="1101">
-    <title><ref to="msg.status"/> response with no <h>Upgrade</h> header</title>
+    <title><st>426</st> response with no <h>Upgrade</h> header</title>
     <rfc num="7231" sect="6.5.15">
-      The server MUST send an Upgrade header field in a <st>426</st>
-   response to indicate the required protocol(s) (Section 6.7 of
-   [RFC7230]).
+      The server MUST send an <h>Upgrade</h> header field in a 426
+   response to indicate the required protocol(s)
     </rfc>
   </error>
 
   <error id="1102">
-    <title>Unnecessary <ref to="msg.status"/> response</title>
-    <explain>In this response, the server <ref to="msg.headers.upgrade">demands</ref> that the client upgrade to <ref to="protocol"/>. But the client’s request is already offering that same upgrade in its own <ref to="msg.request.headers.upgrade"/> header. The server can just send a <st>101</st> response and switch to <ref to="protocol"/> without sending an error.</explain>
+    <title>Wrong <st>426</st> response</title>
+    <explain>In this response, the server demands that the client upgrade to <var ref="protocol"/>. But the client’s request is already offering that same upgrade in its own <h ref="no">Upgrade</h> header. The server can just send a <st>101</st> response and switch to <var ref="protocol"/>.</explain>
     <explain>See <rfc num="7230" sect="6.7"/>.</explain>
+    <ref to="msg.headers.upgrade"/>
+    <ref to="msg.request.headers.upgrade"/>
   </error>
 
   <error id="1103">
     <title>Not proceeding with protocol upgrade</title>
-    <explain>This response’s <ref to="msg.headers.upgrade"/> header indicates that the server is ready to upgrade to <ref to="protocol"/>. But the client’s request is already offering that same upgrade in its own <ref to="msg.request.headers.upgrade"/> header. If the server actually wants to switch to <ref to="protocol"/>, it should go ahead, send a <st>101</st> response, and switch.</explain>
+    <explain>This response’s <h>Upgrade</h> header indicates that the server is ready to upgrade to <var ref="protocol"/>. But the client’s request is already offering that same upgrade in its own <h ref="no">Upgrade</h> header. If the server actually wants to switch to <var ref="protocol"/>, it should go ahead, send a <st>101</st> response, and switch.</explain>
     <explain>See <rfc num="7230" sect="6.7"/>.</explain>
+    <ref to="msg.request.headers.upgrade"/>
   </error>
 
   <comment id="1104">
-    <title><ref to="msg.status"/> response with no payload</title>
+    <title><var ref="msg.status"/> response with no body</title>
     <rfc num="7231" sect="6.6">
       Except when responding to a <m>HEAD</m> request, the
    server SHOULD send a representation containing an explanation of the
@@ -760,8 +774,8 @@
   </comment>
 
   <error id="1105">
-    <title><ref to="msg.status"/> response with the same version as the request</title>
-    <explain>The <st>505</st> status code means that the server does not support the HTTP version used in the request—which is <ref to="msg.request.version"/>—but the response itself <ref to="msg.version">is</ref> of that same version.</explain>
+    <title><st>505</st> response with the same version as the request</title>
+    <explain>The <st>505</st> status code means that the server does not support the HTTP version used in the request—which is <var ref="msg.request.version"/>—but the response itself is <var ref="msg.version"/>, too.</explain>
     <rfc num="7230" sect="2.6">
       A server MUST NOT send
    a version to which it is not conformant.
@@ -769,73 +783,68 @@
   </error>
 
   <comment id="1106">
-    <title><ref to="msg.status"/> response with no payload</title>
+    <title><st>505</st> response with no body</title>
     <rfc num="7231" sect="6.6.6">
       The server SHOULD
-   generate a representation for the <st>505</st> response that describes why
+   generate a representation for the 505 response that describes why
    that version is not supported and what other protocols are supported
    by that server.
     </rfc>
   </comment>
 
   <error id="1107">
-    <title>Obsolete date format in <ref to="place"/></title>
-    <rfc num="7231" sect="7.1.1.1">
-      When a sender generates a
-   header field that contains one or more timestamps defined as
-   HTTP-date, the sender MUST generate those timestamps in the
-   IMF-fixdate format.
-    </rfc>
+    <title>Obsolete date-time format in <var ref="place"/></title>
+    <explain>This message’s <var ref="place"/> uses an obsolete date-time format. See <rfc num="7231" sect="7.1.1.1"/>.</explain>
   </error>
 
   <error id="1108">
-    <title>Wrong day of week in <ref to="place"/></title>
-    <explain>This message’s <ref to="place"/> claims that <ref to="date"/> is <ref to="claimed"/>, but in reality it’s <ref to="actual"/>.</explain>
+    <title>Wrong day of week in <var ref="place"/></title>
+    <explain>This message’s <var ref="place"/> claims that <var ref="date"/> is <var ref="claimed"/>, but in reality it’s <var ref="actual"/>.</explain>
   </error>
 
   <error id="1109">
-    <title><ref to="msg.headers.date"/> header is in the future</title>
-    <explain>The <h>Date</h> header contains the date and time at which the message was originated, but in this message it appears to be in the future.</explain>
+    <title><h>Date</h> header is in the future</title>
+    <explain>The <h>Date</h> header contains the date and time at which the message was originated. But here it seems to be in the future.</explain>
     <explain>This might be due to wrong timezone settings.</explain>
   </error>
 
   <comment id="1110">
-    <title><ref to="msg.status"/> response with no <h>Date</h> header</title>
-    <explain>According to <rfc num="7231" sect="7.1.1.2"/>, every <ref to="msg.status"/> response must include a <h>Date</h> header, unless the server has no usable clock.</explain>
+    <title><var ref="msg.status"/> response with no <h>Date</h> header</title>
+    <explain>According to <rfc num="7231" sect="7.1.1.2"/>, every <var ref="msg.status"/> response must have a <h>Date</h> header, unless the server has no usable clock.</explain>
   </comment>
 
   <error id="1111">
-    <title><ref to="msg.headers.location"/> with a fragment (#) in a <ref to="msg.status"/> response</title>
+    <title><h>Location</h> with a fragment (#) in a <st>201</st> response</title>
     <rfc num="7231" sect="7.1.2">
       There are circumstances in which a fragment identifier in a <h>Location</h>
    value would not be appropriate.  For example, the Location header
-   field in a <st>201</st> (Created) response is supposed to provide a URI that
+   field in a 201 (Created) response is supposed to provide a URI that
    is specific to the created resource.
     </rfc>
   </error>
 
   <comment id="1112">
-    <title><ref to="msg.headers.location"/> header in a <ref to="msg.status"/> response</title>
-    <explain><rfc num="7231" sect="7.1.2"/> does not define what it means for a <ref to="msg.status"/> response to have a <ref to="msg.headers.location"/> header. Of course, other documents (unknown to HTTPolice) may do so.</explain>
+    <title><h>Location</h> header in a <var ref="msg.status"/> response</title>
+    <explain><rfc num="7231" sect="7.1.2"/> does not define what it means for a <var ref="msg.status"/> response to have a <h>Location</h> header.</explain>
   </comment>
 
   <comment id="1113">
-    <title><ref to="msg.headers.retry_after"/> header in a <ref to="msg.status"/> response</title>
-    <explain>As far as HTTPolice knows, the meaning of the <h>Retry-After</h> header is defined for status codes 3xx, <st>413</st>, <st>429</st>, and <st>503</st>, but not for <ref to="msg.status"/>.</explain>
+    <title><h>Retry-After</h> header in a <var ref="msg.status"/> response</title>
+    <explain>As far as HTTPolice knows, the <h>Retry-After</h> header is defined for status codes 3xx, <st>413</st>, <st>429</st>, and <st>503</st>, but not for <var ref="msg.status"/>.</explain>
   </comment>
 
   <error id="1114">
-    <title><ref to="msg.headers.allow"/> actually includes <ref to="msg.request.method"/></title>
-    <explain>The <ref to="msg.status"/> status code means that the request method, which is <ref to="msg.request.method"/>, is not allowed for this resource. But the response’s <h>Allow</h> header does include <ref to="msg.request.method"/>. Either the status code or the <h>Allow</h> header is wrong here.</explain>
+    <title><h>Allow</h> actually includes <var ref="msg.request.method"/></title>
+    <explain>The <st>405</st> status code means that the request method (<var ref="msg.request.method"/>) is not allowed for this resource. But the <h>Allow</h> header does include <var ref="msg.request.method"/>.</explain>
   </error>
 
   <error id="1115">
-    <title><ref to="msg.headers.allow"/> does not include <ref to="msg.request.method"/></title>
-    <explain>The <ref to="msg.status"/> status code means that this <ref to="msg.request.method"/> request was handled successfully. But, according to the <h>Allow</h> header, it should have been disallowed (status code <st>405</st>). Either the status code or the <h>Allow</h> header is wrong here.</explain>
+    <title><h>Allow</h> does not include <var ref="msg.request.method"/></title>
+    <explain>The <var ref="msg.status"/> status code means that this <var ref="msg.request.method"/> request was handled successfully. But the <h>Allow</h> header does not include <var ref="msg.request.method"/>, so it should have been disallowed (status code <st>405</st>).</explain>
   </error>
 
   <error id="1116">
-    <title><ref to="msg.headers.accept_encoding"/> contains <ref to="coding"/> with a quality value</title>
+    <title><h>Accept-Encoding</h>: <var ref="coding"/> with a quality value</title>
     <rfc num="7231" sect="5.3.4">
       Most HTTP/1.0 applications do not recognize or obey qvalues
       associated with content-codings.  This means that qvalues might
@@ -844,12 +853,13 @@
   </error>
 
   <comment id="1117">
-    <title><ref to="msg.status"/> response when unable to satisfy <ref to="msg.request.headers.accept_language"/></title>
-    <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers. The only such header (known to HTTPolice) in this request is <h>Accept-Language</h>. However, <rfc num="7231" sect="5.3.5"/> discourages sending a <st>406</st> response in this case: it’s better to send a representation in a different language, because the user may still be able to understand some of it.</explain>
+    <title><st>406</st> response when unable to satisfy <h ref="no">Accept-Language</h></title>
+    <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers. The only such header (known to HTTPolice) in this request is <h ref="no">Accept-Language</h>. However, <rfc num="7231" sect="5.3.5"/> discourages sending a <st>406</st> response in this case: it’s better to send a representation in a different language, because the user may still be able to understand some of it.</explain>
+    <ref to="msg.request.headers.accept_language"/>
   </comment>
 
   <error id="1118">
-    <title><ref to="msg.headers.last_modified"/> later than <ref to="msg.headers.date"/></title>
+    <title><h>Last-Modified</h> later than <h>Date</h></title>
     <rfc num="7232" sect="2.2.1">
       An origin server with a clock MUST NOT send a <h>Last-Modified</h> date that
    is later than the server's time of message origination (<h>Date</h>).
@@ -857,7 +867,7 @@
   </error>
 
   <comment id="1119">
-    <title>Backslash in <ref to="place"/></title>
+    <title>Backslash in <var ref="place"/></title>
     <rfc num="7232" sect="2.3">
       Previously, opaque-tag was defined to be a quoted-string
       ([RFC2616], Section 3.11); thus, some recipients might perform
@@ -867,7 +877,7 @@
   </comment>
 
   <error id="1120">
-    <title>Weak entity tag in <ref to="msg.headers.if_match"/></title>
+    <title>Weak entity tag in <h>If-Match</h></title>
     <rfc num="7232" sect="3.1">
       An origin server MUST use the strong comparison function when
    comparing entity-tags for <h>If-Match</h> (Section 2.3.2), since the client
@@ -878,65 +888,66 @@
   </error>
 
   <error id="1121">
-    <title><ref to="msg.request.headers.if_none_match"/> was ignored</title>
-    <explain>This is a <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request, but its <ref to="msg.headers.etag"/> header matches the <h>If-None-Match</h> header of the request. The server is supposed to send a <st>304</st> response in this situation. See <rfc num="7232" sect="3.2"/>.</explain>
+    <title><h ref="no">If-None-Match</h> was ignored</title>
+    <explain>This is a <var ref="msg.status"/> response to a <var ref="msg.request.method"/> request, but its <h>ETag</h> header matches the <h ref="no">If-None-Match</h> header of the request. The server is supposed to send a <st>304</st> response in this situation.</explain>
+    <explain>See <rfc num="7232" sect="3.2"/>.</explain>
+    <ref to="msg.request.headers.if_none_match"/>
   </error>
 
   <error id="1122">
-    <title><ref to="msg.headers.if_modified_since"/> in a <ref to="msg.method"/> request</title>
-    <rfc num="7232" sect="3.3">
-      A recipient MUST ignore the <h>If-Modified-Since</h> header field if the
-   received field-value is not a valid HTTP-date, or if the request
-   method is neither <m>GET</m> nor <m>HEAD</m>.
-    </rfc>
+    <title><h>If-Modified-Since</h> in a <var ref="msg.method"/> request</title>
+    <explain>According to <rfc num="7232" sect="3.3"/>, an <h>If-Modified-Since</h> header must be ignored in requests that are neither <m>GET</m> nor <m>HEAD</m>.</explain>
   </error>
 
   <comment id="1123">
-    <title><ref to="msg.request.headers.if_modified_since"/> was ignored</title>
-    <explain>This is a <ref to="msg.status"/> response to a <ref to="msg.request.method"/> request, but its <ref to="msg.headers.last_modified"/> date is no later than the <h>If-Modified-Since</h> header of the request. The server should send a <st>304</st> response in this situation. See <rfc num="7232" sect="3.3"/>.</explain>
+    <title><h ref="no">If-Modified-Since</h> was ignored</title>
+    <explain>This is a <var ref="msg.status"/> response to a <var ref="msg.request.method"/> request, but its <h>Last-Modified</h> date is no later than the <h ref="no">If-Modified-Since</h> header of the request. The server should send a <st>304</st> response in this situation.</explain>
+    <explain>See <rfc num="7232" sect="3.3"/>.</explain>
+    <ref to="msg.request.headers.if_modified_since"/>
   </comment>
 
   <error id="1124">
-    <title><ref to="msg.status"/> response to a <ref to="msg.request.method"/> request</title>
-    <explain>The <st>304</st> status code is only defined by <rfc num="7232" sect="4.1"/> for responses to <m>GET</m> and <m>HEAD</m> requests. With other methods, the <st>412</st> status code may be useful.</explain>
+    <title><st>304</st> response to a <var ref="msg.request.method"/> request</title>
+    <explain>The <st>304</st> status code is only defined by <rfc num="7232" sect="4.1"/> for responses to <m>GET</m> and <m>HEAD</m>. With other methods, the <st>412</st> status code may be useful.</explain>
   </error>
 
   <error id="1125">
-    <title>Wrong use of status code <ref to="msg.status"/></title>
-    <explain>The <ref to="msg.status"/> status code is only used when the request includes a precondition, such as <h>If-Modified-Since</h>. There are no such preconditions in this request.</explain>
+    <title>Wrong use of status code <st>412</st></title>
+    <explain>The <st>412</st> status code is only used when the request includes a precondition, such as <h ref="no">If-Modified-Since</h>. But there are no such preconditions in this request.</explain>
     <explain>See <rfc num="7232"/>.</explain>
   </error>
 
   <comment id="1126">
-    <title>Probably wrong use of status code <ref to="msg.status"/></title>
-    <explain>The <ref to="msg.status"/> status code is only used when the request includes a precondition, such as <h>If-Modified-Since</h>. There are no such preconditions in this request, unless it’s an extension header unknown to HTTPolice.</explain>
+    <title>Probably wrong use of status code <st>412</st></title>
+    <explain>The <st>412</st> status code is only used when the request includes a precondition, such as <h ref="no">If-Modified-Since</h>. But there are no such preconditions in this request, unless it’s an extension header unknown to HTTPolice.</explain>
     <explain>See <rfc num="7232"/>.</explain>
   </comment>
 
   <comment id="1127">
-    <title><ref to="header"/> in a <ref to="msg.status"/> response</title>
+    <title><var ref="header"/> in a <st>304</st> response</title>
     <rfc num="7232" sect="4.1">
-      Since the goal of a <st>304</st> response is to minimize information transfer
+      Since the goal of a 304 response is to minimize information transfer
    when the recipient already has one or more cached representations, a
    sender SHOULD NOT generate representation metadata other than the
    above listed fields unless said metadata exists for the purpose of
-   guiding cache updates (e.g., <h>Last-Modified</h> might be useful if the
-   response does not have an <h>ETag</h> field).
+   guiding cache updates (e.g., <h ref="no">Last-Modified</h> might be useful if the
+   response does not have an <h ref="no">ETag</h> field).
     </rfc>
   </comment>
 
   <error id="1128">
-    <title><ref to="msg.request.headers.if_modified_since"/> was not ignored</title>
-    <explain>The <ref to="msg.status"/> status code means that the server could not satisfy a precondition included in the request. The only such precondition (known to HTTPolice) in this request is <ref to="msg.request.headers.if_modified_since"/>. But <rfc num="7232" sect="3.3"/> says that an <h>If-Modified-Since</h> header in a <ref to="msg.request.method"/> request must be ignored.</explain>
+    <title><h ref="no">If-Modified-Since</h> was not ignored</title>
+    <explain>The <st>412</st> status code means that the server could not satisfy a precondition included in the request. The only such precondition (known to HTTPolice) in this request is <h ref="no">If-Modified-Since</h>. But <rfc num="7232" sect="3.3"/> says that an <h ref="no">If-Modified-Since</h> header in a <var ref="msg.request.method"/> request must be ignored.</explain>
+    <ref to="msg.request.headers.if_modified_since"/>
   </error>
 
   <error id="1129">
-    <title>Wrong <ref to="msg.status"/> response</title>
-    <explain>The <ref to="msg.status"/> status code means that the server could not satisfy a precondition included in the request. But, as defined in <rfc num="7232" sect="5"/>, such preconditions must be ignored in a <ref to="msg.request.method"/> request.</explain>
+    <title>Wrong <st>412</st> response</title>
+    <explain>The <st>412</st> status code means that the server could not satisfy a precondition included in the request. But, as defined in <rfc num="7232" sect="5"/>, such preconditions must be ignored in a <var ref="msg.request.method"/> request.</explain>
   </error>
 
   <error id="1130">
-    <title><ref to="header"/> header in a <ref to="msg.method"/> request</title>
+    <title><var ref="header"/> in a <var ref="msg.method"/> request</title>
     <rfc num="7232" sect="5">
       Likewise, a server
    MUST ignore the conditional request header fields defined by this
@@ -947,7 +958,7 @@
   </error>
 
   <comment id="1131">
-    <title><ref to="header"/> header in a <ref to="msg.method"/> request</title>
+    <title><var ref="header"/> in a <m>HEAD</m> request</title>
     <rfc num="7232" sect="5">
       Although conditional request header fields are defined as being
    usable with the <m>HEAD</m> method (to keep HEAD's semantics consistent with
@@ -959,7 +970,7 @@
   </comment>
 
   <error id="1132">
-    <title><ref to="msg.headers.range"/> header in a <ref to="msg.method"/> request</title>
+    <title><h>Range</h> header in a <var ref="msg.method"/> request</title>
     <rfc num="7233" sect="3.1">
       A server
    MUST ignore a <h>Range</h> header field received with a request method other
@@ -968,7 +979,7 @@
   </error>
 
   <error id="1133">
-    <title>Malformed byte range in <ref to="place"/></title>
+    <title>Invalid byte range in <var ref="place"/></title>
     <rfc num="7233" sect="2.1">
       A byte-range-spec is invalid if the last-byte-pos value is present
    and less than the first-byte-pos.
@@ -976,7 +987,7 @@
   </error>
 
   <error id="1134">
-    <title><ref to="msg.headers.if_range"/> header without a <h>Range</h> header</title>
+    <title><h>If-Range</h> without a <h>Range</h> header</title>
     <rfc num="7233" sect="3.2">
       A client MUST NOT generate an <h>If-Range</h> header field in a request that
    does not contain a <h>Range</h> header field.
@@ -984,7 +995,7 @@
   </error>
 
   <error id="1135">
-    <title>Weak entity tag in the <ref to="msg.headers.if_range"/> header</title>
+    <title>Weak entity tag in <h>If-Range</h></title>
     <rfc num="7233" sect="3.2">
       A client MUST NOT generate an <h>If-Range</h> header field containing an
    entity-tag that is marked as weak.
@@ -992,101 +1003,112 @@
   </error>
 
   <error id="1136">
-    <title><ref to="msg.status"/> response to a request with no <h>Range</h> header</title>
-    <explain>The <st>206</st> status code only makes sense in responses to partial requests—that is, requests containing a <h>Range</h> header. See <rfc num="7233" sect="4.1"/>.</explain>
+    <title><st>206</st> response to a request with no <h ref="no">Range</h> header</title>
+    <explain>The <st>206</st> status code only makes sense in responses to partial requests—that is, requests with a <h ref="no">Range</h> header. See <rfc num="7233" sect="4.1"/>.</explain>
   </error>
 
   <error id="1137">
-    <title><ref to="msg.status"/> response to a <ref to="msg.request.method"/> request</title>
+    <title><st>206</st> response to a <var ref="msg.request.method"/> request</title>
     <rfc num="7233" sect="3.1">
       A server
-   MUST ignore a <ref to="msg.request.headers.range"/> header field received with a request method other
+   MUST ignore a <h ref="no">Range</h> header field received with a request method other
    than <m>GET</m>.
     </rfc>
+    <ref to="msg.request.headers.range"/>
   </error>
 
   <error id="1138">
-    <title><ref to="msg.status"/> response with no range specifiers</title>
-    <explain>The <st>206</st> status code means that the response contains one or more parts of the data. When it contains one part, the response must have a <h>Content-Range</h> header. When it contains several parts, the response must have a <ref to="msg.headers.content_type"/> of <media>multipart/byteranges</media>. This response has neither.</explain>
+    <title><st>206</st> response without range specifiers</title>
+    <explain>The <st>206</st> status code means that the response contains one or more parts of the data. When it contains one part, the response must have a <h>Content-Range</h> header. When it contains several parts, the response must have a <h>Content-Type</h> of <media>multipart/byteranges</media>. But this response has neither.</explain>
     <explain>See <rfc num="7233" sect="4.1"/>.</explain>
   </error>
 
   <error id="1139">
     <title>Multipart boundary not declared</title>
-    <explain>According to the <ref to="msg.headers.content_type"/> header, this message contains a multipart payload, but the Content-Type has no ‘boundary’ parameter that is required for parsing such payload.</explain>
+    <explain>According to <h>Content-Type</h>, this message has a multipart body, but Content-Type not include the ‘boundary’ parameter that is necessary to parse such a body.</explain>
     <explain>See <rfc num="2046" sect="5.1.1"/>.</explain>
   </error>
 
   <error id="1140">
     <title>Multipart boundary not found</title>
-    <explain>The multipart boundary declared in this message’s <ref to="msg.headers.content_type"/> header was not found in the <ref to="msg.body">payload body</ref>.</explain>
+    <explain>The multipart boundary declared in this message’s <h>Content-Type</h> was not found in the body.</explain>
     <explain>See <rfc num="2046" sect="5.1.1"/>.</explain>
+    <ref to="msg.body"/>
   </error>
 
   <error id="1141">
-    <title>No <h>Content-Range</h> in part #<ref to="part_num"/></title>
+    <title>No <h ref="no">Content-Range</h> in part #<var ref="part_num"/></title>
     <rfc num="7233" sect="4.1">
-      Within the header area of each body part in the <ref to="msg.headers.content_type">multipart</ref> <ref to="msg.body">payload</ref>,
-   the server MUST generate a <h>Content-Range</h> header field corresponding
+      Within the header area of each body part in the multipart payload,
+   the server MUST generate a <h ref="no">Content-Range</h> header field corresponding
    to the range being enclosed in that body part.
     </rfc>
+    <ref to="msg.body"/>
+    <ref to="msg.headers.content_type"/>
   </error>
 
   <comment id="1142">
-    <title>No <h>Content-Type</h> in part #<ref to="part_num"/></title>
+    <title>No <h ref="no">Content-Type</h> in part #<var ref="part_num"/></title>
     <rfc num="7233" sect="4.1">
       If the selected
-   representation would have had a <h>Content-Type</h> header field in a <st>200</st>
+   representation would have had a <h ref="no">Content-Type</h> header field in a <st>200</st>
    (OK) response, the server SHOULD generate that same Content-Type
-   field in the header area of each <ref to="msg.body">body</ref> <ref to="msg.headers.content_type">part</ref>.
+   field in the header area of each body part.
     </rfc>
+    <ref to="msg.body"/>
+    <ref to="msg.headers.content_type"/>
   </comment>
 
   <error id="1143">
-    <title><ref to="msg.headers.content_range"/> header in a <ref to="msg.headers.content_type"><media>multipart/byteranges</media></ref> response</title>
+    <title><h>Content-Range</h> in a <media>multipart/byteranges</media> response</title>
     <rfc num="7233" sect="4.1">
       To avoid confusion with single-part responses, a server MUST NOT
    generate a <h>Content-Range</h> header field in the HTTP header section of a
    multiple part response (this field will be sent in each part
    instead).
     </rfc>
+    <ref to="msg.headers.content_type"/>
   </error>
 
   <error id="1144">
-    <title><ref to="msg.headers.content_type"><media>multipart/byteranges</media></ref> response to a request for a single <ref to="msg.request.headers.range"/></title>
+    <title><media>multipart/byteranges</media> response to a request for a single <h ref="no">Range</h></title>
     <rfc num="7233" sect="4.1">
       A server MUST NOT generate a multipart response to a request for a
    single range, since a client that does not request multiple parts
    might not support multipart responses.
     </rfc>
+    <ref to="msg.request.headers.range"/>
+    <ref to="msg.headers.content_type"/>
   </error>
 
   <error id="1145">
-    <title>Wrong <ref to="msg.status"/> response</title>
-    <explain>The request’s <ref to="msg.request.headers.if_range"/> header means that the server is expected to send a <st>206</st> response only if the representation’s <ref to="msg.headers.etag"/> matches the one specified in If-Range. In this case, it doesn’t, so the server is supposed to send a <st>200</st> response with the complete data.</explain>
+    <title>Wrong <st>206</st> response</title>
+    <explain>The request’s <h ref="no">If-Range</h> header means that the server is expected to send a <st>206</st> response only if the representation’s <h>ETag</h> matches the one specified in If-Range. In this case, it doesn’t match, so the server is supposed to send a <st>200</st> response with the complete data.</explain>
     <explain>See <rfc num="7233" sect="3.2"/>.</explain>
+    <ref to="msg.request.headers.if_range"/>
   </error>
 
   <comment id="1146">
-    <title>Unnecessary <ref to="header"/> in a <ref to="msg.status"/> response</title>
+    <title>Unnecessary <var ref="header"/></title>
     <rfc num="7233" sect="4.1">
-      If a <st>206</st> is generated in response to a request with an <ref to="msg.request.headers.if_range"/>
+      If a <st ref="no">206</st> is generated in response to a request with an <h ref="no">If-Range</h>
    header field, the sender SHOULD NOT generate other representation
    header fields beyond those required above, because the client is
    understood to already have a prior response containing those header
    fields.
     </rfc>
+    <ref to="msg.request.headers.if_range"/>
   </comment>
 
-  <comment id="1147">
-    <title><ref to="msg.headers.content_range"/> header in a <ref to="msg.status"/> response</title>
-    <explain>The <h>Content-Range</h> header is defined by <rfc num="7233" sect="4.2"/> for responses with status codes <st>206</st> and <st>416</st>, but not <ref to="msg.status"/>.</explain>
-  </comment>
+  <error id="1147">
+    <title><h>Content-Range</h> in a <var ref="msg.status"/> response</title>
+    <explain>The <h>Content-Range</h> header is defined by <rfc num="7233" sect="4.2"/> for responses with status codes <st>206</st> and <st>416</st>, but not <var ref="msg.status"/>.</explain>
+  </error>
 
   <error id="1148">
-    <title>Malformed byte range in <ref to="place"/></title>
+    <title>Invalid byte range in <var ref="place"/></title>
     <rfc num="7233" sect="4.2">
-      A <h>Content-Range</h> field value is invalid if it contains a
+      A <h ref="no">Content-Range</h> field value is invalid if it contains a
    byte-range-resp that has a last-byte-pos value less than its
    first-byte-pos value, or a complete-length value less than or equal
    to its last-byte-pos value.
@@ -1094,22 +1116,23 @@
   </error>
 
   <error id="1149">
-    <title><ref to="msg.status"/> response to a request with no <h>Range</h></title>
-    <explain>The <st>416</st> status code is defined by <rfc num="7233" sect="4.4"/> only for responses to requests containing a <h>Range</h> header.</explain>
+    <title><st>416</st> response to a request with no <h ref="no">Range</h></title>
+    <explain>The <st>416</st> status code is defined by <rfc num="7233" sect="4.4"/> only for responses to requests that have a <h ref="no">Range</h> header.</explain>
   </error>
 
   <comment id="1150">
-    <title><ref to="msg.status"/> response with no <h>Content-Range</h> header</title>
+    <title><st>416</st> response without <h>Content-Range</h></title>
     <rfc num="7233" sect="4.4">
       When this status
    code is generated in response to a byte-range request, the sender
    SHOULD generate a <h>Content-Range</h> header field specifying the current
-   length of the selected representation (Section 4.2).
+   length of the selected representation
     </rfc>
+    <ref to="msg.request.headers.range"/>
   </comment>
 
   <error id="1151">
-    <title>Empty list element in <ref to="place"/></title>
+    <title>Empty list element in <var ref="place"/></title>
     <rfc num="7230" sect="7">
       In any production that uses the list construct, a sender MUST NOT
    generate empty list elements.
@@ -1117,53 +1140,53 @@
   </error>
 
   <error id="1152">
-    <title><ref to="directive"/> cache directive in a request</title>
-    <explain>This request’s <ref to="msg.headers.cache_control"/> header includes the <ref to="directive"/> directive, which is defined for responses, but not for requests.</explain>
+    <title><h>Cache-Control</h>: <var ref="directive"/> in a request</title>
+    <explain>This request’s <h>Cache-Control</h> header includes the <var ref="directive"/> directive, which is only defined for responses.</explain>
   </error>
 
   <error id="1153">
-    <title><ref to="directive"/> cache directive in a response</title>
-    <explain>This response’s <ref to="msg.headers.cache_control"/> header includes the <ref to="directive"/> directive, which is defined for requests, but not for responses.</explain>
+    <title><h>Cache-Control</h>: <var ref="directive"/> in a response</title>
+    <explain>This response’s <h>Cache-Control</h> header includes the <var ref="directive"/> directive, which is only defined for requests.</explain>
   </error>
 
   <comment id="1154">
-    <title>Unquoted argument to the <ref to="directive"/> cache directive</title>
-    <explain>The specification for the <ref to="directive"/> directive recommends that its argument be wrapped in double quotes. But in this message’s <ref to="entry"/> header, it was not quoted.</explain>
+    <title><h>Cache-Control</h>: <var ref="directive"/> without quotes</title>
+    <explain>The specification for the <var ref="directive"/> directive recommends wrapping its argument in double quotes. But in this message’s <h ref="no">Cache-Control</h> header, it is not quoted.</explain>
   </comment>
 
   <comment id="1155">
-    <title>Quoted argument to the <ref to="directive"/> cache directive</title>
-    <explain>In this message’s <ref to="entry"/> header, the argument to the <ref to="directive"/> directive is wrapped in double quotes. But the specification for <ref to="directive"/> recommends that it be written as a plain token, without quotes.</explain>
+    <title><h>Cache-Control</h>: <var ref="directive"/> with quotes</title>
+    <explain>In this message’s <h ref="no">Cache-Control</h> header, the argument to the <var ref="directive"/> directive is wrapped in double quotes. But the specification recommends writing it as a plain token, without quotes.</explain>
   </comment>
 
   <error id="1156">
-    <title><ref to="entry"/>: <ref to="directive"/> with no argument</title>
-    <explain>According to the specification, the <ref to="directive"/> directive must have an argument. But in this message’s <ref to="entry"/> header, it has no argument.</explain>
+    <title><h>Cache-Control</h>: <var ref="directive"/> without argument</title>
+    <explain>According to the specification, the <var ref="directive"/> directive must have an argument. But in this message’s <h>Cache-Control</h> header, it has no argument.</explain>
   </error>
 
   <error id="1157">
-    <title><ref to="entry"/>: <ref to="directive"/> with an argument</title>
-    <explain>In this message’s <ref to="entry"/> header, the <ref to="directive"/> directive has an argument. But the specification for <ref to="directive"/> defines no argument.</explain>
+    <title><h>Cache-Control</h>: <var ref="directive"/> with argument</title>
+    <explain>In this message’s <h>Cache-Control</h> header, the <var ref="directive"/> directive has an argument. But the specification defines no argument for this directive.</explain>
   </error>
 
   <error id="1158">
-    <title>Malformed <ref to="entry"/>: <ref to="directive"/></title>
-    <explain>The argument to the <ref to="directive"/> directive in this message’s <ref to="entry"/> header is malformed.</explain>
-    <ref to="error"/>
+    <title>Malformed <h>Cache-Control</h>: <var ref="directive"/></title>
+    <explain>The argument to the <var ref="directive"/> directive in this message’s <h>Cache-Control</h> header is malformed.</explain>
+    <exception/>
   </error>
 
   <error id="1159">
-    <title><ref to="directive"/> cache directive with an argument</title>
-    <explain>In this request’s <ref to="msg.headers.cache_control"/> header, the <cache>no-cache</cache> directive has an argument. But the specification for <cache>no-cache</cache> only defines an argument when used in responses.</explain>
+    <title><h>Cache-Control</h>: <cache>no-cache</cache> with argument</title>
+    <explain>In this request’s <h>Cache-Control</h> header, the <cache>no-cache</cache> directive has an argument. But the specification for <cache>no-cache</cache> only defines an argument when used in responses.</explain>
   </error>
 
   <comment id="1160">
-    <title>Using extension pragma ‘<ref to="pragma"/>’</title>
-    <explain>This message’s <ref to="msg.headers.pragma"/> header contains a ‘<ref to="pragma"/>’ extension pragma. Extension pragmas (that is, pragma directives other than ‘no-cache’) are deprecated in <rfc num="7234" sect="5.4"/>.</explain>
+    <title><h>Pragma</h>: <var ref="pragma"/></title>
+    <explain>This message’s <h>Pragma</h> header includes a ‘<var ref="pragma"/>’ extension pragma. Extension pragmas (that is, pragma directives other than ‘no-cache’) are deprecated in <rfc num="7234" sect="5.4"/>.</explain>
   </comment>
 
   <comment id="1161">
-    <title>“<ref to="msg.headers.cache_control"/>: <cache>no-cache</cache>” without “<ref to="msg.headers.pragma"/>: no-cache”</title>
+    <title>“<h>Cache-Control</h>: no-cache” without “<h>Pragma</h>: no-cache”</title>
     <rfc num="7234" sect="5.4">
       When sending a no-cache request, a client ought to include both the
    pragma and cache-control directives, unless <h>Cache-Control</h>: <cache>no-cache</cache>
@@ -1173,96 +1196,85 @@
   </comment>
 
   <comment id="1162">
-    <title>Response with <ref to="msg.headers.pragma"/>: no-cache</title>
-    <explain>This response contains the ‘no-cache’ pragma directive, which is defined by <rfc num="7234" sect="5.4"/> for requests, but not for responses.</explain>
+    <title><h>Pragma</h>: no-cache in a response</title>
+    <explain>This response contains the ‘no-cache’ pragma directive, which is defined by <rfc num="7234" sect="5.4"/> only for requests.</explain>
     <!-- Not an error because very widespread and benign. -->
   </comment>
 
-  <comment id="1163">
-    <title>Strange warn code <ref to="code"/></title>
-    <explain><rfc num="7234" sect="5.5"/> defines two classes of warn codes—1xx and 2xx—but this message’s <ref to="msg.headers.warning"/> header contains a <ref to="code"/> warn code.</explain>
-  </comment>
+  <error id="1163">
+    <title>Strange warn code <var ref="code"/></title>
+    <explain><rfc num="7234" sect="5.5"/> defines two classes of warn codes: 1xx and 2xx. But this message’s <h>Warning</h> header contains a <var ref="code"/> code.</explain>
+  </error>
 
-  <comment id="1164">
-    <title>Warning date does not match the <ref to="msg.headers.date"/> header</title>
-    <explain>This message’s <ref to="msg.headers.warning"/> header contains a warning (code <ref to="code"/>) with a date that is different from the <h>Date</h> header.</explain>
-    <rfc num="7234" sect="5.5">
-      If a recipient that uses, evaluates, or displays <h>Warning</h> header
-   fields receives a warn-date that is different from the <h>Date</h> value in
-   the same message, the recipient MUST exclude the warning-value
-   containing that warn-date before storing, forwarding, or using the
-   message.  This allows recipients to exclude warning-values that were
-   improperly retained after a cache validation.
-    </rfc>
-    <!-- This probably cannot be considered an error in the response itself, as the retaining behavior would be natural for an HTTP/1.0 cache oblivious to the semantics of the warning. We could look for a 1.0 entry in the Via header, but that's too complicated for such a useless check. -->
-  </comment>
+  <error id="1164">
+    <title>Warning date does not match the <h>Date</h> header</title>
+    <explain>This message’s <h>Warning</h> header contains a warning (code <var ref="code"/>) with a date that does not match the <h>Date</h> header. This means that the warning was mistakenly kept after cache validation. As explained in <rfc num="7234" sect="5.5"/>, such warnings must be removed.</explain>
+  </error>
 
   <error id="1165">
-    <title>Warn code <ref to="code"/> in a request</title>
-    <explain>This request’s <ref to="msg.headers.warning"/> header contains the <ref to="code"/> warn code. But, according to <rfc num="7234" sect="5.5"/>, 1xx warn codes can only be applied to responses.</explain>
+    <title><h>Warning</h>: <var ref="code"/> in a request</title>
+    <explain>This request’s <h>Warning</h> header contains the <var ref="code"/> warn code. But, according to <rfc num="7234" sect="5.5"/>, 1xx warn codes can only be used on responses.</explain>
   </error>
 
   <error id="1166">
-    <title>Response from cache with no <h>Age</h> header</title>
-    <explain>According to <rfc num="7234" sect="4"/>, a cache must add an <h>Age</h> header to every response that it serves without contacting the origin server. But this response has no such header.</explain>
+    <title>Response from cache without <h>Age</h></title>
+    <explain>According to <rfc num="7234" sect="4"/>, a cache must add an <h>Age</h> header to every response that is served without contacting the origin server.</explain>
   </error>
 
   <error id="1167">
-    <title>Bad status code <ref to="msg.status"/></title>
+    <title>Bad status code <var ref="msg.status"/></title>
     <explain>According to <rfc num="7231" sect="6"/>, HTTP status codes can only range from 100 to 599.</explain>
   </error>
 
   <debug id="1168">
     <title>Response from cache</title>
-    <explain>The presence of the <ref to="msg.headers.age"/> header in this response implies that it was served from a cache, without contacting the origin server.</explain>
+    <explain>This response has an <h>Age</h> header, which implies that it was served from a cache, without contacting the origin server.</explain>
+    <explain>However, note that some servers (such as some CDNs) mistakenly add <h>Age</h> headers even when they are not acting as true HTTP caches. This may confuse HTTPolice.</explain>
   </debug>
 
   <debug id="1169">
     <title>Response from cache</title>
-    <explain>The <ref to="code"/> warn code in this response’s <ref to="msg.headers.warning"/> header implies that it was served from a cache, without contacting the origin server. See <rfc num="7234" sect="5.5"/>.</explain>
+    <explain>This response’s <h>Warning</h> header contains the <var ref="code"/> warn code, which implies that it was served from a cache, without contacting the origin server. See <rfc num="7234" sect="5.5"/>.</explain>
   </debug>
 
   <comment id="1170">
     <title>Response from cache older than <cache>max-age</cache></title>
-    <explain>This response’s <ref to="msg.headers.age"/> of <ref to="msg.headers.age.value"/> is greater than the <cache>max-age</cache> of <ref to="msg.request.headers.cache_control.max_age"/> requested by the client’s <ref to="msg.request.headers.cache_control"/> header.</explain>
+    <explain>This response’s <h>Age</h> of <var ref="msg.headers.age.value"/> is greater than the <cache>max-age</cache> of <var ref="msg.request.headers.cache_control.max_age"/> requested by the client’s <h ref="no">Cache-Control</h> header.</explain>
+    <ref to="msg.request.headers.cache_control"/>
   </comment>
 
   <comment id="1171">
-    <title><ref to="msg.method"/> request with <ref to="msg.headers.cache_control"/>: <ref to="directive"/></title>
-    <explain>The <ref to="msg.method"/> method is defined as non-cacheable, so the <ref to="directive"/> directive in this request’s <h>Cache-Control</h> header  makes no difference.</explain>
+    <title><var ref="msg.method"/> request with <h>Cache-Control</h>: <var ref="directive"/></title>
+    <explain>The <var ref="msg.method"/> method is defined as non-cacheable, so the <var ref="directive"/> directive in this request’s <h>Cache-Control</h> header makes no difference.</explain>
   </comment>
 
   <error id="1172">
-    <title>Response from cache to a <ref to="msg.request.method"/> request</title>
-    <explain>The <ref to="msg.request.method"/> method is defined as non-cacheable.</explain>
+    <title>Response from cache to a <var ref="msg.request.method"/> request</title>
+    <explain>The <var ref="msg.request.method"/> method is defined as non-cacheable.</explain>
   </error>
 
   <error id="1173">
-    <title>Response from cache to a request with <ref to="msg.request.headers.cache_control"/>: <cache>no-cache</cache></title>
+    <title>Response from cache to a request with <h ref="no">Cache-Control</h>: <cache>no-cache</cache></title>
     <rfc num="7234" sect="5.2.1.4">
       The "no-cache" request directive indicates that a cache MUST NOT use
    a stored response to satisfy the request without successful
    validation on the origin server.
     </rfc>
+    <ref to="msg.request.headers.cache_control"/>
   </error>
 
   <error id="1174">
-    <title>Response from cache to a request with <ref to="msg.request.headers.pragma"/>: no-cache</title>
+    <title>Response from cache to a request with <h ref="no">Pragma</h>: no-cache</title>
     <rfc num="7234" sect="5.4">
-      When the <h>Cache-Control</h> header field is not present in a request,
+      When the <h ref="no">Cache-Control</h> header field is not present in a request,
    caches MUST consider the no-cache request pragma-directive as having
-   the same effect as if "<h>Cache-Control</h>: <cache>no-cache</cache>" were present (see
-   Section 5.2.1).
+   the same effect as if "Cache-Control: <cache>no-cache</cache>" were present
     </rfc>
-    <rfc num="7234" sect="5.2.1.4">
-      The "no-cache" request directive indicates that a cache MUST NOT use
-   a stored response to satisfy the request without successful
-   validation on the origin server.
-    </rfc>
+    <ref to="msg.request.headers.pragma"/>
   </error>
 
   <error id="1175">
-    <title>Response from cache with <ref to="msg.headers.cache_control"/>: <cache>no-cache</cache></title>
+    <title>Response from cache with <h>Cache-Control</h>: <cache>no-cache</cache></title>
     <rfc num="7234" sect="5.2.2.2">
       The "no-cache" response directive indicates that the response MUST
    NOT be used to satisfy a subsequent request without successful
@@ -1271,13 +1283,13 @@
   </error>
 
   <error id="1176">
-    <title>Response from cache with <ref to="msg.headers.cache_control"/>: <cache>no-store</cache></title>
+    <title>Response from cache with <h>Cache-Control</h>: <cache>no-store</cache></title>
     <explain>According to <rfc num="7234" sect="3"/>, a cache cannot store a response that includes the <cache>no-store</cache> directive in its <h>Cache-Control</h> header.</explain>
   </error>
 
   <error id="1177">
-    <title>Non-cacheable <ref to="msg.status"/> response served from cache</title>
-    <explain>The <ref to="msg.status"/> status code is not defined as cacheable by default. According to <rfc num="7234" sect="3"/>, such a response can only be cached if it explicitly allows caching with headers such as <h>Expires</h>. But this response has no such headers, so it is not cacheable.</explain>
+    <title>Non-cacheable <var ref="msg.status"/> response served from cache</title>
+    <explain>The <var ref="msg.status"/> status code is not defined as cacheable by default. According to <rfc num="7234" sect="3"/>, such a response can only be cached if it explicitly allows caching, with headers such as <h>Expires</h>. But this response has no such headers, so it is not cacheable.</explain>
   </error>
 
   <debug id="1178">
@@ -1287,21 +1299,22 @@
 
   <debug id="1179">
     <title>Heuristic freshness</title>
-    <explain>The <warn>113</warn> warn code in this response’s <ref to="msg.headers.warning"/> header means that the expiration time for this response was chosen heuristically by the cache.</explain>
+    <explain>The <warn>113</warn> warn code in this response’s <h>Warning</h> header means that the expiration time for this response was chosen heuristically by the cache.</explain>
   </debug>
 
   <comment id="1180">
-    <title>Missing <warn>113</warn> warn code</title>
+    <title>Missing <h>Warning</h>: <warn>113</warn></title>
     <rfc num="7234" sect="4.2.2">
       When a heuristic is used to calculate freshness lifetime, a cache
    SHOULD generate a <h>Warning</h> header field with a <warn>113</warn> warn-code (see
-   Section 5.5.4) in the response if its <ref to="msg.headers.age">current_age</ref> is more than 24
+   Section 5.5.4) in the response if its current_age is more than 24
    hours and such a warning is not already present.
     </rfc>
+    <ref to="msg.headers.age"/>
   </comment>
 
   <error id="1181">
-    <title>Heuristic freshness when <ref to="msg.headers.expires"/> is present</title>
+    <title>Heuristic freshness when <h>Expires</h> is present</title>
     <rfc num="7234" sect="4.2.2">
       A cache MUST NOT use heuristics to determine freshness when an
    explicit expiration time is present in the stored response.
@@ -1309,40 +1322,41 @@
   </error>
 
   <error id="1182">
-    <title>Heuristic freshness when <cache>max-age</cache> is <ref to="msg.headers.cache_control">present</ref></title>
+    <title>Heuristic freshness when <cache>max-age</cache> is present</title>
     <rfc num="7234" sect="4.2.2">
       A cache MUST NOT use heuristics to determine freshness when an
    explicit expiration time is present in the stored response.
     </rfc>
+    <ref to="msg.headers.cache_control"/>
   </error>
 
   <comment id="1183">
     <title>Stale response</title>
-    <explain>The <ref to="code"/> warn code in this response’s <ref to="msg.headers.warning"/> header means that the response is stale, as defined by <rfc num="7234" sect="4.2"/>.</explain>
+    <explain>The <var ref="code"/> warn code in this response’s <h>Warning</h> header means that the response is stale, as defined by <rfc num="7234" sect="4.2"/>.</explain>
   </comment>
 
   <comment id="1184">
     <title>Stale response</title>
-    <explain>This response’s <ref to="msg.headers.age"/> is greater than the <cache>max-age</cache> specified in its <ref to="msg.headers.cache_control"/> header. This means that the response is stale, as defined by <rfc num="7234" sect="4.2"/>.</explain>
+    <explain>This response’s <h>Age</h> is greater than the <cache>max-age</cache> specified in its <h>Cache-Control</h> header. This means that the response is stale, as defined by <rfc num="7234" sect="4.2"/>.</explain>
   </comment>
 
   <comment id="1185">
     <title>Stale response</title>
-    <explain>This response’s <ref to="msg.headers.age"/> is greater than the difference between its <ref to="msg.headers.expires"/> date and its <ref to="msg.headers.date"/> header. This means that the response is stale, as defined by <rfc num="7234" sect="4.2"/>.</explain>
+    <explain>This response’s <h>Age</h> is greater than the difference between its <h>Expires</h> date and its <h>Date</h> header. This means that the response is stale, as defined by <rfc num="7234" sect="4.2"/>.</explain>
   </comment>
 
   <comment id="1186">
-    <title>Stale response without <ref to="msg.headers.warning"/>: <warn>110</warn></title>
+    <title>Stale response without <h ref="no">Warning</h>: <warn>110</warn></title>
     <rfc num="7234" sect="4.2.4">
-      A cache SHOULD generate a <h>Warning</h> header field with the <warn>110</warn> warn-code
+      A cache SHOULD generate a Warning header field with the <warn>110</warn> warn-code
    (see Section 5.5.1) in stale responses.
     </rfc>
   </comment>
 
   <error id="1187">
-    <title>Stale response with <ref to="msg.headers.cache_control"/>: <cache>must-revalidate</cache></title>
+    <title>Stale response with <h>Cache-Control</h>: <cache>must-revalidate</cache></title>
     <rfc num="7234" sect="5.2.2.1">
-      The "<cache>must-revalidate</cache>" response directive indicates that once it has
+      The "must-revalidate" response directive indicates that once it has
    become stale, a cache MUST NOT use the response to satisfy subsequent
    requests without successful validation on the origin server.
     </rfc>
@@ -1356,33 +1370,33 @@
    forward path) or doing so is explicitly allowed (e.g., by the
    <cache>max-stale</cache> request directive; see Section 5.2.1).
     </rfc>
-    <explain>If the cache is disconnected, it should have added a <h>Warning</h> header with a <warn>112</warn> or <warn>111</warn> warn code to indicate that.</explain>
+    <explain>If the cache is disconnected, it should have added a <h ref="no">Warning</h> header with a <warn>112</warn> or <warn>111</warn> warn code to indicate that.</explain>
   </comment>
 
   <debug id="1189">
     <title>Message transformed by a proxy</title>
-    <explain>The <warn>214</warn> warn code in this message’s <ref to="msg.headers.warning"/> header means that it was transformed by a proxy.</explain>
+    <explain>The <warn>214</warn> warn code in this message’s <h>Warning</h> header means that it was transformed by a proxy.</explain>
     <explain>See also <rfc num="7230" sect="5.7.2"/>.</explain>
   </debug>
 
   <debug id="1190">
     <title>Response transformed by a proxy</title>
-    <explain>The <ref to="msg.status"/> status code means that this response was transformed by a proxy.</explain>
+    <explain>The <st>203</st> status code means that this response was transformed by a proxy.</explain>
     <explain>See also <rfc num="7230" sect="5.7.2"/>.</explain>
   </debug>
 
   <error id="1191">
-    <title>Transformed message without <h>Warning</h>: <warn>214</warn></title>
+    <title>Transformed message without <h ref="no">Warning</h>: <warn>214</warn></title>
     <rfc num="7230" sect="5.7.2">
       A proxy that transforms a
-   payload MUST add a <h>Warning</h> header field with the warn-code of <warn>214</warn>
+   payload MUST add a Warning header field with the warn-code of <warn>214</warn>
    ("Transformation Applied") if one is not already in the message (see
    Section 5.5 of [RFC7234]).
     </rfc>
   </error>
 
   <error id="1192">
-    <title>Transformed message with <ref to="msg.headers.cache_control"/>: <cache>no-transform</cache></title>
+    <title>Transformed message with <h>Cache-Control</h>: <cache>no-transform</cache></title>
     <rfc num="7230" sect="5.7.2">
       A proxy MUST NOT transform the payload (Section 3.3 of [RFC7231]) of
    a message that contains a <cache>no-transform</cache> cache-control directive
@@ -1391,21 +1405,21 @@
   </error>
 
   <error id="1193">
-    <title><ref to="directive1"/> together with <ref to="directive2"/></title>
-    <explain>This message’s <ref to="msg.headers.cache_control"/> header includes both the <ref to="directive1"/> and the <ref to="directive2"/> directives, which contradict each other.</explain>
+    <title><h>Cache-Control</h>: <var ref="directive1"/>, <var ref="directive2"/></title>
+    <explain>This message’s <h>Cache-Control</h> header includes both the <var ref="directive1"/> and the <var ref="directive2"/> directives, which contradict each other.</explain>
   </error>
 
   <error id="1194">
-    <title><ref to="msg.status"/> response with no <h>WWW-Authenticate</h></title>
+    <title><st>401</st> response without <h>WWW-Authenticate</h></title>
     <rfc num="7235" sect="3.1">
-      The server generating a <st>401</st> response MUST send
+      The server generating a 401 response MUST send
    a <h>WWW-Authenticate</h> header field (Section 4.1) containing at least one
    challenge applicable to the target resource.
     </rfc>
   </error>
 
   <error id="1195">
-    <title><ref to="msg.status"/> response with no <h>Proxy-Authenticate</h></title>
+    <title><st>407</st> response without <h>Proxy-Authenticate</h></title>
     <rfc num="7235" sect="3.2">
       The proxy MUST send a
    <h>Proxy-Authenticate</h> header field (Section 4.3) containing a challenge
@@ -1414,33 +1428,33 @@
   </error>
 
   <error id="1196">
-    <title>Unquoted ‘realm’ parameter in <ref to="place"/></title>
-    <explain>According to <rfc num="7235" sect="2.2"/>, the value of the ‘realm’ parameter must be a quoted string, but here it was a plain token.</explain>
+    <title>Unquoted ‘realm’ parameter in <var ref="place"/></title>
+    <explain>According to <rfc num="7235" sect="2.2"/>, the value of the ‘realm’ parameter must be enclosed in double quotes.</explain>
   </error>
 
   <comment id="1197">
-    <title>Using deprecated header <ref to="header"/></title>
-    <explain>This message includes the <ref to="header"/> header, which is listed as “obsoleted” or “deprecated” in the <cite title="IANA message headers registry" url="http://www.iana.org/assignments/message-headers/message-headers.xhtml"/>.</explain>
+    <title>Deprecated header <var ref="header"/></title>
+    <explain>This message has the <var ref="header"/> header, which is listed as “obsoleted” or “deprecated” in the <cite title="IANA message headers registry" url="http://www.iana.org/assignments/message-headers/message-headers.xhtml"/>.</explain>
   </comment>
 
   <error id="1198">
-    <title>“<ref to="msg.headers.connection"/>: close” in a <ref to="msg.status"/> response</title>
-    <explain>The <ref to="msg.status"/> status code means that this is an interim response, and more responses will follow on the same connection. But the ‘close’ option in this response’s <h>Connection</h> header means that the server will close the connection after sending this response. Either one is wrong here.</explain>
+    <title>“<h>Connection</h>: close” in a <var ref="msg.status"/> response</title>
+    <explain>The <var ref="msg.status"/> status code means that this is an interim response, and more responses will follow on the same connection. But the ‘close’ option in this response’s <h>Connection</h> header means that the server will close the connection after sending this response.</explain>
   </error>
 
   <error id="1199">
-    <title>“<ref to="msg.headers.connection"/>: close” in a <ref to="msg.status"/> response to <ref to="msg.request.method"/></title>
-    <explain>A <ref to="msg.status"/> response to a <m>CONNECT</m> request means that this connection is becoming a tunnel. But the ‘close’ option in this response’s <h>Connection</h> header means that the server will close the connection after sending this response. Either one is wrong here.</explain>
+    <title>“<h>Connection</h>: close” in a <var ref="msg.status"/> response to <m>CONNECT</m></title>
+    <explain>A <var ref="msg.status"/> response to a <m>CONNECT</m> request means that this connection is becoming a tunnel. But the ‘close’ option in this response’s <h>Connection</h> header means that the server will close the connection after sending this response.</explain>
   </error>
 
   <comment id="1200">
-    <title><ref to="msg.status"/> response to a request with <ref to="header"/></title>
-    <explain>The <st>428</st> status code means that the server refuses to service an unconditional request. But this request has the <ref to="header"/> header, which makes it conditional.</explain>
+    <title><st>428</st> response to a request with <var ref="header"/></title>
+    <explain>The <st>428</st> status code means that the server refuses to handle an unconditional request. But this request is conditional, because it has the <var ref="header"/> header.</explain>
     <!-- This is not an error because the server might not recognize this particular header. -->
   </comment>
 
   <comment id="1201">
-    <title><ref to="msg.status"/> response with no payload</title>
+    <title><st>428</st> response with no body</title>
     <rfc num="6585" sect="3">
       Responses using this status code SHOULD explain how to resubmit the
    request successfully.
@@ -1448,21 +1462,21 @@
   </comment>
 
   <error id="1202">
-    <title><ref to="msg.status"/> response from cache</title>
-    <explain>According to its specification, the <ref to="msg.status"/> status code cannot be served from a cache.</explain>
+    <title><var ref="msg.status"/> response from cache</title>
+    <explain>According to the specification, the <var ref="msg.status"/> status code cannot be served from a cache.</explain>
   </error>
 
   <comment id="1203">
-    <title><ref to="msg.status"/> response with no payload</title>
+    <title><st>429</st> response with no body</title>
     <rfc num="6585" sect="4">
       The response representations SHOULD include details explaining the
-   condition, and MAY include a <h>Retry-After</h> header indicating how long
+   condition, and MAY include a <h ref="no">Retry-After</h> header indicating how long
    to wait before making a new request.
     </rfc>
   </comment>
 
   <comment id="1204">
-    <title><ref to="msg.status"/> response with no payload</title>
+    <title><st>511</st> response with no body</title>
     <rfc num="6585" sect="6">
       The response representation SHOULD contain a link to a resource that
    allows the user to submit credentials (e.g., with an HTML form).
@@ -1470,7 +1484,7 @@
   </comment>
 
   <comment id="1205">
-    <title><ref to="msg.status"/> response with no <h>Location</h> header</title>
+    <title><st>308</st> response with no <h>Location</h> header</title>
     <rfc num="7538" sect="3">
       The server SHOULD generate a <h>Location</h> header field ([RFC7231],
    Section 7.1.2) in the response containing a preferred URI reference
@@ -1479,39 +1493,39 @@
   </comment>
 
   <error id="1206">
-    <title><ref to="header"/>: <auth>Basic</auth> with no realm</title>
+    <title><var ref="header"/>: <auth>Basic</auth> with no realm</title>
     <explain>The Basic authentication scheme requires a ‘realm’ parameter. See <rfc num="7617" sect="2"/>.</explain>
   </error>
 
   <error id="1207">
-    <title><ref to="header"/>: <auth>Basic</auth> with a ‘<ref to="param"/>’ parameter</title>
-    <explain>No ‘<ref to="param"/>’ parameter is defined for the Basic authentication scheme. See <rfc num="7617" sect="2"/>.</explain>
+    <title><var ref="header"/>: <auth>Basic</auth> with a ‘<var ref="param"/>’ parameter</title>
+    <explain>No ‘<var ref="param"/>’ parameter is defined for the Basic authentication scheme. See <rfc num="7617" sect="2"/>.</explain>
   </error>
 
   <error id="1208">
-    <title><ref to="header"/>: <auth>Basic</auth> with a “<ref to="charset"/>” charset</title>
+    <title><var ref="header"/>: <auth>Basic</auth> with a “<var ref="charset"/>” charset</title>
     <explain>According to <rfc num="7617" sect="2.1"/>, the ‘charset’ parameter to the Basic authentication scheme can only have the value “UTF-8”.</explain>
   </error>
 
   <error id="1209">
-    <title>Malformed <ref to="header"/>: <auth>Basic</auth></title>
+    <title>Malformed <var ref="header"/>: <auth>Basic</auth></title>
     <explain>In the Basic authentication scheme, credentials are sent as a single Base64 string. See <rfc num="7617" sect="2"/>.</explain>
   </error>
 
   <error id="1210">
-    <title>Malformed <ref to="header"/>: <auth>Basic</auth></title>
-    <explain>In the Basic authentication scheme, the user ID and password are combined with a colon ‘:’ and packed into Base64. In this request’s <ref to="header"/> header, HTTPolice tried to decode them from Base64 and got the following error:</explain>
-    <explain><ref to="error"/></explain>
+    <title>Malformed <var ref="header"/>: <auth>Basic</auth></title>
+    <explain>In the Basic authentication scheme, the user ID and password are combined with a colon ‘:’ and packed into Base64. In this request’s <var ref="header"/> header, HTTPolice tried to decode them from Base64 and got the following error:</explain>
+    <exception/>
     <explain>See <rfc num="7617" sect="2"/>.</explain>
   </error>
 
   <error id="1211">
-    <title>Malformed <ref to="header"/>: <auth>Basic</auth></title>
-    <explain>In the Basic authentication scheme, the user ID and password are combined with a colon ‘:’ and packed into Base64. But in this request’s <ref to="header"/> header, there is no ‘:’ after decoding from Base64. See <rfc num="7617" sect="2"/>.</explain>
+    <title>Malformed <var ref="header"/>: <auth>Basic</auth></title>
+    <explain>In the Basic authentication scheme, the user ID and password are combined with a colon ‘:’ and packed into Base64. But in this request’s <var ref="header"/> header, there is no ‘:’ after decoding from Base64. See <rfc num="7617" sect="2"/>.</explain>
   </error>
 
   <error id="1212">
-    <title>Control character <ref to="char"/> in <ref to="header"/>: <auth>Basic</auth></title>
+    <title>Control character <var ref="char"/> in <var ref="header"/>: <auth>Basic</auth></title>
     <rfc num="7617" sect="2">
       The user-id and password MUST NOT contain any control characters (see
    "CTL" in Appendix B.1 of [RFC5234]).
@@ -1519,25 +1533,27 @@
   </error>
 
   <error id="1213">
-    <title><ref to="msg.method"/> with <ref to="msg.headers.content_type"/>: <ref to="msg.headers.content_type.value"/></title>
-    <explain>The <m>PATCH</m> method only makes sense with media types that define how to apply the patch. <ref to="msg.headers.content_type.value"/> is not such a media type.</explain>
+    <title><m>PATCH</m> with <h>Content-Type</h>: <var ref="msg.headers.content_type.value"/></title>
+    <explain>The <m>PATCH</m> method only makes sense with media types that define how to apply the patch. <var ref="msg.headers.content_type.value"/> is not such a media type.</explain>
     <explain>See <rfc num="5789" errata="3169"/>.</explain>
     <explain>For example, <media>application/merge-patch+json</media> would be a suitable patch format for JSON.</explain>
   </error>
 
   <comment id="1214">
-    <title><ref to="msg.status">Successful</ref> application of a <ref to="msg.request.headers.content_type"><ref to="msg.request.headers.content_type.value"/></ref> <ref to="msg.request.method">patch</ref></title>
+    <title>Successful application of a <var ref="msg.request.headers.content_type.value"/> patch</title>
     <rfc num="5789" errata="3169">
       If a server receives a <m>PATCH</m>
    request with a media type whose specification does not define
-   semantics specific to <m>PATCH</m>, the server SHOULD reject the request by
+   semantics specific to PATCH, the server SHOULD reject the request by
    returning the <st>415</st> Unsupported Media Type status code, unless a more
    specific error status code takes priority.
     </rfc>
+    <ref to="msg.request.headers.content_type"/>
+    <ref to="msg.status"/>
   </comment>
 
   <comment id="1215">
-    <title><ref to="msg.status"/> response to <ref to="msg.request.method"/> without <h>Accept-Patch</h></title>
+    <title><st>415</st> response to <m>PATCH</m> without <h>Accept-Patch</h></title>
     <rfc num="5789" sect="2.2">
       Such a response SHOULD include an
       <h>Accept-Patch</h> response header as described in Section 3.1 to notify
@@ -1546,35 +1562,36 @@
   </comment>
 
   <comment id="1216">
-    <title>“<ref to="msg.headers.allow"/>: <m>PATCH</m>” without <h>Accept-Patch</h></title>
-    <explain>This <ref to="msg.request.method"/> response indicates in its <ref to="msg.headers.allow"/> header that the <m>PATCH</m> method is supported. According to <rfc num="5789" sect="3.1"/>, in this case the server should also send an <h>Accept-Patch</h> header.</explain>
+    <title>“<h>Allow</h>: <m>PATCH</m>” without <h>Accept-Patch</h></title>
+    <explain>This <m>OPTIONS</m> response indicates in its <h>Allow</h> header that the <m>PATCH</m> method is supported. According to <rfc num="5789" sect="3.1"/>, in this case the server should also send an <h>Accept-Patch</h> header.</explain>
   </comment>
 
   <error id="1217">
-    <title><ref to="msg.headers.accept_patch"/> without “<ref to="msg.headers.allow"/>: <m>PATCH</m>”</title>
-    <explain>This response’s <h>Accept-Patch</h> header means that this resource supports the <m>PATCH</m> method, but it’s missing from the <h>Allow</h> header.</explain>
+    <title><h>Accept-Patch</h> without “<h>Allow</h>: <m ref="no">PATCH</m>”</title>
+    <explain>This response’s <h>Accept-Patch</h> header means that this resource supports the <m ref="no">PATCH</m> method, but it’s missing from the <h>Allow</h> header.</explain>
   </error>
 
   <error id="1218">
     <title>HSTS without <hsts>max-age</hsts></title>
-    <explain>According to <rfc num="6797" sect="6.1.1"/>, a <ref to="msg.headers.strict_transport_security"/> header must have a <hsts>max-age</hsts> directive.</explain>
+    <explain>According to <rfc num="6797" sect="6.1.1"/>, a <h>Strict-Transport-Security</h> header must have a <hsts>max-age</hsts> directive.</explain>
   </error>
 
   <comment id="1219">
-    <title>HSTS: <hsts>max-age</hsts>=0 with <hsts>includeSubDomains</hsts></title>
-    <explain>The “<hsts>max-age</hsts>=0” directive in this response’s <ref to="msg.headers.strict_transport_security"/> header tells the user agent to delete the HSTS policy for the domain. The <hsts>includeSubDomains</hsts> directive makes no difference in this case.</explain>
+    <title>HSTS: <hsts>max-age</hsts>=0; <hsts>includeSubDomains</hsts></title>
+    <explain>The “<hsts>max-age</hsts>=0” directive in this response’s <h>Strict-Transport-Security</h> header tells the user agent to delete the HSTS policy for the domain. The <hsts>includeSubDomains</hsts> directive makes no difference in this case.</explain>
     <explain>See <rfc num="6797" sect="6.2"/>.</explain>
   </comment>
 
   <error id="1220">
-    <title>Multiple <ref to="directive"/> directives in <ref to="msg.headers.strict_transport_security">HSTS</ref></title>
+    <title>Multiple <var ref="directive"/> directives in HSTS</title>
     <rfc num="6797" sect="6.1">
       All directives MUST appear only once in an STS header field.
     </rfc>
+    <ref to="msg.headers.strict_transport_security"/>
   </error>
 
   <error id="1221">
-    <title><ref to="msg.headers.strict_transport_security"/> without TLS</title>
+    <title><h>Strict-Transport-Security</h> without TLS</title>
     <rfc num="6798" sect="7.2">
       An HSTS Host MUST NOT include the STS header field in HTTP responses
    conveyed over non-secure transport.
@@ -1582,28 +1599,28 @@
   </error>
 
   <error id="1222">
-    <title>Impossible date in <ref to="place"/></title>
-    <explain>“<ref to="date"/>” is not a valid date.</explain>
+    <title>Impossible date in <var ref="place"/></title>
+    <explain>“<var ref="date"/>” is not a valid date.</explain>
   </error>
 
   <error id="1223">
-    <title>Impossible time in <ref to="place"/></title>
-    <explain>“<ref to="time"/>” is not a valid time.</explain>
+    <title>Impossible time in <var ref="place"/></title>
+    <explain>“<var ref="time"/>” is not a valid time.</explain>
   </error>
 
   <error id="1224">
-    <title>LF without CR in <ref to="place"/></title>
+    <title>LF without CR in <var ref="place"/></title>
     <explain>Lines in HTTP message framing are terminated by two bytes: a carriage return (CR) followed by a line feed (LF). Some implementations accept a bare LF without CR, like in this message, but this is not reliable.</explain>
     <explain>See also <rfc num="7230" sect="3.5"/>.</explain>
   </error>
 
   <error id="1225">
-    <title>Multiple ‘<ref to="name"/>’ parameters in <ref to="place"/></title>
-    <explain>According to <rfc num="5988" sect="5"/>, the ‘<ref to="name"/>’ parameter must not occur more than once in a single link.</explain>
+    <title>Multiple ‘<var ref="name"/>’ parameters in <var ref="place"/></title>
+    <explain>According to <rfc num="5988" sect="5"/>, the ‘<var ref="name"/>’ parameter must not occur more than once in a single link.</explain>
   </error>
 
   <comment id="1226">
-    <title>Deprecated ‘rev’ parameter in <ref to="place"/></title>
+    <title>Deprecated ‘rev’ parameter in <var ref="place"/></title>
     <rfc num="5988" sect="5.3">
       "rev" is deprecated by this
    specification because it often confuses authors and readers; in most
@@ -1612,37 +1629,39 @@
   </comment>
 
   <error id="1227">
-    <title><ref to="msg.headers.accept_patch"/>: <ref to="patch_type"/></title>
-    <explain>The <m>PATCH</m> method only makes sense with media types that define how to apply the patch. <ref to="patch_type"/> is not such a media type. But this response’s <ref to="msg.headers.accept_patch"/> header invites the client to send patches of type <ref to="patch_type"/>.</explain>
+    <title><h>Accept-Patch</h>: <var ref="patch_type"/></title>
+    <explain>The <m>PATCH</m> method only makes sense with media types that define how to apply the patch. <var ref="patch_type"/> is not such a media type. But this response’s <h>Accept-Patch</h> header invites the client to send patches of type <var ref="patch_type"/>.</explain>
     <explain>See <rfc num="5789" errata="3169"/>.</explain>
     <explain>For example, <media>application/merge-patch+json</media> would be a suitable patch format for JSON.</explain>
   </error>
 
   <error id="1228">
-    <title><ref to="msg.headers.upgrade"/>: h2</title>
-    <explain>This request’s <h>Upgrade</h> header includes the token ‘h2’, which normally refers to HTTP/2 over TLS. But HTTP/2 over TLS does not use the Upgrade mechanism, and cleartext HTTP/2 uses the ‘h2c’ token instead, so “Upgrade: h2” is wrong. See <rfc num="7540" sect="3"/>.</explain>
+    <title><h>Upgrade</h>: h2</title>
+    <explain>This request’s <h>Upgrade</h> header includes the token ‘h2’, which normally refers to HTTP/2 over TLS. But HTTP/2 over TLS does not use the <h>Upgrade</h> mechanism, and cleartext HTTP/2 uses the ‘h2c’ token instead, so “Upgrade: h2” is wrong.</explain>
+    <explain>See <rfc num="7540" sect="3"/>.</explain>
   </error>
 
   <error id="1229">
-    <title><ref to="msg.headers.upgrade">Upgrading</ref> to ‘h2’</title>
+    <title>Upgrading to ‘h2’</title>
     <rfc num="7540" sect="3.2">
-      A server MUST ignore an "h2" token in an <ref to="msg.request.headers.upgrade"><h>Upgrade</h></ref> header field.
+      A server MUST ignore an "h2" token in an <h ref="no">Upgrade</h> header field.
     </rfc>
+    <ref to="msg.headers.upgrade"/>
+    <ref to="msg.request.headers.upgrade"/>
   </error>
 
   <error id="1230">
-    <title><ref to="msg.headers.http2_settings"/> without “<ref to="msg.headers.connection"/>: http2-settings”</title>
+    <title><h>HTTP2-Settings</h> without “<h>Connection</h>: http2-settings”</title>
     <rfc num="7540" sect="3.2.1">
       Since the upgrade is only intended to apply to the immediate
    connection, a client sending the <h>HTTP2-Settings</h> header field MUST
    also send "HTTP2-Settings" as a connection option in the <h>Connection</h>
-   header field to prevent it from being forwarded (see Section 6.1 of
-   [RFC7230]).
+   header field to prevent it from being forwarded
     </rfc>
   </error>
 
   <error id="1231">
-    <title>“<ref to="msg.headers.upgrade"/>: h2c” without <h>HTTP2-Settings</h></title>
+    <title>“<h>Upgrade</h>: h2c” without <h>HTTP2-Settings</h></title>
     <rfc num="7540" sect="3.2.1">
       A request that upgrades from HTTP/1.1 to HTTP/2 MUST include exactly
    one "HTTP2-Settings" header field.
@@ -1650,57 +1669,64 @@
   </error>
 
   <error id="1232">
-    <title><ref to="msg.headers.upgrade">Upgrading</ref> to HTTP/2 despite bad <ref to="msg.request.headers.http2_settings"/></title>
-    <explain>According to <rfc num="7540" sect="3.2.1"/>, the server must not upgrade to HTTP/2 unless the request has exactly one valid <h>HTTP2-Settings</h> header.</explain>
+    <title>Upgrading to HTTP/2 despite bad <h ref="no">HTTP2-Settings</h></title>
+    <explain>According to <rfc num="7540" sect="3.2.1"/>, the server must not upgrade to HTTP/2 unless the request has exactly one valid <h ref="no">HTTP2-Settings</h> header.</explain>
+    <ref to="msg.headers.upgrade"/>
+    <ref to="msg.request.headers.http2_settings"/>
   </error>
 
   <error id="1233">
-    <title>“<ref to="msg.headers.upgrade"/>: h2c” on an encrypted connection</title>
-    <explain>An “<h>Upgrade</h>: h2c” header is used to switch to HTTP/2 from a cleartext HTTP/1.1 connection. But this request was sent on an encrypted (TLS) connection. HTTP/2 over TLS is negotiated by other means. See <rfc num="7540" sect="3"/>.</explain>
+    <title>“<h>Upgrade</h>: h2c” on an encrypted connection</title>
+    <explain>An “<h>Upgrade</h>: h2c” header is used to switch to HTTP/2 from a cleartext HTTP/1.1 connection. But this request was sent on an encrypted (TLS) connection. HTTP/2 over TLS is negotiated by other means.</explain>
+    <explain>See <rfc num="7540" sect="3"/>.</explain>
   </error>
 
   <error id="1234">
-    <title>Malformed <ref to="msg.headers.http2_settings"/> header</title>
-    <explain>According to <rfc num="7540" sect="3.2.1"/>, the <h>HTTP2-Settings</h> header must use the URL- and filename-safe Base64 encoding without padding. This means that it can only contain letters, digits, dash (-), and underscore (_). But in this request, it also contained the character <ref to="char"/>.</explain>
+    <title>Malformed <h>HTTP2-Settings</h></title>
+    <explain>According to <rfc num="7540" sect="3.2.1"/>, the <h>HTTP2-Settings</h> header must use the URL- and filename-safe Base64 encoding without padding. This means that it can only contain letters, digits, dash (-), and underscore (_). But in this request, it also contained the character <var ref="char"/>.</explain>
   </error>
 
   <comment id="1235">
-    <title><ref to="msg.headers.vary"/>: <h>Host</h></title>
-    <explain>There is no need to include <h>Host</h> in the <h>Vary</h> header, because Host is part of the request URI, and therefore, every HTTP response implicitly varies by Host already. “Vary: Host” can only scare caches away from storing the response.</explain>
+    <title><h>Vary</h>: <h ref="no">Host</h></title>
+    <explain>There is no need to include <h ref="no">Host</h> in the <h>Vary</h> header, because Host is part of the request URI, and therefore, every HTTP response implicitly varies by Host already. “Vary: Host” can only scare caches away from storing the response.</explain>
     <explain>See <rfc num="7231" sect="7.1.4"/> and <rfc num="7234" sect="2"/>.</explain>
   </comment>
 
   <debug id="1236">
     <title>Request to a proxy</title>
-    <explain>This request’s <ref to="msg.target">target</ref> is an absolute URI. According to <rfc num="7230" sect="5.3"/>, <ref to="msg.version">HTTP/1.1</ref> clients only use this “absolute form” when connecting to proxies. Therefore, HTTPolice assumes that this request is to a proxy.</explain>
+    <explain>This request’s target is an absolute URI. According to <rfc num="7230" sect="5.3"/>, HTTP/1.1 clients only use this “absolute form” when connecting to proxies. Therefore, HTTPolice assumes that this request is to a proxy.</explain>
+    <ref to="msg.target"/>
+    <ref to="msg.version"/>
   </debug>
 
   <error id="1237">
     <title>Response to a direct request transformed by proxy</title>
-    <explain>It seems like this response was transformed by a proxy, but the request was not directed to a proxy. Something is wrong here.</explain>
+    <explain>It seems like this response was transformed by a proxy, but the request was not directed to a proxy.</explain>
   </error>
 
   <comment id="1238">
-    <title><ref to="directive1"/> together with <ref to="directive2"/></title>
-    <explain>This response’s <ref to="msg.headers.cache_control"/> header includes both the <ref to="directive1"/> and the <ref to="directive2"/> directives. But <ref to="directive1"/> makes no difference when <ref to="directive2"/> is present.</explain>
+    <title><h>Cache-Control</h>: <var ref="directive1"/>, <var ref="directive2"/></title>
+    <explain>This response’s <h>Cache-Control</h> header includes both the <var ref="directive1"/> and the <var ref="directive2"/> directives. But <var ref="directive1"/> makes no difference when <var ref="directive2"/> is present.</explain>
     <!-- This used to be part of no. 1193, but strictly speaking ``max-age`` does not contradict ``no-cache``, similarly ``s-maxage`` vs. ``private``, etc. -->
   </comment>
 
   <error id="1239">
-    <title><ref to="msg.body">Payload</ref> in a response to <ref to="msg.request.method"/></title>
+    <title>Body in a response to <m>HEAD</m></title>
     <rfc num="7231" sect="4.3.2">
       The <m>HEAD</m> method is identical to <m>GET</m> except that the server MUST NOT
    send a message body in the response
     </rfc>
+    <ref to="msg.body"/>
   </error>
 
   <error id="1240">
-    <title><ref to="msg.status"/> response with a <ref to="msg.body">payload</ref></title>
+    <title><st>204</st> response with a body</title>
     <rfc num="7231" sect="6.3.5">
       The 204 (No Content) status code indicates that the server has
    successfully fulfilled the request and that there is no additional
    content to send in the response payload body.
     </rfc>
+    <ref to="msg.body"/>
   </error>
 
 </notices>
