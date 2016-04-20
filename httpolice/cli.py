@@ -11,7 +11,8 @@ from httpolice.util.seven import stdio_as_text
 def main():
     parser = argparse.ArgumentParser(
         description=u'Run HTTPolice on input files.')
-    parser.add_argument(u'-i', u'--input', choices=inputs.formats)
+    parser.add_argument(u'-i', u'--input', choices=inputs.formats,
+                        required=True)
     parser.add_argument(u'-o', u'--output', choices=reports.formats,
                         default=u'text')
     parser.add_argument(u'path', nargs='+')
