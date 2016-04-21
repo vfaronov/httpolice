@@ -165,13 +165,14 @@ def ellipsize(s, max_length=60):
 
 def detypographize(s):
     u"""
-    >>> print(detypographize(u'“Foo bar—baz ‘qux’—xyzzy”: A–Z'))
+    >>> print(detypographize(u'“Foo bar—baz ‘qux’—xyzzy”: A–Z'))
     "Foo bar--baz 'qux'--xyzzy": A-Z
     """
     return (s.
             replace(u'“', u'"').replace(u'”', u'"').
             replace(u'‘', u"'").replace(u'’', u"'").
-            replace(u'—', u'--').replace(u'–', u'-'))
+            replace(u'—', u'--').replace(u'–', u'-').
+            replace(u' ', u' '))                        # no-break space
 
 
 # See also http://stackoverflow.com/a/25829509/200445
