@@ -55,7 +55,7 @@ class TestFromFiles(unittest.TestCase):
 
     def _make_case(dir_path, name):
         file_path = os.path.join(dir_path, name)
-        test_name = name.split('.')[0]
+        test_name = name.replace('.', '_')
         def test_func(self):
             self._run_test(file_path)
         return test_name, test_func
