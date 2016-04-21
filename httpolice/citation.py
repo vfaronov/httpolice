@@ -54,7 +54,7 @@ class RFC(Citation):
         self.section = section
         self.appendix = appendix
         self.errata = errata
-        title = u'RFC %d' % num
+        title = u'RFC %d' % num         # no-break space
         if errata:
             title += u' errata'
             url = u'https://www.rfc-editor.org/errata_search.php?eid=%d' % \
@@ -66,7 +66,7 @@ class RFC(Citation):
                                          for n in section or appendix)
                 word1 = u'§' if section else u'appendix'
                 word2 = u'section' if section else u'appendix'
-                title += u' %s %s' % (word1, section_text)
+                title += u' %s %s' % (word1, section_text)     # no-break space
                 url += u'#%s-%s' % (word2, section_text)
         super(RFC, self).__init__(title, url)
 

@@ -38,7 +38,7 @@ def expand_error(error):
     if isinstance(error, ParseError):
         return expand_parse_error(error)
     else:
-        return [expand_piece(error)]
+        return [error]
 
 
 def expand_parse_error(error):

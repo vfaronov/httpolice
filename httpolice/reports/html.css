@@ -1,117 +1,220 @@
+/****************************************************************
+ * Common styles
+ ****************************************************************/
+
 body {
-    color: #111111;
-    padding: 3em;
+    background: white;
+    color: black;
     font-family: sans-serif;
+    quotes: '“' '”';
+
+    /* I hate this line with a passion, but so far I can't figure out
+     * how else to make both sans-serif and monospace fonts look reasonable
+     * on a wide range of browsers and platforms. */
+    font-size: 14px;
 }
 
-h1, h2 {
-    margin-top: 0;
+@media screen {                             /* Print margins are OK already. */
+    body {
+        margin: 3em;
+    }
 }
 
-a:link, a:active, a:visited, a:hover {
-    color: #000000;
-    text-decoration: none;
-    border-bottom: dotted 1px;
+h1 {
+    font-size: x-large;
+}
+
+h2, h3 {
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+pre, code {
+    font-family: 'Consolas', monospace;
+}
+
+a[href] {
+    color: inherit;
+    text-decoration: inherit;
+    border-bottom: thin dotted;
 }
 
 cite {
-    font-style: normal;
+    font-style: inherit;
 }
 
 q {
     font-style: italic;
 }
 
-.highlight {
-    background-color: #FFF0BF;
+abbr {
+    text-decoration: inherit;
+    border: inherit;
 }
 
-.request-line, .status-line, .HeaderEntry {
-    font-family: monospace;
-    padding: 0.3em 0;
+hr {
+    visibility: hidden;
+    clear: both;
+}
+
+@media print {
+    button {
+        display: none;
+    }
+}
+
+
+/****************************************************************
+ * Request and response data
+ ****************************************************************/
+
+div.message-display {
+    margin-top: 3em;
+    max-width: 55em;
+}
+
+.message-display h2 {
+    font-weight: bolder;
+    margin: 0;
     overflow: auto;
+    padding: 0 0 0.3em 0;
+    white-space: nowrap;
 }
 
-.request-line, .status-line {
-    white-space: pre;
-    font-weight: bold;
-}
-
-.HeaderEntry {
+pre.header-entry {
+    margin: 0;
     white-space: pre-wrap;
+    overflow: auto;
+    padding: 0.3em 0;
+
+    /* Indent all lines after the first one, a la ``obs-fold``. */
+    padding-left: 2em;
+    text-indent: -2em;
 }
 
-.review-block {
+div.body-display, div.trailer {
     margin-top: 2em;
 }
 
-.hint {
-    margin: 0 0 1em 0;
-    color: #444444;
+.body-display h3, .trailer h3 {
     display: inline-block;
-    padding: 0.3em;
-    border: dashed 1px #444444;
+    border: thin dashed;
+    padding: 0.3em 0.5em;
+    margin: 0;
+    color: dimgray;
 }
 
-.payload-body {
-    font-family: monospace;
+.body-display pre {
+    margin-top: 0.7em;
+    margin-bottom: 0;
     white-space: pre-wrap;
     max-height: 20em;
     overflow: auto;
 }
 
-.review {
-    float: left;
-    width: 57%;
-    padding-right: 1em;
-    margin-bottom: 2em;
-}
 
-.notices {
-    float: right;
-    width: 40%;
-    border-left: solid 1px #DDDDDD;
+/****************************************************************
+ * Notices
+ ****************************************************************/
+
+div.complaints {
+    margin-top: 2em;
     padding-left: 1em;
+    border-left: thin solid lightgray;
 }
 
-.notice-info {
-    color: #BBBBBB;
+div.notice {
+    max-width: 55em;
+    page-break-inside: avoid;
 }
 
-.notice-error .notice-severity {
-    color: #FF0000;
+.notice:not(.collapsed) + div.notice {
+    /* More spacing between expanded notices. */
+    margin-top: 2em;
 }
 
-.toggle-notice {
-    display: inline-block;
+.debug .severity {
+    color: darkgray;
+}
+
+.error .severity {
+    color: red;
+}
+
+.notice .ident {
+    color: darkgray;
+}
+
+
+/****************************************************************
+ * Float notices to the right on wider displays
+ ****************************************************************/
+
+@media (min-width: 55em) {
+    div.message-display {
+        float: left;
+        width: 55%;
+    }
+
+    div.complaints {
+        float: right;
+        width: 40%;
+    }
+}
+
+
+/****************************************************************
+ * Interactive notices
+ ****************************************************************/
+
+.notice button {
     float: right;
     margin-left: 1em;
+
+    /* Make it look more like a pseudo-link. */
+    background: transparent;
+    border-top: none;
+    border-right: none;
+    border-bottom: thin dotted;
+    border-left: none;
+    padding: 0;
+    color: gray;
+    font-size: smaller;
     cursor: pointer;
-    color: #BBBBBB;
-    border-bottom: dotted 1px;
 }
 
-br.item-separator {
-    clear: both;
+@media screen {                          /* Don't collapse notices in print. */
+    .notice.collapsed p {
+        display: none;
+    }
+
+    .notice.debug.collapsed h3 {
+        color: darkgray;
+    }
 }
 
-.notice-examples {
-    margin-top: 2em;
-    max-width: 60em;
-    border-collapse: collapse;
+.highlight {
+    background: navajowhite;
 }
 
-.notice-examples td {
-    padding: 1em 1em 0 1em;
-    vertical-align: top;
-    border-top: solid 1px #BBBBBB;
+
+/****************************************************************
+ * List of all notices
+ ****************************************************************/
+
+.notices-list div.notice {
+    margin-top: 4em !important;
 }
 
-.notice-examples th {
-    padding-bottom: 1em;
+.notices-list h3 {
+    font-size: larger;
+    font-weight: bolder;
 }
 
-.notice-examples .notice-heading {
-    margin-top: 0;
-    font-weight: bold;
+.notices-list var {
+    font-style: inherit;
+    display: inline-block;
+    background: lavender;
+    border: solid thin gray;
+    padding: 0 0.1em;
 }

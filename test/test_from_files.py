@@ -17,14 +17,11 @@ from httpolice.inputs.har import har_input
 from httpolice.inputs.streams import combined_input, parse_combined
 from httpolice.notice import notices
 from httpolice.reports import html_report, text_report
-from httpolice.reports.html import render_notice_examples
 
 
 class TestFromFiles(unittest.TestCase):
 
     covered = set()
-    examples_filename = os.environ.get('WRITE_EXAMPLES_TO')
-    examples = {} if examples_filename else None
 
     def _run_test(self, file_path):
         if file_path.endswith('.har'):
@@ -48,10 +45,6 @@ class TestFromFiles(unittest.TestCase):
         self.covered.update(actual)
         self.assertEqual(expected, actual)
         html_report(exchanges, six.BytesIO())
-        if self.examples is not None:
-            for exch in exchanges:
-                for ident, ctx in exch.collect_complaints():
-                    self.examples.setdefault(ident, ctx)
 
     def _make_case(dir_path, name):
         file_path = os.path.join(dir_path, name)
@@ -68,10 +61,3 @@ class TestFromFiles(unittest.TestCase):
 
     def test_all_notices_covered(self):
         self.assertEqual(self.covered, set(notices))
-        if self.examples is not None:
-            self.assertEqual(self.covered, set(self.examples))
-            with io.open(self.examples_filename, 'wt', encoding='utf-8') as f:
-                f.write(render_notice_examples(
-                    (notices[ident], ctx)
-                    for ident, ctx in sorted(self.examples.items())
-                ))

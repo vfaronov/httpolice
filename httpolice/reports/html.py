@@ -7,7 +7,8 @@ import dominate.tags as H
 import pkg_resources
 import six
 
-from httpolice import known, notice, structure
+from httpolice import known, message, notice, structure
+from httpolice.__metadata__ import version
 from httpolice.citation import Citation
 from httpolice.header import HeaderView
 from httpolice.reports.common import (
@@ -27,164 +28,183 @@ js_code = pkg_resources.resource_string('httpolice.reports', 'html.js'). \
 
 
 def html_report(exchanges, buf):
-    encoding = 'utf-8'
-    document = dominate.document(title=u'HTTPolice report')
+    title = u'HTTPolice report'
+    document = dominate.document(title=title)
     with document.head:
-        H.meta(http_equiv=u'Content-Type',
-               content=u'text/html; charset=%s' % encoding)
-        _include_stylesheet()
-        _include_scripts()
+        _common_meta()
+        H.script(type=u'text/javascript').add_raw_string(js_code)
     with document:
+        H.h1(title)
         _render_exchanges(exchanges)
-    buf.write(document.render().encode(encoding))
+    buf.write(document.render().encode('utf-8'))
 
 
-def render_notice_examples(examples):
-    document = dominate.document(title=u'HTTPolice notice examples')
+class Placeholder(object):
+
+    def __init__(self, name=None):
+        self.name = name
+
+    def get(self, name, _=None):
+        return Placeholder(name)
+
+    def __getitem__(self, name):
+        return self.get(name)
+
+    def __getattr__(self, name):
+        return self.get(name)
+
+
+def list_notices(buf):
+    title = u'HTTPolice notices'
+    document = dominate.document(title=title)
     with document.head:
-        H.meta(http_equiv=u'Content-Type', content=u'text/html; charset=utf-8')
-        _include_stylesheet()
+        _common_meta()
     with document:
-        H.h1(u'HTTPolice notice examples')
-        with H.table(_class=u'notice-examples'):
-            H.thead(H.tr(H.th(u'ID'), H.th(u'severity'), H.th(u'example')))
-            with H.tbody():
-                for the_notice, ctx in examples:
-                    with H.tr():
-                        H.td(six.text_type(the_notice.ident))
-                        H.td(the_notice.severity)
-                        with H.td():
-                            _notice_to_html(the_notice, ctx, for_example=True)
-    return document.render()
+        H.h1(title)
+        with H.div(_class=u'notices-list'):
+            placeholder = Placeholder()
+            for ident in sorted(notice.notices.keys()):
+                _notice_to_html(notice.notices[ident], placeholder)
+    buf.write(document.render().encode('utf-8'))
+
+
+def _common_meta():
+    H.meta(charset=u'utf-8')
+    H.meta(name=u'generator', content=u'HTTPolice %s' % version)
+    H.style(type=u'text/css').add_raw_string(css_code)
 
 
 def _render_exchanges(exchanges):
     for exch in exchanges:
-        with H.div(**_for_object(exch)):
+        with H.div(_class=u'exchange'):
+            # The ``hr`` elements really help readability in w3m.
             if exch.request:
                 _render_request(exch.request)
+                H.hr()
             for resp in exch.responses:
                 _render_response(resp)
-            _render_complaints(exch)
-            H.br(_class=u'item-separator')
+                H.hr()
+            if exch.complaints:
+                _render_complaints(exch)
+                H.hr()
 
 
-def _render_complaints(obj):
-    if obj.complaints:
-        with H.div(_class=u'notices'):
-            for complaint in obj.complaints:
-                the_notice = notice.notices[complaint.notice_ident]
-                _notice_to_html(the_notice, complaint.context)
+def _render_request(req):
+    with H.section():
+        with H.div(_class=u'message-display'):
+            with H.h2(), H.code():      # Request line
+                # We don't insert spaces here because we assume that
+                # Dominate will render each element on its own line,
+                # thus implicitly creating whitespace.
+                # https://github.com/Knio/dominate/issues/68
+                with H.span(**_for_object(req.method)):
+                    _known_to_html(req.method)
+                H.span(printable(req.target), **_for_object(req.target))
+                if req.version:
+                    H.span(printable(req.version), **_for_object(req.version))
+            _render_message(req)        # Headers, body and all that
+        _render_complaints(req)
 
 
-def _render_annotated(pieces):
-    for piece in pieces:
-        with H.span(_class=u'annotated-piece', **_for_object(piece)):
-            if isinstance(piece, bytes):
-                H.span(printable(piece.decode('iso-8859-1')))
-            else:
-                _known_to_html(piece)
-
-
-def _render_header_entries(annotated_entries):
-    for entry, annotated in annotated_entries:
-        with H.div(__inline=True, **_for_object(entry)):
-            _known_to_html(entry.name)
-            H.span(u': ')
-            _render_annotated(annotated)
+def _render_response(resp):
+    with H.section():
+        with H.div(_class=u'message-display'):
+            with H.h2(), H.code():      # Status line
+                # See above regarding spaces.
+                if resp.version:
+                    H.span(printable(resp.version),
+                           **_for_object(resp.version))
+                with H.span(**_for_object(resp.status)):
+                    _known_to_html(resp.status)
+                    H.span(printable(find_reason_phrase(resp)))
+            _render_message(resp)       # Headers, body and all that
+        _render_complaints(resp)
 
 
 def _render_message(msg):
     _render_header_entries(msg.annotated_header_entries)
 
     body, transforms = _displayable_body(msg)
-    if body is None:
-        with H.div(_class=u'review-block'):
-            H.p(u'Body is unknown.', _class=u'hint')
-    if body is Unavailable:
-        with H.div(_class=u'review-block'):
-            H.p(u'Body is present, but not available for inspection.',
-                _class=u'hint')
-    elif body:
-        with H.div(**_for_object(msg.body, extra_class=u'review-block')):
-            if transforms:
-                H.p(u'Body after %s:' % nicely_join(transforms),
-                    _class=u'hint')
-            H.div(body, _class=u'payload-body')
+    if body != u'':
+        with H.div(**_for_object(msg.body, u'body-display')):
+            if body is None:
+                H.h3(u'Body is unknown')
+            elif body is Unavailable:
+                H.h3(u'Body is present, but not available for inspection')
+            else:
+                if transforms:
+                    H.h3(u'Body after %s' % nicely_join(transforms))
+                H.pre(body)
 
     if msg.trailer_entries:
-        with H.div(_class=u'review-block'):
-            H.p(u'Header fields from the trailer part:', _class=u'hint')
+        with H.div(_class=u'trailer'):
+            H.h3(u'Headers from the trailer part')
             _render_header_entries(msg.annotated_trailer_entries)
 
 
-def _render_request(req):
-    with H.div(_class=u'review'):
-        with H.div(_class=u'request-line', __inline=True):
-            with H.span(**_for_object(req.method)):
-                _known_to_html(req.method)
-            H.span(u' ')
-            H.span(printable(req.target),
-                   **_for_object(req.target, u'request-target'))
-            if req.version is not None:
-                H.span(u' ')
-                H.span(printable(req.version), **_for_object(req.version))
-        _render_message(req)
-    _render_complaints(req)
+def _render_header_entries(annotated_entries):
+    for entry, annotated in annotated_entries:
+        with H.pre(**_for_object(entry, 'header-entry')), H.code():
+            # Dominate (at least as of 2.2.0)
+            # automatically inlines all descendants of ``pre``.
+            # https://github.com/Knio/dominate/issues/68
+            _known_to_html(entry.name)
+            H.span(u': ')
+            _render_annotated(annotated)
 
 
-def _render_response(resp):
-    with H.div(_class=u'review'):
-        with H.div(_class=u'status-line', __inline=True):
-            if resp.version is not None:
-                H.span(printable(resp.version), **_for_object(resp.version))
-                H.span(u' ')
-            with H.span(**_for_object(resp.status)):
-                _known_to_html(resp.status)
-                H.span(u' ')
-                H.span(printable(find_reason_phrase(resp)))
-        _render_message(resp)
-    _render_complaints(resp)
+def _render_annotated(pieces):
+    for piece in pieces:
+        if isinstance(piece, bytes):
+            H.span(printable(piece.decode('iso-8859-1')))
+        else:
+            with H.span(**_for_object(piece)):
+                _known_to_html(piece)
 
 
-def _include_stylesheet():
-    H.style(type=u'text/css').add_raw_string(css_code)
+def _render_complaints(obj):
+    if obj.complaints:
+        with H.div(_class=u'complaints'):
+            for complaint in obj.complaints:
+                the_notice = notice.notices[complaint.notice_ident]
+                _notice_to_html(the_notice, complaint.context)
 
 
-def _include_scripts():
-    H.script(src=u'https://code.jquery.com/jquery-1.11.3.js',
-             type=u'text/javascript')
-    H.script(type=u'text/javascript').add_raw_string(js_code)
+_seen_ids = {}
 
 
-def _for_object(obj, extra_class=u''):
-    if okay(obj):
-        return {
-            u'class': u'%s %s' % (type(obj).__name__, extra_class),
-            u'id': six.text_type(id(obj)),
-        }
+def _anonymize_id(id_):
+    if id_ not in _seen_ids:
+        _seen_ids[id_] = len(_seen_ids)
+    return _seen_ids[id_]
+
+
+def _reference_ids(obj):
+    if isinstance(obj, list):
+        return [ref for item in obj for ref in _reference_ids(item)]
+    elif isinstance(obj, HeaderView):
+        return [ref for entry in obj.entries for ref in _reference_ids(entry)]
     else:
-        return {u'class': extra_class}
+        return [six.text_type(_anonymize_id(id(obj)))]
 
 
-def _reference_targets(obj):
-    if isinstance(obj, HeaderView):
-        return [u'#' + six.text_type(id(entry)) for entry in obj.entries]
-    elif isinstance(obj, list):
-        # Support no. 1013, where we want to highlight all entries,
-        # not just the one which is ultimately selected by `SingleHeaderView`.
-        # Makes sense in general, so I'm inclined not to consider it a hack.
-        return [ref for item in obj for ref in _reference_targets(item)]
-    else:
-        return [u'#' + six.text_type(id(obj))]
+def _for_object(obj, extra_class=None):
+    r = {u'data-ref-id': _reference_ids(obj)[0]}
+    if extra_class:
+        r[u'class'] = extra_class
+    return r
 
 
-def _magic_references(piece, ctx):
-    if piece.get('ref') == u'no':
+def _referring_to(obj):
+    return {u'data-ref-to': u' '.join(_reference_ids(obj))}
+
+
+def _magic_references(elem, ctx):
+    if elem.get('ref') == u'no':
         return []
-    obj = piece.content
+    obj = elem.content
     msg = ctx.get('msg')
-    if not msg:
+    if not isinstance(msg, message.Message):
         return []
 
     if isinstance(obj, structure.FieldName) and msg.headers[obj].is_present:
@@ -204,35 +224,31 @@ def _magic_references(piece, ctx):
 
 
 def _known_to_html(obj):
-    cls = u'known known-%s' % type(obj).__name__
+    cls = type(obj).__name__
     text = printable(six.text_type(obj))
     cite = known.citation(obj)
-    title = known.title(obj, with_citation=True)
     if cite:
-        elem = H.a(text, _class=cls, href=cite.url, target=u'_blank')
+        elem = H.a(text, _class=cls, href=cite.url, target=u'_blank',
+                   __inline=True)
     else:
-        elem = H.span(text, _class=cls)
+        elem = H.span(text, _class=cls, __inline=True)
+    title = known.title(obj, with_citation=True)
     if title:
         with elem:
             H.attr(title=title)
 
 
-def _notice_to_html(the_notice, ctx, for_example=False):
-    with H.div(_class=u'notice notice-%s' % the_notice.severity):
-        with H.p(_class=u'notice-heading', __inline=True):
-            if not for_example:
-                with H.span(_class=u'notice-info'):
-                    H.span(six.text_type(the_notice.ident),
-                           _class=u'notice-ident')
-                    H.span(u' ')
-                    H.span(the_notice.severity_short,
-                           _class=u'notice-severity',
-                           title=the_notice.severity)
-                H.span(u' ')
-            with H.span(_class=u'notice-title'):
+def _notice_to_html(the_notice, ctx):
+    with H.div(_class=u'notice %s' % the_notice.severity):
+        with H.h3():
+            # See above regarding spaces.
+            H.abbr(the_notice.severity_short, _class=u'severity',
+                   title=the_notice.severity)
+            H.span(six.text_type(the_notice.ident), _class=u'ident')
+            with H.span():
                 _piece_to_html(the_notice.title, ctx)
-        for para in the_notice.explanation:
-            _piece_to_html(para, ctx)
+        for piece in the_notice.explanation:
+            _piece_to_html(piece, ctx)
 
 
 def _piece_to_html(piece, ctx):
@@ -241,45 +257,48 @@ def _piece_to_html(piece, ctx):
             _piece_to_html(p, ctx)
 
     elif isinstance(piece, notice.Paragraph):
-        with H.p(_class=u'notice-para', __inline=True):
+        with H.p():
             _piece_to_html(piece.content, ctx)
 
     elif isinstance(piece, notice.Var):
         target = resolve_reference(ctx, piece.reference)
-        with H.span(data_ref_to=u', '.join(_reference_targets(target))):
+        with H.span(__inline=True, **_referring_to(target)):
             _piece_to_html(target, ctx)
 
     elif isinstance(piece, notice.Ref):
         target = resolve_reference(ctx, piece.reference)
-        H.span(u'', data_ref_to=u', '.join(_reference_targets(target)))
+        H.span(u'', **_referring_to(target))
 
     elif isinstance(piece, notice.Cite):
         _piece_to_html(piece.info, ctx)
         quote = piece.content
         if quote:
-            H.span(u': ')
-            with H.q(cite=piece.info.url):
+            H.span(u': ', __inline=True)
+            with H.q(__inline=True):
                 _piece_to_html(quote, ctx)
 
     elif isinstance(piece, notice.ExceptionDetails):
         for para in expand_error(ctx['error']):
-            with H.p(_class=u'notice-para', __inline=True):
+            with H.p():
                 _piece_to_html(para, ctx)
 
     elif isinstance(piece, Citation):
-        with H.cite():
-            H.a(piece.title, href=piece.url, target=u'_blank')
+        with H.cite(__inline=True):
+            H.a(piece.title, href=piece.url, target=u'_blank', __inline=True)
 
     elif isinstance(piece, notice.Known):
         magic = _magic_references(piece, ctx)
-        with H.span(data_ref_to=u', '.join(_reference_targets(magic))):
+        with H.span(__inline=True, **_referring_to(magic)):
             _piece_to_html(piece.content, ctx)
 
     elif known.is_known(piece):
         _known_to_html(piece)
 
+    elif isinstance(piece, Placeholder):
+        H.var(piece.name, __inline=True)
+
     elif isinstance(piece, six.text_type):
-        H.span(printable(piece))
+        H.span(printable(piece), __inline=True)
 
     else:
         _piece_to_html(expand_piece(piece), ctx)
@@ -310,7 +329,7 @@ def _displayable_body(msg):
     else:
         return msg.body, []
 
-    limit = 5000
+    limit = 1000
     if len(r) > limit:
         r = r[:limit]
         transforms += [u'taking the first %d characters' % limit]

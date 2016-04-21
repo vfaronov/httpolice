@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 import copy
+import six
 
 import lxml.etree
 import pkg_resources
@@ -51,7 +52,17 @@ class Content(lxml.etree.ElementBase):
         for child in self:
             r.append(child)
             r.append(child.tail)
-        return [piece for piece in r if piece is not None and piece != u'']
+        r = [piece for piece in r if piece is not None and piece != u'']
+
+        # Strip spaces from the first and last text children.
+        # Useful for quotes.
+        if r:
+            if isinstance(r[0], (six.text_type, bytes)):
+                r[0] = r[0].lstrip()
+            if isinstance(r[-1], (six.text_type, bytes)):
+                r[-1] = r[-1].rstrip()
+
+        return r
 
 
 class Paragraph(Content):

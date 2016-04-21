@@ -26,7 +26,7 @@ setup(
         'six >=1.10.0',
         'lxml >=3.6.0',
         'bitstring >=3.1.4',
-        'dominate >=2.1.17',
+        'dominate >=2.2.0',
         'defusedxml >=0.4.1',
     ],
     packages=[
