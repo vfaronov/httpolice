@@ -164,7 +164,7 @@ def ellipsize(s, max_length=60):
 
 
 def detypographize(s):
-    """
+    u"""
     >>> print(detypographize(u'“Foo bar—baz ‘qux’—xyzzy”: A–Z'))
     "Foo bar--baz 'qux'--xyzzy": A-Z
     """
