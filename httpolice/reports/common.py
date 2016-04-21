@@ -42,7 +42,7 @@ def expand_error(error):
 
 
 def expand_parse_error(error):
-    paras = [[u'Parse error at byte offset %d.' % error.point]]
+    paras = [[u'Parse error at offset %d.' % error.point]]
     if error.found == b'':
         paras.append([u'Found end of data.'])
     elif error.found is not None:
