@@ -1,0 +1,17 @@
+1241
+
+======== BEGIN INBOUND STREAM ========
+GET /hello.txt HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 21 Apr 2016 17:37:39 GMT
+Age: 157680000
+Content-Type: text/plain
+Cache-Control: no-cache, no-store, must-revalidate
+Content-Length: 14
+Via: 1.1 cc603.cache.example.net (SuperAccelerator)
+
+Hello world!

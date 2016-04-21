@@ -1229,7 +1229,6 @@
   <debug id="1168">
     <title>Response from cache</title>
     <explain>This response has an <h>Age</h> header, which implies that it was served from a cache, without contacting the origin server.</explain>
-    <explain>However, note that some servers (such as some CDNs) mistakenly add <h>Age</h> headers even when they are not acting as true HTTP caches. This may confuse HTTPolice.</explain>
   </debug>
 
   <debug id="1169">
@@ -1727,6 +1726,13 @@
    content to send in the response payload body.
     </rfc>
     <ref to="msg.body"/>
+  </error>
+
+  <error id="1241">
+    <title><h>Date</h> + <h>Age</h> is in the future</title>
+    <explain>The <h>Date</h> header is the date and time when the response was originated. And the <h>Age</h> header is how long the response has been cached since then (or since it was revalidated). But in this response, the sum of <h>Date</h> + <h>Age</h> is in the future, so one of them must be wrong.</explain>
+    <explain>This can happen when a cache mistakenly changes the <h>Date</h> header, or adds an <h>Age</h> header even though it is not a true HTTP cache (according to <rfc num="7234"/>).</explain>
+    <explain>Also, this error can be caused by wrong timezone settings.</explain>
   </error>
 
 </notices>

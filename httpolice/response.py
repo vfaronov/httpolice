@@ -1,5 +1,7 @@
 # -*- coding: utf-8; -*-
 
+from datetime import datetime, timedelta
+
 try:
     from urlparse import urljoin, urlparse
 except ImportError:                                     # Python 2
@@ -55,13 +57,22 @@ class Response(message.Message):
 
     @derived_property
     def from_cache(self):
+        if self.headers.date.is_okay and self.headers.age.is_okay:
+            date = self.headers.date.value
+            age = timedelta(seconds=self.headers.age.value)
+            if date + age > datetime.utcnow() + timedelta(seconds=30):
+                self.complain(1241)
+                return None
+
         if self.headers.age.is_present:
             self.complain(1168)
             return True
+
         for warning in self.headers.warning.okay:
             if 100 <= warning.code < 200:
                 self.complain(1169, code=warning.code)
                 return True
+
         return None
 
     @derived_property
