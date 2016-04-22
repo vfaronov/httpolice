@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 import io
+import re
 import string
 
 import six
@@ -175,7 +176,17 @@ def detypographize(s):
             replace(u' ', u' '))                        # no-break space
 
 
-# See also http://stackoverflow.com/a/25829509/200445
-nonprintable = set([chr(_i) for _i in range(128)]) - set(string.printable)
-printable = lambda s: s.translate({ord(c): u'\ufffd' for c in nonprintable})
-has_nonprintable = lambda s: printable(s) != s
+
+def printable(s):
+    # Based on `XML 1.0 section 2.2 <https://www.w3.org/TR/xml/#charsets>`_,
+    # with the addition of U+0085,
+    # which the W3C (Nu) validator also marked as a "forbidden code point".
+    # Even with this code, the validator still complains about
+    # "Text run is not in Unicode Normalization Form C"
+    # and "Document uses the Unicode Private Use Area(s)".
+    return re.sub(
+        pattern=(u'[\u0000-\u0008\u000B\u000C\u000E-\u001F'
+                 u'\u007F-\u009F\uD800-\uDFFF\uFDD0-\uFDEF\uFFFE\uFFFF]'),
+        repl=u'\N{REPLACEMENT CHARACTER}',
+        string=s
+    )

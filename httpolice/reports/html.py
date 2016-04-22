@@ -17,7 +17,7 @@ from httpolice.reports.common import (
     resolve_reference,
 )
 from httpolice.structure import Unavailable, okay
-from httpolice.util.text import has_nonprintable, nicely_join, printable
+from httpolice.util.text import nicely_join, printable
 
 
 css_code = pkg_resources.resource_string('httpolice.reports', 'html.css'). \
@@ -315,8 +315,9 @@ def _displayable_body(msg):
         r = r[:limit]
         transforms += [u'taking the first %d characters' % limit]
 
-    if has_nonprintable(r):
-        r = printable(r)
+    pr = printable(r)
+    if r != pr:
+        r = pr
         transforms += [u'replacing non-printable characters '
                        u'with the \ufffd sign']
 
