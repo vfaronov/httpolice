@@ -912,8 +912,8 @@
   </error>
 
   <error id="1125">
-    <title>Wrong use of status code <st>412</st></title>
-    <explain>The <st>412</st> status code is only used when the request includes a precondition, such as <h ref="no">If-Modified-Since</h>. But there are no such preconditions in this request.</explain>
+    <title>Wrong use of status code <var ref="msg.status"/></title>
+    <explain>The <var ref="msg.status"/> status code is only used when the request includes a precondition, such as <h ref="no">If-Modified-Since</h>. But there are no such preconditions in this request.</explain>
     <explain>See <rfc num="7232"/>.</explain>
   </error>
 
