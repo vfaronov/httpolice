@@ -1,7 +1,6 @@
 # -*- coding: utf-8; -*-
 
 from collections import namedtuple
-import sys
 
 import six
 
@@ -55,18 +54,16 @@ class Parametrized(namedtuple('Parametrized', ('item', 'param'))):
         return set(name for name, value in self.param or [])
 
 
+@six.python_2_unicode_compatible
 class Versioned(namedtuple('Versioned', ('item', 'version'))):
 
     __slots__ = ()
 
-    def __unicode__(self):
+    def __str__(self):
         if self.version:
             return u'%s/%s' % self
         else:
             return six.text_type(self.item)
-
-    if sys.version_info[0] >= 3:
-        __str__ = __unicode__
 
 
 class ProtocolString(six.text_type):

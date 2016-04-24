@@ -1,16 +1,13 @@
 # -*- coding: utf-8; -*-
 
-import sys
-
 import six
 
 
+@six.python_2_unicode_compatible
 class Citation(object):
 
     __slots__ = ('title', 'url')
-    __unicode__ = lambda self: self.title or self.url
-    if sys.version_info[0] >= 3:
-        __str__ = __unicode__
+    __str__ = lambda self: self.title or self.url
     __repr__ = lambda self: 'Citation(%r, %r)' % (self.title, self.url)
 
     def __init__(self, title, url):
