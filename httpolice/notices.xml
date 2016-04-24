@@ -522,7 +522,7 @@
 
   <error id="1072">
     <title><st>201</st> response to <var ref="msg.request.method"/></title>
-    <explain>The <var ref="msg.request.method"/> method is defined as safe (read-only). But the <st>201</st> status code means that a new resource was created. Either one is wrong here.</explain>
+    <explain>The <var ref="msg.request.method"/> method is defined as safe (read-only). But the <st>201</st> status code means that a new resource was created.</explain>
   </error>
 
   <comment id="1073">
@@ -532,7 +532,7 @@
 
   <error id="1074">
     <title><st>202</st> response to <var ref="msg.request.method"/></title>
-    <explain>The <var ref="msg.request.method"/> method is defined as safe (read-only). But the <st>202</st> status code means that the server started some kind of processing operation. Either one is wrong here.</explain>
+    <explain>The <var ref="msg.request.method"/> method is defined as safe (read-only). But the <st>202</st> status code means that the server started some kind of processing operation.</explain>
   </error>
 
   <error id="1076">
@@ -1182,7 +1182,7 @@
 
   <comment id="1160">
     <title><h>Pragma</h>: <var ref="pragma"/></title>
-    <explain>This message’s <h>Pragma</h> header includes a ‘<var ref="pragma"/>’ extension pragma. Extension pragmas (that is, pragma directives other than ‘no-cache’) are deprecated in <rfc num="7234" sect="5.4"/>.</explain>
+    <explain>This message’s <h>Pragma</h> header includes ‘<var ref="pragma"/>’, but all pragmas other than ‘no-cache’ are deprecated in <rfc num="7234" sect="5.4"/>.</explain>
   </comment>
 
   <comment id="1161">
