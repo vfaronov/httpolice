@@ -28,6 +28,17 @@ js_code = pkg_resources.resource_string('httpolice.reports', 'html.js'). \
 
 
 def html_report(exchanges, buf):
+    """Generate an HTML report with check results.
+
+    :param exchanges:
+        An iterable of :class:`~httpolice.Exchange` objects.
+        They must be already processed by :func:`~httpolice.check_exchange`.
+
+    :param buf:
+        The file (or file-like object) to which the report will be written.
+        It must be opened in binary mode (not text).
+
+    """
     title = u'HTTPolice report'
     document = dominate.document(title=title)
     with document.head:
@@ -63,8 +74,8 @@ def list_notices(buf):
         H.h1(title)
         with H.div(_class=u'notices-list'):
             placeholder = Placeholder()
-            for ident in sorted(notice.notices.keys()):
-                _notice_to_html(notice.notices[ident], placeholder)
+            for id_ in sorted(notice.notices.keys()):
+                _notice_to_html(notice.notices[id_], placeholder)
     buf.write(document.render().encode('utf-8'))
 
 
@@ -166,7 +177,7 @@ def _render_complaints(obj):
     if obj.complaints:
         with H.div(_class=u'complaints'):
             for complaint in obj.complaints:
-                the_notice = notice.notices[complaint.notice_ident]
+                the_notice = notice.notices[complaint.notice_id]
                 _notice_to_html(the_notice, complaint.context)
 
 
@@ -244,7 +255,7 @@ def _notice_to_html(the_notice, ctx):
             # See above regarding spaces.
             H.abbr(the_notice.severity_short, _class=u'severity',
                    title=the_notice.severity)
-            H.span(six.text_type(the_notice.ident), _class=u'ident')
+            H.span(six.text_type(the_notice.id), _class=u'ident')
             with H.span():
                 _piece_to_html(the_notice.title, ctx)
         for piece in the_notice.explanation:

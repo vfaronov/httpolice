@@ -546,16 +546,16 @@ class Stream(object):
     def parse(self, target, to_eof=False):
         return parse(self, target.as_nonterminal(), to_eof)
 
-    def complain(self, notice_ident, **context):
-        self.complaints.append((notice_ident, context))
+    def complain(self, notice_id, **context):
+        self.complaints.append((notice_id, context))
 
     def add_complaints(self, complaints):
         self.complaints.extend(complaints)
 
     def dump_complaints(self, target, place=u'???'):
-        for (notice_ident, context) in self.complaints:
+        for (notice_id, context) in self.complaints:
             context['place'] = place
-            target.complain(notice_ident, **context)
+            target.complain(notice_id, **context)
         self.complaints = []
 
     def add_annotations(self, annotations):

@@ -42,6 +42,72 @@ class Request(message.Message):
 
     def __init__(self, scheme, method, target, version, header_entries,
                  body, trailer_entries=None):
+        """
+        :param scheme:
+            The scheme of the request URI, as a Unicode string
+            (usually ``u'http'`` or ``u'https'``),
+            or `None` if unknown (this disables some checks).
+
+        :param method:
+            The request method, as a Unicode string.
+
+        :param target:
+            The request target, as a Unicode string.
+            It must be in one of the four forms `defined by RFC 7230`__.
+            (For HTTP/2, it can be `reconstructed from pseudo-headers`__.)
+
+            __ https://tools.ietf.org/html/rfc7230#section-5.3
+            __ https://tools.ietf.org/html/rfc7540#section-8.1.2.3
+
+        :param version:
+            The request's protocol version, as a Unicode string,
+            or `None` if unknown (this disables some checks).
+
+            For requests sent over HTTP/1.x connections,
+            this should be the HTTP version sent in the `request line`__,
+            such as ``u'HTTP/1.0'`` or ``u'HTTP/1.1'``.
+
+            __ https://tools.ietf.org/html/rfc7230#section-3.1.1
+
+            For requests sent over HTTP/2 connections,
+            this should be ``u'HTTP/2'``.
+
+        :param header_entries:
+            A list of the request's headers (may be empty).
+
+            Every item of the list must be a ``(name, value)`` pair.
+
+            `name` must be a Unicode string.
+
+            `value` may be a byte string or a Unicode string.
+            If it is Unicode, HTTPolice will assume that it has been decoded
+            from ISO-8859-1 (the historic encoding of HTTP),
+            and will encode it back into ISO-8859-1 before any processing.
+
+        :param body:
+            The request's payload body, as a **byte string**,
+            or `None` if unknown (this disables some checks).
+
+            If the request has no payload (like a GET request),
+            this should be the empty string ``b''``.
+
+            This must be the payload body as `defined by RFC 7230`__:
+            **after** removing any ``Transfer-Encoding`` (like ``chunked``),
+            but **before** removing any ``Content-Encoding`` (like ``gzip``).
+
+            __ https://tools.ietf.org/html/rfc7230#section-3.3
+
+        :param trailer_entries:
+            A list of headers from the request's trailer part
+            (as found in `chunked coding`__ or `HTTP/2`__),
+            or `None` if there is no trailer part.
+
+            __ https://tools.ietf.org/html/rfc7230#section-4.1.2
+            __ https://tools.ietf.org/html/rfc7540#section-8.1
+
+            The format is the same as for `header_entries`.
+
+        """
         super(Request, self).__init__(version, header_entries, body,
                                       trailer_entries)
         self.scheme = force_unicode(scheme) if scheme is not None else None

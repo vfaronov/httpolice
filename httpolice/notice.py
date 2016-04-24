@@ -9,6 +9,11 @@ import pkg_resources
 from httpolice import citation, structure
 
 
+ERROR = 'error'
+COMMENT = 'comment'
+DEBUG = 'debug'
+
+
 known_map = {
     'auth': structure.AuthScheme,
     'cache': structure.CacheDirective,
@@ -25,7 +30,7 @@ known_map = {
 
 class Notice(lxml.etree.ElementBase):
 
-    ident = property(lambda self: int(self.get('id')))
+    id = property(lambda self: int(self.get('id')))
     severity = property(lambda self: self.tag)
     severity_short = property(lambda self: self.severity[0].upper())
     title = property(lambda self: self.find('title').content)
@@ -115,12 +120,12 @@ class Known(lxml.etree.ElementBase):
     content = property(lambda self: known_map[self.tag](self.text))
 
 
-def load_notices():
+def _load_notices():
     lookup = lxml.etree.ElementNamespaceClassLookup()
     parser = lxml.etree.XMLParser()
     parser.set_element_class_lookup(lookup)
     ns = lookup.get_namespace(None)
-    for tag in ['error', 'comment', 'debug']:
+    for tag in [ERROR, COMMENT, DEBUG]:
         ns[tag] = Notice
     ns['title'] = Title
     ns['explain'] = Paragraph
@@ -136,8 +141,8 @@ def load_notices():
     r = {}
     for elem in tree.getroot():
         if isinstance(elem, Notice):
-            assert elem.ident not in r
-            r[elem.ident] = elem
+            assert elem.id not in r
+            r[elem.id] = elem
     return r, parser
 
-(notices, _parser) = load_notices()
+(notices, _parser) = _load_notices()

@@ -21,18 +21,29 @@ from httpolice.util.text import (
 
 
 def text_report(exchanges, buf):
+    """Generate a plain-text report with check results.
+
+    :param exchanges:
+        An iterable of :class:`~httpolice.Exchange` objects.
+        They must be already processed by :func:`~httpolice.check_exchange`.
+
+    :param buf:
+        The file (or file-like object) to which the report will be written.
+        It must be opened in binary mode (not text).
+
+    """
     req_i = resp_i = 1
     f1 = codecs.getwriter('utf-8')(buf)
     for exch in exchanges:
         with write_if_any(_exchange_marker(exch, req_i), f1) as f2:
             if exch.request:
                 req_i += 1
-                for complaint in exch.request.collect_complaints():
+                for complaint in exch.request.complaints:
                     _write_complaint_line(complaint, f2)
             for resp in exch.responses:
                 with write_if_any(_response_marker(resp, resp_i), f2) as f3:
                     resp_i += 1
-                    for complaint in resp.collect_complaints():
+                    for complaint in resp.complaints:
                         _write_complaint_line(complaint, f3)
             for complaint in exch.complaints:
                 _write_complaint_line(complaint, f2)
@@ -59,11 +70,10 @@ def _response_marker(response, resp_i):
 
 
 def _write_complaint_line(complaint, f):
-    the_notice = notice.notices[complaint.notice_ident]
+    the_notice = notice.notices[complaint.notice_id]
     title = detypographize(
         _piece_to_text(the_notice.title, complaint.context).strip())
-    f.write(u'%s %d %s\n' % (the_notice.severity_short, the_notice.ident,
-                             title))
+    f.write(u'%s %d %s\n' % (the_notice.severity_short, the_notice.id, title))
 
 
 def _piece_to_text(piece, ctx):

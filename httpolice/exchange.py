@@ -13,21 +13,23 @@ class Exchange(Blackboard):
 
     def __init__(self, req, resps):
         """
-        :type req: Request | None
-        :type resp: list[Response]
+        :param req:
+            The request, as a :class:`~httpolice.Request` object.
+            If it is not available, you can pass `None`,
+            and the responses will be checked on their own.
+            However, this **disables many checks**
+            which rely on context information from the request.
+        :param resps:
+            The responses to `req`,
+            as a list of :class:`~httpolice.Response` objects.
+            Usually this will be a list of 1 element.
+            If you only want to check the request, pass an empty list ``[]``.
         """
         super(Exchange, self).__init__()
         for resp in resps:
             resp.request = req
         self.request = req
         self.responses = resps
-
-    @property
-    def sub_nodes(self):
-        if self.request:
-            yield self.request
-        for resp in self.responses:
-            yield resp
 
 
 def complaint_box(*args, **kwargs):
@@ -37,6 +39,7 @@ def complaint_box(*args, **kwargs):
 
 
 def check_exchange(exch):
+    """Run all checks on the exchange `exch`, modifying it in place."""
     if exch.request:
         request.check_request(exch.request)
     response.check_responses(exch.responses)

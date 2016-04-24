@@ -37,6 +37,63 @@ class Response(message.Message):
 
     def __init__(self, version, status, reason, header_entries,
                  body, trailer_entries=None):
+        """
+        :param version:
+            The response's protocol version, as a Unicode string,
+            or `None` if unknown (this disables some checks).
+
+            For responses sent over HTTP/1.x connections,
+            this should be the HTTP version sent in the `status line`__,
+            such as ``u'HTTP/1.0'`` or ``u'HTTP/1.1'``.
+
+            __ https://tools.ietf.org/html/rfc7230#section-3.1.2
+
+            For responses sent over HTTP/2 connections,
+            this should be ``u'HTTP/2'``.
+
+        :param status:
+            The response's status code, as an integer.
+
+        :param reason:
+            The response's reason phrase (such as "OK" or "Not Found"),
+            as a Unicode string, or `None` if unknown (as in HTTP/2).
+
+        :param header_entries:
+            A list of the response's headers (may be empty).
+
+            Every item of the list must be a ``(name, value)`` pair.
+
+            `name` must be a Unicode string.
+
+            `value` may be a byte string or a Unicode string.
+            If it is Unicode, HTTPolice will assume that it has been decoded
+            from ISO-8859-1 (the historic encoding of HTTP),
+            and will encode it back into ISO-8859-1 before any processing.
+
+        :param body:
+            The response's payload body, as a **byte string**,
+            or `None` if unknown (this disables some checks).
+
+            If the response has no payload (like 204 or 304 responses),
+            this should be the empty string ``b''``.
+
+            This must be the payload body as `defined by RFC 7230`__:
+            **after** removing any ``Transfer-Encoding`` (like ``chunked``),
+            but **before** removing any ``Content-Encoding`` (like ``gzip``).
+
+            __ https://tools.ietf.org/html/rfc7230#section-3.3
+
+        :param trailer_entries:
+            A list of headers from the response's trailer part
+            (as found in `chunked coding`__ or `HTTP/2`__),
+            or `None` if there is no trailer part.
+
+            __ https://tools.ietf.org/html/rfc7230#section-4.1.2
+            __ https://tools.ietf.org/html/rfc7540#section-8.1
+
+            The format is the same as for `header_entries`.
+
+        """
         super(Response, self).__init__(version, header_entries,
                                        body, trailer_entries)
         self.status = StatusCode(status)
