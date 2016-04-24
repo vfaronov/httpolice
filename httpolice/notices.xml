@@ -1591,7 +1591,7 @@
 
   <error id="1221">
     <title><h>Strict-Transport-Security</h> without TLS</title>
-    <rfc num="6798" sect="7.2">
+    <rfc num="6797" sect="7.2">
       An HSTS Host MUST NOT include the STS header field in HTTP responses
    conveyed over non-secure transport.
     </rfc>
