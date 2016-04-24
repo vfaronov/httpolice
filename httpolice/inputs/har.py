@@ -19,6 +19,11 @@ from httpolice.response import Response
 from httpolice.structure import FieldName, Unavailable, http11, http2
 
 
+CHROME = [u'WebInspector']
+FIREFOX = [u'Firefox']
+EDGE = [u'F12 Developer Tools']
+
+
 def har_input(paths):
     for path in paths:
         # According to the spec, HAR files are UTF-8 with an optional BOM.
@@ -43,9 +48,8 @@ def _process_entry(data, creator):
 
 
 def _process_request(data, creator):
-    (version, header_entries, pseudo_headers) = _process_message(data)
-    if creator == u'WebInspector' and version == http11 and \
-            u':host' in pseudo_headers:
+    (version, header_entries, pseudo_headers) = _process_message(data, creator)
+    if creator in CHROME and version == http11 and u':host' in pseudo_headers:
         # SPDY exported from Chrome.
         version = None
 
@@ -84,7 +88,7 @@ def _process_request(data, creator):
     post = data.get('postData')
     if post and post.get('text'):
         text = post['text']
-        if creator == u'Firefox' and \
+        if creator in FIREFOX and \
                 post['mimeType'] == media.application_x_www_form_urlencoded \
                 and u'\r\n' in text:
             # Yes, Firefox actually outputs this stuff. Go figure.
@@ -108,7 +112,7 @@ def _process_request(data, creator):
 def _process_response(data, req, creator):
     if data['status'] == 0:          # Indicates error in Chrome.
         return None
-    (version, header_entries, _) = _process_message(data)
+    (version, header_entries, _) = _process_message(data, creator)
     status = data['status']
     reason = data['statusText']
 
@@ -124,7 +128,7 @@ def _process_response(data, req, creator):
     else:
         body = None
 
-    if version == http11 and creator == u'Firefox' and \
+    if version == http11 and creator in FIREFOX and \
             any(name == u'x-firefox-spdy' for (name, _) in header_entries):
         # Helps with SPDY in Firefox.
         version = None
@@ -141,13 +145,15 @@ def _process_response(data, req, creator):
     return resp
 
 
-def _process_message(data):
+def _process_message(data, creator):
     header_entries = [(FieldName(d['name']), d['value'])
                       for d in data['headers']]
     pseudo_headers = pop_pseudo_headers(header_entries)
-    if data['httpVersion'] == u'HTTP/2.0':          # Used by Firefox.
+    if creator in EDGE:         # Edge exports HTTP/2 messages as HTTP/1.1.
+        version = None
+    elif data['httpVersion'] == u'HTTP/2.0':          # Used by Firefox.
         version = http2
-    elif data['httpVersion'] == u'unknown':         # Used by Chrome.
+    elif data['httpVersion'] == u'unknown':           # Used by Chrome.
         version = None
     else:
         version = data['httpVersion']

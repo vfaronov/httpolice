@@ -4,7 +4,8 @@ import os
 import unittest
 
 from httpolice.inputs.har import har_input
-from httpolice.structure import Unavailable, http11, http2
+from httpolice.known import m
+from httpolice.structure import Method, Unavailable, http11, http2
 
 
 def load_from_file(name):
@@ -98,3 +99,25 @@ class TestHARInput(unittest.TestCase):
         self.assertEqual(exchanges[0].request.target, u'/put')
         self.assertEqual(exchanges[0].request.version, http11)
         self.assertEqual(exchanges[0].responses[0].version, http11)
+
+    def test_httpbin_edge(self):
+        exchanges = load_from_file('httpbin_edge.har')
+
+        self.assertEqual(exchanges[0].request.target, u'/get')
+        self.assertIs(exchanges[0].request.version, None)
+        self.assertIs(exchanges[0].responses[0].version, None)
+        self.assertIs(exchanges[0].responses[0].body, Unavailable)
+        self.assertEqual(exchanges[0].responses[0].json_data['url'],
+                         u'http://httpbin.org/get')
+
+        self.assertTrue(
+            u'Unicode Demo' in exchanges[1].responses[0].unicode_body)
+
+        self.assertEqual(exchanges[4].responses[0].body, b'')
+        self.assertEqual(exchanges[5].responses[0].body, b'')
+
+    def test_xhr_edge(self):
+        exchanges = load_from_file('xhr_edge.har')
+        self.assertEqual(exchanges[1].request.method, m.DELETE)
+        self.assertEqual(exchanges[1].request.body, b'')
+        self.assertEqual(exchanges[2].request.method, Method(u'FOO-BAR'))
