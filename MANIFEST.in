@@ -1,2 +1,3 @@
+include LICENSE.txt
 include test/combined_data/*
 include test/har_data/*
