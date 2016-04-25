@@ -127,10 +127,17 @@ that combines the request and response streams into one file::
 
 You may want to save it with CRLF (Windows) line endings to avoid notice 1224.
 
+Also, for this format, the filename suffix (extension) is important.
+If it is ``.https``, the request URI is assumed to have an ``https:`` scheme.
+If it is ``.noscheme``, the scheme is unknown.
+Otherwise, the ``http:`` scheme is assumed.
+
 .. highlight:: console
 
-Then tell HTTPolice to use the ``combined`` format::
+Now, tell HTTPolice to use the ``combined`` format::
 
   $ httpolice -i combined exchange1.txt
 
-More examples can be found in HTTPolice’s test suite.
+More examples can be found in HTTPolice’s `test suite`__.
+
+__ https://github.com/vfaronov/httpolice/tree/master/test/combined_data

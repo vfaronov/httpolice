@@ -19,5 +19,7 @@ on files exported from Chrome, Firefox, and Edge,
 but some information is simply lost.
 
 If HTTPolice fails on your HAR files,
-feel free to submit an issue (don’t forget to attach the files),
+feel free to `submit an issue`__ (don’t forget to attach the files),
 and I’ll see what can be done about it.
+
+__ https://github.com/vfaronov/httpolice/issues

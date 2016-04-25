@@ -19,6 +19,7 @@ setup(
     version=metadata['version'],
     description='Lint for HTTP requests and responses',
     long_description=long_description,
+    url='https://github.com/vfaronov/httpolice',
     author='Vasiliy Faronov',
     author_email='vfaronov@gmail.com',
     license='MIT',

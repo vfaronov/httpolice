@@ -16,6 +16,9 @@ from a real process or test suite.
 
 __ https://redbot.org/
 
-HTTPolice is released under the MIT license (see ``LICENSE.txt``).
+HTTPolice is hosted `on GitHub`__
+and released under the MIT license (see ``LICENSE.txt``).
+
+__ https://github.com/vfaronov/httpolice
 
 Problems, suggestions? Feel free to email the author at vfaronov@gmail.com.
