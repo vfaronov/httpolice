@@ -21,6 +21,7 @@ setup(
     long_description=long_description,
     author='Vasiliy Faronov',
     author_email='vfaronov@gmail.com',
+    license='MIT',
     install_requires=[
         'setuptools',
         'six >=1.10.0',
@@ -49,6 +50,7 @@ setup(
     },
     classifiers=[
         'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
