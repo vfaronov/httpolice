@@ -10,6 +10,7 @@ This manual explains all features of HTTPolice in detail.
    :maxdepth: 1
 
    concepts
+   install
    streams
    har
    mitmproxy

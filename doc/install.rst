@@ -1,0 +1,53 @@
+Installation
+============
+
+.. highlight:: console
+
+HTTPolice is a Python package that requires Python 2.7 or 3.4+.
+It can be installed like all other Python packages:
+with `pip`__ from `PyPI`__.
+
+__ https://pip.pypa.io/en/stable/
+__ https://pypi.python.org/pypi/HTTPolice
+
+If you’re not familiar with pip,
+you may need to install it `manually`__ or `from your OS distribution`__.
+You may also need development files and tools for `lxml`__ dependencies.
+
+__ https://pip.pypa.io/en/stable/installing/
+__ https://packaging.python.org/en/latest/install_requirements_linux/
+__ http://lxml.de/installation.html
+
+
+On Debian/Ubuntu
+----------------
+
+::
+
+  $ sudo apt-get install python-dev libxml2-dev libxslt-dev zlib1g-dev
+  $ sudo apt-get install python-pip
+  $ pip install HTTPolice
+
+This will put the HTTPolice command-line tool into ``~/.local/bin`` by default.
+Or your can do::
+
+  $ sudo pip install HTTPolice
+
+to install system-wide.
+
+Check that the installation was successful::
+
+  $ httpolice --version
+  HTTPolice 0.1.0
+
+
+On Windows
+----------
+After `installing Python`__, something like this should do the trick::
+
+  C:\>Python27\Scripts\pip install HTTPolice
+
+  C:\>Python27\Scripts\httpolice --version
+  HTTPolice 0.1.0
+
+__ https://www.python.org/downloads/windows/
