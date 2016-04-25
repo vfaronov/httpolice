@@ -5,20 +5,14 @@ import unittest
 
 import six
 
-from httpolice.exchange import Exchange, check_exchange
+from httpolice.exchange import check_exchange
 from httpolice.framing1 import parse_streams
 from httpolice.known import hsts, m
 from httpolice.reports import html_report, text_report
-from httpolice.request import Request
-from httpolice.response import Response
 from httpolice.structure import (
     AuthScheme,
-    FieldName,
     HSTSDirective,
-    HTTPVersion,
-    Method,
     Parametrized,
-    StatusCode,
     Unavailable,
     WarnCode,
     WarningValue,
