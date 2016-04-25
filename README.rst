@@ -1,12 +1,22 @@
 HTTPolice is a **lint for HTTP requests and responses**.
 It checks them for conformance to standards and best practices.
 
+See `example report`__.
+
+__ http://pythonhosted.org/HTTPolice/showcase.html
+
 As a command-line tool, it can read `HAR files`__ or raw HTTP/1.x TCP streams.
 It can integrate with `mitmproxy`__ for TLS-encrypted and HTTP/2 traffic.
 Or you can use it as a Python library (for Python 2.7 and 3.4+).
 
 __ https://en.wikipedia.org/wiki/.har
 __ https://mitmproxy.org/
+
+A full `user manual`__ is available.
+Also, a `list of all problems`__ HTTPolice can detect.
+
+__ http://pythonhosted.org/HTTPolice/
+__ http://pythonhosted.org/HTTPolice/notices.html
 
 HTTPolice was partly inspired by `REDbot`__, another QA tool for the Web.
 But the approach is different: instead of actively testing your server,
