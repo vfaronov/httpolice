@@ -152,6 +152,8 @@ known = KnownDict([
  {'_': RelationType(u'up'), '_citations': [RFC(5988)]},
  {'_': RelationType(u'version-history'), '_citations': [RFC(5829)]},
  {'_': RelationType(u'via'), '_citations': [RFC(4287)]},
+ {'_': RelationType(u'webmention'),
+  '_citations': [Citation(None, u'http://www.w3.org/TR/webmention/')]},
  {'_': RelationType(u'working-copy'), '_citations': [RFC(5829)]},
  {'_': RelationType(u'working-copy-of'), '_citations': [RFC(5829)]},
  ])
