@@ -39,12 +39,11 @@ To run HTTPolice together with mitmproxy, use a command like this::
 
   $ mitmdump -s "`python -m httpolice.plus.mitmproxy` -o html report.html"
 
-(or ``mitmproxy`` instead of ``mitmdump``)
-
-There’s a lot going on there. Let’s take a closer look.
+Note the backticks.
+Also, you can replace ``mitmdump`` with ``mitmproxy`` if you wish.
 
 ``-s`` is mitmproxy’s option that specifies an inline script to run,
-along with arguments *to that script*.
+along with arguments to that script.
 
 ``python -m httpolice.plus.mitmproxy`` is a sub-command
 that prints the path to the script file (installed with HTTPolice)::
@@ -52,18 +51,11 @@ that prints the path to the script file (installed with HTTPolice)::
   $ python -m httpolice.plus.mitmproxy
   /home/vasiliy/.local/lib/python2.7/site-packages/httpolice/plus/mitmproxy.py
 
-This sub-command is wrapped in backticks
-to insert its output back into the mitmproxy command.
-Thus, mitmproxy’s ``-s`` option gets an argument like this::
-
-  .../httpolice/plus/mitmproxy.py -o html report.html
-
 ``-o html`` tells HTTPolice to produce :doc:`HTML reports <reports>`
 (omit it if you want a plain text report).
 Finally, ``report.html`` is the name of the output file.
 
 Now, mitmproxy/mitmdump starts up as usual.
-As it intercepts requests and responses,
-it feeds them to HTTPolice for checking.
+Every exchange that it intercepts is checked by HTTPolice.
 When you stop mitmdump (Ctrl+C) or exit mitmproxy,
 HTTPolice writes an HTML report to ``report.html``.

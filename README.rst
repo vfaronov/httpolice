@@ -12,6 +12,10 @@ Or you can use it as a Python library (for Python 2.7 and 3.4+).
 __ https://en.wikipedia.org/wiki/.har
 __ https://mitmproxy.org/
 
+Start with the `quickstart`__.
+
+__ http://pythonhosted.org/HTTPolice/quickstart.html
+
 A full `user manual`__ is available.
 Also, a `list of all problems`__ HTTPolice can detect.
 

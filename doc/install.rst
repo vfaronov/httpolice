@@ -24,16 +24,16 @@ On Debian/Ubuntu
 
 ::
 
-  $ sudo apt-get install python-dev libxml2-dev libxslt-dev zlib1g-dev
+  $ sudo apt-get install python-dev libxml2-dev libxslt1-dev zlib1g-dev
   $ sudo apt-get install python-pip
-  $ pip install HTTPolice
 
-This will put the HTTPolice command-line tool into ``~/.local/bin`` by default.
-Or your can do::
+Then, to install the HTTPolice command-line tool into ``~/.local/bin``::
+
+  $ pip install --user HTTPolice
+
+Or, to install it system-wide::
 
   $ sudo pip install HTTPolice
-
-to install system-wide.
 
 Check that the installation was successful::
 
@@ -43,7 +43,7 @@ Check that the installation was successful::
 
 On Windows
 ----------
-After `installing Python`__, something like this should do the trick::
+After `installing Python 2.7`__, something like this should do the trick::
 
   C:\>Python27\Scripts\pip install HTTPolice
 

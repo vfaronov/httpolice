@@ -125,7 +125,7 @@ that combines the request and response streams into one file::
   
   Hello world!
 
-You may want to save it with CRLF (Windows) line endings to avoid notice 1224.
+It must be saved with **CRLF (Windows)** line endings.
 
 Also, for this format, the filename suffix (extension) is important.
 If it is ``.https``, the request URI is assumed to have an ``https:`` scheme.
