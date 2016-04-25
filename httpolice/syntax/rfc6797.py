@@ -8,7 +8,7 @@ from httpolice.syntax.rfc7230 import OWS, quoted_string, token
 
 
 # This has been slightly adapted to the rules of RFC 7230.
-# The ``OWS`` are derived from the "linear ``*LWS``" requirement.
+# The ``OWS`` are derived from the "implied ``*LWS``" requirement.
 
 directive_name = HSTSDirective << token                                 > auto
 directive_value = token | quoted_string                                 > auto
