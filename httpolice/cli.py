@@ -14,9 +14,10 @@ def main():
     parser.add_argument(u'--version', action='version',
                         version=u'HTTPolice %s' % httpolice.__version__)
     parser.add_argument(u'-i', u'--input', choices=inputs.formats,
-                        required=True)
+                        required=True, metavar=u'FORMAT',
+                        help=u'input format (see the user manual)')
     parser.add_argument(u'-o', u'--output', choices=reports.formats,
-                        default=u'text')
+                        default=u'text', help=u'output format')
     parser.add_argument(u'path', nargs='+')
     args = parser.parse_args()
 
