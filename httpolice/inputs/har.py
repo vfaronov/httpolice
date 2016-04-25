@@ -20,8 +20,10 @@ from httpolice.structure import FieldName, Unavailable, http11, http2
 
 
 CHROME = [u'WebInspector']
-FIREFOX = [u'Firefox']
 EDGE = [u'F12 Developer Tools']
+
+# Not sure if "Iceweasel" is actually used, but it won't hurt.
+FIREFOX = [u'Firefox', u'Iceweasel']
 
 
 def har_input(paths):
