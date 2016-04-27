@@ -3,6 +3,7 @@ Python API
 
 HTTPolice can be used as a Python library:
 for example, to analyze requests or responses as part of a test suite.
+It is **not intended** to be used inside live production processes.
 
 
 Example
