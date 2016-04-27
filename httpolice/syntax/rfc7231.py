@@ -1,6 +1,5 @@
 # -*- coding: utf-8; -*-
 
-import calendar
 from datetime import date, datetime, time
 
 from httpolice.citation import RFC
@@ -47,6 +46,12 @@ from httpolice.syntax.rfc7230 import (
     token,
     token__excluding,
 )
+
+
+# The standard library's `calendar.day_name` is locale-dependent,
+# which brings in Unicode problems.
+_DAY_NAMES = [u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday',
+              u'Saturady', u'Sunday']
 
 
 def parameter(exclude=None):
@@ -188,8 +193,8 @@ def _check_day_of_week(complain, r):
     (claimed_dow, r) = r
     if r is not Unavailable and r.weekday() != claimed_dow:
         complain(1108, date=r.strftime(u'%Y-%m-%d'),
-                 claimed=calendar.day_name[claimed_dow],
-                 actual=calendar.day_name[r.weekday()])
+                 claimed=_DAY_NAMES[claimed_dow],
+                 actual=_DAY_NAMES[r.weekday()])
     return r
 
 HTTP_date = (_check_day_of_week << IMF_fixdate |
