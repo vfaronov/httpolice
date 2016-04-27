@@ -324,6 +324,7 @@ def check_request(req):
                 req.complain(1171, directive=direct)
 
     for direct1, direct2 in [(cache.max_stale, cache.min_fresh),
+                             (cache.stale_if_error, cache.min_fresh),
                              (cache.max_stale, cache.no_cache),
                              (cache.max_age, cache.no_cache)]:
         if req.headers.cache_control[direct1] and \

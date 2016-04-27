@@ -335,7 +335,10 @@ def check_response_itself(resp):
 
     for direct1, direct2 in [(cache.public, cache.no_store),
                              (cache.private, cache.public),
-                             (cache.private, cache.no_store)]:
+                             (cache.private, cache.no_store),
+                             (cache.must_revalidate,
+                              cache.stale_while_revalidate),
+                             (cache.must_revalidate, cache.stale_if_error)]:
         if headers.cache_control[direct1] and headers.cache_control[direct2]:
             resp.complain(1193, directive1=direct1, directive2=direct2)
 
@@ -653,7 +656,10 @@ def check_response_in_context(resp, req):
     if resp.stale and \
             warn.revalidation_failed not in resp.headers.warning and \
             warn.disconnected_operation not in resp.headers.warning and \
-            req.headers.cache_control.max_stale is None:
+            req.headers.cache_control.max_stale is None and \
+            req.headers.cache_control.stale_if_error is None and \
+            resp.headers.cache_control.stale_if_error is None and \
+            resp.headers.cache_control.stale_while_revalidate is None:
         resp.complain(1188)
 
     if resp.status == st.precondition_required:
