@@ -1735,4 +1735,25 @@
     <explain>Also, this error can be caused by wrong timezone settings.</explain>
   </error>
 
+  <comment id="1242">
+    <title><st>451</st> response with no body</title>
+    <rfc num="7725" sect="3">
+      Responses using this status code SHOULD include an explanation, in
+   the response body, of the details of the legal demand: the party
+   making it, the applicable legislation or regulation, and what classes
+   of person and resource it applies to.
+    </rfc>
+  </comment>
+
+  <comment id="1243">
+    <title><st>451</st> response with no <rel>blocked-by</rel> link</title>
+    <rfc num="7725" sect="4">
+      When an entity blocks access to a resource and returns status 451, it
+   SHOULD include a "<h>Link</h>" HTTP header field [RFC5988] whose value is a
+   URI reference [RFC3986] identifying itself.  When used for this
+   purpose, the "Link" header field MUST have a "rel" parameter whose
+   value is "blocked-by".
+    </rfc>
+  </comment>
+
 </notices>

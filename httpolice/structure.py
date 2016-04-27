@@ -53,6 +53,12 @@ class Parametrized(namedtuple('Parametrized', ('item', 'param'))):
     def param_names(self):
         return set(name for name, value in self.param or [])
 
+    def get_param(self, name):
+        for n, v in self.param or []:
+            if n == name:
+                return v
+        return None
+
 
 @six.python_2_unicode_compatible
 class Versioned(namedtuple('Versioned', ('item', 'version'))):

@@ -22,6 +22,7 @@ known_map = {
     'hsts': structure.HSTSDirective,
     'm': structure.Method,
     'media': structure.MediaType,
+    'rel': structure.RelationType,
     'st': structure.StatusCode,
     'tc': structure.TransferCoding,
     'warn': structure.WarnCode,

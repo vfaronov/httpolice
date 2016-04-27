@@ -20,6 +20,7 @@ from httpolice.known import (
     media,
     media_type,
     method,
+    rel,
     st,
     status_code,
     tc,
@@ -392,6 +393,11 @@ def check_response_itself(resp):
     if resp.transformed_by_proxy and headers.via.is_absent:
         resp.complain(1046)
 
+    if status == st.unavailable_for_legal_reasons:
+        if not any(rel.blocked_by in link.get_param(u'rel') or []
+                   for link in headers.link.okay):
+            resp.complain(1243)
+
 
 def check_response_in_context(resp, req):
     if resp.body and resp.headers.content_type.is_absent and \
@@ -497,6 +503,8 @@ def check_response_in_context(resp, req):
             resp.complain(1201)
         elif resp.status == st.too_many_requests:
             resp.complain(1203)
+        elif resp.status == st.unavailable_for_legal_reasons:
+            resp.complain(1242)
         elif resp.status.client_error:
             resp.complain(1087)
         elif resp.status == st.http_version_not_supported:

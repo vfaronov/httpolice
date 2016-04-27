@@ -22,7 +22,7 @@ known = KnownDict([
   '_citations': [Citation(None,
                           u'http://www.w3.org/TR/html5/links.html'
                           u'#link-type-author')]},
- {'_': RelationType(u'blocked-by'), '_citations': [RFC(7725)]},
+ {'_': RelationType(u'blocked-by'), '_citations': [RFC(7725, section=(4,))]},
  {'_': RelationType(u'bookmark'),
   '_citations': [Citation(None,
                           u'http://www.w3.org/TR/html5/links.html'

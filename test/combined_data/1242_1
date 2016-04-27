@@ -1,0 +1,13 @@
+1242
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 451 Unavailable For Legal Reasons
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Link: <https://isp.example.net/>; Rel="blocked-by"
+Content-Length: 0
+
