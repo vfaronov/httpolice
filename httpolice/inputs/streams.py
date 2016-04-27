@@ -48,7 +48,10 @@ def tcpick_input(paths):
             if not match:
                 continue
             (src, dest, port, direction, counter) = match.groups()
-            counter = counter or ''
+            if counter:
+                counter = int(counter.lstrip('.'), base=16)
+            else:
+                counter = 0
             sort_key = (os.stat(path).st_ctime, counter)
             conn_key = (port, counter)
             if direction == 'serv':
