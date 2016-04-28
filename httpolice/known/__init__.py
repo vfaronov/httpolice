@@ -34,10 +34,6 @@ classes = {
 }
 
 
-def is_known(obj):
-    return any(isinstance(obj, cls) for cls in classes)
-
-
 def get_info(obj):
     for cls, known in classes.items():
         if isinstance(obj, cls):

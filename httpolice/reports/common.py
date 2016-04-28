@@ -1,8 +1,9 @@
 # -*- coding: utf-8; -*-
 
+from singledispatch import singledispatch
 import six
 
-from httpolice import known
+from httpolice import known, notice
 from httpolice.header import HeaderView
 from httpolice.parse import ParseError, Symbol
 from httpolice.structure import HeaderEntry, Parametrized
@@ -17,30 +18,33 @@ def resolve_reference(ctx, path):
     return node
 
 
+@singledispatch
 def expand_piece(piece):
-    if hasattr(piece, 'content'):
-        return piece.content
+    return six.text_type(piece)
 
-    elif isinstance(piece, Symbol):
-        return [piece.name, u' (', piece.citation, u')']
+@expand_piece.register(notice.Content)
+def expand_elem(elem):
+    return elem.content
 
-    elif isinstance(piece, Parametrized):
-        return piece.item
+@expand_piece.register(Symbol)
+def expand_symbol(sym):
+    return [sym.name, u' (', sym.citation, u')']
 
-    elif isinstance(piece, (HeaderEntry, HeaderView)):
-        return piece.name
+@expand_piece.register(Parametrized)
+def expand_parametrized(x):
+    return x.item
 
-    else:
-        return six.text_type(piece)
+@expand_piece.register(HeaderEntry)
+@expand_piece.register(HeaderView)
+def expand_header(hdr):
+    return hdr.name
 
 
+@singledispatch
 def expand_error(error):
-    if isinstance(error, ParseError):
-        return expand_parse_error(error)
-    else:
-        return [error]
+    return [error]
 
-
+@expand_error.register(ParseError)
 def expand_parse_error(error):
     paras = [[u'Parse error at offset %d.' % error.point]]
     if error.found == b'':

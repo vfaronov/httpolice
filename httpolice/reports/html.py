@@ -5,6 +5,7 @@ import json
 import dominate
 import dominate.tags as H
 import pkg_resources
+from singledispatch import singledispatch
 import six
 
 from httpolice import known, message, notice, structure
@@ -109,7 +110,7 @@ def _render_request(req):
                 # thus implicitly creating whitespace.
                 # https://github.com/Knio/dominate/issues/68
                 with H.span(**_for_object(req.method)):
-                    _known_to_html(req.method)
+                    _render_known(req.method)
                 H.span(printable(req.target), **_for_object(req.target))
                 if req.version:
                     H.span(printable(req.version), **_for_object(req.version))
@@ -126,7 +127,7 @@ def _render_response(resp):
                     H.span(printable(resp.version),
                            **_for_object(resp.version))
                 with H.span(**_for_object(resp.status)):
-                    _known_to_html(resp.status)
+                    _render_known(resp.status)
                     H.span(printable(find_reason_phrase(resp)))
             _render_message(resp)       # Headers, body and all that
         _render_complaints(resp)
@@ -159,7 +160,7 @@ def _render_header_entries(annotated_entries):
             # Dominate (at least as of 2.2.0)
             # automatically inlines all descendants of ``pre``.
             # https://github.com/Knio/dominate/issues/68
-            _known_to_html(entry.name)
+            _render_known(entry.name)
             H.span(u': ')
             _render_annotated(annotated)
 
@@ -170,7 +171,7 @@ def _render_annotated(pieces):
             H.span(printable(piece.decode('iso-8859-1')))
         else:
             with H.span(**_for_object(piece)):
-                _known_to_html(piece)
+                _render_known(piece)
 
 
 def _render_complaints(obj):
@@ -190,13 +191,17 @@ def _anonymize_id(id_):
     return _seen_ids[id_]
 
 
+@singledispatch
 def _reference_ids(obj):
-    if isinstance(obj, list):
-        return [ref for item in obj for ref in _reference_ids(item)]
-    elif isinstance(obj, HeaderView):
-        return [ref for entry in obj.entries for ref in _reference_ids(entry)]
-    else:
-        return [six.text_type(_anonymize_id(id(obj)))]
+    return [six.text_type(_anonymize_id(id(obj)))]
+
+@_reference_ids.register(list)
+def _list_reference_ids(xs):
+    return [ref for x in xs for ref in _reference_ids(x)]
+
+@_reference_ids.register(HeaderView)
+def _header_reference_ids(hdr):
+    return _reference_ids(hdr.entries)
 
 
 def _for_object(obj, extra_class=None):
@@ -234,7 +239,7 @@ def _magic_references(elem, ctx):
     return []
 
 
-def _known_to_html(obj):
+def _render_known(obj):
     cls = type(obj).__name__
     text = printable(six.text_type(obj))
     cite = known.citation(obj)
@@ -262,57 +267,67 @@ def _notice_to_html(the_notice, ctx):
             _piece_to_html(piece, ctx)
 
 
+@singledispatch
 def _piece_to_html(piece, ctx):
-    if isinstance(piece, list):
-        for p in piece:
-            _piece_to_html(p, ctx)
+    _piece_to_html(expand_piece(piece), ctx)
 
-    elif isinstance(piece, notice.Paragraph):
+@_piece_to_html.register(six.text_type)
+def _text_to_html(text, _):
+    H.span(printable(text), __inline=True)
+
+@_piece_to_html.register(list)
+def _list_to_html(xs, ctx):
+    for x in xs:
+        _piece_to_html(x, ctx)
+
+@_piece_to_html.register(notice.Paragraph)
+def _paragraph_to_html(para, ctx):
+    with H.p():
+        _piece_to_html(para.content, ctx)
+
+@_piece_to_html.register(notice.Known)
+def _known_elem_to_html(elem, ctx):
+    magic = _magic_references(elem, ctx)
+    with H.span(__inline=True, **_referring_to(magic)):
+        _piece_to_html(elem.content, ctx)
+
+@_piece_to_html.register(notice.Var)
+def _var_to_html(var, ctx):
+    target = resolve_reference(ctx, var.reference)
+    with H.span(__inline=True, **_referring_to(target)):
+        _piece_to_html(target, ctx)
+
+@_piece_to_html.register(notice.ExceptionDetails)
+def _exc_to_html(_, ctx):
+    for para in expand_error(ctx['error']):
         with H.p():
-            _piece_to_html(piece.content, ctx)
+            _piece_to_html(para, ctx)
 
-    elif isinstance(piece, notice.Var):
-        target = resolve_reference(ctx, piece.reference)
-        with H.span(__inline=True, **_referring_to(target)):
-            _piece_to_html(target, ctx)
+@_piece_to_html.register(notice.Cite)
+def _cite_elem_to_html(elem, ctx):
+    _piece_to_html(elem.info, ctx)
+    quote = elem.content
+    if quote:
+        H.span(u': ', __inline=True)
+        with H.q(__inline=True):
+            _piece_to_html(quote, ctx)
 
-    elif isinstance(piece, notice.Ref):
-        target = resolve_reference(ctx, piece.reference)
-        H.span(u'', **_referring_to(target))
+@_piece_to_html.register(Citation)
+def _cite_to_html(cite, _):
+    with H.cite(__inline=True):
+        H.a(cite.title, href=cite.url, target=u'_blank', __inline=True)
 
-    elif isinstance(piece, notice.Cite):
-        _piece_to_html(piece.info, ctx)
-        quote = piece.content
-        if quote:
-            H.span(u': ', __inline=True)
-            with H.q(__inline=True):
-                _piece_to_html(quote, ctx)
+@_piece_to_html.register(notice.Ref)
+def _ref_to_html(ref, ctx):
+    target = resolve_reference(ctx, ref.reference)
+    H.span(u'', **_referring_to(target))
 
-    elif isinstance(piece, notice.ExceptionDetails):
-        for para in expand_error(ctx['error']):
-            with H.p():
-                _piece_to_html(para, ctx)
+@_piece_to_html.register(Placeholder)
+def _placeholder_to_html(placeholder, _):
+    H.var(placeholder.name, __inline=True)
 
-    elif isinstance(piece, Citation):
-        with H.cite(__inline=True):
-            H.a(piece.title, href=piece.url, target=u'_blank', __inline=True)
-
-    elif isinstance(piece, notice.Known):
-        magic = _magic_references(piece, ctx)
-        with H.span(__inline=True, **_referring_to(magic)):
-            _piece_to_html(piece.content, ctx)
-
-    elif known.is_known(piece):
-        _known_to_html(piece)
-
-    elif isinstance(piece, Placeholder):
-        H.var(piece.name, __inline=True)
-
-    elif isinstance(piece, six.text_type):
-        H.span(printable(piece), __inline=True)
-
-    else:
-        _piece_to_html(expand_piece(piece), ctx)
+for _cls in known.classes:
+    _piece_to_html.register(_cls, lambda obj, _: _render_known(obj))
 
 
 def _displayable_body(msg):

@@ -3,6 +3,7 @@
 import codecs
 import re
 
+from singledispatch import singledispatch
 import six
 
 from httpolice import notice
@@ -76,34 +77,41 @@ def _write_complaint_line(complaint, f):
     f.write(u'%s %d %s\n' % (the_notice.severity_short, the_notice.id, title))
 
 
+@singledispatch
 def _piece_to_text(piece, ctx):
-    if isinstance(piece, list):
-        return u''.join(_piece_to_text(p, ctx) for p in piece)
+    return _piece_to_text(expand_piece(piece), ctx)
 
-    elif isinstance(piece, notice.Paragraph):
-        return _piece_to_text(piece.content, ctx) + u'\n'
+@_piece_to_text.register(six.text_type)
+def _text_to_text(text, _):
+    return printable(text)
 
-    elif isinstance(piece, notice.Var):
-        target = resolve_reference(ctx, piece.reference)
-        return _piece_to_text(target, ctx)
+@_piece_to_text.register(list)
+def _list_to_text(xs, ctx):
+    return u''.join(_piece_to_text(x, ctx) for x in xs)
 
-    elif isinstance(piece, notice.Ref):
-        return u''
+@_piece_to_text.register(notice.Paragraph)
+def _para_to_text(para, ctx):
+    return _piece_to_text(para.content, ctx) + u'\n'
 
-    elif isinstance(piece, notice.Cite):
-        quote = piece.content
-        if quote:
-            quote = re.sub(u'\\s+', u' ', _piece_to_text(quote, ctx)).strip()
-            return u'“%s” (%s)' % (quote, piece.info)
-        else:
-            return six.text_type(piece.info)
-
-    elif isinstance(piece, notice.ExceptionDetails):
-        return u''.join(_piece_to_text(para, ctx) + u'\n'
-                        for para in expand_error(ctx['error']))
-
-    elif isinstance(piece, six.text_type):
-        return printable(piece)
-
+@_piece_to_text.register(notice.Cite)
+def _cite_to_text(cite, ctx):
+    quote = cite.content
+    if quote:
+        quote = re.sub(u'\\s+', u' ', _piece_to_text(quote, ctx)).strip()
+        return u'“%s” (%s)' % (quote, cite.info)
     else:
-        return _piece_to_text(expand_piece(piece), ctx)
+        return six.text_type(cite.info)
+
+@_piece_to_text.register(notice.Var)
+def _var_to_text(var, ctx):
+    target = resolve_reference(ctx, var.reference)
+    return _piece_to_text(target, ctx)
+
+@_piece_to_text.register(notice.ExceptionDetails)
+def _exc_to_text(_, ctx):
+    return u''.join(_piece_to_text(para, ctx) + u'\n'
+                    for para in expand_error(ctx['error']))
+
+@_piece_to_text.register(notice.Ref)
+def _ref_to_text(_ref, _ctx):
+    return u''

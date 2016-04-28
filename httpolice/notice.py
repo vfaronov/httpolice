@@ -116,9 +116,12 @@ class CiteRFC(Cite):
         return citation.RFC(num, section=sect, errata=errata)
 
 
-class Known(lxml.etree.ElementBase):
+class Known(Content):
 
-    content = property(lambda self: known_map[self.tag](self.text))
+    @property
+    def content(self):
+        [name] = super(Known, self).content
+        return known_map[self.tag](name)
 
 
 def _load_notices():
