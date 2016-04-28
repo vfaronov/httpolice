@@ -214,7 +214,7 @@ class TestSyntax(unittest.TestCase):
             p, b'compress, gzip',
             [Parametrized(cc.compress, None), Parametrized(cc.gzip, None)])
         self.assertParse(p, b'', [])
-        self.assertParse(p, b'*', [Parametrized(ContentCoding(u'*'), None)])
+        self.assertParse(p, b'*', [Parametrized(u'*', None)])
         self.assertParse(
             p, b'compress;q=0.5, gzip;q=1.0',
             [Parametrized(cc.compress, 0.5), Parametrized(cc.gzip, 1)])
@@ -223,7 +223,7 @@ class TestSyntax(unittest.TestCase):
             [
                 Parametrized(cc.gzip, 1),
                 Parametrized(ContentCoding(u'identity'), 0.5),
-                Parametrized(ContentCoding(u'*'), 0)
+                Parametrized(u'*', 0)
             ]
         )
         self.assertNoParse(p, b'gzip; identity')
@@ -234,19 +234,14 @@ class TestSyntax(unittest.TestCase):
         self.assertParse(
             p, b'da, en-gb;q=0.8, en;q=0.7',
             [
-                Parametrized(LanguageTag(u'da'), None),
-                Parametrized(LanguageTag(u'en-GB'), 0.8),
-                Parametrized(LanguageTag(u'en'), 0.7),
+                Parametrized(u'da', None),
+                Parametrized(u'en-GB', 0.8),
+                Parametrized(u'en', 0.7),
             ]
         )
-        self.assertParse(
-            p, b'en, *; q=0',
-            [
-                Parametrized(LanguageTag(u'en'), None),
-                Parametrized(LanguageTag(u'*'), 0),
-            ]
-        )
-        self.assertParse(p, b'da', [Parametrized(LanguageTag(u'da'), None)])
+        self.assertParse(p, b'en, *; q=0',
+                         [Parametrized(u'en', None), Parametrized(u'*', 0)])
+        self.assertParse(p, b'da', [Parametrized(u'da', None)])
         self.assertNoParse(p, b'en_GB')
         self.assertNoParse(p, b'x1, x2')
         self.assertNoParse(p, b'en; q = 0.7')

@@ -229,7 +229,7 @@ Accept_Charset = comma_list1(
 
 codings = (content_coding |
            ContentCoding << literal('identity') |
-           ContentCoding << literal('*'))                               > pivot
+           literal('*'))                                                > pivot
 Accept_Encoding = comma_list(Parametrized << codings * maybe(weight))   > pivot
 
 Accept_Language = comma_list1(
