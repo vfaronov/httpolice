@@ -28,6 +28,7 @@ from httpolice.structure import (
     FieldName,
     HTTPVersion,
     Method,
+    MultiDict,
     Parametrized,
     StatusCode,
     TransferCoding,
@@ -165,18 +166,18 @@ field_content = (field_vchar +
                            field_vchar))                                > auto
 
 def transfer_parameter(no_q=False):
-    return Parametrized << (
+    return (
         (token__excluding(['q']) if no_q else token) *
         skip(BWS * '=' * BWS) * (token | quoted_string)
     ) > named(u'transfer-parameter', RFC(7230), is_pivot=True)
 
 _built_in_codings = ['chunked', 'compress', 'deflate', 'gzip']
-_empty_params = lambda c: Parametrized(c, [])
+_empty_params = lambda c: Parametrized(c, MultiDict())
 
 def transfer_extension(exclude=None, no_q=False):
     return Parametrized << (
         (TransferCoding << token__excluding(exclude or [])) *
-        many(skip(OWS * ';' * OWS) * transfer_parameter(no_q))
+        (MultiDict << many(skip(OWS * ';' * OWS) * transfer_parameter(no_q)))
     ) > named(u'transfer-extension', RFC(7230), is_pivot=True)
 
 def transfer_coding(no_trailers=False, no_q=False):

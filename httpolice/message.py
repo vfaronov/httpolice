@@ -105,9 +105,8 @@ class Message(Blackboard):
     def guessed_charset(self):
         charset = 'utf-8'
         if self.headers.content_type.is_okay:
-            for (name, value) in self.headers.content_type.value.param:
-                if name == u'charset':
-                    charset = value
+            charset = self.headers.content_type.value.param.get(u'charset',
+                                                                charset)
 
         try:
             codec = codecs.lookup(charset)
@@ -244,11 +243,8 @@ def check_message(msg):
     if msg.headers.content_type.is_okay:
         if media_type.deprecated(msg.headers.content_type.value.item):
             msg.complain(1035)
-        seen_params = set()
-        for param_name, _ in msg.headers.content_type.value.param:
-            if param_name in seen_params:
-                msg.complain(1042, param=param_name)
-            seen_params.add(param_name)
+        for name in msg.headers.content_type.value.param.duplicates():
+            msg.complain(1042, param=name)
 
     if msg.headers.upgrade.is_present and \
             u'upgrade' not in msg.headers.connection:

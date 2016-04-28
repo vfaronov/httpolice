@@ -12,6 +12,7 @@ from httpolice.reports import html_report, text_report
 from httpolice.structure import (
     AuthScheme,
     HSTSDirective,
+    MultiDict,
     Parametrized,
     Unavailable,
     WarnCode,
@@ -148,18 +149,19 @@ class TestResponse(unittest.TestCase):
             resp1.headers.www_authenticate.value,
             [
                 Parametrized(AuthScheme(u'Basic'),
-                             [(u'realm', u'my "magical" realm')]),
-                Parametrized(AuthScheme(u'Foo'), None),
+                             MultiDict([(u'realm', u'my "magical" realm')])),
+                Parametrized(AuthScheme(u'Foo'), MultiDict()),
                 Parametrized(AuthScheme(u'Bar'), u'jgfCGSU8u=='),
-                Parametrized(AuthScheme(u'Baz'), None),
+                Parametrized(AuthScheme(u'Baz'), MultiDict()),
                 Unavailable,
-                Parametrized(AuthScheme(u'Scheme1'), [(u'foo', u'bar'),
-                                                      (u'baz', u'qux')]),
-                Parametrized(AuthScheme(u'Scheme2'), None),
+                Parametrized(AuthScheme(u'Scheme1'),
+                             MultiDict([(u'foo', u'bar'), (u'baz', u'qux')])),
+                Parametrized(AuthScheme(u'Scheme2'), MultiDict()),
                 Parametrized(AuthScheme(u'Newauth'),
-                             [(u'realm', u'apps'), (u'type', u'1'),
-                              (u'title', u'Login to "apps"')]),
-                Parametrized(AuthScheme(u'basic'), [(u'realm', u'simple')]),
+                             MultiDict([(u'realm', u'apps'), (u'type', u'1'),
+                                        (u'title', u'Login to "apps"')])),
+                Parametrized(AuthScheme(u'basic'),
+                             MultiDict([(u'realm', u'simple')])),
             ]
         )
 

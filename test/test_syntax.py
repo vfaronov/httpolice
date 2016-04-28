@@ -10,6 +10,7 @@ from httpolice.structure import (
     ContentRange,
     LanguageTag,
     MediaType,
+    MultiDict,
     Parametrized,
     ProductName,
     RangeSpecifier,
@@ -98,22 +99,24 @@ class TestSyntax(unittest.TestCase):
 
     def test_transfer_coding(self):
         p = rfc7230.transfer_coding()
-        self.assertParse(p, b'chunked', Parametrized(tc.chunked, []))
+        self.assertParse(p, b'chunked', Parametrized(tc.chunked, MultiDict()))
         self.assertParse(p, b'foo',
-                         Parametrized(TransferCoding(u'foo'), []))
+                         Parametrized(TransferCoding(u'foo'), MultiDict()))
         self.assertParse(p, b'foo ; bar = baz ; qux = "\\"xyzzy\\""',
                          Parametrized(TransferCoding(u'foo'),
-                                      [(u'bar', u'baz'),
-                                       (u'qux', u'"xyzzy"')]))
+                                      MultiDict([(u'bar', u'baz'),
+                                                 (u'qux', u'"xyzzy"')])))
         self.assertNoParse(p, b'')
         self.assertNoParse(p, b'foo;???')
         self.assertNoParse(p, b'foo;"bar"="baz"')
 
         p = rfc7230.t_codings
         self.assertParse(p, b'gzip;q=0.345',
-                         Parametrized(Parametrized(tc.gzip, []), 0.345))
+                         Parametrized(Parametrized(tc.gzip, MultiDict()),
+                                      0.345))
         self.assertParse(p, b'gzip; Q=1.0',
-                         Parametrized(Parametrized(tc.gzip, []), 1))
+                         Parametrized(Parametrized(tc.gzip, MultiDict()),
+                                      1))
         self.assertParse(p, b'trailers', u'trailers')
         self.assertNoParse(p, b'gzip;q=2.0')
 
@@ -121,10 +124,11 @@ class TestSyntax(unittest.TestCase):
         p = rfc7231.media_type
         self.assertParse(
             p, b'Text/HTML; Charset="utf-8"',
-            Parametrized(media.text_html, [(u'charset', u'utf-8')]))
+            Parametrized(media.text_html, MultiDict([(u'charset', u'utf-8')])))
         self.assertParse(
             p, b'application/vnd.github.v3+json',
-            Parametrized(MediaType(u'application/vnd.github.v3+json'), []))
+            Parametrized(MediaType(u'application/vnd.github.v3+json'),
+                         MultiDict()))
 
     def test_accept(self):
         p = rfc7231.Accept
@@ -134,56 +138,67 @@ class TestSyntax(unittest.TestCase):
             b'text/plain;Q=0.2, text/*;Q=0.02, */*;Q=0.01',
             [
                 Parametrized(
-                    Parametrized(media.text_html, [(u'charset', u'utf-8')]),
-                    [(u'q', 1), (u'profile', u'mobile')]
+                    Parametrized(media.text_html,
+                                 MultiDict([(u'charset', u'utf-8')])),
+                    MultiDict([(u'q', 1), (u'profile', u'mobile')])
                 ),
                 Parametrized(
-                    Parametrized(media.text_plain, []),
-                    [(u'q', 0.2)]
+                    Parametrized(media.text_plain, MultiDict()),
+                    MultiDict([(u'q', 0.2)])
                 ),
                 Parametrized(
-                    Parametrized(MediaType(u'text/*'), []),
-                    [(u'q', 0.02)]
+                    Parametrized(MediaType(u'text/*'), MultiDict()),
+                    MultiDict([(u'q', 0.02)])
                 ),
                 Parametrized(
-                    Parametrized(MediaType(u'*/*'), []),
-                    [(u'q', 0.01)]
+                    Parametrized(MediaType(u'*/*'), MultiDict()),
+                    MultiDict([(u'q', 0.01)])
                 ),
             ]
         )
         self.assertParse(
             p, b'*/*',
-            [Parametrized(Parametrized(MediaType(u'*/*'), []), [])])
+            [Parametrized(Parametrized(MediaType(u'*/*'), MultiDict()),
+                          MultiDict())])
         self.assertParse(
             p, b'application/json',
-            [Parametrized(Parametrized(media.application_json, []), [])])
+            [Parametrized(Parametrized(media.application_json, MultiDict()),
+                          MultiDict())])
         self.assertParse(
             p, b'audio/*; q=0.2, audio/basic',
             [
-                Parametrized(Parametrized(MediaType(u'audio/*'), []),
-                             [(u'q', 0.2)]),
-                Parametrized(Parametrized(media.audio_basic, []), []),
+                Parametrized(Parametrized(MediaType(u'audio/*'), MultiDict()),
+                             MultiDict([(u'q', 0.2)])),
+                Parametrized(Parametrized(media.audio_basic, MultiDict()),
+                             MultiDict()),
             ])
         self.assertParse(
             p, b'text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c',
             [
-                Parametrized(Parametrized(media.text_plain, []),
-                             [(u'q', 0.5)]),
-                Parametrized(Parametrized(media.text_html, []), []),
-                Parametrized(Parametrized(MediaType(u'text/x-dvi'), []),
-                             [(u'q', 0.8)]),
-                Parametrized(Parametrized(MediaType(u'text/x-c'), []), []),
+                Parametrized(Parametrized(media.text_plain, MultiDict()),
+                             MultiDict([(u'q', 0.5)])),
+                Parametrized(Parametrized(media.text_html, MultiDict()),
+                             MultiDict()),
+                Parametrized(Parametrized(MediaType(u'text/x-dvi'),
+                                          MultiDict()),
+                             MultiDict([(u'q', 0.8)])),
+                Parametrized(Parametrized(MediaType(u'text/x-c'), MultiDict()),
+                             MultiDict()),
             ])
         self.assertParse(
             p, b', ,text/*, text/plain,,, text/plain;format=flowed, */*',
             [
-                Parametrized(Parametrized(MediaType(u'text/*'), []), []),
-                Parametrized(Parametrized(media.text_plain, []), []),
+                Parametrized(Parametrized(MediaType(u'text/*'), MultiDict()),
+                             MultiDict()),
+                Parametrized(Parametrized(media.text_plain, MultiDict()),
+                             MultiDict()),
                 Parametrized(
-                    Parametrized(media.text_plain, [(u'format', u'flowed')]),
-                    []
+                    Parametrized(media.text_plain,
+                                 MultiDict([(u'format', u'flowed')])),
+                    MultiDict()
                 ),
-                Parametrized(Parametrized(MediaType(u'*/*'), []), []),
+                Parametrized(Parametrized(MediaType(u'*/*'), MultiDict()),
+                             MultiDict()),
             ])
         self.assertParse(p, b'', [])
         self.assertParse(p, b',', [])
@@ -422,16 +437,17 @@ class TestSyntax(unittest.TestCase):
             [
                 Parametrized(
                     u'http://example.com/TheBook/chapter2',
-                    [
+                    MultiDict([
                         (u'rel', [RelationType(u'previous')]),
                         (u'title', u'previous chapter'),
-                    ]
+                    ])
                 )
             ],
         )
         self.assertParse(
             p, b'</>; rel="http://example.net/foo"',
-            [Parametrized(u'/', [(u'rel', [u'http://example.net/foo'])])]
+            [Parametrized(u'/',
+                          MultiDict([(u'rel', [u'http://example.net/foo'])]))]
         )
         self.assertParse(
             p,
@@ -442,18 +458,18 @@ class TestSyntax(unittest.TestCase):
             [
                 Parametrized(
                     u'/TheBook/chapter2',
-                    [
+                    MultiDict([
                         (u'rel', [RelationType(u'previous')]),
                         (u'title*', (u'UTF-8', u'de', u'letztes%20Kapitel')),
-                    ]
+                    ])
                 ),
                 Parametrized(
                     u'/TheBook/chapter4',
-                    [
+                    MultiDict([
                         (u'rel', [RelationType(u'next')]),
                         (u'Title*', (u'UTF-8', u'de',
                                      u'n%c3%a4chstes%20Kapitel')),
-                    ]
+                    ])
                 ),
             ]
         )
@@ -464,10 +480,10 @@ class TestSyntax(unittest.TestCase):
             [
                 Parametrized(
                     u'http://example.org/',
-                    [
+                    MultiDict([
                         (u'REL', [RelationType(u'START'),
                                   u'http://example.net/relation/other']),
-                    ]
+                    ])
                 ),
             ]
         )
@@ -476,11 +492,11 @@ class TestSyntax(unittest.TestCase):
             [
                 Parametrized(
                     u'/',
-                    [
+                    MultiDict([
                         (u'rel', [RelationType(u'foo')]),
                         (u'type', MediaType(u'text/plain')),
                         (u'type', MediaType(u'text/html')),
-                    ]
+                    ])
                 ),
             ]
         )
@@ -491,19 +507,19 @@ class TestSyntax(unittest.TestCase):
             [
                 Parametrized(
                     u'/foo/bar?baz=qux#xyzzy',
-                    [
+                    MultiDict([
                         (u'media', u' whatever man okay?'),
                         (u'hreflang', LanguageTag(u'en-US')),
-                    ]
+                    ])
                 ),
             ]
         )
         self.assertParse(
             p, b'<foo>, <bar>, <>',
             [
-                Parametrized(u'foo', []),
-                Parametrized(u'bar', []),
-                Parametrized(u'', []),
+                Parametrized(u'foo', MultiDict()),
+                Parametrized(u'bar', MultiDict()),
+                Parametrized(u'', MultiDict()),
             ]
         )
         self.assertParse(
@@ -511,9 +527,9 @@ class TestSyntax(unittest.TestCase):
             [
                 Parametrized(
                     u'urn:foo:bar:baz',
-                    [
+                    MultiDict([
                         (u'myparam*', (u'ISO-8859-1', u'en', u'whatever')),
-                    ]
+                    ])
                 ),
             ]
         )
@@ -522,7 +538,11 @@ class TestSyntax(unittest.TestCase):
             [
                 Parametrized(
                     u'#me',
-                    [(u'coolest', None), (u'man', None), (u'ever!', None)]
+                    MultiDict([
+                        (u'coolest', None),
+                        (u'man', None),
+                        (u'ever!', None),
+                    ])
                 ),
             ]
         )

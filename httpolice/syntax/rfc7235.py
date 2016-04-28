@@ -12,7 +12,12 @@ from httpolice.parse import (
     string,
     string1,
 )
-from httpolice.structure import AuthScheme, CaseInsensitive, Parametrized
+from httpolice.structure import (
+    AuthScheme,
+    CaseInsensitive,
+    MultiDict,
+    Parametrized,
+)
 from httpolice.syntax.common import ALPHA, DIGIT, SP
 from httpolice.syntax.rfc7230 import (
     BWS,
@@ -38,21 +43,20 @@ auth_param = _check_realm << ((CaseInsensitive << token) *
                               skip(BWS * '=' * BWS) *
                               (mark(token) | mark(quoted_string)))      > pivot
 
-def _empty_to_none(r):
-    return r or None
-
 challenge = Parametrized << (
     auth_scheme *
-    maybe(skip(string1(SP)) *
-          (token68 | _empty_to_none << comma_list(auth_param))))        > auto
+    maybe(skip(string1(SP)) * (token68 |
+                               MultiDict << comma_list(auth_param)),
+          default=MultiDict()))                                         > auto
 
 WWW_Authenticate = comma_list1(challenge)                               > pivot
 Proxy_Authenticate = comma_list1(challenge)                             > pivot
 
 credentials = Parametrized << (
     auth_scheme *
-    maybe(skip(string1(SP)) *
-          (token68 | _empty_to_none << comma_list(auth_param))))        > auto
+    maybe(skip(string1(SP)) * (token68 |
+                               MultiDict << comma_list(auth_param)),
+          default=MultiDict()))                                         > auto
 
 Authorization = credentials                                             > pivot
 Proxy_Authorization = credentials                                       > pivot

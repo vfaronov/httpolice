@@ -10,6 +10,7 @@ from httpolice.known import cache
 from httpolice.reports import html_report, text_report
 from httpolice.structure import (
     CacheDirective,
+    MultiDict,
     Parametrized,
     TransferCoding,
     Unavailable,
@@ -144,10 +145,10 @@ class TestRequest(unittest.TestCase):
         [req] = self.parse(stream)
         self.assertIs(req.body, Unavailable)
         self.assertEqual(list(req.headers.transfer_encoding),
-                         [Parametrized(u'foo', []),
+                         [Parametrized(u'foo', MultiDict()),
                           Unavailable,
-                          Parametrized(u'gzip', []),
-                          Parametrized(u'chunked', [])])
+                          Parametrized(u'gzip', MultiDict()),
+                          Parametrized(u'chunked', MultiDict())])
         self.assertEqual(req.annotations[(False, 1)],
                          [TransferCoding(u'foo')])
         self.assertNotIn((False, 2), req.annotations)

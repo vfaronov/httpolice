@@ -364,14 +364,13 @@ def check_response_itself(resp):
     for hdr in [headers.www_authenticate, headers.proxy_authenticate]:
         for challenge in hdr.okay:
             if challenge.item == auth.basic:
-                if u'realm' not in challenge.param_names:
+                if u'realm' not in challenge.param:
                     resp.complain(1206, header=hdr)
-                for k, v in challenge.param or []:
-                    if k == u'charset':
-                        if v.lower() != u'utf-8':
-                            resp.complain(1208, header=hdr, charset=v)
-                    elif k != u'realm':
-                        resp.complain(1207, header=hdr, param=k)
+                for charset in challenge.param.getall(u'charset'):
+                    if charset.lower() != u'utf-8':
+                        resp.complain(1208, header=hdr, charset=charset)
+                for name in set(challenge.param) - set([u'charset', u'realm']):
+                    resp.complain(1207, header=hdr, param=name)
 
     if headers.allow.is_present and headers.accept_patch.is_present and \
             m.PATCH not in headers.allow:
@@ -397,7 +396,7 @@ def check_response_itself(resp):
         resp.complain(1046)
 
     if status == st.unavailable_for_legal_reasons:
-        if not any(rel.blocked_by in link.get_param(u'rel') or []
+        if not any(rel.blocked_by in link.param.get(u'rel', [])
                    for link in headers.link.okay):
             resp.complain(1243)
 

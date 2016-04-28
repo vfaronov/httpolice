@@ -24,6 +24,7 @@ from httpolice.structure import (
     Charset,
     ContentCoding,
     MediaType,
+    MultiDict,
     Parametrized,
     ProductName,
     Unavailable,
@@ -64,7 +65,7 @@ type_ = token                                                           > pivot
 subtype = token                                                         > pivot
 media_type = Parametrized << (
     (MediaType << type_ + '/' + subtype) *
-    many(skip(OWS * ';' * OWS) * parameter()))                          > pivot
+    (MultiDict << many(skip(OWS * ';' * OWS) * parameter())))           > pivot
 
 content_coding = ContentCoding << token                                 > pivot
 
@@ -202,10 +203,17 @@ HTTP_date = (_check_day_of_week << IMF_fixdate |
 
 def media_range(no_q=False):
     return Parametrized << (
-        (MediaType << literal('*/*') |
-         MediaType << type_ + '/' + '*' |
-         MediaType << type_ + '/' + subtype) *
-        many(skip(OWS * ';' * OWS) * parameter(exclude=['q'] if no_q else []))
+        (
+            literal('*/*') |
+            type_ + '/' + '*' |
+            MediaType << type_ + '/' + subtype
+        ) *
+        (
+            MultiDict << many(
+                skip(OWS * ';' * OWS) *
+                parameter(exclude=['q'] if no_q else [])
+            )
+        )
     ) > named(u'media-range', RFC(7231), is_pivot=True)
 
 qvalue = (float << '0' + maybe_str('.' + string_times(0, 3, DIGIT)) |
@@ -215,12 +223,13 @@ accept_ext = (skip(OWS * ';' * OWS) * token *
               maybe(skip('=') * (token | quoted_string)))               > pivot
 
 def _prepend_q(q, xs):
-    return [(CaseInsensitive('q'), q)] + xs
+    return MultiDict([(CaseInsensitive(u'q'), q)] + xs)
 
 accept_params = _prepend_q << weight * many(accept_ext)                 > pivot
 
-Accept = comma_list(Parametrized << (media_range(no_q=True) *
-                                     maybe(accept_params, [])))         > pivot
+Accept = comma_list(
+    Parametrized << (media_range(no_q=True) *
+                     maybe(accept_params, MultiDict())))                > pivot
 
 charset = Charset << token                                              > pivot
 Accept_Charset = comma_list1(

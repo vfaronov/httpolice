@@ -17,6 +17,7 @@ from httpolice.parse import (
 from httpolice.structure import (
     CaseInsensitive,
     MediaType,
+    MultiDict,
     Parametrized,
     RelationType,
 )
@@ -122,7 +123,7 @@ def _process_params(complain, params):
         r.append((name, value))
         if name == u'rev':
             complain(1226)
-    return r
+    return MultiDict(r)
 
 link_value = Parametrized << (
     skip('<') * URI_Reference * skip('>') *

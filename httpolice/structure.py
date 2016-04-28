@@ -49,15 +49,45 @@ class Parametrized(namedtuple('Parametrized', ('item', 'param'))):
     def __hash__(self):
         return hash(self.item)
 
-    @property
-    def param_names(self):
-        return set(name for name, value in self.param or [])
 
-    def get_param(self, name):
-        for n, v in self.param or []:
-            if n == name:
-                return v
-        return None
+class MultiDict(object):
+
+    __slots__ = ('sequence', 'dictionary')
+
+    def __init__(self, sequence=None):
+        if sequence is None:
+            sequence = []
+        self.sequence = sequence
+        self.dictionary = {}
+        for k, v in sequence:
+            self.dictionary.setdefault(k, []).append(v)
+
+    def __repr__(self):
+        return 'MultiDict(%r)' % self.sequence
+
+    def __eq__(self, other):
+        return isinstance(other, MultiDict) and self.sequence == other.sequence
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __getitem__(self, name):
+        return self.dictionary[name][0]
+
+    def __contains__(self, name):
+        return name in self.dictionary
+
+    def __iter__(self):
+        return iter(self.dictionary)
+
+    def get(self, name, default=None):
+        return self[name] if name in self else default
+
+    def getall(self, name):
+        return self.dictionary.get(name, [])
+
+    def duplicates(self):
+        return [k for k, v in self.dictionary.items() if len(v) > 1]
 
 
 @six.python_2_unicode_compatible
