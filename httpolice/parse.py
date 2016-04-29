@@ -1,5 +1,44 @@
 # -*- coding: utf-8; -*-
 
+"""A library of parser combinators based on the Earley algorithm.
+
+Examples of usage can be found in :mod:`httpolice.syntax`.
+
+Why do we use Earley instead of a more mainstream approach like LR(1)?
+Because Earley can deal with any (context-free) grammar.
+So we can use the rules almost exactly as defined in the RFCs.
+We don't need to transform them, add lookaheads etc.
+They just work. And we get detailed error messages for free.
+
+However, Earley is not very fast (at least this implementation).
+We use it for headers, which have complex grammars.
+For HTTP/1.x message framing, we just use regexes,
+which are derived automatically from the same code (:meth:`Symbol.as_regex`).
+
+A parser's input is a stream of bytes, represented by :class:`Stream`.
+The output is whatever is returned by the semantic actions
+(the ``<<`` operator, :meth:`Symbol.__rlshift__`).
+Before applying semantic actions,
+bytes are automatically decoded from ISO-8859-1--the historic encoding of HTTP.
+
+If a semantic action is marked with the :func:`can_complain` decorator,
+then it can also produce complaints (notices).
+For example, this is how notice 1015 is implemented.
+Only the parser sees the ``BWS``,
+but its complaint is propagated up to the message where the ``BWS`` was found.
+
+Also, the input string can be annotated with parsed objects.
+For example, in an HTML report,
+the ``text/xml`` in ``Accept: text/xml;q=0.9`` becomes a hyperlink to RFC,
+because it is parsed into a :class:`~httpolice.structure.MediaType` object.
+The list of classes to annotate must be passed to :meth:`Stream.__init__`.
+Also, the object (in this case, ``MediaType(u'text/xml')``)
+must be the end result of a distinct :class:`Nonterminal`,
+**not** buried inside some :class:`Rule`.
+The ``<<`` operator (:meth:`Symbol.__rlshift__`)
+ensures this automatically for most classes.
+"""
+
 from collections import OrderedDict
 import operator
 import re
@@ -16,6 +55,8 @@ from httpolice.util.text import format_chars
 
 class Symbol(object):
 
+    """A symbol of the grammar (either terminal or nonterminal)."""
+
     def __init__(self, name=None, citation=None, is_pivot=False,
                  is_ephemeral=None):
         self.name = name
@@ -30,6 +71,15 @@ class Symbol(object):
                             self.name or hex(id(self)))
 
     def __gt__(self, seal):
+        """``sym >seal`` seals the `sym` symbol, then applies `seal` to it.
+
+        After a symbol is sealed, it is treated as a unit,
+        never inlined into other symbols' rules.
+        If every "top-level" symbol is sealed,
+        the actual grammar is structured exactly as seen in the code.
+        This is also necessary for error reporting.
+        See also :func:`fill_names`.
+        """
         if self.name is None:
             sealed = self
         else:
@@ -91,6 +141,7 @@ class Symbol(object):
             rules=[other.as_rule().concat(self.as_rule())])
 
     def __rlshift__(self, func):
+        """``func << sym`` wraps the result of parsing `sym` with `func`."""
         if isinstance(func, type) and not (func is int or func is float or
                                            func is six.text_type):
             is_ephemeral = False
@@ -111,6 +162,8 @@ class Symbol(object):
 
 
 class Terminal(Symbol):
+
+    """A terminal symbol of the grammar."""
 
     def __init__(self, name=None, citation=None, bits=None):
         super(Terminal, self).__init__(name, citation, is_pivot=False)
@@ -152,6 +205,14 @@ class Terminal(Symbol):
 
 
 class Nonterminal(Symbol):
+
+    """A nonterminal symbol of the grammar.
+
+    Every nonterminal has a list of rules (:class:`Rule` objects)
+    according to which it can be parsed.
+    This list can be static (as in :class:`SimpleNonterminal`)
+    or generated on the fly (as in :class:`RepeatedNonterminal`).
+    """
 
     def __init__(self, name=None, citation=None, is_pivot=False,
                  is_ephemeral=None):
@@ -256,6 +317,13 @@ class RepeatedNonterminal(Nonterminal):
 
 class Rule(object):
 
+    """A rule according to which a nonterminal can be parsed.
+
+    Consists of a tuple of symbols (terminals or nonterminals)
+    + a semantic action that will be applied to the tuple of results
+    to produce this rule's final result.
+    """
+
     def __init__(self, symbols, action=None):
         self.symbols = symbols
         self.action = action
@@ -306,15 +374,18 @@ empty = SimpleNonterminal(name=u'empty', rules=[Rule(())], is_ephemeral=True)
 
 
 def octet_range(min_, max_):
+    """Create a terminal that accepts bytes from `min_` to `max_` inclusive."""
     bits = BitArray(256)
     for i in range(min_, max_ + 1):
         bits[i] = True
     return Terminal(bits=Bits(bits))
 
 def octet(value):
+    """Create a terminal that accepts only the `value` byte."""
     return octet_range(value, value)
 
 def literal(s):
+    """Create a symbol that parses the `s` string, case-insensitively."""
     if len(s) == 1:
         return octet(ord(s.lower())) | octet(ord(s.upper()))
     else:
@@ -344,6 +415,11 @@ def group(x):
     return as_symbol(x).group()
 
 def mark(symbol):
+    """Wrap the symbol's result in a tuple where the first element is `symbol`.
+
+    Used where the information about "which branch of the grammar was used"
+    must be propagated upwards for further checks.
+    """
     def mark_action(x):
         return (symbol, x)
     return mark_action << symbol
@@ -390,6 +466,15 @@ def string1(inner):
 
 
 def string_excluding(terminal, excluding):
+    """
+    ``string_excluding(t, [b'foo', b'bar'])`` is the same as ``string(t)``,
+    except it **never parses** the input strings
+    ``b'foo'`` and ``b'bar'`` (case-insensitively).
+
+    See :mod:`httpolice.syntax.rfc5988` for an example of usage.
+
+    This only works when the exclusions are relatively short and few.
+    """
     initials = set(s[0:1].lower() for s in excluding if s)
 
     free = terminal
@@ -420,6 +505,18 @@ auto = named(_AUTO)
 pivot = named(_AUTO, is_pivot=True)
 
 def fill_names(scope, citation):
+    """Process automatic names for all symbols in `scope`.
+
+    When we write::
+
+      foobar = literal(b'foo') | literal(b'bar')
+
+    there is no way for `foobar` to know its own name
+    (which is ``foobar``, important for error reporting),
+    unless we post-process it with this function.
+    It takes names from `scope` and writes them back into the symbols.
+    This only happens for symbols sealed with :func:`auto` or :func:`pivot`.
+    """
     for name, x in scope.items():
         if isinstance(x, Symbol) and x.name is _AUTO:
             x.name = name.rstrip('_').replace('_', '-')
@@ -452,6 +549,12 @@ def _continue_right_list(*args):
     return [new_elem] + list_
 
 def can_complain(func):
+    """Marks `func` (in-place) as capable of reporting notices.
+
+    If so marked, `func` will be called
+    with a special `complain` function as the first argument,
+    which must be called to report a notice.
+    """
     func.with_complaints = True
     return func
 
@@ -460,6 +563,8 @@ def can_complain(func):
 # The input stream and parse error abstractions.
 
 class Stream(object):
+
+    """Wraps a string of bytes that are the input to parsers."""
 
     def __init__(self, data, annotate_classes=None):
         self._stack = []

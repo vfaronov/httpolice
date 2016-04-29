@@ -40,6 +40,8 @@ from httpolice.util.text import force_unicode
 
 class Request(message.Message):
 
+    """An HTTP request."""
+
     def __init__(self, scheme, method, target, version, header_entries,
                  body, trailer_entries=None):
         """
@@ -202,6 +204,8 @@ class Request(message.Message):
 
 
 def check_request(req):
+    """Apply all checks to the request `req`."""
+
     message.check_message(req)
 
     _ = req.target_form                 # Force check.

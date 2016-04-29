@@ -1,5 +1,7 @@
 # -*- coding: utf-8; -*-
 
+"""Classes for representing various elements of the protocol."""
+
 from collections import namedtuple
 
 import six
@@ -7,10 +9,17 @@ import six
 from httpolice.util.text import force_bytes, force_unicode
 
 
-# Commonly useful structures for representing various elements of the protocol
+###############################################################################
+# Commonly useful structures
 
 
 class _Unavailable(object):
+
+    """
+    A placeholder for something that we know is present (**not** missing),
+    but we don't know its exact value.
+    Used as the singleton :data:`Unavailable`, like `None`.
+    """
 
     __slots__ = ()
 
@@ -135,8 +144,6 @@ class CaseInsensitive(ProtocolString):
 
 
 ###############################################################################
-
-
 # Representations of specific protocol elements
 
 
@@ -171,6 +178,12 @@ class StatusCode(int):
 
 class HeaderEntry(namedtuple('HeaderEntry', ('name', 'value'))):
 
+    """A single header field from the message's headers or trailers.
+
+    A message can have more than one header entry with the same :attr:`name`.
+    Contrast with :class:`httpolice.header.HeaderView`.
+    """
+
     __slots__ = ()
 
     def __new__(cls, name, value):
@@ -204,14 +217,13 @@ class ConnectionOption(CaseInsensitive):
 
 class MediaType(CaseInsensitive):
 
-    """
-    Although in RFC 7231 a ``<media-type>`` includes parameters,
-    what's mainly interesting for HTTPolice is the media type itself,
-    i.e. the ``type/subtype`` pair
-    (or ``type/*``, or ``*/*`` -- in the case of the ``Accept`` header,
-    although formally a ``*`` matches the production for ``<token>``).
+    """A media type.
 
-    We could represent this as a tuple, but that's a hopeless rabbit hole,
+    Although in RFC 7231 a ``media-type`` includes parameters,
+    what's mainly interesting for HTTPolice is the media type itself,
+    i.e. the ``type/subtype`` pair.
+
+    We could represent it as a tuple, but that's a hopeless rabbit hole,
     because then we would branch out to structured suffixes (like ``+xml``),
     facet prefixes (like ``vnd.``), and so on.
     Instead we have a single string that can be picked apart

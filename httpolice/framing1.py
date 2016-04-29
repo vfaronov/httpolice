@@ -1,5 +1,7 @@
 # -*- coding: utf-8; -*-
 
+"""Parse HTTP/1.x message framing according to RFC 7230."""
+
 from httpolice.codings import decode_deflate, decode_gzip
 from httpolice.exchange import Exchange, complaint_box
 from httpolice.known import m, st, tc
@@ -20,10 +22,23 @@ from httpolice.syntax.common import CRLF, LF, SP
 
 
 def parse_streams(inbound, outbound, scheme=None):
-    """
-    :type inbound: bytes | None
-    :type outbound: bytes | None
-    :type scheme: six.text_type | bytes | None
+    """Parse one or two HTTP/1.x streams.
+
+    Note that parsing an outbound stream without an inbound stream
+    is unreliable, because response framing depends on the request.
+
+    :param inbound:
+        The inbound (request) stream as a byte string, or `None`.
+    :param outbound:
+        The outbound (response) stream as a byte string, or `None`.
+    :param scheme:
+        The scheme of the request URI, as a Unicode string,
+        or `None` if unknown.
+    :return:
+        An iterable of :class:`Exchange` objects.
+        Some of the exchanges may be "empty",
+        containing neither request nor responses,
+        but only a notice that indicates some general problem with the streams.
     """
     inbound = None if inbound is None else Stream(inbound)
     outbound = None if outbound is None else Stream(outbound)
@@ -221,6 +236,12 @@ def _parse_line_ending(stream):
 
 
 def parse_header_fields(stream):
+    """Parse a block of HTTP/1.x header fields.
+
+    :param stream: The :class:`Stream` from which to parse.
+    :return: A list of :class:`HeaderEntry`.
+    :raises: :class:`ParseError`
+    """
     entries = []
     while True:
         name = stream.maybe_consume_regex(rfc7230.field_name)

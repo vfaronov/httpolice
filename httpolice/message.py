@@ -49,6 +49,8 @@ URL_ENCODED_GOOD_BYTES = Bits(
 
 class Message(Blackboard):
 
+    """An HTTP message (request or response)."""
+
     self_name = u'msg'
 
     def __init__(self, version, header_entries, body, trailer_entries=None):
@@ -208,6 +210,8 @@ class Message(Blackboard):
 
 
 def check_message(msg):
+    """Run all checks that apply to any message (both request and response)."""
+
     for hdr in msg.headers:
         # Force parsing every header present in the message
         # according to its syntax rules.

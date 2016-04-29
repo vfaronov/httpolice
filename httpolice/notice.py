@@ -1,5 +1,19 @@
 # -*- coding: utf-8; -*-
 
+"""Access to the HTTPolice notices base.
+
+Notices are written and stored in XML (``notices.xml``).
+Before you scoff: XML is good for this purpose.
+Firstly, the notices' explanations are free-form markup,
+or *mixed content*--exactly what XML was designed for.
+Secondly, lxml makes it easy to map XML elements to custom classes.
+To render a notice, we recursively reduce these custom classes to strings,
+obtaining an HTML tree (or plain text) along the way.
+
+This module exposes the :data:`notices` variable,
+which is a map from notice ID (:class:`int`) to :class:`Notice`.
+"""
+
 import copy
 import six
 
@@ -31,6 +45,8 @@ known_map = {
 
 class Notice(lxml.etree.ElementBase):
 
+    """An element that represents a single notice."""
+
     id = property(lambda self: int(self.get('id')))
     severity = property(lambda self: self.tag)
     severity_short = property(lambda self: self.severity[0].upper())
@@ -51,6 +67,8 @@ class Notice(lxml.etree.ElementBase):
 
 
 class Content(lxml.etree.ElementBase):
+
+    """An element that has further content inside it."""
 
     @property
     def content(self):
@@ -73,30 +91,45 @@ class Content(lxml.etree.ElementBase):
 
 class Paragraph(Content):
 
+    """A paragraph of explanation."""
+
     pass
 
 
 class Title(Content):
+
+    """A notice's title."""
 
     pass
 
 
 class Ref(lxml.etree.ElementBase):
 
+    """A reference to a piece of data, for highlights in HTML reports."""
+
     reference = property(lambda self: self.get('to').split('.'))
 
 
 class Var(Ref):
+
+    """A placeholder for a piece of data from a notice's context.
+
+    It also acts as an implicit :class:`Ref` to that data.
+    """
 
     reference = property(lambda self: self.get('ref').split('.'))
 
 
 class ExceptionDetails(lxml.etree.ElementBase):
 
+    """A placeholder for details of the ``error`` key from the context."""
+
     pass
 
 
 class Cite(Content):
+
+    """A citation, with an optional quote."""
 
     @property
     def info(self):
@@ -104,6 +137,8 @@ class Cite(Content):
 
 
 class CiteRFC(Cite):
+
+    """A citation from an RFC, with an optional quote."""
 
     @property
     def info(self):
@@ -117,6 +152,8 @@ class CiteRFC(Cite):
 
 
 class Known(Content):
+
+    """A protocol item known in advance, such as a header or a status code."""
 
     @property
     def content(self):

@@ -36,6 +36,8 @@ from httpolice.util.text import force_unicode
 
 class Response(message.Message):
 
+    """An HTTP response."""
+
     def __init__(self, version, status, reason, header_entries,
                  body, trailer_entries=None):
         """
@@ -183,6 +185,7 @@ def check_responses(resps):
 
 
 def check_response(resp):
+    """Apply all checks to the response `resp`."""
     check_response_itself(resp)
     if resp.request:
         check_response_in_context(resp, resp.request)

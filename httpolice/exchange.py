@@ -6,6 +6,13 @@ from httpolice.blackboard import Blackboard
 
 class Exchange(Blackboard):
 
+    """An HTTP exchange (also known as a transaction).
+
+    Note that an exchange is a :class:`Blackboard`,
+    so notices can be reported directly on it.
+    See :func:`complaint_box`.
+    """
+
     self_name = u'exch'
 
     def __repr__(self):
@@ -33,6 +40,11 @@ class Exchange(Blackboard):
 
 
 def complaint_box(*args, **kwargs):
+    """Create an empty exchange that only carries a single notice.
+
+    This is used (for example, in :mod:`httpolice.framing1`)
+    to report notices that do not correspond to any particular message.
+    """
     box = Exchange(None, [])
     box.complain(*args, **kwargs)
     return box

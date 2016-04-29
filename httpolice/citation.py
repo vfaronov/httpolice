@@ -6,6 +6,8 @@ import six
 @six.python_2_unicode_compatible
 class Citation(object):
 
+    """A reference to a relevant document."""
+
     __slots__ = ('title', 'url')
     __str__ = lambda self: self.title or self.url
     __repr__ = lambda self: 'Citation(%r, %r)' % (self.title, self.url)
@@ -30,8 +32,12 @@ class Citation(object):
 
 class RFC(Citation):
 
-    # We remember the RFC-specific locators (number, section, etc.)
-    # in order to get a nice `repr()` and a correct :meth:`subset_of`.
+    """A reference to an RFC document.
+
+    It remembers the RFC-specific locators (number, section, etc.)
+    in order to get a nice `repr` and a correct :meth:`subset_of`,
+    which are needed for ``tools/iana.py``.
+    """
 
     __slots__ = ('num', 'section', 'appendix', 'errata')
 

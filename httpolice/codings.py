@@ -1,5 +1,7 @@
 # -*- coding: utf-8; -*-
 
+"""Decoding content and transfer codings."""
+
 import gzip
 import io
 import zlib

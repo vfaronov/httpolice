@@ -1,5 +1,20 @@
 # -*- coding: utf-8; -*-
 
+"""Wrappers over raw HTTP headers.
+
+HTTPolice works with headers on two levels.
+
+On the low level, :class:`httpolice.structure.HeaderEntry`
+is a single name-value line from a message's headers (or trailers).
+
+On a higher level, :class:`HeaderView` and its subclasses
+aggregate, parse, and represent various header entries.
+They know how to combine two entries with the same name into one entry.
+They know how to parse their contents.
+And to simplify the checks code, they provide some **magic**.
+Particularly non-obvious are comparisons of :class:`SingleHeaderView` (q.v.).
+"""
+
 import operator
 import sys
 
@@ -11,6 +26,8 @@ from httpolice.syntax.rfc7230 import quoted_string, token
 
 
 class HeadersView(object):
+
+    """Wraps all headers of a single message, exposing them as attributes."""
 
     def __init__(self, message):
         self._message = message
@@ -67,6 +84,8 @@ class HeadersView(object):
 
 
 class HeaderView(object):
+
+    """Wraps all headers with a particular name in a given message."""
 
     def __init__(self, message, name):
         self.message = message
@@ -145,6 +164,8 @@ class HeaderView(object):
 
 class UnknownHeaderView(HeaderView):
 
+    """Wraps a generic header that we know nothing about."""
+
     def _parse(self):
         # RFC 7230 section 3.2.2 permits combining field-values with a comma
         # even if we don't really know what the header is.
@@ -154,6 +175,21 @@ class UnknownHeaderView(HeaderView):
 
 
 class SingleHeaderView(HeaderView):
+
+    """Wraps a header that can only appear once in a message.
+
+    This class has **tricky comparison magic** to simplify checks.
+    All comparisons return `False` when the value is not :func:`okay`
+    (is absent or malformed).
+    Thus, the following expression::
+
+      msg.headers.last_modified <= date(2016, 4, 29)
+
+    is **not the same** as::
+
+      not (msg.headers.last_modified > date(2016, 4, 29))
+
+    """
 
     def _parse(self):
         entries, values = self._pre_parse()
@@ -184,6 +220,8 @@ class SingleHeaderView(HeaderView):
 
 class ListHeaderView(HeaderView):
 
+    """Wraps a header whose parsed value is a list, allowing iteration."""
+
     def __iter__(self):
         return iter(self.value)
 
@@ -208,6 +246,8 @@ class ListHeaderView(HeaderView):
 
 class MultiHeaderView(ListHeaderView):
 
+    """Wraps a header that can appear multiple times in a message."""
+
     def _parse(self):
         entries, values = self._pre_parse()
         self._value = []
@@ -220,6 +260,8 @@ class MultiHeaderView(ListHeaderView):
 
 
 class DirectivesView(ListHeaderView):
+
+    """Wraps a header whose parsed value is a list of directives."""
 
     knowledge_module = None
 
@@ -260,6 +302,8 @@ class DirectivesView(ListHeaderView):
 
 class CacheControlView(DirectivesView, MultiHeaderView):
 
+    """Wraps a ``Cache-Control`` header."""
+
     knowledge_module = cache_directive
 
     def _process_directive(self, entry, directive_with_argument):
@@ -280,5 +324,7 @@ class CacheControlView(DirectivesView, MultiHeaderView):
 
 
 class StrictTransportSecurityView(DirectivesView, SingleHeaderView):
+
+    """Wraps a ``Strict-Transport-Security`` header."""
 
     knowledge_module = httpolice.known.hsts_directive
