@@ -23,13 +23,14 @@ import six
 from httpolice.blackboard import Blackboard, derived_property
 from httpolice.codings import decode_deflate, decode_gzip
 from httpolice.header import HeadersView
-from httpolice.known import cc, header, media, media_type, tc, warn
+from httpolice.known import cc, h, header, media, media_type, tc, warn
 from httpolice.structure import (
     HTTPVersion,
     HeaderEntry,
     FieldName,
     Unavailable,
     http11,
+    http2,
     okay,
 )
 from httpolice.util.text import force_unicode, format_chars
@@ -272,3 +273,10 @@ def check_message(msg):
     for pragma in msg.headers.pragma.okay:
         if pragma != u'no-cache':
             msg.complain(1160, pragma=pragma.item)
+
+    if msg.version == http2:
+        for hdr in msg.headers:
+            if hdr.name in [h.connection, h.transfer_encoding, h.keep_alive]:
+                msg.complain(1244, header=hdr)
+            elif hdr.name == h.upgrade:
+                msg.complain(1245)

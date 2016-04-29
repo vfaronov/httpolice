@@ -29,7 +29,14 @@ from httpolice.known import (
     warn,
 )
 from httpolice.known.status_code import NOT_AT_ALL, NOT_BY_DEFAULT
-from httpolice.structure import EntityTag, StatusCode, http10, http11, okay
+from httpolice.structure import (
+    EntityTag,
+    StatusCode,
+    http10,
+    http11,
+    http2,
+    okay,
+)
 from httpolice.syntax.rfc7230 import asterisk_form
 from httpolice.util.text import force_unicode
 
@@ -194,6 +201,7 @@ def check_response(resp):
 def check_response_itself(resp):
     message.check_message(resp)
 
+    version = resp.version
     status = resp.status
     headers = resp.headers
     body = resp.body
@@ -217,8 +225,11 @@ def check_response_itself(resp):
                 status.informational:
             resp.complain(1052, header=hdr)
 
-    if status == st.switching_protocols and headers.upgrade.is_absent:
-        resp.complain(1048)
+    if status == st.switching_protocols:
+        if headers.upgrade.is_absent:
+            resp.complain(1048)
+        if version == http2:
+            resp.complain(1246)
 
     if status == st.no_content and body:
         resp.complain(1240)

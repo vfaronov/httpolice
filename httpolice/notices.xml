@@ -1756,4 +1756,37 @@
     </rfc>
   </comment>
 
+  <error id="1244">
+    <title><var ref="header"/> header in an HTTP/2 message</title>
+    <rfc num="7540" sect="8.1.2.2">
+      An endpoint MUST NOT
+   generate an HTTP/2 message containing connection-specific header
+   fields
+    </rfc>
+    <rfc num="7540" sect="8.1.2.2">
+      The only exception to this is the <h ref="no">TE</h> header field, which MAY be
+   present in an HTTP/2 request; when it is, it MUST NOT contain any
+   value other than "trailers".
+    </rfc>
+    <ref to="msg.version"/>
+  </error>
+
+  <error id="1245">
+    <title><h>Upgrade</h> header in an HTTP/2 message</title>
+    <rfc num="7540" sect="8.1.2.2">
+      HTTP/2 purposefully does not support upgrade to another
+      protocol.
+    </rfc>
+    <ref to="msg.version"/>
+  </error>
+
+  <error id="1246">
+    <title><st>101</st> response over HTTP/2</title>
+    <rfc num="7540" sect="8.1.1">
+      HTTP/2 removes support for the <st>101</st> (Switching Protocols)
+   informational status code
+    </rfc>
+    <ref to="msg.version"/>
+  </error>
+
 </notices>

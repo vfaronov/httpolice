@@ -27,7 +27,14 @@ from httpolice.known import (
     upgrade,
 )
 from httpolice.parse import ParseError, Stream, mark
-from httpolice.structure import EntityTag, Method, Versioned, http10, http11
+from httpolice.structure import (
+    EntityTag,
+    Method,
+    Versioned,
+    http10,
+    http11,
+    http2,
+)
 from httpolice.syntax.rfc7230 import (
     absolute_form,
     asterisk_form,
@@ -216,8 +223,12 @@ def check_request(req):
     if tc.chunked in req.headers.te:
         req.complain(1028)
 
-    if req.headers.te and u'TE' not in req.headers.connection:
-        req.complain(1029)
+    if req.version == http2:
+        if req.headers.te and req.headers.te.value != [u'trailers']:
+            req.complain(1244, header=req.headers.te)
+    else:
+        if req.headers.te and u'TE' not in req.headers.connection:
+            req.complain(1029)
 
     if req.version == http11 and req.headers.host.is_absent:
         req.complain(1031)
