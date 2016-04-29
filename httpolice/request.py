@@ -119,15 +119,6 @@ class Request(message.Message):
     def __repr__(self):
         return '<Request %s>' % self.method
 
-    def _target_parses_as(self, parser):
-        try:
-            parse.Stream(self.target.encode('ascii', 'replace')). \
-                parse(parser, to_eof=True)
-        except parse.ParseError:
-            return False
-        else:
-            return True
-
     @derived_property
     def target_form(self):
         try:
