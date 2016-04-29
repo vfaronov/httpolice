@@ -17,14 +17,14 @@ By default, HTTPolice produces simple plain text reports like this::
 
 They are intended to be suitable for grep and other Unix-like tools.
 
-Use the ``-o html`` option to enable HTML reports.
-These are much more detailed, including:
-
-- previews of the actual requests and responses;
-- explanation for every notice;
-- cross-references to the standards;
-
-and more.
+Use the ``-o html`` option to enable much more detailed HTML reports.
+These include explanations for every notice,
+cross-referenced with the standards,
+as well as previews of the actual requests and responses.
+(Please note that these previews **do not represent exactly**
+what was sent on the wire. For example, in an HTTP/1.x request,
+a header may have been split into two physical lines,
+but will be rendered as one line in the report.)
 
 .. highlight:: console
 
