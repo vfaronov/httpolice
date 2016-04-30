@@ -39,7 +39,7 @@ from httpolice.structure import (
     okay,
 )
 from httpolice.syntax.rfc7230 import asterisk_form
-from httpolice.util.text import force_unicode
+from httpolice.util.text import force_unicode, is_ascii
 
 
 class Response(message.Message):
@@ -416,22 +416,24 @@ def check_response_itself(resp):
             resp.complain(1243)
 
     if headers.content_disposition.is_okay:
-        for name in headers.content_disposition.value.param.duplicates():
+        params = headers.content_disposition.value.param
+        for name in params.duplicates():
             resp.complain(1247, param=name)
-        filename = headers.content_disposition.value.param.get(u'filename')
+        filename = params.get(u'filename')
         if filename is not None:
             if re.search(u'%[0-9A-Fa-f]{2}', filename):
                 resp.complain(1248)
-            if u'"' in filename:        # It must have been backslash-escaped
+            if u'"' in filename or u'\\' in filename:
+                # These must have been backslash-escaped.
                 resp.complain(1249)
-            try:
-                filename.encode('ascii')
-            except UnicodeError:
+            if not is_ascii(filename):
                 resp.complain(1250)
-        filename_x = headers.content_disposition.value.param.get(u'filename*')
-        if filename_x is not None:
+        filename_ext = params.get(u'filename*')
+        if filename_ext is not None:
             if filename is None:
                 resp.complain(1251)
+            elif params.index(u'filename*') < params.index(u'filename'):
+                resp.complain(1252)
 
 
 def check_response_in_context(resp, req):

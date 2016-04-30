@@ -98,6 +98,9 @@ class MultiDict(object):
     def duplicates(self):
         return [k for k, v in self.dictionary.items() if len(v) > 1]
 
+    def index(self, name):
+        return [k for k, _ in self.sequence].index(name)
+
 
 @six.python_2_unicode_compatible
 class Versioned(namedtuple('Versioned', ('item', 'version'))):

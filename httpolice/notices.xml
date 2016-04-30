@@ -1805,6 +1805,7 @@
       existing implementations consider it to be an escape character,
       while others will pass it through unchanged.
     </rfc>
+    <explain>Such a filename can be sent in the special ‘filename*’ parameter instead. See <rfc num="6266" sect="4.3"/>.</explain>
   </comment>
 
   <comment id="1249">
@@ -1814,6 +1815,7 @@
       filename parameter, as escaping is not implemented by some user
       agents, and "\" can be considered an illegal path character.
     </rfc>
+    <explain>Such a filename can be sent in the special ‘filename*’ parameter instead. See <rfc num="6266" sect="4.3"/>.</explain>
   </comment>
 
   <comment id="1250">
@@ -1824,6 +1826,7 @@
       ISO-8859-1, some will apply heuristics to detect UTF-8, and thus
       might fail on certain names.
     </rfc>
+    <explain>Such a filename can be sent in the special ‘filename*’ parameter instead. See <rfc num="6266" sect="4.3"/>.</explain>
   </comment>
 
   <comment id="1251">
@@ -1832,6 +1835,15 @@
       When a "filename*" parameter is sent, to also generate a
       "filename" parameter as a fallback for user agents that do not
       support the "filename*" form, if possible.
+    </rfc>
+  </comment>
+
+  <comment id="1252">
+    <title><h>Content-Disposition</h>: ‘filename*’ before ‘filename’</title>
+    <rfc num="6266" appendix="D">
+      When a "filename" parameter is included as a fallback (as per
+      above), "filename" should occur first, due to parsing problems in
+      some existing implementations.
     </rfc>
   </comment>
 

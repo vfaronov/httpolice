@@ -197,3 +197,17 @@ def printable(s):
         repl=u'\N{REPLACEMENT CHARACTER}',
         string=s
     )
+
+
+def is_ascii(s):
+    u"""
+    >>> is_ascii(u'The quick brown fox jumps over the lazy dog.')
+    True
+    >>> is_ascii(u'Liberté, égalité, fraternité!')
+    False
+    """
+    try:
+        s.encode('ascii')
+        return True
+    except UnicodeError:
+        return False
