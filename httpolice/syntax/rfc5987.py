@@ -1,10 +1,15 @@
 # -*- coding: utf-8; -*-
 
+try:
+    from urllib.parse import unquote_to_bytes as pct_decode
+except ImportError:         # Python 2
+    from urllib import unquote as pct_decode
+
 from httpolice.citation import RFC
 from httpolice.parse import (
     auto,
+    can_complain,
     fill_names,
-    literal,
     maybe,
     named,
     pivot,
@@ -13,8 +18,10 @@ from httpolice.parse import (
     string_excluding,
     skip,
 )
+from httpolice.structure import CaseInsensitive, ExtValue
 from httpolice.syntax.common import ALPHA, DIGIT, HEXDIG
 from httpolice.syntax.rfc5646 import Language_Tag as language
+from httpolice.util.text import force_bytes
 
 
 attr_char = (ALPHA | DIGIT |
@@ -27,18 +34,32 @@ def parmname__excluding(exclude):
 
 parmname = parmname__excluding([])
 
+# We don't need to special-case "UTF-8" and "ISO-8859-1", simplify.
 mime_charsetc = (ALPHA | DIGIT |
                  '!' | '#' | '$' | '%' | '&' | '+' | '-' | '^' | '_' | '`' |
                  '{' | '}' | '~')                                       > auto
 mime_charset = string1(mime_charsetc)                                   > auto
-charset = literal('UTF-8') | 'ISO-8859-1' | mime_charset                > pivot
+charset = CaseInsensitive << mime_charset                               > pivot
 
 pct_encoded = '%' + HEXDIG + HEXDIG                                     > auto
-value_chars = string(pct_encoded | attr_char)                           > auto
+value_chars = pct_decode << (
+    force_bytes << string(pct_encoded | attr_char))                     > auto
 
-ext_value = (charset * skip("'") *
-             maybe(language) * skip("'") *
-             value_chars)                                               > pivot
+@can_complain
+def _check_ext_value(complain, val):
+    if val.charset in [u'UTF-8', u'ISO-8859-1']:
+        try:
+            val.value_bytes.decode(val.charset)
+        except UnicodeError as e:
+            complain(1254, charset=val.charset, error=e)
+    else:
+        complain(1253, charset=val.charset)
+    return val
+
+ext_value = _check_ext_value << (
+    ExtValue << (charset * skip("'") *
+                 maybe(language) * skip("'") *
+                 value_chars))                                          > pivot
 
 
 fill_names(globals(), RFC(5987))

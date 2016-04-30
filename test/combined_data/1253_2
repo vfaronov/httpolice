@@ -1,0 +1,16 @@
+1253
+
+======== BEGIN INBOUND STREAM ========
+GET /book/chapter1 HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain; charset=windows-1250
+Content-Length: 22
+Content-Language: pl
+Link: <chapter2>; rel=next; title*=windows-1250''Rozdzia%B3%20drugi
+
+Dawno, dawno temu...

@@ -434,6 +434,8 @@ def check_response_itself(resp):
                 resp.complain(1251)
             elif params.index(u'filename*') < params.index(u'filename'):
                 resp.complain(1252)
+            if filename_ext.charset != u'UTF-8':
+                resp.complain(1255)
 
 
 def check_response_in_context(resp, req):

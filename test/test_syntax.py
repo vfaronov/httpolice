@@ -8,6 +8,7 @@ from httpolice.known import cc, media, tc, unit
 from httpolice.structure import (
     ContentCoding,
     ContentRange,
+    ExtValue,
     LanguageTag,
     MediaType,
     MultiDict,
@@ -467,15 +468,18 @@ class TestSyntax(unittest.TestCase):
                     u'/TheBook/chapter2',
                     MultiDict([
                         (u'rel', [RelationType(u'previous')]),
-                        (u'title*', (u'UTF-8', u'de', u'letztes%20Kapitel')),
+                        (u'title*',
+                         ExtValue(u'UTF-8', u'de',
+                                  u'letztes Kapitel'.encode('utf-8'))),
                     ])
                 ),
                 Parametrized(
                     u'/TheBook/chapter4',
                     MultiDict([
                         (u'rel', [RelationType(u'next')]),
-                        (u'Title*', (u'UTF-8', u'de',
-                                     u'n%c3%a4chstes%20Kapitel')),
+                        (u'Title*',
+                         ExtValue(u'UTF-8', u'de',
+                                  u'nächstes Kapitel'.encode('utf-8'))),
                     ])
                 ),
             ]
@@ -535,7 +539,8 @@ class TestSyntax(unittest.TestCase):
                 Parametrized(
                     u'urn:foo:bar:baz',
                     MultiDict([
-                        (u'myparam*', (u'ISO-8859-1', u'en', u'whatever')),
+                        (u'myparam*',
+                         ExtValue(u'ISO-8859-1', u'en', b'whatever')),
                     ])
                 ),
             ]
@@ -574,17 +579,23 @@ class TestSyntax(unittest.TestCase):
                          MultiDict([(u'filename', u'an example.html')])))
         self.assertParse(
             p, b"attachment; filename*= UTF-8''%e2%82%ac%20rates",
-            Parametrized(u'attachment',
-                         MultiDict([(u'filename*',
-                                     (u'UTF-8', None, u'%e2%82%ac%20rates'))]))
+            Parametrized(
+                u'attachment',
+                MultiDict([(u'filename*',
+                            ExtValue(u'UTF-8', None,
+                                     u'€ rates'.encode('utf-8')))])
+            )
         )
         self.assertParse(
             p,
             b'attachment; filename="EURO rates"; '
             b"filename*=utf-8''%e2%82%ac%20rates",
-            Parametrized(u'attachment',
-                         MultiDict([(u'filename', u'EURO rates'),
-                                    (u'filename*',
-                                     (u'utf-8', None, u'%e2%82%ac%20rates'))]))
+            Parametrized(
+                u'attachment',
+                MultiDict([(u'filename', u'EURO rates'),
+                           (u'filename*',
+                            ExtValue(u'utf-8', None,
+                                     u'€ rates'.encode('utf-8')))])
+            )
         )
         self.assertNoParse(p, b'attachment; filename*=example.html')

@@ -1,0 +1,15 @@
+1253 1255
+
+======== BEGIN INBOUND STREAM ========
+GET /files/123/download/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: application/octet-stream
+Content-Length: 14
+Content-Disposition: attachment; filename=file.dat; filename*=windows-1251'ru'%F4%E0%E9%EB.dat
+
+Hello world!
