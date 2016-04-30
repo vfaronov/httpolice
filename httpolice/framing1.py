@@ -82,7 +82,7 @@ def _parse_request(stream, scheme=None):
     req = _parse_request_heading(stream, scheme)
     if req is Unavailable:
         box = Exchange(None, [])
-        stream.dump_complaints(box, u'request heading')
+        stream.dump_complaints(box.complain, place=u'request heading')
         return (None, box)
     else:
         _parse_request_body(req, stream)
@@ -105,7 +105,7 @@ def _parse_request_heading(stream, scheme=None):
         return Unavailable
     else:
         req = Request(scheme, method_, target, version_, entries, body=None)
-        stream.dump_complaints(req, u'request heading')
+        stream.dump_complaints(req.complain, place=u'request heading')
         return req
 
 
@@ -148,7 +148,7 @@ def _parse_responses(stream, req):
         resp = _parse_response_heading(req, stream)
         if resp is Unavailable:
             box = Exchange(None, [])
-            stream.dump_complaints(box, u'response heading')
+            stream.dump_complaints(box.complain, place=u'response heading')
             return (resps, box)
         else:
             resps.append(resp)
@@ -177,7 +177,7 @@ def _parse_response_heading(req, stream):
     else:
         resp = Response(version_, status, reason, entries, body=None)
         resp.request = req
-        stream.dump_complaints(resp, u'response heading')
+        stream.dump_complaints(resp.complain, place=u'response heading')
         return resp
 
 
@@ -315,7 +315,7 @@ def _parse_chunked(msg, stream):
         msg.complain(1005, error=e)
         msg.body = Unavailable
     else:
-        stream.dump_complaints(msg, u'chunked framing')
+        stream.dump_complaints(msg.complain, place=u'chunked framing')
         msg.body = b''.join(data)
         msg.trailer_entries = trailer
         if trailer:

@@ -18,9 +18,10 @@ Particularly non-obvious are comparisons of :class:`SingleHeaderView` (q.v.).
 import operator
 import sys
 
-from httpolice import known, parse
+from httpolice import known
 from httpolice.known import cache_directive, h, header
 import httpolice.known.hsts_directive
+from httpolice.parse import ParseError, Stream, simple_parse
 from httpolice.structure import Parametrized, Unavailable, okay
 from httpolice.syntax.rfc7230 import quoted_string, token
 
@@ -111,18 +112,17 @@ class HeaderView(object):
             if parser is None:
                 parsed = entry.value
             else:
-                stream = parse.Stream(entry.value,
-                                      annotate_classes=known.classes)
+                stream = Stream(entry.value, annotate_classes=known.classes)
                 try:
                     parsed = stream.parse(parser, to_eof=True)
-                except parse.ParseError as e:
+                except ParseError as e:
                     self.message.complain(1000, entry=entry, error=e)
                     parsed = Unavailable
                 else:
                     parsed = self._process_parsed(entry, parsed)
                     self.message.annotations[(from_trailer, i)] = \
                         stream.collect_annotations()
-                    stream.dump_complaints(self.message, entry)
+                    stream.dump_complaints(self.message.complain, place=entry)
             values.append(parsed)
         return entries, values
 
@@ -280,14 +280,10 @@ class DirectivesView(ListHeaderView):
                 self.message.complain(1157, directive=directive)
                 argument = None
             elif parser is not None:
-                stream = parse.Stream(argument.encode('iso-8859-1'))
-                try:
-                    argument = stream.parse(parser, to_eof=True)
-                except parse.ParseError as e:
-                    self.message.complain(1158, directive=directive, error=e)
-                    argument = Unavailable
-                else:
-                    stream.dump_complaints(self.message, entry)
+                argument = simple_parse(argument, parser,
+                                        self.message.complain, 1158,
+                                        place=entry,
+                                        directive=directive, value=argument)
         return Parametrized(directive, argument)
 
     def __getattr__(self, key):

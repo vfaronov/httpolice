@@ -10,7 +10,7 @@ except ImportError:                             # Python 2
 
 import six
 
-from httpolice import message, parse
+from httpolice import message
 from httpolice.blackboard import derived_property
 from httpolice.known import (
     auth,
@@ -26,7 +26,7 @@ from httpolice.known import (
     tc,
     upgrade,
 )
-from httpolice.parse import ParseError, Stream, mark
+from httpolice.parse import mark, simple_parse
 from httpolice.structure import (
     EntityTag,
     Method,
@@ -34,6 +34,7 @@ from httpolice.structure import (
     http10,
     http11,
     http2,
+    okay,
 )
 from httpolice.syntax.rfc7230 import (
     absolute_form,
@@ -142,13 +143,13 @@ class Request(message.Message):
         else:
             parser = mark(origin_form) | mark(absolute_form)
 
-        try:
-            (symbol, _) = Stream(target).parse(parser, to_eof=True)
-        except ParseError as e:
-            self.complain(1045, error=e)
+        r = simple_parse(target, parser,
+                         self.complain, 1045, place=u'request target')
+        if okay(r):
+            (symbol, _) = r
+            return symbol
+        else:
             return None
-
-        return symbol
 
     @derived_property
     def effective_uri(self):

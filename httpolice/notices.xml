@@ -1170,8 +1170,8 @@
   </error>
 
   <error id="1158">
-    <title>Malformed <h>Cache-Control</h>: <var ref="directive"/></title>
-    <explain>The argument to the <var ref="directive"/> directive in this message’s <h>Cache-Control</h> header is malformed.</explain>
+    <title>Malformed <var ref="place"/>: <var ref="directive"/></title>
+    <explain>“<var ref="value"/>” is not a correct value for a <var ref="directive"/> directive in <var ref="place"/>.</explain>
     <exception/>
   </error>
 

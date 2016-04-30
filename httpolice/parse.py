@@ -46,7 +46,8 @@ import re
 from bitstring import BitArray, Bits
 import six
 
-from httpolice.util.text import format_chars
+from httpolice.structure import Unavailable
+from httpolice.util.text import force_bytes, format_chars
 
 
 ###############################################################################
@@ -669,10 +670,10 @@ class Stream(object):
     def add_complaints(self, complaints):
         self.complaints.extend(complaints)
 
-    def dump_complaints(self, target, place=u'???'):
+    def dump_complaints(self, complain_func, **extra_context):
         for (notice_id, context) in self.complaints:
-            context['place'] = place
-            target.complain(notice_id, **context)
+            context = dict(extra_context, **context)
+            complain_func(notice_id, **context)
         self.complaints = []
 
     def add_annotations(self, annotations):
@@ -1026,3 +1027,19 @@ def _find_pivots(chart, symbol, start, stack=None):
             if (parent, parent_start) not in stack:
                 for p in _find_pivots(chart, parent, parent_start, stack):
                     yield p
+
+
+###############################################################################
+# Miscellaneous helpers.
+
+def simple_parse(data, symbol, complain, fail_notice_id, **extra_context):
+    """(Try to) parse an entire string as a single grammar symbol."""
+    stream = Stream(force_bytes(data))
+    try:
+        r = stream.parse(symbol, to_eof=True)
+    except ParseError as e:
+        complain(fail_notice_id, error=e, **extra_context)
+        r = Unavailable
+    else:
+        stream.dump_complaints(complain, **extra_context)
+    return r
