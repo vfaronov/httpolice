@@ -565,6 +565,8 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, b"</>; title * = UTF-8''Hello")
         self.assertNoParse(p, b'</index.html>;')
         self.assertNoParse(p, b'</index.html>; rel=next;')
+        self.assertNoParse(p, b'</index.html>; foo*=bar')
+        self.assertNoParse(p, b'</index.html>; hreflang="Hello world!"')
 
     def test_content_disposition(self):
         p = rfc6266.content_disposition

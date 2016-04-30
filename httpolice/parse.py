@@ -467,13 +467,25 @@ def string1(inner):
 
 def string_excluding(terminal, excluding):
     """
-    ``string_excluding(t, [b'foo', b'bar'])`` is the same as ``string(t)``,
+    ``string_excluding(t, ['foo', 'bar'])`` is the same as ``string(t)``,
     except it **never parses** the input strings
-    ``b'foo'`` and ``b'bar'`` (case-insensitively).
+    "foo" and "bar" (case-insensitive).
 
-    See :mod:`httpolice.syntax.rfc5988` for an example of usage.
+    This is used where the grammar special-cases certain strings.
+    For example, consider the ``link-param`` rule from RFC 5988.
+    Strictly speaking, that rule matches the string::
 
-    This only works when the exclusions are relatively short and few.
+      hreflang="Hello world!"
+
+    because the ``link-extension`` rule matches it.
+    But the spec obviously intends that
+    an "hreflang" parameter must only have a language tag as a value,
+    as it is special-cased in the definition of ``link-param``.
+    Therefore, in our code for ``link-extension``,
+    we exclude "hreflang" and other special cases
+    from the allowed values of ``parmname``.
+
+    This only works when the excluded strings are relatively few and short.
     """
     initials = set(s[0:1].lower() for s in excluding if s)
 
