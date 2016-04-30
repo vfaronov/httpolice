@@ -437,6 +437,12 @@ def check_response_itself(resp):
             if filename_ext.charset != u'UTF-8':
                 resp.complain(1255)
 
+    if headers.alt_svc.is_present:
+        if version == http2:
+            resp.complain(1258)
+        if status == st.misdirected_request:
+            resp.complain(1260)
+
 
 def check_response_in_context(resp, req):
     if resp.body and resp.headers.content_type.is_absent and \

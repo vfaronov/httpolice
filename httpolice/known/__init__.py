@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from httpolice import structure
+from httpolice.known.alt_svc_param import known as altsvc
 from httpolice.known.auth_scheme import known as auth
 from httpolice.known.cache_directive import known as cache
 from httpolice.known.content_coding import known as cc
@@ -17,6 +18,7 @@ from httpolice.known.upgrade_token import known as upgrade
 from httpolice.known.warn_code import known as warn
 
 classes = {
+    structure.AltSvcParam: altsvc,
     structure.AuthScheme: auth,
     structure.CacheDirective: cache,
     structure.ContentCoding: cc,

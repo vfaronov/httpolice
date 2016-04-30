@@ -1,0 +1,16 @@
+1260
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Alt-Used: balancer4-eu.example.com:8000
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 421 Misdirected Request
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 43
+Alt-Svc: http%2F1.1="balancer4-eu.example.com:8000"
+
+No idea what you're talking about, sorry.

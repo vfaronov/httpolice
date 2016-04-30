@@ -19,7 +19,7 @@ import operator
 import sys
 
 from httpolice import known
-from httpolice.known import cache_directive, h, header
+from httpolice.known import alt_svc_param, cache_directive, h, header
 import httpolice.known.hsts_directive
 from httpolice.parse import ParseError, Stream, simple_parse
 from httpolice.structure import Parametrized, Unavailable, okay
@@ -40,17 +40,29 @@ class HeadersView(object):
     def __getitem__(self, key):
         if key not in self._cache:
             rule = header.rule_for(key)
+
+            # Some headers have more internal structure
+            # than can be handled by a simple context-free parser,
+            # so they need special-casing.
             if key == h.cache_control:
                 cls = CacheControlView
             elif key == h.strict_transport_security:
                 cls = StrictTransportSecurityView
+            elif key == h.alt_svc:
+                cls = AltSvcView
+
+            # For the rest, we only need to know
+            # a generic "rule" for combining multiple entries,
+            # and a parser to parse the value.
             elif rule in [header.SINGLE, header.SINGLE_LIST]:
                 cls = SingleHeaderView
             elif rule == header.MULTI:
                 cls = MultiHeaderView
             else:
                 cls = UnknownHeaderView
+
             self._cache[key] = cls(self._message, key)
+
         return self._cache[key]
 
     @property
@@ -324,3 +336,26 @@ class StrictTransportSecurityView(DirectivesView, SingleHeaderView):
     """Wraps a ``Strict-Transport-Security`` header."""
 
     knowledge_module = httpolice.known.hsts_directive
+
+
+class AltSvcView(SingleHeaderView):
+
+    """Wraps an ``Alt-Svc`` header with its various parameters."""
+
+    def _process_parsed(self, entry, parsed):
+        if parsed == u'clear':
+            return parsed
+
+        # Parse every parameter's value according to its defined parser.
+        for alternative in parsed:
+            params = alternative.param.sequence
+            for i in range(len(params)):
+                (name, value) = params[i]
+                parser = alt_svc_param.parser_for(name)
+                if parser is not None:
+                    value = simple_parse(value, parser,
+                                         self.message.complain, 1259,
+                                         place=entry, param=name, value=value)
+                params[i] = (name, value)
+
+        return parsed

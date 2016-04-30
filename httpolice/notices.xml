@@ -1871,4 +1871,35 @@
     </rfc>
   </comment>
 
+  <error id="1256">
+    <title>Bad encoding of protocol ID in <h>Alt-Svc</h></title>
+    <explain>This message’s <h>Alt-Svc</h> contains a protocol ID encoded as “<var ref="actual"/>”. But according to <rfc num="7838" sect="3"/>, it must be encoded as “<var ref="correct"/>”.</explain>
+  </error>
+
+  <error id="1257">
+    <title>Malformed authority in <h>Alt-Svc</h></title>
+    <explain>“<var ref="authority"/>” is not a valid <h>Alt-Svc</h> authority, according to <rfc num="7838" sect="3"/>.</explain>
+    <exception/>
+  </error>
+
+  <comment id="1258">
+    <title><h>Alt-Svc</h> header in an HTTP/2 response</title>
+    <explain><rfc num="7838" sect="3"/> recommends using ALTSVC frames instead of the <h>Alt-Svc</h> header on HTTP/2 connections.</explain>
+    <ref to="msg.version"/>
+  </comment>
+
+  <error id="1259">
+    <title>Malformed <var ref="param"/> parameter in <var ref="place"/></title>
+    <explain>“<var ref="value"/>” is not a correct value for a <var ref="param"/> parameter in <var ref="place"/>.</explain>
+    <exception/>
+  </error>
+
+  <error id="1260">
+    <title><st>421</st> response with <h>Alt-Svc</h></title>
+    <rfc num="7838" sect="6">
+      An <h>Alt-Svc</h> header field in a <st>421</st> (Misdirected Request) response MUST
+   be ignored.
+    </rfc>
+  </error>
+
 </notices>

@@ -199,6 +199,7 @@ class Terminal(Symbol):
             return super(Terminal, self).__or__(other)
 
     def __sub__(self, other):
+        other = as_symbol(other)
         return Terminal(bits=self.bits ^ (self.bits & other.bits))
 
     def is_nullable(self):

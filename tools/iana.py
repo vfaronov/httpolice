@@ -17,6 +17,7 @@ import lxml.etree
 from httpolice.citation import Citation, RFC
 import httpolice.known
 from httpolice.structure import (
+    AltSvcParam,
     AuthScheme,
     CacheDirective,
     ContentCoding,
@@ -68,7 +69,7 @@ class Registry(object):
     def extract_citations(self, record):
         for xref in record.findall('iana:xref', self.xmlns):
             if xref.get('type') == 'rfc':
-                match = re.match(
+                match = re.search(
                     r'RFC(\d+), (Section|Appendix) ([A-Z0-9]+(\.[0-9]+)*)',
                     xref.text or '')
                 if match:
@@ -261,6 +262,18 @@ class RelationTypeRegistry(Registry):
             '_': RelationType(record.find('iana:value', self.xmlns).text),
             '_citations': list(
                 self.extract_citations(record.find('iana:spec', self.xmlns))),
+        }
+
+
+class AltSvcParamRegistry(Registry):
+
+    cls = AltSvcParam
+    relative_url = 'http-alt-svc-parameters/http-alt-svc-parameters.xml'
+
+    def _from_record(self, record):
+        return {
+            '_': AltSvcParam(record.find('iana:value', self.xmlns).text),
+            '_citations': list(self.extract_citations(record)),
         }
 
 

@@ -61,15 +61,22 @@ class Parametrized(namedtuple('Parametrized', ('item', 'param'))):
 
 class MultiDict(object):
 
-    __slots__ = ('sequence', 'dictionary')
+    __slots__ = ('sequence',)
 
     def __init__(self, sequence=None):
         if sequence is None:
             sequence = []
         self.sequence = sequence
-        self.dictionary = {}
-        for k, v in sequence:
-            self.dictionary.setdefault(k, []).append(v)
+
+    @property
+    def dictionary(self):
+        # This is generated on the fly every time,
+        # because `self.sequence` can be mutated,
+        # e.g. in :cls:`httpolice.header.AltSvcView`.
+        r = {}
+        for k, v in self.sequence:
+            r.setdefault(k, []).append(v)
+        return r
 
     def __repr__(self):
         return 'MultiDict(%r)' % self.sequence
@@ -343,3 +350,8 @@ class ExtValue(namedtuple('ExtValue', ('charset', 'language', 'value_bytes'))):
     """An ``ext-value`` as defined in RFC 5987."""
 
     pass
+
+
+class AltSvcParam(ProtocolString):
+
+    __slots__ = ()

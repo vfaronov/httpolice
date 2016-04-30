@@ -7,9 +7,10 @@ import six
 
 from httpolice.exchange import check_exchange
 from httpolice.framing1 import parse_streams
-from httpolice.known import hsts, m
+from httpolice.known import altsvc, hsts, m
 from httpolice.reports import html_report, text_report
 from httpolice.structure import (
+    AltSvcParam,
     AuthScheme,
     HSTSDirective,
     MultiDict,
@@ -188,3 +189,31 @@ class TestResponse(unittest.TestCase):
             resp1.headers.strict_transport_security.max_age, 15768000)
         self.assertEqual(
             resp1.headers.strict_transport_security.includesubdomains, True)
+
+    def test_alt_svc(self):
+        inbound = self.req(m.GET)
+
+        stream = (b'HTTP/1.1 200 OK\r\n'
+                  b'Alt-Svc: http%2F1.1="foo:443";ma=3600;persist=1 ,\r\n'
+                  b'  h2=":8000";foo=bar\r\n'
+                  b'\r\n')
+        [[resp1]] = self.parse(inbound, stream)
+        self.assertEqual(
+            resp1.headers.alt_svc.value,
+            [
+                Parametrized(
+                    (b'http/1.1', u'foo:443'),
+                    MultiDict([(altsvc.ma, 3600), (altsvc.persist, True)])
+                ),
+                Parametrized(
+                    (b'h2', u':8000'),
+                    MultiDict([(AltSvcParam(u'foo'), u'bar')])
+                ),
+            ]
+        )
+
+        stream = (b'HTTP/1.1 200 OK\r\n'
+                  b'Alt-Svc: clear\r\n'
+                  b'\r\n')
+        [[resp1]] = self.parse(inbound, stream)
+        self.assertEqual(resp1.headers.alt_svc.value, u'clear')
