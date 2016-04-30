@@ -1,0 +1,15 @@
+1247
+
+======== BEGIN INBOUND STREAM ========
+GET /files/123/download/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: application/octet-stream
+Content-Length: 14
+Content-Disposition: attachment; filename=file123.dat; filename=file123.dat
+
+Hello world!

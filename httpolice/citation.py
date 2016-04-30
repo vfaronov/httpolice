@@ -73,6 +73,11 @@ class RFC(Citation):
                 url += u'#%s-%s' % (word2, section_text)
         super(RFC, self).__init__(title, url)
 
+    @staticmethod
+    def parse_sect(s):
+        return tuple(int(part) if part.isdigit() else part
+                     for part in s.split('.'))
+
     def subset_of(self, other):
         if self.num != other.num:
             return False

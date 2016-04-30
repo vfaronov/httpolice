@@ -20,7 +20,14 @@ from httpolice.structure import (
     Unavailable,
     Versioned,
 )
-from httpolice.syntax import rfc3986, rfc5988, rfc7230, rfc7231, rfc7233
+from httpolice.syntax import (
+    rfc3986,
+    rfc5988,
+    rfc6266,
+    rfc7230,
+    rfc7231,
+    rfc7233,
+)
 
 
 class TestSyntax(unittest.TestCase):
@@ -553,3 +560,31 @@ class TestSyntax(unittest.TestCase):
         self.assertNoParse(p, b"</>; title * = UTF-8''Hello")
         self.assertNoParse(p, b'</index.html>;')
         self.assertNoParse(p, b'</index.html>; rel=next;')
+
+    def test_content_disposition(self):
+        p = rfc6266.content_disposition
+        self.assertParse(
+            p, b'Attachment; filename=example.html',
+            Parametrized(u'attachment',
+                         MultiDict([(u'filename', u'example.html')]))
+        )
+        self.assertParse(
+            p, b'INLINE; FILENAME= "an example.html"',
+            Parametrized(u'inline',
+                         MultiDict([(u'filename', u'an example.html')])))
+        self.assertParse(
+            p, b"attachment; filename*= UTF-8''%e2%82%ac%20rates",
+            Parametrized(u'attachment',
+                         MultiDict([(u'filename*',
+                                     (u'UTF-8', None, u'%e2%82%ac%20rates'))]))
+        )
+        self.assertParse(
+            p,
+            b'attachment; filename="EURO rates"; '
+            b"filename*=utf-8''%e2%82%ac%20rates",
+            Parametrized(u'attachment',
+                         MultiDict([(u'filename', u'EURO rates'),
+                                    (u'filename*',
+                                     (u'utf-8', None, u'%e2%82%ac%20rates'))]))
+        )
+        self.assertNoParse(p, b'attachment; filename*=example.html')

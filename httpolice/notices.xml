@@ -1789,4 +1789,50 @@
     <ref to="msg.version"/>
   </error>
 
+  <error id="1247">
+    <title><h>Content-Disposition</h>: multiple ‘<var ref="param"/>’ parameters</title>
+    <rfc num="6266" sect="4.1">
+      Content-Disposition header field values with multiple instances of
+   the same parameter name are invalid.
+    </rfc>
+  </error>
+
+  <comment id="1248">
+    <title><h>Content-Disposition</h>: percent-encoded filename</title>
+    <rfc num="6266" appendix="D">
+      Avoid including the percent character followed by two hexadecimal
+      characters (e.g., %A9) in the filename parameter, since some
+      existing implementations consider it to be an escape character,
+      while others will pass it through unchanged.
+    </rfc>
+  </comment>
+
+  <comment id="1249">
+    <title><h>Content-Disposition</h>: backslash in filename</title>
+    <rfc num="6266" appendix="D">
+      Avoid including the "\" character in the quoted-string form of the
+      filename parameter, as escaping is not implemented by some user
+      agents, and "\" can be considered an illegal path character.
+    </rfc>
+  </comment>
+
+  <comment id="1250">
+    <title><h>Content-Disposition</h>: non-ASCII filename</title>
+    <rfc num="6266" appendix="D">
+      Avoid using non-ASCII characters in the filename parameter.
+      Although most existing implementations will decode them as
+      ISO-8859-1, some will apply heuristics to detect UTF-8, and thus
+      might fail on certain names.
+    </rfc>
+  </comment>
+
+  <comment id="1251">
+    <title><h>Content-Disposition</h>: ‘filename*’ without ‘filename’</title>
+    <rfc num="6266" appendix="D">
+      When a "filename*" parameter is sent, to also generate a
+      "filename" parameter as a fallback for user agents that do not
+      support the "filename*" form, if possible.
+    </rfc>
+  </comment>
+
 </notices>

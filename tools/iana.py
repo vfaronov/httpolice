@@ -74,8 +74,7 @@ class Registry(object):
                 if match:
                     num = int(match.group(1))
                     kw = match.group(2).lower()
-                    sect = tuple(int(n) if n.isdigit() else n
-                                 for n in match.group(3).split('.'))
+                    sect = RFC.parse_sect(match.group(3))
                     yield RFC(num, **{kw: sect})
                 else:
                     num = int(xref.get('data')[3:])

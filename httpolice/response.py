@@ -1,6 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from datetime import datetime, timedelta
+import re
 
 try:
     from urlparse import urljoin, urlparse
@@ -413,6 +414,24 @@ def check_response_itself(resp):
         if not any(rel.blocked_by in link.param.get(u'rel', [])
                    for link in headers.link.okay):
             resp.complain(1243)
+
+    if headers.content_disposition.is_okay:
+        for name in headers.content_disposition.value.param.duplicates():
+            resp.complain(1247, param=name)
+        filename = headers.content_disposition.value.param.get(u'filename')
+        if filename is not None:
+            if re.search(u'%[0-9A-Fa-f]{2}', filename):
+                resp.complain(1248)
+            if u'"' in filename:        # It must have been backslash-escaped
+                resp.complain(1249)
+            try:
+                filename.encode('ascii')
+            except UnicodeError:
+                resp.complain(1250)
+        filename_x = headers.content_disposition.value.param.get(u'filename*')
+        if filename_x is not None:
+            if filename is None:
+                resp.complain(1251)
 
 
 def check_response_in_context(resp, req):
