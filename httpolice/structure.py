@@ -349,7 +349,7 @@ class ExtValue(namedtuple('ExtValue', ('charset', 'language', 'value_bytes'))):
 
     """An ``ext-value`` as defined in RFC 5987."""
 
-    pass
+    __slots__ = ()
 
 
 class AltSvcParam(ProtocolString):
