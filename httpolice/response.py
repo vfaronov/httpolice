@@ -116,6 +116,10 @@ class Response(message.Message):
 
     @derived_property
     def content_is_full(self):
+        if self.request is None:
+            return None
+        if self.request.method == m.HEAD:
+            return False
         if self.status == st.not_modified:
             return False
         if self.status == st.partial_content and \
