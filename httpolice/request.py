@@ -239,7 +239,7 @@ def check_request(req):
     for hdr in req.headers:
         if header.is_for_request(hdr.name) == False:
             req.complain(1063, header=hdr)
-        elif header.is_representation_metadata(hdr.name) and not req.body:
+        elif header.is_representation_metadata(hdr.name) and req.body == b'':
             req.complain(1053, header=hdr)
 
     if req.body:
