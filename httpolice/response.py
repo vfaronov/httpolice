@@ -44,8 +44,6 @@ from httpolice.util.text import force_unicode, is_ascii
 
 class Response(message.Message):
 
-    """An HTTP response."""
-
     def __init__(self, version, status, reason, header_entries,
                  body, trailer_entries=None):
         """

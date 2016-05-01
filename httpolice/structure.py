@@ -72,7 +72,7 @@ class MultiDict(object):
     def dictionary(self):
         # This is generated on the fly every time,
         # because `self.sequence` can be mutated,
-        # e.g. in :cls:`httpolice.header.AltSvcView`.
+        # e.g. in :class:`httpolice.header.AltSvcView`.
         r = {}
         for k, v in self.sequence:
             r.setdefault(k, []).append(v)

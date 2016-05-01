@@ -6,12 +6,9 @@ from httpolice.blackboard import Blackboard
 
 class Exchange(Blackboard):
 
-    """An HTTP exchange (also known as a transaction).
-
-    Note that an exchange is a :class:`Blackboard`,
-    so notices can be reported directly on it.
-    See :func:`complaint_box`.
-    """
+    # Note that an exchange is a :class:`Blackboard`,
+    # so notices can be reported directly on it.
+    # See :func:`complaint_box`.
 
     self_name = u'exch'
 
