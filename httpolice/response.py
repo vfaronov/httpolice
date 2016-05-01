@@ -186,6 +186,13 @@ class Response(message.Message):
             return True
         return super(Response, self).transformed_by_proxy
 
+    @derived_property
+    def is_tls(self):
+        if okay(self.request):
+            return self.request.is_tls
+        else:
+            return None
+
 
 def check_responses(resps):
     for resp in resps:
@@ -487,8 +494,6 @@ def check_response_in_context(resp, req):
         for proto in resp.headers.upgrade.okay:
             if proto not in req.headers.upgrade:
                 resp.complain(1049)
-            elif proto.item == u'h2':
-                resp.complain(1229)
             elif proto.item == upgrade.h2c:
                 if not req.headers.http2_settings.is_okay:
                     resp.complain(1232)

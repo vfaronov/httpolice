@@ -1,0 +1,20 @@
+1228
+
+# Apache actually used to send this:
+# https://bz.apache.org/bugzilla/show_bug.cgi?id=59311
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Sun, 01 May 2016 10:47:28 GMT
+Server: Apache
+Upgrade: h2
+Connection: Upgrade
+Content-Length: 14
+Content-Type: text/plain
+
+Hello world!

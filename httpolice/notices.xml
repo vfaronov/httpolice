@@ -1636,17 +1636,8 @@
 
   <error id="1228">
     <title><h>Upgrade</h>: h2</title>
-    <explain>This request’s <h>Upgrade</h> header includes the token ‘h2’, which normally refers to HTTP/2 over TLS. But HTTP/2 over TLS does not use the <h>Upgrade</h> mechanism, and cleartext HTTP/2 uses the ‘h2c’ token instead, so “Upgrade: h2” is wrong.</explain>
+    <explain>This message’s <h>Upgrade</h> header includes the token ‘h2’, which normally refers to HTTP/2 over TLS. But HTTP/2 over TLS does not use the <h>Upgrade</h> mechanism, and cleartext HTTP/2 uses the ‘h2c’ token instead, so “Upgrade: h2” is wrong.</explain>
     <explain>See <rfc num="7540" sect="3"/>.</explain>
-  </error>
-
-  <error id="1229">
-    <title>Upgrading to ‘h2’</title>
-    <rfc num="7540" sect="3.2">
-      A server MUST ignore an "h2" token in an <h ref="no">Upgrade</h> header field.
-    </rfc>
-    <ref to="msg.headers.upgrade"/>
-    <ref to="msg.request.headers.upgrade"/>
   </error>
 
   <error id="1230">
@@ -1676,7 +1667,7 @@
 
   <error id="1233">
     <title>“<h>Upgrade</h>: h2c” on an encrypted connection</title>
-    <explain>An “<h>Upgrade</h>: h2c” header is used to switch to HTTP/2 from a cleartext HTTP/1.1 connection. But this request was sent on an encrypted (TLS) connection. HTTP/2 over TLS is negotiated by other means.</explain>
+    <explain>An “<h>Upgrade</h>: h2c” header is used to switch to HTTP/2 from a cleartext HTTP/1.1 connection. But this message was sent on an encrypted (TLS) connection. HTTP/2 over TLS is negotiated by other means.</explain>
     <explain>See <rfc num="7540" sect="3"/>.</explain>
   </error>
 

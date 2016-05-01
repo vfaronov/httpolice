@@ -23,7 +23,7 @@ import six
 from httpolice.blackboard import Blackboard, derived_property
 from httpolice.codings import decode_deflate, decode_gzip
 from httpolice.header import HeadersView
-from httpolice.known import cc, h, header, media, media_type, tc, warn
+from httpolice.known import cc, h, header, media, media_type, tc, upgrade, warn
 from httpolice.structure import (
     HTTPVersion,
     HeaderEntry,
@@ -209,6 +209,10 @@ class Message(Blackboard):
             return True
         return None
 
+    @derived_property
+    def is_tls(self):
+        raise NotImplementedError()
+
 
 def check_message(msg):
     """Run all checks that apply to any message (both request and response)."""
@@ -280,3 +284,9 @@ def check_message(msg):
                 msg.complain(1244, header=hdr)
             elif hdr.name == h.upgrade:
                 msg.complain(1245)
+
+    for proto in msg.headers.upgrade.okay:
+        if proto.item == u'h2':
+            msg.complain(1228)
+        if proto.item == upgrade.h2c and msg.is_tls:
+            msg.complain(1233)

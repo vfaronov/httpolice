@@ -365,8 +365,6 @@ def check_request(req):
             req.complain(1213)
 
     for proto in req.headers.upgrade.okay:
-        if proto.item == u'h2':
-            req.complain(1228)
         if proto.item == upgrade.h2c:
             if req.is_tls:
                 req.complain(1233)
