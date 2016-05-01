@@ -386,14 +386,17 @@ def octet(value):
     """Create a terminal that accepts only the `value` byte."""
     return octet_range(value, value)
 
-def literal(s):
-    """Create a symbol that parses the `s` string, case-insensitively."""
+def literal(s, case_sensitive=False):
+    """Create a symbol that parses the `s` string."""
     if len(s) == 1:
-        return octet(ord(s.lower())) | octet(ord(s.upper()))
+        if case_sensitive:
+            return octet(ord(s))
+        else:
+            return octet(ord(s.lower())) | octet(ord(s.upper()))
     else:
         r = empty
         for c in s:
-            r = r * literal(c)
+            r = r * literal(c, case_sensitive)
         return _join_args << r
 
 def as_symbol(x):

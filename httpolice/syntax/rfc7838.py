@@ -17,7 +17,6 @@ from httpolice.parse import (
     literal,
     many,
     maybe_str,
-    octet,
     pivot,
     simple_parse,
     skip,
@@ -37,8 +36,7 @@ from httpolice.syntax.rfc7234 import delta_seconds
 from httpolice.util.text import force_bytes, force_unicode
 
 
-clear = (octet(0x63) + octet(0x6C) + octet(0x65) +
-         octet(0x61) + octet(0x72))                                     > pivot
+clear = literal('clear', case_sensitive=True)                           > pivot
 
 @can_complain
 def _check_protocol_id(complain, encoded_id):
