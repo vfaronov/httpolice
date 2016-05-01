@@ -40,10 +40,10 @@ class TestFuzz(unittest.TestCase):
     def _run_fuzz(self, i):
         state = random.getstate()
         req = Request(
-            scheme=random.choice([u'http', u'https', u'foobar']),
-            method=random.choice(list(m)),
+            scheme=random.choice([u'http', u'https', u'foobar', None]),
+            method=random.choice(sorted(m)),
             target=binary_garbage().decode('iso-8859-1'),
-            version=random.choice([http10, http11, http2, None]),
+            version=random.choice([http10, http11, http2, u'HTTP/3.0', None]),
             header_entries=[
                 (random.choice(interesting_headers), make_header_value())
                 for _ in range(5)
@@ -55,7 +55,8 @@ class TestFuzz(unittest.TestCase):
         )
         resps = [
             Response(
-                version=random.choice([http10, http11, http2, None]),
+                version=random.choice([http10, http11, http2,
+                                       u'HTTP/3.0', None]),
                 status=random.randint(0, 699),
                 reason=binary_garbage().decode('iso-8859-1'),
                 header_entries=[
