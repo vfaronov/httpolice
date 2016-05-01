@@ -1,5 +1,6 @@
 # -*- coding: utf-8; -*-
 
+from httpolice import helpers
 from httpolice.__metadata__ import version as __version__
 from httpolice.exchange import Exchange, check_exchange
 from httpolice.notice import COMMENT, DEBUG, ERROR
@@ -16,6 +17,7 @@ __all__ = [
     'DEBUG',
     'ERROR',
     'check_exchange',
+    'helpers',
     'html_report',
     'text_report',
 ]

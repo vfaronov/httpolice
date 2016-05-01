@@ -18,6 +18,7 @@ If you want a brief introduction, see the :doc:`quickstart`.
    mitmproxy
    reports
    api
+   django
 
 There is also a `list of all notices`__ that HTTPolice can output.
 

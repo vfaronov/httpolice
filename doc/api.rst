@@ -56,3 +56,9 @@ API reference
 .. autofunction:: httpolice.text_report
 
 .. autofunction:: httpolice.html_report
+
+
+Integration helpers
+-------------------
+.. automodule:: httpolice.helpers
+   :members:
