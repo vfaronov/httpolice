@@ -15,7 +15,7 @@ except ImportError:
 
 from httpolice.inputs.common import pop_pseudo_headers
 from httpolice.known import h, st
-from httpolice.structure import http2
+from httpolice.structure import HTTPVersion, http2
 
 
 def start(context, argv):
@@ -77,7 +77,9 @@ def preprocess_response(resp):
 
 def preprocess_message(msg):
     if msg.version == u'HTTP/2.0':
-        msg.version = http2
+        # Copy `http2` to get a unique instance,
+        # so that identity-based highlights in HTML reports work correctly.
+        msg.version = HTTPVersion(http2)
     if any(entry.name == h.transfer_encoding for entry in msg.header_entries):
         strip_content_length(msg)
 
