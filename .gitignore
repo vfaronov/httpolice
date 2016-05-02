@@ -1,4 +1,5 @@
 *.pyc
+.cache
 Django_HTTPolice.egg-info
 HTTPolice.egg-info
 _build
