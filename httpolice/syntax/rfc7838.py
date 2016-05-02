@@ -1,5 +1,7 @@
 # -*- coding: utf-8; -*-
 
+# pylint: disable=import-error,no-name-in-module
+
 try:
     from urllib.parse import (
         quote as pct_encode,
@@ -7,6 +9,8 @@ try:
     )
 except ImportError:         # Python 2
     from urllib import quote as pct_encode, unquote as pct_decode
+
+# pylint: enable=import-error,no-name-in-module
 
 import six
 

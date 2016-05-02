@@ -109,6 +109,7 @@ class HeaderView(object):
         return '<%s %s>' % (self.__class__.__name__, self.name)
 
     def _process_parsed(self, entry, value):
+        # pylint: disable=unused-argument
         return value
 
     def _pre_parse(self):
@@ -221,16 +222,28 @@ class SingleHeaderView(HeaderView):
         else:
             return self.is_okay and okay(other) and op(self.value, other)
 
-    __lt__ = lambda self, other: self._compare(other, operator.lt)
-    __le__ = lambda self, other: self._compare(other, operator.le)
-    __eq__ = lambda self, other: self._compare(other, operator.eq)
-    __ne__ = lambda self, other: self._compare(other, operator.ne)
-    __ge__ = lambda self, other: self._compare(other, operator.ge)
-    __gt__ = lambda self, other: self._compare(other, operator.gt)
+    def __lt__(self, other):
+        return self._compare(other, operator.lt)
+
+    def __le__(self, other):
+        return self._compare(other, operator.le)
+
+    def __eq__(self, other):
+        return self._compare(other, operator.eq)
+
+    def __ne__(self, other):
+        return self._compare(other, operator.ne)
+
+    def __ge__(self, other):
+        return self._compare(other, operator.ge)
+
+    def __gt__(self, other):
+        return self._compare(other, operator.gt)
+
     __hash__ = None
 
 
-class ListHeaderView(HeaderView):
+class ListHeaderView(HeaderView):       # pylint: disable=abstract-method
 
     """Wraps a header whose parsed value is a list, allowing iteration."""
 
@@ -241,7 +254,7 @@ class ListHeaderView(HeaderView):
         return len(self.value)
 
     def __getitem__(self, i):
-        return self.value[i]
+        return self.value[i]           # pylint: disable=unsubscriptable-object
 
     def __contains__(self, other):
         # Since multi-headers often contain `Parametrized` values,
@@ -249,6 +262,7 @@ class ListHeaderView(HeaderView):
         # ignoring its parameters.
         # This is handled by :meth:`Parametrized.__eq__`,
         # but it's only invoked when the `Parametrized` is on the left side.
+        # pylint: disable=not-an-iterable
         return any(val == other for val in self.value)
 
     @property
@@ -271,7 +285,7 @@ class MultiHeaderView(ListHeaderView):
         self._entries = entries
 
 
-class DirectivesView(ListHeaderView):
+class DirectivesView(ListHeaderView):       # pylint: disable=abstract-method
 
     """Wraps a header whose parsed value is a list of directives."""
 

@@ -3,10 +3,14 @@
 import base64
 import string
 
+# pylint: disable=import-error
+
 try:
     from urllib.parse import urlparse
 except ImportError:                             # Python 2
     from urlparse import urlparse
+
+# pylint: enable=import-error
 
 import six
 
@@ -50,6 +54,7 @@ class Request(message.Message):
 
     def __init__(self, scheme, method, target, version, header_entries,
                  body, trailer_entries=None):
+        # pylint: disable=redefined-outer-name
         """
         :param scheme:
             The scheme of the request URI, as a Unicode string

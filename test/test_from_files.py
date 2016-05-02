@@ -46,7 +46,7 @@ def input_from_file(request):
     return (exchanges, expected)
 
 
-def test_from_file(input_from_file):
+def test_from_file(input_from_file):    # pylint: disable=redefined-outer-name
     (exchanges, expected) = input_from_file
     for exch in exchanges:
         check_exchange(exch)

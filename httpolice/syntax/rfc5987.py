@@ -1,9 +1,13 @@
 # -*- coding: utf-8; -*-
 
+# pylint: disable=import-error,no-name-in-module
+
 try:
     from urllib.parse import unquote_to_bytes as pct_decode
 except ImportError:         # Python 2
     from urllib import unquote as pct_decode
+
+# pylint: enable=import-error,no-name-in-module
 
 from httpolice.citation import RFC
 from httpolice.parse import (

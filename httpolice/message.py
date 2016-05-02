@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 import email.errors
 import json
 
+# pylint: disable=import-error
+
 try:
     from email import message_from_bytes as parse_email_message
 except ImportError:                             # Python 2
@@ -14,6 +16,8 @@ try:
     from urllib.parse import parse_qs
 except ImportError:                             # Python 2
     from urlparse import parse_qs
+
+# pylint: enable=import-error
 
 import defusedxml
 import defusedxml.ElementTree
@@ -119,7 +123,7 @@ class Message(Blackboard):
 
         if okay(self.decoded_body):
             try:
-                self.decoded_body.decode(charset)
+                self.decoded_body.decode(charset)   # pylint: disable=no-member
             except UnicodeError:
                 return None
         return charset
@@ -130,6 +134,7 @@ class Message(Blackboard):
             return self.decoded_body
         if self.guessed_charset is None:
             return Unavailable
+        # pylint: disable=no-member
         return self.decoded_body.decode(self.guessed_charset)
 
     @derived_property
@@ -200,6 +205,7 @@ class Message(Blackboard):
             if not URL_ENCODED_GOOD_BYTES[byte]:
                 self.complain(1040, char=format_chars([six.int2byte(byte)]))
                 return Unavailable
+        # pylint: disable=no-member
         return parse_qs(self.decoded_body.decode('ascii'))
 
     @derived_property

@@ -3,10 +3,14 @@
 from datetime import datetime, timedelta
 import re
 
+# pylint: disable=import-error,no-name-in-module
+
 try:
     from urlparse import urljoin, urlparse
 except ImportError:                                     # Python 2
     from urllib.parse import urljoin, urlparse
+
+# pylint: enable=import-error,no-name-in-module
 
 from httpolice import message
 from httpolice.blackboard import derived_property

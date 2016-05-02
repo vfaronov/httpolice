@@ -4,10 +4,14 @@ import base64
 import json
 import io
 
+# pylint: disable=import-error
+
 try:
     from urllib.parse import urlparse
 except ImportError:                             # Python 2
     from urlparse import urlparse
+
+# pylint: enable=import-error
 
 from httpolice import framing1
 from httpolice.exchange import Exchange

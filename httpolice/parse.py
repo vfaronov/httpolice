@@ -904,6 +904,7 @@ def _find_results(stream, symbol, chart, end_i, outer_parents=None):
                 # It can also add its own complaints.
                 if rule.action is not None:
                     def complain(id_, **ctx):
+                        # pylint: disable=cell-var-from-loop
                         all_complaints.append((id_, ctx))
                     nodes = rule.action(complain, tuple(nodes))
                 nodes = tuple(n for n in nodes if n is not _SKIP)

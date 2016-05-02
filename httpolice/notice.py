@@ -43,6 +43,9 @@ known_map = {
 }
 
 
+# pylint: disable=property-on-old-class
+
+
 class Notice(lxml.etree.ElementBase):
 
     """An element that represents a single notice."""

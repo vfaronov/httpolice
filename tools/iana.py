@@ -5,12 +5,16 @@ from __future__ import print_function
 import pprint
 import re
 
+# pylint: disable=import-error,no-name-in-module
+
 try:
     from urllib.request import Request, urlopen
     from urllib.parse import urljoin
 except ImportError:                             # Python 2
     from urllib2 import Request, urlopen
     from urlparse import urljoin
+
+# pylint: enable=import-error,no-name-in-module
 
 import lxml.etree
 
@@ -136,7 +140,7 @@ class StatusCodeRegistry(Registry):
         }
 
 
-class ParametersRegistry(Registry):
+class ParametersRegistry(Registry):     # pylint: disable=abstract-method
 
     def get_all(self):
         tree = self._get_xml('http-parameters/http-parameters.xml')
