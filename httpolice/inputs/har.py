@@ -15,7 +15,7 @@ except ImportError:                             # Python 2
 
 from httpolice import framing1
 from httpolice.exchange import Exchange
-from httpolice.inputs.common import pop_pseudo_headers
+from httpolice.helpers import pop_pseudo_headers
 from httpolice.known import h, media, st
 from httpolice.parse import ParseError, Stream
 from httpolice.request import Request

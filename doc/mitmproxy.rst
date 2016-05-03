@@ -26,18 +26,16 @@ that should be recent enough for HTTPolice.
 __ http://docs.mitmproxy.org/en/latest/install.html
 __ http://packages.ubuntu.com/xenial/mitmproxy
 
-If you have multiple Python environments (like `virtualenv`__),
-HTTPolice must be installed into **the same environment** as mitmproxy.
-Also note that mitmproxy only supports Python 2 (currently).
+You will also need to install the integration package (see :doc:`install`)::
 
-__ https://virtualenv.pypa.io/en/latest/
+  $ pip install mitmproxy-HTTPolice
 
 
 Usage
 -----
 To run HTTPolice together with mitmproxy, use a command like this::
 
-  $ mitmdump -s "`python -m httpolice.plus.mitmproxy` -o html report.html"
+  $ mitmdump -s "`python -m mitmproxy_httpolice` -o html report.html"
 
 Note the backticks.
 Also, you can replace ``mitmdump`` with ``mitmproxy`` if you wish.
@@ -45,11 +43,11 @@ Also, you can replace ``mitmdump`` with ``mitmproxy`` if you wish.
 ``-s`` is mitmproxy’s option that specifies an inline script to run,
 along with arguments to that script.
 
-``python -m httpolice.plus.mitmproxy`` is a sub-command
-that prints the path to the script file (installed with HTTPolice)::
+``python -m mitmproxy_httpolice`` is a sub-command
+that prints the path to the script file::
 
-  $ python -m httpolice.plus.mitmproxy
-  /home/vasiliy/.local/lib/python2.7/site-packages/httpolice/plus/mitmproxy.py
+  $ python -m mitmproxy_httpolice
+  /home/vasiliy/.local/lib/python2.7/site-packages/mitmproxy_httpolice.py
 
 ``-o html`` tells HTTPolice to produce :doc:`HTML reports <reports>`
 (omit it if you want a plain text report).

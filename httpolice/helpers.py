@@ -7,7 +7,32 @@ import six
 from httpolice.util.text import force_bytes, force_unicode
 
 
-__all__ = ['headers_from_cgi']
+__all__ = ['headers_from_cgi', 'pop_pseudo_headers']
+
+
+def pop_pseudo_headers(entries):
+    """Remove and return HTTP/2 `pseudo-headers`__ from a list of headers.
+
+    __ https://tools.ietf.org/html/rfc7540#section-8.1.2.1
+
+    :param entries:
+        A list of header name-value pairs,
+        as would be passed to :class:`httpolice.Request`
+        or :class:`httpolice.Response`.
+        It will be modified in-place by removing all names
+        that start with a colon (:).
+    :return: A dictionary of the removed pseudo-headers.
+    """
+    i = 0
+    r = {}
+    while i < len(entries):
+        (name, value) = entries[i]
+        if name.startswith(u':'):
+            r[name] = value
+            del entries[i]
+        else:
+            i += 1
+    return r
 
 
 def headers_from_cgi(cgi_dict):

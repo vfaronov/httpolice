@@ -36,7 +36,6 @@ setup(
         'httpolice',
         'httpolice.inputs',
         'httpolice.known',
-        'httpolice.plus',
         'httpolice.reports',
         'httpolice.syntax',
         'httpolice.util',

@@ -86,11 +86,15 @@ or from your distribution’s packages if they are recent enough
 __ https://mitmproxy.org/
 __ http://docs.mitmproxy.org/en/stable/install.html
 
-We’re going to use mitmproxy’s command-line tool—`mitmdump`__.
+And you’ll need the integration package::
+
+  $ pip install mitmproxy-HTTPolice
+
+Now, we’re going to use mitmproxy’s command-line tool—`mitmdump`__.
 The following command will start mitmdump as an HTTP proxy on port 8080
 with HTTPolice integration::
 
-  $ mitmdump -s "`python -m httpolice.plus.mitmproxy` -o html report.html"
+  $ mitmdump -s "`python -m mitmproxy_httpolice` -o html report.html"
 
 __ http://docs.mitmproxy.org/en/latest/mitmdump.html
 
