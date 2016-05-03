@@ -1,6 +1,8 @@
 *.pyc
 .cache
+.coverage
+_build
 Django_HTTPolice.egg-info
 HTTPolice.egg-info
+htmlcov
 mitmproxy_HTTPolice.egg-info
-_build

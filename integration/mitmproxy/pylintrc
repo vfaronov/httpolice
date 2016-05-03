@@ -1,0 +1,32 @@
+[MASTER]
+
+persistent=no
+
+
+[REPORTS]
+
+reports=no
+
+
+[MESSAGES CONTROL]
+
+# - No factoring and code style checks for now. Maybe later.
+# - Don't tell me that I've locally disabled/enabled a check. That's the point!
+disable=R,C,locally-disabled,locally-enabled
+
+
+[VARIABLES]
+
+# Local names that start with an underscore do not count as unused variables.
+dummy-variables-rgx=_
+
+
+[EXCEPTIONS]
+
+# `Exception` is not "too general" to be caught.
+overgeneral-exceptions=
+
+
+[TYPECHECK]
+
+generated-members=PROTOCOL_TLSv1_2,recv,sendall

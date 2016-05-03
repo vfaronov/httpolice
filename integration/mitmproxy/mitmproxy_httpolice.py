@@ -103,7 +103,7 @@ def decode(s):
         return s
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':                      # pragma: no cover
     # Print the path to this script,
     # for substitution into the mitmproxy command.
     print(__file__)
