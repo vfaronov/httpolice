@@ -73,6 +73,9 @@ class Response(message.Message):
 
         :param header_entries:
             A list of the response's headers (may be empty).
+            It must **not** include HTTP/2 `pseudo-headers`__.
+
+            __ https://tools.ietf.org/html/rfc7540#section-8.1.2.1
 
             Every item of the list must be a ``(name, value)`` pair.
 
