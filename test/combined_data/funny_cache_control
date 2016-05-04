@@ -1,0 +1,21 @@
+1155 1151 1000 1151 1156 1157 1193 1160 1160 1160 1000
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Cache-Control: max-age="3600", max-stale=60,
+Cache-Control: "foo bar"
+Via: 1.1 baz
+Cache-Control: qux="xyzzy 123", ,no-transform, abcde
+Cache-Control: min-fresh, no-store=yes
+Pragma: no-cache, foo, bar=baz, qux="xyzzy"
+Pragma: no-cache=krekfewhrfk
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!

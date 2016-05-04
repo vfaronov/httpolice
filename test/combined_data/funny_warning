@@ -1,0 +1,21 @@
+1000 1016 1163 1163 1168
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 0K
+Date: Thu, 28 Jan 2016 08:22:04 GMT
+Content-Type: text/plain
+Content-Length: 14
+Expires: Fri, 29 Jan 2016 08:22:04 GMT
+Age: 160
+Warning: 123 - "something"
+Warning: 234 [::0]:8080 "something else"
+    "Thu, 28 Jan 2016 08:22:04 GMT" 
+Warning: 345 - forgot to quote this one
+Warning: 456 baz "qux", 567 - "xyzzy"
+
+Hello world!

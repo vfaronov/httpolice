@@ -1,4 +1,6 @@
-1011 1010 1007
+1016 1023 1011 1007 1010
+
+# Mind the trailing whitespace, including tabs at the end of ``X-Foo``.
 
 ======== BEGIN INBOUND STREAM ========
 POST /articles/ HTTP/1.1
@@ -13,6 +15,15 @@ Hello world!
 HEAD /articles/123/ HTTP/1.1
 Host: example.com
 User-Agent: demo
+X-Quux:
+   demo
+ 
+        (demo)
+  
+X-Foo:   
+   
+ bar		
+Accept-Encoding:
 
 OPTIONS * HTTP/1.1
 Host: example.com
@@ -31,6 +42,9 @@ kjwbkljhqb lu
 fre;/nqejfrn w;ejnf;er
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 100 Continue
+
+HTTP/1.1 123 Keep On Rollin' Baby
+Content-Length: 1
 
 HTTP/1.1 201 Created
 Date: Thu, 31 Dec 2015 18:26:56 GMT

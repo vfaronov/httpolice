@@ -1,4 +1,4 @@
-1005
+
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
@@ -9,5 +9,7 @@ User-Agent: demo
 HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
-Transfer-Encoding: chunked
+Content-Length: 14
+Alt-Svc: http%2F1.1="foo:443";ma=3600;persist=1 , h2=":8000";foo=bar  
 
+Hello world!

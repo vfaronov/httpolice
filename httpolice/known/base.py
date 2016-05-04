@@ -36,7 +36,10 @@ class KnownDict(object):
 
     def _name_for(self, item):
         name = item['_title'] if self._name_from_title else item['_']
-        return (name.
+        name = (name.
                 replace(u'-', u' ').replace(u' ', u'_').replace(u'/', u'_').
                 replace(u'+', u'_').replace(u'.', u'_').
                 lower())
+        if name in [u'continue', u'from']:
+            name = name + u'_'
+        return name

@@ -1,4 +1,4 @@
-1005
+1013 1016 1156 1157 1220
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
@@ -9,5 +9,9 @@ User-Agent: demo
 HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
-Transfer-Encoding: chunked
+Content-Length: 14
+Strict-Transport-Security: foo
+Strict-Transport-Security: ;max-age  =  "15768000" ;
+     includeSubdomains=xyzzy; ; max-age;  foobar ;
 
+Hello world!
