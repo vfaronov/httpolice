@@ -1160,13 +1160,13 @@
   </comment>
 
   <error id="1156">
-    <title><h>Cache-Control</h>: <var ref="directive"/> without argument</title>
-    <explain>According to the specification, the <var ref="directive"/> directive must have an argument. But in this message’s <h>Cache-Control</h> header, it has no argument.</explain>
+    <title><var ref="entry"/>: <var ref="directive"/> without argument</title>
+    <explain>According to the specification, the <var ref="directive"/> directive must have an argument. But in this message’s <var ref="entry"/> header, it has no argument.</explain>
   </error>
 
   <error id="1157">
-    <title><h>Cache-Control</h>: <var ref="directive"/> with argument</title>
-    <explain>In this message’s <h>Cache-Control</h> header, the <var ref="directive"/> directive has an argument. But the specification defines no argument for this directive.</explain>
+    <title><var ref="entry"/>: <var ref="directive"/> with argument</title>
+    <explain>In this message’s <var ref="entry"/> header, the <var ref="directive"/> directive has an argument. But the specification defines no argument for this directive.</explain>
   </error>
 
   <error id="1158">

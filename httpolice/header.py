@@ -299,11 +299,11 @@ class DirectivesView(ListHeaderView):       # pylint: disable=abstract-method
         parser = self.knowledge_module.parser_for(directive)
         if argument is None:
             if self.knowledge_module.argument_required(directive):
-                self.message.complain(1156, directive=directive)
+                self.message.complain(1156, entry=entry, directive=directive)
                 argument = Unavailable
         else:
             if self.knowledge_module.no_argument(directive):
-                self.message.complain(1157, directive=directive)
+                self.message.complain(1157, entry=entry, directive=directive)
                 argument = None
             elif parser is not None:
                 argument = simple_parse(argument, parser,
