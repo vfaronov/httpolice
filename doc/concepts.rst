@@ -1,6 +1,8 @@
 General concepts
 ================
 
+.. highlight:: console
+
 .. _exchanges:
 
 Exchanges
@@ -26,7 +28,9 @@ Reports
 -------
 The output of HTTPolice is a *report* containing *notices*.
 
-Every notice has an ID (such as “1061”) and one of three *severities*:
+Every notice has an ID (such as “1061”)
+that can be used to :ref:`silence <silence>` it,
+and one of three *severities*:
 
 *error*
   Something is clearly wrong.
@@ -38,6 +42,7 @@ Every notice has an ID (such as “1061”) and one of three *severities*:
   Sometimes there is a good reason to violate a standard.
   Sometimes you just don’t care.
   You decide which errors to fix and which to ignore.
+  If you don’t want to see an error, you can :ref:`silence <silence>` it.
 
 *comment*
   Something is *possibly* wrong or sub-optimal, but HTTPolice isn’t sure.
@@ -51,3 +56,39 @@ Every notice has an ID (such as “1061”) and one of three *severities*:
   it will report a debug notice to explain why it thinks so.
   This may help you understand further cache-related notices
   for that response.
+
+
+.. _silence:
+
+Silencing unwanted notices
+--------------------------
+
+You can *silence* notices that you don’t want to see.
+They will disappear from reports and from the :doc:`api`.
+
+Please note that some notice IDs can stand for a range of problems.
+For example, almost all errors in header syntax are reported as notice 1000,
+so if you silence it, you **lose a big chunk** of HTTPolice’s functionality.
+
+Silencing globally
+~~~~~~~~~~~~~~~~~~
+When using the ``httpolice`` command-line tool,
+you can use the ``-s`` option to specify notice IDs to silence::
+
+  $ httpolice -s 1089 -s 1194 ...
+
+Every integration method has a similar mechanism.
+For example, :doc:`mitmproxy` understands the same ``-s`` option.
+
+Silencing locally
+~~~~~~~~~~~~~~~~~
+You can also silence notices on individual messages
+by adding the special ``HTTPolice-Silence`` header to them.
+Its value is a comma-separated list of notice IDs. For example::
+
+  HTTPolice-Silence: 1089, 1110
+
+Requests can also silence notices on responses (but not vice-versa)
+by adding a ``resp`` keyword after an ID::
+
+  HTTPolice-Silence: 1033 resp, 1031

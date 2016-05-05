@@ -10,11 +10,14 @@ This project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Added
 - Django integration (as a separate distribution; see docs).
+- Unwanted notices can now be [silenced][].
 - Checks for the Content-Disposition header (RFC 6266).
 - Checks for RFC 5987 encoded values.
 - Checks for alternative services (RFC 7838).
 - Checks for HTTP/1.1 connection control features prohibited in HTTP/2.
 - Checks for status code 451 (Unavailable For Legal Reasons; RFC 7725).
+
+[silenced]: http://pythonhosted.org/HTTPolice/concepts.html#silence
 
 ### Changed
 - mitmproxy integration has been moved into a separate distribution (see docs).

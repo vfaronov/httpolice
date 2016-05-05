@@ -57,3 +57,8 @@ Now, mitmproxy/mitmdump starts up as usual.
 Every exchange that it intercepts is checked by HTTPolice.
 When you stop mitmdump (Ctrl+C) or exit mitmproxy,
 HTTPolice writes an HTML report to ``report.html``.
+
+You can use the ``-s`` option to :ref:`silence <silence>` unwanted notices,
+just as with the ``httpolice`` command-line tool::
+
+  $ mitmdump -s "`python -m mitmproxy_httpolice` -s 1089 -s 1194 report.txt"
