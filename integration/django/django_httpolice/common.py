@@ -1,8 +1,7 @@
 # -*- coding: utf-8; -*-
 
-import six
-
 from django.conf import settings
+from django.utils import six
 
 
 DEFAULT_SETTINGS = {
