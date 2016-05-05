@@ -24,8 +24,9 @@ setup(
     author_email='vfaronov@gmail.com',
     license='MIT',
     install_requires=[
-        'Django >=1.8',
+        'Django >=1.8.0',
         'HTTPolice >=0.2.0.dev1',
+        'six >=1.10.0',
     ],
     packages=['django_httpolice'],
     classifiers=[

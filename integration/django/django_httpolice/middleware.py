@@ -2,11 +2,11 @@
 
 import collections
 
-from django.conf import settings
-from django.utils.encoding import force_text
+import django.utils.encoding
+from django_httpolice.common import ProtocolError, get_setting
 
 
-backlog = collections.deque(maxlen=getattr(settings, 'HTTPOLICE_BACKLOG', 20))
+backlog = collections.deque(maxlen=get_setting('BACKLOG'))
 
 
 class HTTPoliceMiddleware(object):
@@ -14,16 +14,18 @@ class HTTPoliceMiddleware(object):
     """Captures and checks HTTP exchanges, saving them for later review."""
 
     def process_response(self, request, response):
-        enable = getattr(settings, 'HTTPOLICE_ENABLE', None)
-        if (enable == False) or (enable is None and not settings.DEBUG):
+        if not get_setting('ENABLE'):
             return response
 
         # Importing `httpolice` can execute a lot of code,
         # so we only do it when it's really time for action.
         import httpolice
 
-        req_method = force_text(request.method)
+        req_method = _force_text(request.method)
         req_headers = httpolice.helpers.headers_from_cgi(request.META)
+        req_target = _force_text(request.path)
+        if request.META.get('QUERY_STRING'):
+            req_target += u'?' + _force_text(request.META['QUERY_STRING'])
 
         try:
             # This can raise `django.http.request.RawPostDataException`, saying
@@ -41,9 +43,9 @@ class HTTPoliceMiddleware(object):
                            if entry != (u'Content-Type', b'text/plain')]
 
         req = httpolice.Request(
-            scheme=force_text(request.scheme),
+            scheme=_force_text(request.scheme),
             method=req_method,
-            target=force_text(request.path),
+            target=req_target,
             version=None,
             header_entries=req_headers,
             body=req_body,
@@ -61,14 +63,24 @@ class HTTPoliceMiddleware(object):
         resp = httpolice.Response(
             version=None,
             status=response.status_code,
-            reason=force_text(response.reason_phrase),
+            reason=_force_text(response.reason_phrase),
             header_entries=[
-                (force_text(name), value)
+                (_force_text(name), value)
                 for (name, value) in response.items()],
             body=resp_body,
         )
 
         exchange = httpolice.Exchange(req, [resp])
+        exchange.silence(get_setting('SILENCE'))
         httpolice.check_exchange(exchange)
         backlog.appendleft(exchange)
+
+        if get_setting('RAISE') and any(notice.severity == httpolice.ERROR
+                                        for notice in resp.notices):
+            raise ProtocolError(exchange)
+
         return response
+
+
+def _force_text(s):
+    return django.utils.encoding.force_text(s, encoding='iso-8859-1')
