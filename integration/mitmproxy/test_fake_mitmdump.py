@@ -201,3 +201,28 @@ def test_html(fake_mitmdump):           # pylint: disable=redefined-outer-name
             b'Hello world!\r\n'
         )
     assert b'<h1>HTTPolice report</h1>' in fake_mitmdump.report
+
+
+def test_silence(fake_mitmdump):         # pylint: disable=redefined-outer-name
+    fake_mitmdump.opts = ['-s', '1087', '-s', '1194']
+    with fake_mitmdump:
+        fake_mitmdump.flow(
+            'http',
+            'GET', '/', 'HTTP/1.1',
+            [
+                ('host', 'example.com'),
+                ('User-Agent', 'demo'),
+            ],
+            b'',
+            'HTTP/1.1', 401, 'Unauthorized',
+            [
+                ('Content-Type', 'text/plain'),
+                ('Content-Length', '0'),
+            ],
+            b''
+        )
+    assert fake_mitmdump.report == (
+        b'------------ request 1 : GET /\n'
+        b'------------ response 1 : 401 Unauthorized\n'
+        b'C 1110 401 response with no Date header\n'
+    )
