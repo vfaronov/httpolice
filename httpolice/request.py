@@ -211,6 +211,10 @@ class Request(message.Message):
 def check_request(req):
     """Apply all checks to the request `req`."""
 
+    req.silence(notice_id
+                for (notice_id, in_resp) in req.headers.httpolice_silence.okay
+                if not in_resp)
+
     message.check_message(req)
 
     _ = req.target_form                 # Force check.

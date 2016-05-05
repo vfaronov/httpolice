@@ -4,6 +4,7 @@ from httpolice.citation import Citation, RFC
 from httpolice.known.base import KnownDict
 from httpolice.structure import FieldName
 from httpolice.syntax import (
+    internal,
     rfc5789,
     rfc5988,
     rfc6266,
@@ -381,6 +382,13 @@ known = KnownDict([
   'proactive_conneg': False,
   'rule': SINGLE},
  {'_': FieldName(u'GetProfile'), '_citations': [RFC(4229)]},
+ {'_': FieldName(u'HTTPolice-Silence'),
+  'for_request': True,
+  'for_response': True,
+  'parser': internal.HTTPolice_Silence,
+  'precondition': False,
+  'proactive_conneg': False,
+  'rule': MULTI},
  {'_': FieldName(u'Hobareg'),
   '_citations': [RFC(7486, section=(6, 1, 1))],
   'iana_status': 'experimental'},

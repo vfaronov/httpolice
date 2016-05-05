@@ -28,7 +28,10 @@ def expand_elem(elem):
 
 @expand_piece.register(Symbol)
 def expand_symbol(sym):
-    return [sym.name, u' (', sym.citation, u')']
+    if sym.citation:
+        return [sym.name, u' (', sym.citation, u')']
+    else:
+        return [sym.name]
 
 @expand_piece.register(Parametrized)
 def expand_parametrized(x):

@@ -35,6 +35,14 @@ class Exchange(Blackboard):
         self.request = req
         self.responses = resps
 
+    @property
+    def _children(self):
+        r = super(Exchange, self)._children
+        if self.request is not None:
+            r.append(self.request)
+        r.extend(self.responses)
+        return r
+
 
 def complaint_box(*args, **kwargs):
     """Create an empty exchange that only carries a single notice.

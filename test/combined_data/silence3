@@ -1,0 +1,17 @@
+1039
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+User-Agent: demo
+Httpolice-silence: 1031, 1033 resp, 1039
+Httpolice-silence:
+Httpolice-silence: 1168 Resp , 1178 Resp
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/xml
+Content-Length: 14
+Age: 2019
+
+Hello world!

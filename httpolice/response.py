@@ -216,6 +216,9 @@ def check_response(resp):
 
 
 def check_response_itself(resp):
+    resp.silence(notice_id
+                 for (notice_id, _) in resp.headers.httpolice_silence.okay)
+
     message.check_message(resp)
 
     version = resp.version
@@ -461,6 +464,10 @@ def check_response_itself(resp):
 
 
 def check_response_in_context(resp, req):
+    resp.silence(notice_id
+                 for (notice_id, in_resp) in req.headers.httpolice_silence.okay
+                 if in_resp)
+
     if resp.body and resp.headers.content_type.is_absent and \
             not (resp.status == st.partial_content and
                  req.headers.if_range.is_present):

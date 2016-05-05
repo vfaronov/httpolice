@@ -14,20 +14,17 @@ Example
 API reference
 -------------
 .. autoclass:: httpolice.Request
+   :members: notices, silence
 
-   .. attribute:: notices
-
-      A list of :class:`Notice` objects reported on this request.
-      Filled by :func:`~httpolice.check_exchange`.
+|
 
 .. autoclass:: httpolice.Response
+   :members: notices, silence
 
-   .. attribute:: notices
-
-      A list of :class:`Notice` objects reported on this response.
-      Filled by :func:`~httpolice.check_exchange`.
+|
 
 .. autoclass:: httpolice.Exchange
+   :members: silence
 
    .. attribute:: request
 
@@ -38,7 +35,11 @@ API reference
       The list of :class:`~httpolice.Response` objects
       passed to the constructor.
 
+|
+
 .. autofunction:: httpolice.check_exchange
+
+|
 
 .. class:: Notice
 
@@ -53,7 +54,11 @@ API reference
      :data:`httpolice.ERROR`, :data:`httpolice.COMMENT`,
      and :data:`httpolice.DEBUG`.
 
+|
+
 .. autofunction:: httpolice.text_report
+
+|
 
 .. autofunction:: httpolice.html_report
 

@@ -8,19 +8,19 @@ exchanges = [
                           [(u'Host', b'example.com')],
                           b''),
         [
-            httpolice.Response(u'HTTP/1.1', 200, u'OK',
+            httpolice.Response(u'HTTP/1.1', 401, u'Unauthorized',
                                [(u'Content-Type', b'text/plain')],
-                               b'Hello world!'),
+                               b'No way!'),
         ]
     )
 ]
 
-ignore_ids = [1089, 1194]         # Errors we don't care about
 bad_exchanges = []
 
 for exch in exchanges:
+    exch.silence([1089, 1194])      # Errors we don't care about
     httpolice.check_exchange(exch)
-    if any(notice.severity == httpolice.ERROR and notice.id not in ignore_ids
+    if any(notice.severity == httpolice.ERROR
            for resp in exch.responses       # We only care about responses
            for notice in resp.notices):
         bad_exchanges.append(exch)
