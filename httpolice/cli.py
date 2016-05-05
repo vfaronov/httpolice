@@ -21,6 +21,8 @@ def main():
                         help=u'input format (see the user manual)')
     parser.add_argument(u'-o', u'--output', choices=reports.formats,
                         default=u'text', help=u'output format')
+    parser.add_argument(u'-s', u'--silence', metavar=u'ID', type=int,
+                        action='append', help=u'silence the given notice ID')
     parser.add_argument(u'path', nargs='+')
     args = parser.parse_args()
 
@@ -28,6 +30,8 @@ def main():
     report = reports.formats[args.output]
     def generate_exchanges():
         for exch in input_(args.path):
+            if args.silence:
+                exch.silence(args.silence)
             check_exchange(exch)
             yield exch
 
