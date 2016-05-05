@@ -13,9 +13,11 @@ reports = {'text': httpolice.text_report, 'html': httpolice.html_report}
 
 
 def start(context, argv):
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog=os.path.basename(__file__),
+                                     add_help=False)
     parser.add_argument('-o', '--output', choices=reports, default='text')
-    parser.add_argument('-s', '--silence', type=int, action='append')
+    parser.add_argument('-s', '--silence', metavar='ID',
+                        type=int, action='append')
     parser.add_argument('report_path')
     context.args = parser.parse_args(argv[1:])
 
