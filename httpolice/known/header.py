@@ -240,6 +240,7 @@ known = KnownDict([
   'for_response': True,
   'iana_status': u'standard',
   'parser': rfc6266.content_disposition,
+  'representation_metadata': True,
   'rule': SINGLE},
  {'_': FieldName(u'Content-Encoding'),
   '_citations': [RFC(7231, section=(3, 1, 2, 2))],
