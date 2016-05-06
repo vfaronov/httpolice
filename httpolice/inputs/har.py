@@ -16,6 +16,7 @@ except ImportError:                             # Python 2
 from httpolice import framing1
 from httpolice.exchange import Exchange
 from httpolice.helpers import pop_pseudo_headers
+from httpolice.inputs.common import InputError
 from httpolice.known import h, media, st
 from httpolice.parse import ParseError, Stream
 from httpolice.request import Request
@@ -37,14 +38,14 @@ def har_input(paths):
             try:
                 data = json.load(f)
             except ValueError as exc:
-                raise RuntimeError('bad HAR file: %s: %s' % (path, exc))
+                raise InputError('%s: bad HAR file: %s' % (path, exc))
             try:
                 creator = data['log']['creator']['name']
                 for entry in data['log']['entries']:
                     yield _process_entry(entry, creator)
             except (TypeError, KeyError) as exc:
-                raise RuntimeError('cannot understand HAR file: %s: %r' %
-                                   (path, exc))
+                raise InputError('%s: cannot understand HAR file: %r' %
+                                 (path, exc))
 
 
 def _process_entry(data, creator):

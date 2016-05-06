@@ -6,11 +6,12 @@ import os
 import re
 
 from httpolice.framing1 import parse_streams
+from httpolice.inputs.common import InputError
 
 
 def streams_input(paths):
     if len(paths) % 2 != 0:
-        raise RuntimeError('even number of input files required')
+        raise InputError('even number of input streams required')
     while paths:
         with io.open(paths.pop(0), 'rb') as f:
             inbound_data = f.read()
@@ -94,7 +95,7 @@ def _directory_input(dir_path, streams_info):
         try:
             other_name = streams_map[(conn_key, dest, src)]
         except KeyError:
-            raise RuntimeError('no reverse stream corresponding to %s' % path)
+            raise InputError('%s: no corresponding reverse stream' % path)
 
         other_path = os.path.join(dir_path, other_name)
         del streams_map[(conn_key, dest, src)]
@@ -105,8 +106,8 @@ def _directory_input(dir_path, streams_info):
         elif _sniff_outbound_stream(other_path):
             paired_paths.extend((path, other_path))
         else:
-            raise RuntimeError(
-                'cannot detect streams direction (not HTTP/1.x?): %s and %s' %
+            raise InputError(
+                '%s and %s: cannot detect streams direction (not HTTP/1.x?)' %
                 (path, other_path))
 
     for exch in streams_input(paired_paths):
@@ -139,12 +140,12 @@ def parse_combined(path):
         data = f.read()
     parts1 = data.split(b'======== BEGIN INBOUND STREAM ========\r\n', 1)
     if len(parts1) != 2:
-        raise RuntimeError('bad combined file: no inbound marker: %s' % path)
+        raise InputError('%s: bad combined file: no inbound marker' % path)
     (preamble, rest) = parts1
     preamble = preamble.decode('utf-8')
     parts2 = rest.split(b'======== BEGIN OUTBOUND STREAM ========\r\n', 1)
     if len(parts2) != 2:
-        raise RuntimeError('bad combined file: no outbound marker: %s' % path)
+        raise InputError('%s: bad combined file: no outbound marker' % path)
     (inbound, outbound) = parts2
 
     return (inbound, outbound, scheme, preamble)

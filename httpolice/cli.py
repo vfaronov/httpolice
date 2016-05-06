@@ -11,7 +11,7 @@ from httpolice.exchange import check_exchange
 from httpolice.util.text import stdio_as_bytes
 
 
-def main():
+def run_cli(argv, stdout, stderr):
     parser = argparse.ArgumentParser(
         description=u'Run HTTPolice on input files.')
     parser.add_argument(u'--version', action='version',
@@ -24,7 +24,7 @@ def main():
     parser.add_argument(u'-s', u'--silence', metavar=u'ID', type=int,
                         action='append', help=u'silence the given notice ID')
     parser.add_argument(u'path', nargs='+')
-    args = parser.parse_args()
+    args = parser.parse_args(argv[1:])
 
     input_ = inputs.formats[args.input]
     report = reports.formats[args.output]
@@ -45,10 +45,22 @@ def main():
         # (perhaps from pieces of input data),
         # we don't want to trip over Unicode errors.
         # So we encode all text into UTF-8 and write directly as bytes.
-        report(generate_exchanges(), stdio_as_bytes(sys.stdout))
-    except (OSError, RuntimeError) as exc:
-        sys.stderr.write('Error: %s\n' % exc)
-        sys.exit(1)
+        report(generate_exchanges(), stdio_as_bytes(stdout))
+    except (EnvironmentError, inputs.InputError) as exc:
+        stderr.write('httpolice: %s\n' % exc)
+        return 1
+
+    return 0
+
+
+def excepthook(_type, exc, traceback):
+    sys.stderr.write('httpolice: unhandled exception: %r\n' % exc)
+    sys.exit(1)
+
+
+def main():
+    sys.excepthook = excepthook
+    sys.exit(run_cli(sys.argv, sys.stdout, sys.stderr))
 
 if __name__ == '__main__':
     main()
