@@ -1,3 +1,4 @@
 include README.rst
 include LICENSE.txt
+include CHANGELOG.md
 prune test
