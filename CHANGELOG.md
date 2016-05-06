@@ -29,8 +29,11 @@ This project adheres to [Semantic Versioning](http://semver.org/)
 
 ### Fixed
 - Input files from tcpick are sorted correctly.
-- Notice 1108 (wrong day of week) doesn't crash in non-English locales.
-- Notice 1038 (bad JSON body) and such are not reported on responses to HEAD.
+- Notice [1108][] doesn't crash in non-English locales.
+- Notices such as [1038][] are not reported on responses to HEAD.
+
+[1108]: http://pythonhosted.org/HTTPolice/notices.html#1108
+[1038]: http://pythonhosted.org/HTTPolice/notices.html#1038
 
 ### Security
 

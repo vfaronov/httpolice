@@ -107,8 +107,9 @@ you can use the `HTTPOLICE_SILENCE` setting::
 They will disappear from reports and will not cause `ProtocolError`.
 
 By default, `HTTPOLICE_SILENCE` includes some notices
-that are irrelevant because of Django specifics,
-such as 1110 (response with no Date header).
+that are irrelevant because of Django specifics, such as `1110`__.
+
+__ http://pythonhosted.org/HTTPolice/notices.html#1110
 
 Of course, the ``HTTPolice-Silence`` header works, too::
 

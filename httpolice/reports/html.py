@@ -76,7 +76,8 @@ def list_notices(buf):
         with H.div(_class=u'notices-list'):
             placeholder = Placeholder()
             for id_ in sorted(notice.notices.keys()):
-                _notice_to_html(notice.notices[id_], placeholder)
+                _notice_to_html(notice.notices[id_], placeholder,
+                                with_anchor=True)
     buf.write(document.render().encode('utf-8'))
 
 
@@ -254,8 +255,9 @@ def _render_known(obj):
             H.attr(title=title)
 
 
-def _notice_to_html(the_notice, ctx):
-    with H.div(_class=u'notice %s' % the_notice.severity):
+def _notice_to_html(the_notice, ctx, with_anchor=False):
+    anchor = {'id': six.text_type(the_notice.id)} if with_anchor else {}
+    with H.div(_class=u'notice %s' % the_notice.severity, **anchor):
         with H.h3():
             # See above regarding spaces.
             H.abbr(the_notice.severity_short, _class=u'severity',
