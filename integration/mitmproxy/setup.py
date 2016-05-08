@@ -25,8 +25,8 @@ setup(
     author_email='vfaronov@gmail.com',
     license='MIT',
     install_requires=[
-        'mitmproxy >=0.17',
-        'HTTPolice >=0.2.0.dev1',
+        'mitmproxy >=0.15',
+        'HTTPolice >=0.2.0',
     ],
     py_modules=['mitmproxy_httpolice'],
     classifiers=[
