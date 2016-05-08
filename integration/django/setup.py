@@ -8,7 +8,7 @@ from setuptools import setup
 
 metadata = {}
 with io.open(os.path.join('django_httpolice', '__metadata__.py'), 'rb') as f:
-    exec(f.read(), metadata)
+    exec(f.read(), metadata)            # pylint: disable=exec-used
 
 with io.open('README.rst') as f:
     long_description = f.read()
