@@ -79,7 +79,7 @@ This can be used to fail tests on errors::
     File "[...]/django_httpolice/middleware.py", line 81, in process_response
       raise ProtocolError(exchange)
   django_httpolice.common.ProtocolError: HTTPolice found errors in this response:
-  ------------ request 1 : GET /api/v1/?format=plain&name=M...
+  ------------ request 1 : GET /api/v1/?name=Martha&format=plain
   C 1070 No User-Agent header
   ------------ response 1 : 200 OK
   E 1038 Bad JSON body

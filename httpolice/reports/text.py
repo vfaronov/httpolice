@@ -60,7 +60,7 @@ def _exchange_marker(exchange, req_i):
         marker = u'------------ unknown request'
     else:
         marker = u'------------'
-    return ellipsize(marker) + u'\n'
+    return ellipsize(marker, 80) + u'\n'
 
 
 def _response_marker(response, resp_i):
