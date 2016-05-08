@@ -14,6 +14,7 @@ Added
 -----
 - `Django integration`_ (as a separate distribution).
 - Unwanted notices can now be `silenced`_.
+- Checks for OAuth `bearer tokens`_.
 - Checks for the `Content-Disposition`_ header.
 - Checks for `RFC 5987`_ encoded values.
 - Checks for `alternative services`_.
@@ -23,6 +24,7 @@ Added
 
 .. _Django integration: http://pythonhosted.org/HTTPolice/django.html
 .. _silenced: http://pythonhosted.org/HTTPolice/concepts.html#silence
+.. _bearer tokens: http://tools.ietf.org/html/rfc6750
 .. _Content-Disposition: http://tools.ietf.org/html/rfc6266
 .. _RFC 5987: https://tools.ietf.org/html/rfc5987
 .. _alternative services: https://tools.ietf.org/html/rfc7838

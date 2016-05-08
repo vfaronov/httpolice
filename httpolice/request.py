@@ -6,9 +6,9 @@ import string
 # pylint: disable=import-error
 
 try:
-    from urllib.parse import urlparse
+    from urllib.parse import parse_qs, urlparse
 except ImportError:                             # Python 2
-    from urlparse import urlparse
+    from urlparse import parse_qs, urlparse
 
 # pylint: enable=import-error
 
@@ -207,6 +207,14 @@ class Request(message.Message):
                 return False
         return None
 
+    @derived_property
+    def query_params(self):
+        # `parse_qs` returns an empty dictionary on garbage,
+        # so this property should be understood as "salvageable query params."
+        if not okay(self.effective_uri):
+            return {}
+        return parse_qs(urlparse(self.effective_uri).query)
+
 
 def check_request(req):
     """Apply all checks to the request `req`."""
@@ -352,23 +360,9 @@ def check_request(req):
         if hdr.is_okay:
             scheme, credentials = hdr.value
             if scheme == auth.basic:
-                if isinstance(credentials, six.text_type):   # ``token68`` form
-                    try:
-                        credentials = base64.b64decode(credentials)
-                    except Exception as e:
-                        req.complain(1210, header=hdr, error=e)
-                    else:
-                        # RFC 7617 section 2 requires that,
-                        # whatever the encoding of the credentials,
-                        # it must be ASCII-compatible,
-                        # so we don't need to know it.
-                        if b':' not in credentials:
-                            req.complain(1211, header=hdr)
-                        for c in six.iterbytes(credentials):
-                            if CTL.match(six.int2byte(c)):
-                                req.complain(1212, header=hdr, char=hex(c))
-                else:
-                    req.complain(1209, header=hdr)
+                _check_basic_auth(req, hdr, credentials)
+            if scheme == auth.bearer:
+                _check_bearer_auth(req, hdr, credentials)
 
     if req.method == m.PATCH and req.headers.content_type.is_okay:
         if media_type.is_patch(req.headers.content_type.value.item) == False:
@@ -389,3 +383,40 @@ def check_request(req):
         for c in req.headers.http2_settings.value:
             if c not in string.ascii_letters + string.digits + '-_':
                 req.complain(1234, char=c)
+
+    if u'access_token' in req.query_params:
+        req.complain(1270)
+        if req.is_tls == False:
+            req.complain(1271, where=req.target)
+        if not req.headers.cache_control.no_store:
+            req.complain(1272)
+
+    if okay(req.url_encoded_data) and u'access_token' in req.url_encoded_data:
+        if req.is_tls == False:
+            req.complain(1271, where=req.body)
+
+
+def _check_basic_auth(req, hdr, credentials):
+    if isinstance(credentials, six.text_type):   # ``token68`` form
+        try:
+            credentials = base64.b64decode(credentials)
+        except Exception as e:
+            req.complain(1210, header=hdr, error=e)
+        else:
+            # RFC 7617 section 2 requires that,
+            # whatever the encoding of the credentials,
+            # it must be ASCII-compatible, so we don't need to know it.
+            if b':' not in credentials:
+                req.complain(1211, header=hdr)
+            for c in six.iterbytes(credentials):
+                if CTL.match(six.int2byte(c)):
+                    req.complain(1212, header=hdr, char=hex(c))
+    else:
+        req.complain(1209, header=hdr)
+
+
+def _check_bearer_auth(req, hdr, credentials):
+    if req.is_tls == False:
+        req.complain(1261, header=hdr)
+    if not isinstance(credentials, six.text_type):      # not ``token68`` form
+        req.complain(1262, header=hdr)

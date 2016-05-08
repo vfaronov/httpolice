@@ -12,6 +12,8 @@ except ImportError:                                     # Python 2
 
 # pylint: enable=import-error,no-name-in-module
 
+import six
+
 from httpolice import message
 from httpolice.blackboard import derived_property
 from httpolice.known import (
@@ -42,6 +44,8 @@ from httpolice.structure import (
     http2,
     okay,
 )
+from httpolice.parse import simple_parse
+from httpolice.syntax import rfc6749
 from httpolice.syntax.rfc7230 import asterisk_form
 from httpolice.util.text import force_unicode, is_ascii
 
@@ -398,13 +402,9 @@ def check_response_itself(resp):
     for hdr in [headers.www_authenticate, headers.proxy_authenticate]:
         for challenge in hdr.okay:
             if challenge.item == auth.basic:
-                if u'realm' not in challenge.param:
-                    resp.complain(1206, header=hdr)
-                for charset in challenge.param.getall(u'charset'):
-                    if charset.lower() != u'utf-8':
-                        resp.complain(1208, header=hdr, charset=charset)
-                for name in set(challenge.param) - set([u'charset', u'realm']):
-                    resp.complain(1207, header=hdr, param=name)
+                _check_basic_challenge(resp, hdr, challenge)
+            if challenge.item == auth.bearer:
+                _check_bearer_challenge(resp, hdr, challenge)
 
     if headers.allow.is_present and headers.accept_patch.is_present and \
             m.PATCH not in headers.allow:
@@ -748,3 +748,87 @@ def check_response_in_context(resp, req):
     if resp.headers.strict_transport_security.is_present and \
             req.is_tls == False:
         resp.complain(1221)
+
+
+def _check_basic_challenge(resp, hdr, challenge):
+    if u'realm' not in challenge.param:
+        resp.complain(1206, header=hdr)
+    for charset in challenge.param.getall(u'charset'):
+        if charset.lower() != u'utf-8':
+            resp.complain(1208, header=hdr, charset=charset)
+    for name in set(challenge.param) - set([u'charset', u'realm']):
+        resp.complain(1207, header=hdr, param=name)
+
+
+def _check_bearer_challenge(resp, hdr, challenge):
+    # The ``Bearer`` authentication scheme is actually defined
+    # for proxies as well as for servers (RFC 6750 Section 1).
+    # Squid even seems to support it:
+    # http://wiki.squid-cache.org/Features/BearerAuthentication .
+    # However, generalizing these checks to proxies is kind of a pain,
+    # so for now we only handle the ``WWW-Authenticate`` series.
+    # If this is ever extended to proxies, the notices must be adjusted.
+    # Also note that some text in RFC 6750 only applies to servers
+    # (where it says "resource server").
+    if hdr.name != h.www_authenticate:
+        return
+
+    req = resp.request
+    request_has_token = None
+    if req:
+        if req.is_tls == False:
+            resp.complain(1263)
+
+        # Did the request contain a bearer token in one of the defined forms?
+        request_has_token = (
+            (
+                req.headers.authorization.is_okay and
+                req.headers.authorization.value.item == auth.bearer
+            ) or
+            (
+                okay(req.url_encoded_data) and
+                u'access_token' in req.url_encoded_data
+            ) or
+            u'access_token' in req.query_params
+        )
+
+    params = challenge.param
+
+    if isinstance(params, six.text_type) or not params:
+        # ``token68`` form or no parameters at all.
+        resp.complain(1264)
+        return
+
+    for dupe in params.duplicates():
+        if dupe in [u'realm', u'scope', u'error', u'error_description',
+                    u'error_uri']:
+            resp.complain(1265, param=dupe)
+
+    for param in [u'scope', u'error', u'error_description', u'error_uri']:
+        if param in params:
+            parser = getattr(rfc6749, param)
+            simple_parse(params[param], parser,
+                         resp.complain, 1266, param=param, value=params[param])
+
+    if resp.status == st.unauthorized and u'error' not in params and \
+            req and req.headers.authorization.is_okay and \
+            req.headers.authorization.value.item == auth.bearer:
+        # We don't report this if the token was passed in the URI or body,
+        # because the server may not implement those forms at all.
+        resp.complain(1267)
+
+    if u'error' in params:
+        error_code = params[u'error']
+        expected_status = {
+            u'invalid_request': st.bad_request,
+            u'invalid_token': st.unauthorized,
+            u'insufficient_scope': st.forbidden,
+        }.get(error_code)
+        if expected_status and resp.status != expected_status:
+            resp.complain(1268, error_code=error_code,
+                          expected_status=expected_status)
+
+    if req and req.headers.authorization.is_absent and not request_has_token:
+        for param in [u'error', u'error_description', u'error_uri']:
+            if param in params:
+                resp.complain(1269, param=param)

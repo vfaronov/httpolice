@@ -1,0 +1,15 @@
+1265
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+WWW-Authenticate: Bearer scope=foo, scope=bar
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!

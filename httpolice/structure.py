@@ -96,6 +96,9 @@ class MultiDict(object):
     def __iter__(self):
         return iter(self.dictionary)
 
+    def __len__(self):
+        return len(self.sequence)
+
     def get(self, name, default=None):
         return self[name] if name in self else default
 

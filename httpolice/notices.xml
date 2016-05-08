@@ -1893,4 +1893,104 @@
     </rfc>
   </error>
 
+  <error id="1261">
+    <title><h>Authorization</h>: <auth>Bearer</auth> without TLS</title>
+    <rfc num="6750" sect="5.3">
+      Clients MUST always use TLS [RFC5246]
+      (https) or equivalent transport security when making requests with
+      bearer tokens.  Failing to do so exposes the token to numerous
+      attacks that could give attackers unintended access.
+    </rfc>
+  </error>
+
+  <error id="1262">
+    <title>Malformed <h>Authorization</h>: <auth>Bearer</auth></title>
+    <explain>In the Bearer authentication scheme, credentials are sent as a single token. See <rfc num="6750" sect="2.1"/>.</explain>
+  </error>
+
+  <error id="1263">
+    <title><h>WWW-Authenticate</h>: <auth>Bearer</auth> without TLS</title>
+    <explain>According to <rfc num="6750" sect="5.3"/>, bearer tokens must not be used without TLS. Instead of prompting the client to send a token on an insecure connection, perhaps it would be better to redirect to an ‘https:’ URI first.</explain>
+  </error>
+
+  <error id="1264">
+    <title>Malformed <h>WWW-Authenticate</h>: <auth>Bearer</auth></title>
+    <explain>A Bearer authentication challenge must have “key=value” parameters. See <rfc num="6750" sect="3"/>.</explain>
+  </error>
+
+  <error id="1265">
+    <title><h>WWW-Authenticate</h>: <auth>Bearer</auth> with multiple ‘<var ref="param"/>’ parameters</title>
+    <explain>According to <rfc num="6750" sect="3"/>, the ‘<var ref="param"/>’ parameter must not appear more than once.</explain>
+  </error>
+
+  <error id="1266">
+    <title>Malformed ‘<var ref="param"/>’ parameter in <h>WWW-Authenticate</h></title>
+    <explain>“<var ref="value"/>” is not a correct value for a ‘<var ref="param"/>’ parameter in a <auth>Bearer</auth> challenge. See <rfc num="6750" sect="3"/>.</explain>
+    <exception/>
+  </error>
+
+  <comment id="1267">
+    <title>Declined a <auth>Bearer</auth> token, but no ‘error’ parameter</title>
+    <rfc num="6750" sect="3">
+      If the protected resource request included an access token and failed
+   authentication, the resource server SHOULD include the "error"
+   attribute to provide the client with the reason why the access
+   request was declined.
+    </rfc>
+    <ref to="msg.request.headers.authorization"/>
+    <ref to="msg.status"/>
+    <ref to="msg.headers.www_authenticate"/>
+  </comment>
+
+  <comment id="1268">
+    <title><var ref="msg.status"/> response with “error=<var ref="error_code"/>”</title>
+    <explain>According to <rfc num="6750" sect="3.1"/>, when the server’s <auth>Bearer</auth> challenge has “error=<var ref="error_code"/>”, the status code should be <var ref="expected_status"/>.</explain>
+    <ref to="msg.headers.www_authenticate"/>
+  </comment>
+
+  <comment id="1269">
+    <title>Unneeded ‘<var ref="param"/>’ in <h>WWW-Authenticate</h></title>
+    <rfc num="6750" sect="3.1">
+      If the request lacks any authentication information (e.g., the client
+   was unaware that authentication is necessary or attempted using an
+   unsupported authentication method), the resource server SHOULD NOT
+   include an error code or other error information.
+    </rfc>
+  </comment>
+
+  <comment id="1270">
+    <title>Access token in URI</title>
+    <explain>The query string of this request’s URI contains an ‘access_token’ parameter. It’s probably a bearer token, as defined in <rfc num="6750"/>.</explain>
+    <rfc num="6750" sect="5.3">
+      Bearer tokens SHOULD NOT be
+      passed in page URLs (for example, as query string parameters).
+      Instead, bearer tokens SHOULD be passed in HTTP message headers or
+      message bodies for which confidentiality measures are taken.
+      Browsers, web servers, and other software may not adequately
+      secure URLs in the browser history, web server logs, and other
+      data structures.  If bearer tokens are passed in page URLs,
+      attackers might be able to steal them from the history data, logs,
+      or other unsecured locations.
+    </rfc>
+    <ref to="msg.target"/>
+  </comment>
+
+  <comment id="1271">
+    <title>Access token without TLS</title>
+    <explain>This request has an ‘access_token’ parameter. It’s probably a bearer token, as defined in <rfc num="6750"/>.</explain>
+    <rfc num="6750" sect="5.3">
+      Clients MUST always use TLS [RFC5246]
+      (https) or equivalent transport security when making requests with
+      bearer tokens.  Failing to do so exposes the token to numerous
+      attacks that could give attackers unintended access.
+    </rfc>
+    <ref to="where"/>
+  </comment>
+
+  <comment id="1272">
+    <title>Access token in URI without “<h ref="no">Cache-Control</h>: no-store”</title>
+    <explain>According to <rfc num="6750" sect="2.3"/>, if an access token is sent in the request URI, then the request should at least have a “<h ref="no">Cache-Control</h>: no-store” header. This reduces the risk of caches saving this token.</explain>
+    <ref to="msg.target"/>
+  </comment>
+
 </notices>

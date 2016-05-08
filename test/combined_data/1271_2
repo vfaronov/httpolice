@@ -1,0 +1,16 @@
+1271
+
+======== BEGIN INBOUND STREAM ========
+POST /api/v1/products/search.xml HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 34
+
+q=frobnicator&access_token=FAZwgNw======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: application/xml; charset="utf-8"
+Content-Length: 21
+
+<results></results>

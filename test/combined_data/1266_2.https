@@ -1,0 +1,15 @@
+1266
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 401 Unauthorized
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+WWW-Authenticate: Bearer scope=""
+Content-Type: text/plain
+Content-Length: 35
+
+Please authenticate with a token.

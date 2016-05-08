@@ -1,0 +1,15 @@
+1270
+
+======== BEGIN INBOUND STREAM ========
+GET /api/v1/products/search.xml?q=frobnicator&access_token=FAZwgNw HTTP/1.1
+Host: example.com
+User-Agent: demo
+Cache-Control: max-age=0,no-store
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: application/xml; charset="utf-8"
+Content-Length: 21
+
+<results></results>

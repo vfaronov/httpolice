@@ -1,0 +1,15 @@
+1269 1269
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 401 Unauthorized
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+WWW-Authenticate: Bearer Scope="foo bar", Error="invalid_token", Error_Description="The supplied token is expired or invalid."
+Content-Type: text/plain
+Content-Length: 35
+
+Please authenticate with a token.
