@@ -7,10 +7,12 @@ __ http://pythonhosted.org/HTTPolice/showcase.html
 
 As a command-line tool, it can read `HAR files`__ or raw HTTP/1.x TCP streams.
 It can integrate with `mitmproxy`__ for TLS-encrypted and HTTP/2 traffic.
-Or you can use it as a Python library (for Python 2.7 and 3.4+).
+Or you can use it as a Python library (for Python 2.7 and 3.4+),
+with optional `Django`__ integration.
 
 __ https://en.wikipedia.org/wiki/.har
 __ https://mitmproxy.org/
+__ https://www.djangoproject.com/
 
 Start with the `quickstart`__.
 
