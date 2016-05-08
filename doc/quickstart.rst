@@ -110,6 +110,66 @@ Now, when you stop mitmdump (Ctrl+C),
 HTTPolice will write an HTML report to ``report.html``.
 
 
+Django integration
+------------------
+Suppose you’re building a Web application with `Django`__ (1.8+).
+You probably have a test suite
+that makes requests to your app and checks responses.
+You can easily instrument this test suite with HTTPolice
+and get instant feedback when you break the protocol.
+
+__ https://www.djangoproject.com/
+
+::
+
+  $ pip install Django-HTTPolice
+
+.. highlight:: py
+
+Add the HTTPolice middleware to the top of your middleware list::
+
+  MIDDLEWARE_CLASSES = [
+      'django_httpolice.HTTPoliceMiddleware',
+      'django.middleware.common.CommonMiddleware',
+      # ...
+  ]
+
+Add a couple settings::
+
+  HTTPOLICE_ENABLE = True
+  HTTPOLICE_RAISE = True
+
+.. highlight:: console
+
+Now let’s run the tests and see what’s broken::
+
+  $ python manage.py test
+  .E.
+  ======================================================================
+  ERROR: test_get_plain (example_app.test.ExampleTestCase)
+  ----------------------------------------------------------------------
+  Traceback (most recent call last):
+    [...]
+    File "[...]/django_httpolice/middleware.py", line 81, in process_response
+      raise ProtocolError(exchange)
+  django_httpolice.common.ProtocolError: HTTPolice found errors in this response:
+  ------------ request 1 : GET /api/v1/?name=Martha&format=plain
+  C 1070 No User-Agent header
+  ------------ response 1 : 200 OK
+  E 1038 Bad JSON body
+  
+  
+  ----------------------------------------------------------------------
+  Ran 3 tests in 0.351s
+  
+  FAILED (errors=1)
+
+In `this example`__, the app sent a wrong ``Content-Type`` header
+and HTTPolice caught it.
+
+__ https://github.com/vfaronov/httpolice/blob/bca47b2/integration/django/example/example_app/views.py#L16
+
+
 More options
 ------------
 There are other ways to get your data into HTTPolice.
