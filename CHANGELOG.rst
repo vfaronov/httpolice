@@ -7,8 +7,8 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 (which means it is unstable until 1.0).
 
 
-Unreleased
-~~~~~~~~~~
+0.2.0 - 2016-05-08
+~~~~~~~~~~~~~~~~~~
 
 Added
 -----
@@ -38,12 +38,6 @@ Changed
 
 .. _mitmproxy integration: http://pythonhosted.org/HTTPolice/mitmproxy.html
 
-Deprecated
-----------
-
-Removed
--------
-
 Fixed
 -----
 - Input files from tcpick are sorted correctly.
@@ -52,9 +46,6 @@ Fixed
 
 .. _1108: http://pythonhosted.org/HTTPolice/notices.html#1108
 .. _1038: http://pythonhosted.org/HTTPolice/notices.html#1038
-
-Security
---------
 
 
 0.1.0 - 2016-04-25
