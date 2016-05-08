@@ -11,7 +11,7 @@ HTTPolice is a Python package that can be installed with pip
 
   $ pip install HTTPolice
 
-If you’re not familiar with pip, check the :doc:`install` section.
+If you’re not familiar with pip, check the manual’s :doc:`install` section.
 
 
 Using HAR files

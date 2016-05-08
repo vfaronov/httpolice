@@ -51,9 +51,7 @@ If `HTTPOLICE_ENABLE` is not `True`, the view responds with 404 (Not Found).
 
 You can also access the backlog from your own code:
 it’s in the :data:`django_httpolice.backlog` variable,
-as a `deque`__ of :class:`httpolice.Exchange` objects.
-
-__ https://docs.python.org/3/library/collections.html#collections.deque
+as a sequence of :class:`httpolice.Exchange` objects.
 
 
 Raising on errors
@@ -73,8 +71,6 @@ This can be used to fail tests on errors::
   ERROR: test_get_plain (example_app.test.ExampleTestCase)
   ----------------------------------------------------------------------
   Traceback (most recent call last):
-    File "[...]/example_app/test.py", line 20, in test_get_plain
-      {'format': 'plain', 'name': u'Martha'})
     [...]
     File "[...]/django_httpolice/middleware.py", line 81, in process_response
       raise ProtocolError(exchange)
@@ -114,8 +110,6 @@ __ http://pythonhosted.org/HTTPolice/notices.html#1110
 Of course, the ``HTTPolice-Silence`` header works, too::
 
   def test_unauthorized(self):
-      # Ensure that a client without credentials gets a 401 error.
-      # Note: we don't send WWW-Authenticate because it confuses our client.
       response = self.client.get('/api/v1/products/',
                                  HTTP_HTTPOLICE_SILENCE='1194 resp')
       self.assertEqual(response.status_code, 401)

@@ -8,17 +8,17 @@ General concepts
 Exchanges
 ---------
 HTTPolice takes HTTP *exchanges* (also known as *transactions*) as input.
-Every exchange can consist of one request and one or more responses.
-Usually there is just one response,
+Every exchange can consist of 1 request and 1+ responses.
+Usually there is just 1 response,
 but sometimes there are `interim (1xx) responses`__ before the main one.
 
 __ https://tools.ietf.org/html/rfc7231#section-6.2
 
 If you only want to check the request,
-you can omit the responses from an exchange.
+you can omit responses from the exchange.
 
 On the other hand, if you only want to check the *responses*,
-you should still provide the request (if at all possible),
+you should still provide the request (if possible),
 because responses cannot be properly analyzed without it.
 If you really have no access to the request, you can omit it,
 but **many checks will be disabled**.
@@ -67,7 +67,7 @@ You can *silence* notices that you don’t want to see.
 They will disappear from reports and from the :doc:`api`.
 
 Please note that some notice IDs can stand for a range of problems.
-For example, almost all errors in header syntax are reported as notice 1000,
+For example, most errors in header syntax are reported as notice 1000,
 so if you silence it, you **lose a big chunk** of HTTPolice’s functionality.
 
 Silencing globally
@@ -86,9 +86,13 @@ You can also silence notices on individual messages
 by adding the special ``HTTPolice-Silence`` header to them.
 Its value is a comma-separated list of notice IDs. For example::
 
+  HTTP/1.1 405 Method Not Allowed
+  Content-Length: 0
   HTTPolice-Silence: 1089, 1110
 
 Requests can also silence notices on responses (but not vice-versa)
 by adding a ``resp`` keyword after an ID::
 
+  GET /index.html HTTP/1.1
+  User-Agent: Mozilla/5.0
   HTTPolice-Silence: 1033 resp, 1031

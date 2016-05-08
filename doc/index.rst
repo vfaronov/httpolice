@@ -11,8 +11,8 @@ If you want a brief introduction, see the :doc:`quickstart`.
    :maxdepth: 1
 
    quickstart
-   concepts
    install
+   concepts
    streams
    har
    mitmproxy
