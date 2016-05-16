@@ -911,12 +911,6 @@
     <explain>See <rfc num="7232"/>.</explain>
   </error>
 
-  <comment id="1126">
-    <title>Probably wrong use of status code <st>412</st></title>
-    <explain>The <st>412</st> status code is only used when the request includes a precondition, such as <h ref="no">If-Modified-Since</h>. But there are no such preconditions in this request, unless it’s an extension header unknown to HTTPolice.</explain>
-    <explain>See <rfc num="7232"/>.</explain>
-  </comment>
-
   <comment id="1127">
     <title><var ref="header"/> in a <st>304</st> response</title>
     <rfc num="7232" sect="4.1">

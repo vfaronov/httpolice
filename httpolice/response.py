@@ -662,10 +662,13 @@ def check_response_in_context(resp, req):
         if req.method not in [m.GET, m.HEAD] and \
                 resp.status == st.not_modified:
             resp.complain(1124)
-        elif not req.headers.possibly(header.is_precondition):
-            resp.complain(1125)
         elif not req.headers.clearly(header.is_precondition):
-            resp.complain(1126)
+            resp.complain(1125)
+            # We used to report a separate comment notice (no. 1126)
+            # in case the request had some headers we didn't know.
+            # But it's unlikely that anyone would use custom preconditions,
+            # and it seems more helpful to report an error in this case
+            # (after all, it can be silenced).
         elif req.headers.clearly(header.is_precondition) == \
                 set([h.if_modified_since]):
             if req.method not in [m.GET, m.HEAD]:
