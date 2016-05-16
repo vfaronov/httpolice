@@ -42,8 +42,8 @@ def html_report(exchanges, buf):
     """
     title = u'HTTPolice report'
     document = dominate.document(title=title)
+    _common_meta(document)
     with document.head:
-        _common_meta()
         H.script(type=u'text/javascript').add_raw_string(js_code)
     with document:
         H.h1(title)
@@ -69,8 +69,7 @@ class Placeholder(object):
 def list_notices(buf):
     title = u'HTTPolice notices'
     document = dominate.document(title=title)
-    with document.head:
-        _common_meta()
+    _common_meta(document)
     with document:
         H.h1(title)
         with H.div(_class=u'notices-list'):
@@ -81,10 +80,13 @@ def list_notices(buf):
     buf.write(document.render().encode('utf-8'))
 
 
-def _common_meta():
-    H.meta(charset=u'utf-8')
-    H.meta(name=u'generator', content=u'HTTPolice %s' % version)
-    H.style(type=u'text/css').add_raw_string(css_code)
+def _common_meta(document):
+    with document:
+        H.attr(lang=u'en')
+    with document.head:
+        H.meta(charset=u'utf-8')
+        H.meta(name=u'generator', content=u'HTTPolice %s' % version)
+        H.style(type=u'text/css').add_raw_string(css_code)
 
 
 def _render_exchanges(exchanges):
