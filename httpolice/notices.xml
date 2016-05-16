@@ -658,12 +658,6 @@
     <explain>See also <rfc num="7231" sect="5.3"/>.</explain>
   </error>
 
-  <comment id="1091">
-    <title>Probably wrong use of status code <st>406</st></title>
-    <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers, such as <h ref="no">Accept</h>. But this request has no such headers, unless it’s an extension header unknown to HTTPolice.</explain>
-    <explain>See also <rfc num="7231" sect="5.3"/>.</explain>
-  </comment>
-
   <comment id="1092">
     <title><st>406</st> response with no body</title>
     <rfc num="7231" sect="6.5.6">

@@ -587,10 +587,13 @@ def check_response_in_context(resp, req):
         resp.complain(1086)
 
     if resp.status == st.not_acceptable:
-        if not req.headers.possibly(header.is_proactive_conneg):
+        if not req.headers.clearly(header.is_proactive_conneg):
             resp.complain(1090)
-        elif not req.headers.clearly(header.is_proactive_conneg):
-            resp.complain(1091)
+            # We used to report a separate comment notice (no. 1091)
+            # in case the request had some headers we didn't know.
+            # But it's unlikely that anyone would use custom conneg headers,
+            # and it seems more helpful to report an error in this case
+            # (after all, it can be silenced).
         elif req.headers.clearly(header.is_proactive_conneg) == \
                 set([h.accept_language]):
             resp.complain(1117)
