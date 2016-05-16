@@ -1986,4 +1986,12 @@
     <explain>A Basic authentication challenge must have parameters as “key=value” pairs. See <rfc num="7617" sect="2"/>.</explain>
   </error>
 
+  <error id="1274">
+    <title>Probably malformed <var ref="header"/> header</title>
+    <explain>An <var ref="header"/> header usually consists of two parts: the name of the authentication scheme, and the actual credentials. But in this request, it only contains the scheme (“<var ref="header.value.item"/>”).</explain>
+    <explain>Did you mean something like “<var ref="header"/>: <auth>Bearer</auth> <var ref="header.value.item"/>”?</explain>
+    <explain>See also <rfc num="7235" sect="2"/>.</explain>
+    <!-- This is an error, not a comment, because it's hard to imagine a conformant use of ``credentials`` consisting only of the ``auth-scheme`` (in particular, none of the schemes registered with IANA allow this), whereas forgetting the ``auth-scheme`` is a common mistake. -->
+  </error>
+
 </notices>

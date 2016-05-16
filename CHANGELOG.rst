@@ -12,6 +12,9 @@ Unreleased
 
 Added
 -----
+- Check for missing scheme name in authorization headers (notice `1274`_).
+
+.. _1274: http://pythonhosted.org/HTTPolice/notices.html#1274
 
 Changed
 -------

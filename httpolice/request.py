@@ -361,8 +361,10 @@ def check_request(req):
             scheme, credentials = hdr.value
             if scheme == auth.basic:
                 _check_basic_auth(req, hdr, credentials)
-            if scheme == auth.bearer:
+            elif scheme == auth.bearer:
                 _check_bearer_auth(req, hdr, credentials)
+            elif not credentials:
+                req.complain(1274, header=hdr)
 
     if req.method == m.PATCH and req.headers.content_type.is_okay:
         if media_type.is_patch(req.headers.content_type.value.item) == False:
