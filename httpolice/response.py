@@ -751,6 +751,9 @@ def check_response_in_context(resp, req):
 
 
 def _check_basic_challenge(resp, hdr, challenge):
+    if isinstance(challenge.param, six.text_type):      # ``token68`` form
+        resp.complain(1273, header=hdr)
+        return
     if u'realm' not in challenge.param:
         resp.complain(1206, header=hdr)
     for charset in challenge.param.getall(u'charset'):

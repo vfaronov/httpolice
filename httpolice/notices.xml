@@ -1993,4 +1993,9 @@
     <ref to="msg.target"/>
   </comment>
 
+  <error id="1273">
+    <title>Malformed <var ref="header"/>: <auth>Basic</auth></title>
+    <explain>A Basic authentication challenge must have parameters as “key=value” pairs. See <rfc num="7617" sect="2"/>.</explain>
+  </error>
+
 </notices>
