@@ -7,6 +7,28 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 (which means it is unstable until 1.0).
 
 
+Unreleased
+~~~~~~~~~~
+
+Added
+-----
+
+Changed
+-------
+
+Deprecated
+----------
+
+Removed
+-------
+
+Fixed
+-----
+
+Security
+--------
+
+
 0.2.0 - 2016-05-08
 ~~~~~~~~~~~~~~~~~~
 
