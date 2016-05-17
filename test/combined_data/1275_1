@@ -1,5 +1,4 @@
-# `defusedxml` raises an exception here,
-# but it's actually well-formed XML, so we shouldn't complain.
+1275
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1

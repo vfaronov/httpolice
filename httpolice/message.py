@@ -4,6 +4,7 @@ import codecs
 from datetime import datetime, timedelta
 import email.errors
 import json
+import xml.etree.ElementTree
 
 # pylint: disable=import-error
 
@@ -143,70 +144,69 @@ class Message(Blackboard):
 
     @derived_property
     def json_data(self):
-        ctype = self.headers.content_type
-        if not ctype.is_okay or not media_type.is_json(ctype.value.item):
+        if self.headers.content_type.is_okay and \
+                media_type.is_json(self.headers.content_type.value.item) and \
+                okay(self.unicode_body) and self.content_is_full:
+            try:
+                return json.loads(self.unicode_body)
+            except ValueError as e:
+                self.complain(1038, error=e)
+                return Unavailable
+        else:
             return None
-        if not okay(self.unicode_body):
-            return self.unicode_body
-        if not self.content_is_full:
-            return None
-        try:
-            return json.loads(self.unicode_body)
-        except Exception as e:
-            self.complain(1038, error=e)
-            return Unavailable
 
     @derived_property
     def xml_data(self):
-        ctype = self.headers.content_type
-        if not ctype.is_okay or not media_type.is_xml(ctype.value.item):
+        if self.headers.content_type.is_okay and \
+                media_type.is_xml(self.headers.content_type.value.item) and \
+                okay(self.decoded_body) and self.content_is_full:
+            try:
+                # It's not inconceivable that a message might contain
+                # maliciously constructed XML data, so we use `defusedxml`.
+                return defusedxml.ElementTree.fromstring(self.decoded_body)
+            except defusedxml.EntitiesForbidden:
+                self.complain(1275)
+                return Unavailable
+            except xml.etree.ElementTree.ParseError as e:
+                self.complain(1039, error=e)
+                return Unavailable
+        else:
             return None
-        if not okay(self.decoded_body):
-            return self.decoded_body
-        if not self.content_is_full:
-            return None
-        try:
-            return defusedxml.ElementTree.fromstring(self.decoded_body)
-        except defusedxml.DefusedXmlException:
-            return Unavailable
-        except Exception as e:
-            self.complain(1039, error=e)
-            return Unavailable
 
     @derived_property
     def multipart_data(self):
         ctype = self.headers.content_type
-        if not ctype.is_okay or not media_type.is_multipart(ctype.value.item):
+        if ctype.is_okay and media_type.is_multipart(ctype.value.item) and \
+                okay(self.decoded_body) and self.content_is_full:
+            # All multipart media types obey the same general syntax
+            # specified in RFC 2046 Section 5.1,
+            # and should be parseable as email message payloads.
+            multipart_code = (b'Content-Type: ' + ctype.entries[0].value +
+                              b'\r\n\r\n' + self.decoded_body)
+            parsed = parse_email_message(multipart_code)
+            for d in parsed.defects:
+                if isinstance(d, email.errors.NoBoundaryInMultipartDefect):
+                    self.complain(1139)
+                elif isinstance(d, email.errors.StartBoundaryNotFoundDefect):
+                    self.complain(1140)
+            return parsed if parsed.is_multipart() else Unavailable
+        else:
             return None
-        if not okay(self.decoded_body):
-            return self.decoded_body
-        if not self.content_is_full:
-            return None
-        multipart_code = (b'Content-Type: ' + ctype.entries[0].value + b'\r\n'
-                          b'\r\n' + self.decoded_body)
-        parsed = parse_email_message(multipart_code)
-        for defect in parsed.defects:
-            if isinstance(defect, email.errors.NoBoundaryInMultipartDefect):
-                self.complain(1139)
-            elif isinstance(defect, email.errors.StartBoundaryNotFoundDefect):
-                self.complain(1140)
-        return parsed if parsed.is_multipart() else Unavailable
 
     @derived_property
     def url_encoded_data(self):
-        if not (self.headers.content_type ==
-                media.application_x_www_form_urlencoded):
+        if self.headers.content_type == \
+                media.application_x_www_form_urlencoded and \
+                okay(self.decoded_body) and self.content_is_full:
+            for byte in six.iterbytes(self.decoded_body):
+                if not URL_ENCODED_GOOD_BYTES[byte]:
+                    char = six.int2byte(byte)
+                    self.complain(1040, char=format_chars([char]))
+                    return Unavailable
+            # pylint: disable=no-member
+            return parse_qs(self.decoded_body.decode('ascii'))
+        else:
             return None
-        if not okay(self.decoded_body):
-            return self.decoded_body
-        if not self.content_is_full:
-            return None
-        for byte in six.iterbytes(self.decoded_body):
-            if not URL_ENCODED_GOOD_BYTES[byte]:
-                self.complain(1040, char=format_chars([six.int2byte(byte)]))
-                return Unavailable
-        # pylint: disable=no-member
-        return parse_qs(self.decoded_body.decode('ascii'))
 
     @derived_property
     def transformed_by_proxy(self):

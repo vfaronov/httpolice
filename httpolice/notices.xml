@@ -1994,4 +1994,10 @@
     <!-- This is an error, not a comment, because it's hard to imagine a conformant use of ``credentials`` consisting only of the ``auth-scheme`` (in particular, none of the schemes registered with IANA allow this), whereas forgetting the ``auth-scheme`` is a common mistake. -->
   </error>
 
+  <comment id="1275">
+    <title>XML with entity declarations</title>
+    <explain>This message’s XML content includes entity declarations (&lt;!ENTITY&gt;). Many XML applications do not process such declarations because they can lead to denial-of-service attacks.</explain>
+    <ref to="msg.body"/>
+  </comment>
+
 </notices>
