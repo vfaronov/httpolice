@@ -653,8 +653,8 @@
   </error>
 
   <error id="1090">
-    <title>Wrong use of status code <st>406</st></title>
-    <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers, such as <h ref="no">Accept</h>. But this request has no such headers.</explain>
+    <title>Probably wrong use of status code <st>406</st></title>
+    <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers, such as <h ref="no">Accept</h>. But this request doesn’t seem to have such headers.</explain>
     <explain>See also <rfc num="7231" sect="5.3"/>.</explain>
   </error>
 
@@ -906,8 +906,8 @@
   </error>
 
   <error id="1125">
-    <title>Wrong use of status code <var ref="msg.status"/></title>
-    <explain>The <var ref="msg.status"/> status code is only used when the request includes a precondition, such as <h ref="no">If-Modified-Since</h>. But there are no such preconditions in this request.</explain>
+    <title>Probably wrong use of status code <var ref="msg.status"/></title>
+    <explain>The <var ref="msg.status"/> status code is only used when the request includes a precondition, such as <h ref="no">If-Modified-Since</h>. But this request doesn’t seem to have any preconditions.</explain>
     <explain>See <rfc num="7232"/>.</explain>
   </error>
 
