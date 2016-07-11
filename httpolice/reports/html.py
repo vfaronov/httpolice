@@ -108,10 +108,10 @@ def _render_request(req):
     with H.section():
         with H.div(_class=u'message-display'):
             with H.h2(), H.code():      # Request line
-                # We don't insert spaces here because we assume that
-                # Dominate will render each element on its own line,
+                # We don't insert spaces here because,
+                # without ``__pretty=False``,
+                # Dominate renders each element on its own line,
                 # thus implicitly creating whitespace.
-                # https://github.com/Knio/dominate/issues/68
                 with H.span(**_for_object(req.method)):
                     _render_known(req.method)
                 H.span(printable(req.target), **_for_object(req.target))
@@ -160,9 +160,7 @@ def _render_message(msg):
 def _render_header_entries(annotated_entries):
     for entry, annotated in annotated_entries:
         with H.pre(**_for_object(entry, 'header-entry')), H.code():
-            # Dominate (at least as of 2.2.0)
-            # automatically inlines all descendants of ``pre``.
-            # https://github.com/Knio/dominate/issues/68
+            # Dominate defaults to ``__pretty=False`` for ``pre``.
             _render_known(entry.name)
             H.span(u': ')
             _render_annotated(annotated)
@@ -247,10 +245,9 @@ def _render_known(obj):
     text = printable(six.text_type(obj))
     cite = known.citation(obj)
     if cite:
-        elem = H.a(text, _class=cls, href=cite.url, target=u'_blank',
-                   __inline=True)
+        elem = H.a(text, _class=cls, href=cite.url, target=u'_blank')
     else:
-        elem = H.span(text, _class=cls, __inline=True)
+        elem = H.span(text, _class=cls)
     title = known.title(obj, with_citation=True)
     if title:
         with elem:
@@ -265,7 +262,7 @@ def _notice_to_html(the_notice, ctx, with_anchor=False):
             H.abbr(the_notice.severity_short, _class=u'severity',
                    title=the_notice.severity)
             H.span(six.text_type(the_notice.id), _class=u'ident')
-            with H.span():
+            with H.span(__pretty=False):
                 _piece_to_html(the_notice.title, ctx)
         for piece in the_notice.explanation:
             _piece_to_html(piece, ctx)
@@ -277,7 +274,7 @@ def _piece_to_html(piece, ctx):
 
 @_piece_to_html.register(six.text_type)
 def _text_to_html(text, _):
-    H.span(printable(text), __inline=True)
+    H.span(printable(text))
 
 @_piece_to_html.register(list)
 def _list_to_html(xs, ctx):
@@ -286,25 +283,25 @@ def _list_to_html(xs, ctx):
 
 @_piece_to_html.register(notice.Paragraph)
 def _paragraph_to_html(para, ctx):
-    with H.p():
+    with H.p(__pretty=False):
         _piece_to_html(para.content, ctx)
 
 @_piece_to_html.register(notice.Known)
 def _known_elem_to_html(elem, ctx):
     magic = _magic_references(elem, ctx)
-    with H.span(__inline=True, **_referring_to(magic)):
+    with H.span(**_referring_to(magic)):
         _piece_to_html(elem.content, ctx)
 
 @_piece_to_html.register(notice.Var)
 def _var_to_html(var, ctx):
     target = resolve_reference(ctx, var.reference)
-    with H.span(__inline=True, **_referring_to(target)):
+    with H.span(**_referring_to(target)):
         _piece_to_html(target, ctx)
 
 @_piece_to_html.register(notice.ExceptionDetails)
 def _exc_to_html(_, ctx):
     for para in expand_error(ctx['error']):
-        with H.p():
+        with H.p(__pretty=False):
             _piece_to_html(para, ctx)
 
 @_piece_to_html.register(notice.Cite)
@@ -312,14 +309,14 @@ def _cite_elem_to_html(elem, ctx):
     _piece_to_html(elem.info, ctx)
     quote = elem.content
     if quote:
-        H.span(u': ', __inline=True)
-        with H.q(__inline=True):
+        H.span(u': ')
+        with H.q():
             _piece_to_html(quote, ctx)
 
 @_piece_to_html.register(Citation)
 def _cite_to_html(cite, _):
-    with H.cite(__inline=True):
-        H.a(cite.title, href=cite.url, target=u'_blank', __inline=True)
+    with H.cite():
+        H.a(cite.title, href=cite.url, target=u'_blank')
 
 @_piece_to_html.register(notice.Ref)
 def _ref_to_html(ref, ctx):
@@ -328,7 +325,7 @@ def _ref_to_html(ref, ctx):
 
 @_piece_to_html.register(Placeholder)
 def _placeholder_to_html(placeholder, _):
-    H.var(placeholder.name, __inline=True)
+    H.var(placeholder.name)
 
 for _cls in known.classes:
     _piece_to_html.register(_cls, lambda obj, _: _render_known(obj))
