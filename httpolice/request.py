@@ -1,6 +1,8 @@
 # -*- coding: utf-8; -*-
 
 import base64
+import fnmatch
+import itertools
 from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
 from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 import string
@@ -12,8 +14,8 @@ from httpolice.blackboard import derived_property
 from httpolice.known import (auth, cache, cache_directive, cc, h, header, m,
                              media_type, method, product, tc, upgrade)
 from httpolice.parse import mark, simple_parse
-from httpolice.structure import (EntityTag, Method, Versioned, http2, http10,
-                                 http11, okay)
+from httpolice.structure import (EntityTag, Method, MultiDict, Parametrized,
+                                 Versioned, http2, http10, http11, okay)
 from httpolice.syntax.common import CTL
 from httpolice.syntax.rfc7230 import (absolute_form, asterisk_form,
                                       authority_form, origin_form)
@@ -367,6 +369,13 @@ def check_request(req):
         if req.is_tls == False:
             req.complain(1271, where=req.body)
 
+    for hdr in [req.headers.accept, req.headers.accept_charset,
+                req.headers.accept_encoding, req.headers.accept_language]:
+        for (wildcard, value) in _accept_subsumptions(hdr.okay):
+            req.complain(1276, header=hdr, wildcard=wildcard, value=value)
+            # No need to report more than one subsumption per header.
+            break
+
 
 def _check_basic_auth(req, hdr, credentials):
     if isinstance(credentials, six.text_type):   # ``token68`` form
@@ -392,3 +401,23 @@ def _check_bearer_auth(req, hdr, credentials):
         req.complain(1261, header=hdr)
     if not isinstance(credentials, six.text_type):      # not ``token68`` form
         req.complain(1262, header=hdr)
+
+
+def _accept_subsumptions(items):
+    """Find items in an Accept-like header that subsume one another."""
+    normalized = []
+    for (item, q) in items:
+        if isinstance(item, Parametrized):          # The ``Accept`` header.
+            item = item.item
+        if q is None:
+            q = 1.0
+        elif isinstance(q, MultiDict):              # The ``Accept`` header.
+            q = q.get(u'q', 1.0)
+        normalized.append((item, q))
+
+    for ((item1, q1), (item2, q2)) in itertools.permutations(normalized, 2):
+        if (item1 == u'*' or item1.endswith(u'/*')) and \
+                fnmatch.fnmatch(item2, item1) and \
+                not fnmatch.fnmatch(item1, item2) and \
+                q1 >= q2:
+            yield (item1, item2)

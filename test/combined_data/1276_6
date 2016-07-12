@@ -1,0 +1,15 @@
+1276
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Accept: text/plain;charset=utf-8;q=1.0;foo=bar, */*;q=1.0
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!

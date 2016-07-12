@@ -13,8 +13,10 @@ Unreleased
 Added
 -----
 - Check for missing scheme name in authorization headers (notice `1274`_).
+- Check for missing quality values in headers like Accept (notice `1276`_).
 
 .. _1274: http://pythonhosted.org/HTTPolice/notices.html#1274
+.. _1276: http://pythonhosted.org/HTTPolice/notices.html#1276
 
 Changed
 -------

@@ -2000,4 +2000,12 @@
     <ref to="msg.body"/>
   </comment>
 
+  <error id="1276">
+    <title><var ref="header"/>: <var ref="wildcard"/> is as good as <var ref="value"/></title>
+    <explain>The <var ref="header"/> header is not an ordered list. Whether <var ref="wildcard"/> comes before or after <var ref="value"/>, does not affect its priority. Only explicit quality values (q=) count.</explain>
+    <explain>In other words, this request says that any <var ref="wildcard"/> is as acceptable as <var ref="value"/>.</explain>
+    <explain>If you want to make <var ref="wildcard"/> a fallback, you should add a lower quality value to it, for example: <var ref="wildcard"/>;q=0.1</explain>
+    <explain>See <rfc num="7231" sect="5.3.1"/>.</explain>
+  </error>
+
 </notices>
