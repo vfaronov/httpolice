@@ -213,6 +213,7 @@ known = KnownDict([
  {'_': MediaType(u'application/poc-settings+xml'), '_citations': [RFC(4354)]},
  {'_': MediaType(u'application/postscript'),
   '_citations': [RFC(2045), RFC(2046)]},
+ {'_': MediaType(u'application/ppsp-tracker+json'), '_citations': [RFC(7846)]},
  {'_': MediaType(u'application/problem+json'), '_citations': [RFC(7807)]},
  {'_': MediaType(u'application/problem+xml'), '_citations': [RFC(7807)]},
  {'_': MediaType(u'application/pskc+xml'), '_citations': [RFC(6030)]},
@@ -606,5 +607,6 @@ known = KnownDict([
  {'_': MediaType(u'video/rtx'), '_citations': [RFC(4588)]},
  {'_': MediaType(u'video/smpte292m'), '_citations': [RFC(3497)]},
  {'_': MediaType(u'video/ulpfec'), '_citations': [RFC(5109)]},
- {'_': MediaType(u'video/vc1'), '_citations': [RFC(4425)]}
+ {'_': MediaType(u'video/vc1'), '_citations': [RFC(4425)]},
+ {'_': MediaType(u'video/vp8'), '_citations': [RFC(7741)]},
 ], extra_info=['deprecated', 'is_json', 'is_xml', 'patch'])
