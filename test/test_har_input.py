@@ -4,7 +4,7 @@ import os
 
 from httpolice.inputs.har import har_input
 from httpolice.known import m
-from httpolice.structure import Unavailable, http11, http2
+from httpolice.structure import Unavailable, http2, http11
 
 
 def load_from_file(name):

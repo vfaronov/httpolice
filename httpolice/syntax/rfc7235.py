@@ -1,31 +1,13 @@
 # -*- coding: utf-8; -*-
 
 from httpolice.citation import RFC
-from httpolice.parse import (
-    auto,
-    can_complain,
-    fill_names,
-    mark,
-    maybe,
-    pivot,
-    skip,
-    string,
-    string1,
-)
-from httpolice.structure import (
-    AuthScheme,
-    CaseInsensitive,
-    MultiDict,
-    Parametrized,
-)
+from httpolice.parse import (auto, can_complain, fill_names, mark, maybe,
+                             pivot, skip, string, string1)
+from httpolice.structure import (AuthScheme, CaseInsensitive, MultiDict,
+                                 Parametrized)
 from httpolice.syntax.common import ALPHA, DIGIT, SP
-from httpolice.syntax.rfc7230 import (
-    BWS,
-    comma_list,
-    comma_list1,
-    quoted_string,
-    token,
-)
+from httpolice.syntax.rfc7230 import (BWS, comma_list, comma_list1,
+                                      quoted_string, token)
 
 
 auth_scheme = AuthScheme << token                                       > pivot

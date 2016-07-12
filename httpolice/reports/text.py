@@ -7,18 +7,10 @@ from singledispatch import singledispatch
 import six
 
 from httpolice import notice
-from httpolice.reports.common import (
-    expand_error,
-    expand_piece,
-    find_reason_phrase,
-    resolve_reference,
-)
-from httpolice.util.text import (
-    detypographize,
-    ellipsize,
-    printable,
-    write_if_any,
-)
+from httpolice.reports.common import (expand_error, expand_piece,
+                                      find_reason_phrase, resolve_reference)
+from httpolice.util.text import (detypographize, ellipsize, printable,
+                                 write_if_any)
 
 
 def text_report(exchanges, buf):

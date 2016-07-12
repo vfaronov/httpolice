@@ -5,36 +5,13 @@ from datetime import datetime
 import pytest
 
 from httpolice.known import cc, media, rel, tc, unit
-from httpolice.parse import (
-    ParseError,
-    Stream,
-    empty,
-    literal,
-    many,
-    named,
-    recursive,
-    skip,
-    string,
-    subst,
-)
-from httpolice.structure import (
-    ContentRange,
-    ExtValue,
-    LanguageTag,
-    MultiDict,
-    Parametrized,
-    RangeSpecifier,
-    Unavailable,
-    Versioned,
-)
-from httpolice.syntax import (
-    rfc3986,
-    rfc5988,
-    rfc6266,
-    rfc7230,
-    rfc7231,
-    rfc7233,
-)
+from httpolice.parse import (ParseError, Stream, empty, literal, many, named,
+                             recursive, skip, string, subst)
+from httpolice.structure import (ContentRange, ExtValue, LanguageTag,
+                                 MultiDict, Parametrized, RangeSpecifier,
+                                 Unavailable, Versioned)
+from httpolice.syntax import (rfc3986, rfc5988, rfc6266, rfc7230, rfc7231,
+                              rfc7233)
 
 
 def parse(parser, text):

@@ -15,10 +15,10 @@ which is a map from notice ID (:class:`int`) to :class:`Notice`.
 """
 
 import copy
-import six
 
 import lxml.etree
 import pkg_resources
+import six
 
 from httpolice import citation, structure
 

@@ -24,8 +24,8 @@ import six
 
 from httpolice import Exchange, Request, Response, check_exchange
 from httpolice.known import h, header, m
-from httpolice.structure import http10, http11, http2
 from httpolice.reports import html_report, text_report
+from httpolice.structure import http2, http10, http11
 
 
 N_TESTS = 50

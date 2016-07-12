@@ -1,17 +1,9 @@
 # -*- coding: utf-8; -*-
 
 import base64
-import json
 import io
-
-# pylint: disable=import-error
-
-try:
-    from urllib.parse import urlparse
-except ImportError:                             # Python 2
-    from urlparse import urlparse
-
-# pylint: enable=import-error
+import json
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from httpolice import framing1
 from httpolice.exchange import Exchange
@@ -21,7 +13,7 @@ from httpolice.known import h, media, st
 from httpolice.parse import ParseError, Stream
 from httpolice.request import Request
 from httpolice.response import Response
-from httpolice.structure import FieldName, Unavailable, http11, http2
+from httpolice.structure import FieldName, Unavailable, http2, http11
 
 
 CHROME = [u'WebInspector']

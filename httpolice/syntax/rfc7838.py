@@ -1,43 +1,24 @@
 # -*- coding: utf-8; -*-
 
-# pylint: disable=import-error,no-name-in-module
+# pylint: disable=import-error
+# (for `six.moves`; can't fit on the same line due to interference from isort)
 
-try:
-    from urllib.parse import (
-        quote as pct_encode,
-        unquote_to_bytes as pct_decode,
-    )
-except ImportError:         # Python 2
-    from urllib import quote as pct_encode, unquote as pct_decode
-
-# pylint: enable=import-error,no-name-in-module
+from httpolice.util.moves import unquote_to_bytes as pct_decode
+from six.moves.urllib.parse import quote as pct_encode
 
 import six
 
 from httpolice.citation import RFC
-from httpolice.parse import (
-    can_complain,
-    fill_names,
-    literal,
-    many,
-    maybe_str,
-    pivot,
-    simple_parse,
-    skip,
-    subst,
-)
+from httpolice.parse import (can_complain, fill_names, literal, many,
+                             maybe_str, pivot, simple_parse, skip, subst)
 from httpolice.structure import AltSvcParam, MultiDict, Parametrized
-from httpolice.syntax.rfc7230 import (
-    OWS,
-    comma_list1,
-    port,
-    quoted_string,
-    tchar,
-    token,
-    uri_host,
-)
+from httpolice.syntax.rfc7230 import (OWS, comma_list1, port, quoted_string,
+                                      tchar, token, uri_host)
 from httpolice.syntax.rfc7234 import delta_seconds
 from httpolice.util.text import force_bytes, force_unicode
+
+
+# pylint: enable=import-error
 
 
 clear = literal('clear', case_sensitive=True)                           > pivot

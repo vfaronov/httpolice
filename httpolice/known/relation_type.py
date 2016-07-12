@@ -1,6 +1,6 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.citation import Citation, RFC
+from httpolice.citation import RFC, Citation
 from httpolice.known.base import KnownDict
 from httpolice.structure import RelationType
 

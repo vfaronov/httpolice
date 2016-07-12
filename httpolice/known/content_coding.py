@@ -1,8 +1,8 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.citation import Citation, RFC
-from httpolice.structure import ContentCoding
+from httpolice.citation import RFC, Citation
 from httpolice.known.base import KnownDict
+from httpolice.structure import ContentCoding
 
 
 known = KnownDict([

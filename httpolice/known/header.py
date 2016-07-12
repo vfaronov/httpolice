@@ -1,23 +1,11 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.citation import Citation, RFC
+from httpolice.citation import RFC, Citation
 from httpolice.known.base import KnownDict
 from httpolice.structure import FieldName
-from httpolice.syntax import (
-    internal,
-    rfc5789,
-    rfc5988,
-    rfc6266,
-    rfc6797,
-    rfc7230,
-    rfc7231,
-    rfc7232,
-    rfc7233,
-    rfc7234,
-    rfc7235,
-    rfc7540,
-    rfc7838,
-)
+from httpolice.syntax import (internal, rfc5789, rfc5988, rfc6266, rfc6797,
+                              rfc7230, rfc7231, rfc7232, rfc7233, rfc7234,
+                              rfc7235, rfc7540, rfc7838)
 
 
 SINGLE = 1

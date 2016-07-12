@@ -1,35 +1,14 @@
 # -*- coding: utf-8; -*-
 
 from httpolice.citation import RFC
-from httpolice.parse import (
-    fill_names,
-    literal,
-    mark,
-    maybe,
-    maybe_str,
-    named,
-    pivot,
-    skip,
-    string1,
-    string_times,
-)
-from httpolice.structure import (
-    CacheDirective,
-    CaseInsensitive,
-    Parametrized,
-    WarnCode,
-    WarningValue,
-)
+from httpolice.parse import (fill_names, literal, mark, maybe, maybe_str,
+                             named, pivot, skip, string1, string_times)
+from httpolice.structure import (CacheDirective, CaseInsensitive, Parametrized,
+                                 WarnCode, WarningValue)
 from httpolice.syntax.common import DIGIT, DQUOTE, SP
-from httpolice.syntax.rfc7230 import (
-    comma_list1,
-    port,
-    pseudonym,
-    quoted_string,
-    token,
-    token__excluding,
-    uri_host,
-)
+from httpolice.syntax.rfc7230 import (comma_list1, port, pseudonym,
+                                      quoted_string, token, token__excluding,
+                                      uri_host)
 from httpolice.syntax.rfc7231 import HTTP_date
 
 

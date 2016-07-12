@@ -1,27 +1,10 @@
 # -*- coding: utf-8; -*-
 
-# pylint: disable=import-error,no-name-in-module
-
-try:
-    from urllib.parse import unquote_to_bytes as pct_decode
-except ImportError:         # Python 2
-    from urllib import unquote as pct_decode
-
-# pylint: enable=import-error,no-name-in-module
+from httpolice.util.moves import unquote_to_bytes as pct_decode
 
 from httpolice.citation import RFC
-from httpolice.parse import (
-    auto,
-    can_complain,
-    fill_names,
-    maybe,
-    named,
-    pivot,
-    string,
-    string1,
-    string_excluding,
-    skip,
-)
+from httpolice.parse import (auto, can_complain, fill_names, maybe, named,
+                             pivot, skip, string, string1, string_excluding)
 from httpolice.structure import CaseInsensitive, ExtValue
 from httpolice.syntax.common import ALPHA, DIGIT, HEXDIG
 from httpolice.syntax.rfc5646 import Language_Tag as language

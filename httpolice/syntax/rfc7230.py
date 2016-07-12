@@ -1,59 +1,19 @@
 # -*- coding: utf-8; -*-
 
 from httpolice.citation import RFC
-from httpolice.parse import (
-    auto,
-    can_complain,
-    fill_names,
-    group,
-    literal,
-    many,
-    maybe,
-    maybe_str,
-    named,
-    octet,
-    octet_range,
-    pivot,
-    recursive,
-    skip,
-    string,
-    string1,
-    string_excluding,
-    string_times,
-    subst,
-)
-from httpolice.structure import (
-    CaseInsensitive,
-    ConnectionOption,
-    FieldName,
-    HTTPVersion,
-    Method,
-    MultiDict,
-    Parametrized,
-    StatusCode,
-    TransferCoding,
-    UpgradeToken,
-    Versioned,
-)
-from httpolice.syntax.rfc3986 import (
-    absolute_URI,
-    authority,
-    host as uri_host,
-    query,
-    relative_part,
-    port,
-    segment,
-)
-from httpolice.syntax.common import (
-    ALPHA,
-    CRLF,
-    DIGIT,
-    DQUOTE,
-    HEXDIG,
-    HTAB,
-    SP,
-    VCHAR,
-)
+from httpolice.parse import (auto, can_complain, fill_names, group, literal,
+                             many, maybe, maybe_str, named, octet, octet_range,
+                             pivot, recursive, skip, string, string1,
+                             string_excluding, string_times, subst)
+from httpolice.structure import (CaseInsensitive, ConnectionOption, FieldName,
+                                 HTTPVersion, Method, MultiDict, Parametrized,
+                                 StatusCode, TransferCoding, UpgradeToken,
+                                 Versioned)
+from httpolice.syntax.common import (ALPHA, CRLF, DIGIT, DQUOTE, HEXDIG, HTAB,
+                                     SP, VCHAR)
+from httpolice.syntax.rfc3986 import (absolute_URI, authority,
+                                      host as uri_host, port, query,
+                                      relative_part, segment)
 
 
 obs_text = octet_range(0x80, 0xFF)                                      > auto

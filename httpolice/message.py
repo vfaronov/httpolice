@@ -3,41 +3,22 @@
 import codecs
 from datetime import datetime, timedelta
 import email.errors
+from httpolice.util.moves import message_from_bytes as parse_email_message
 import json
+from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
 import xml.etree.ElementTree
 
-# pylint: disable=import-error
-
-try:
-    from email import message_from_bytes as parse_email_message
-except ImportError:                             # Python 2
-    from email import message_from_string as parse_email_message
-
-try:
-    from urllib.parse import parse_qs
-except ImportError:                             # Python 2
-    from urlparse import parse_qs
-
-# pylint: enable=import-error
-
+from bitstring import Bits
 import defusedxml
 import defusedxml.ElementTree
-from bitstring import Bits
 import six
 
 from httpolice.blackboard import Blackboard, derived_property
 from httpolice.codings import decode_deflate, decode_gzip
 from httpolice.header import HeadersView
 from httpolice.known import cc, h, header, media, media_type, tc, upgrade, warn
-from httpolice.structure import (
-    HTTPVersion,
-    HeaderEntry,
-    FieldName,
-    Unavailable,
-    http11,
-    http2,
-    okay,
-)
+from httpolice.structure import (FieldName, HeaderEntry, HTTPVersion,
+                                 Unavailable, http2, http11, okay)
 from httpolice.util.text import force_unicode, format_chars
 
 

@@ -3,6 +3,7 @@
 import collections
 
 import django.utils.encoding
+
 from django_httpolice.common import ProtocolError, get_setting
 
 

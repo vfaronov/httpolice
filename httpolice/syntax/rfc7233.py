@@ -1,18 +1,8 @@
 # -*- coding: utf-8; -*-
 
 from httpolice.citation import RFC
-from httpolice.parse import (
-    auto,
-    can_complain,
-    fill_names,
-    literal,
-    maybe,
-    pivot,
-    skip,
-    string,
-    string1,
-    subst,
-)
+from httpolice.parse import (auto, can_complain, fill_names, literal, maybe,
+                             pivot, skip, string, string1, subst)
 from httpolice.structure import ContentRange, RangeSpecifier, RangeUnit
 from httpolice.syntax.common import CHAR, DIGIT, SP, VCHAR
 from httpolice.syntax.rfc7230 import comma_list1, token__excluding

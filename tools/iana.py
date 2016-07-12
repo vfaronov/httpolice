@@ -4,37 +4,18 @@ from __future__ import print_function
 
 import pprint
 import re
-
-# pylint: disable=import-error,no-name-in-module
-
-try:
-    from urllib.request import Request, urlopen
-    from urllib.parse import urljoin
-except ImportError:                             # Python 2
-    from urllib2 import Request, urlopen
-    from urlparse import urljoin
-
-# pylint: enable=import-error,no-name-in-module
+from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
+from six.moves.urllib.request import Request  # pylint: disable=import-error
+from six.moves.urllib.request import urlopen  # pylint: disable=import-error
 
 import lxml.etree
 
-from httpolice.citation import Citation, RFC
+from httpolice.citation import RFC, Citation
 import httpolice.known
-from httpolice.structure import (
-    AltSvcParam,
-    AuthScheme,
-    CacheDirective,
-    ContentCoding,
-    FieldName,
-    MediaType,
-    Method,
-    RangeUnit,
-    RelationType,
-    StatusCode,
-    TransferCoding,
-    UpgradeToken,
-    WarnCode,
-)
+from httpolice.structure import (AltSvcParam, AuthScheme, CacheDirective,
+                                 ContentCoding, FieldName, MediaType, Method,
+                                 RangeUnit, RelationType, StatusCode,
+                                 TransferCoding, UpgradeToken, WarnCode)
 
 
 def yes_no(s):

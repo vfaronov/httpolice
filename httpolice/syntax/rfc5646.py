@@ -1,17 +1,8 @@
 # -*- coding: utf-8; -*-
 
 from httpolice.citation import RFC
-from httpolice.parse import (
-    auto,
-    fill_names,
-    literal,
-    maybe_str,
-    octet_range,
-    pivot,
-    string,
-    string1,
-    string_times,
-)
+from httpolice.parse import (auto, fill_names, literal, maybe_str, octet_range,
+                             pivot, string, string1, string_times)
 from httpolice.structure import LanguageTag
 from httpolice.syntax.common import ALPHA, DIGIT
 

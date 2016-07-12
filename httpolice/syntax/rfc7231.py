@@ -3,50 +3,19 @@
 from datetime import date, datetime, time
 
 from httpolice.citation import RFC
-from httpolice.parse import (
-    auto,
-    can_complain,
-    octet,
-    fill_names,
-    literal,
-    many,
-    maybe,
-    maybe_str,
-    named,
-    pivot,
-    skip,
-    string1,
-    string_times,
-    subst,
-)
-from httpolice.structure import (
-    CaseInsensitive,
-    Charset,
-    ContentCoding,
-    MediaType,
-    MultiDict,
-    Parametrized,
-    ProductName,
-    Unavailable,
-    Versioned,
-)
+from httpolice.parse import (auto, can_complain, fill_names, literal, many,
+                             maybe, maybe_str, named, octet, pivot, skip,
+                             string1, string_times, subst)
+from httpolice.structure import (CaseInsensitive, Charset, ContentCoding,
+                                 MediaType, MultiDict, Parametrized,
+                                 ProductName, Unavailable, Versioned)
 from httpolice.syntax.common import DIGIT, SP
-from httpolice.syntax.rfc3986 import absolute_URI, URI_reference
+from httpolice.syntax.rfc3986 import URI_reference, absolute_URI
 from httpolice.syntax.rfc4647 import language_range
 from httpolice.syntax.rfc5646 import Language_Tag as language_tag
-from httpolice.syntax.rfc7230 import (
-    OWS,
-    RWS,
-    comma_list,
-    comma_list1,
-    comment,
-    field_name,
-    method,
-    partial_URI,
-    quoted_string,
-    token,
-    token__excluding,
-)
+from httpolice.syntax.rfc7230 import (OWS, RWS, comma_list, comma_list1,
+                                      comment, field_name, method, partial_URI,
+                                      quoted_string, token, token__excluding)
 
 
 # The standard library's `calendar.day_name` is locale-dependent,

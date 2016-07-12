@@ -1,52 +1,22 @@
 # -*- coding: utf-8; -*-
 
 import base64
+from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 import string
-
-# pylint: disable=import-error
-
-try:
-    from urllib.parse import parse_qs, urlparse
-except ImportError:                             # Python 2
-    from urlparse import parse_qs, urlparse
-
-# pylint: enable=import-error
 
 import six
 
 from httpolice import message
 from httpolice.blackboard import derived_property
-from httpolice.known import (
-    auth,
-    cache,
-    cache_directive,
-    cc,
-    h,
-    header,
-    m,
-    media_type,
-    method,
-    product,
-    tc,
-    upgrade,
-)
+from httpolice.known import (auth, cache, cache_directive, cc, h, header, m,
+                             media_type, method, product, tc, upgrade)
 from httpolice.parse import mark, simple_parse
-from httpolice.structure import (
-    EntityTag,
-    Method,
-    Versioned,
-    http10,
-    http11,
-    http2,
-    okay,
-)
-from httpolice.syntax.rfc7230 import (
-    absolute_form,
-    asterisk_form,
-    authority_form,
-    origin_form,
-)
+from httpolice.structure import (EntityTag, Method, Versioned, http2, http10,
+                                 http11, okay)
 from httpolice.syntax.common import CTL
+from httpolice.syntax.rfc7230 import (absolute_form, asterisk_form,
+                                      authority_form, origin_form)
 from httpolice.util.text import force_unicode
 
 

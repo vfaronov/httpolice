@@ -8,19 +8,9 @@ from httpolice.inputs.streams import combined_input
 from httpolice.known import altsvc, auth, cache, h, hsts, m
 from httpolice.request import Request
 from httpolice.response import Response
-from httpolice.structure import (
-    CaseInsensitive,
-    FieldName,
-    HTTPVersion,
-    Method,
-    MultiDict,
-    Parametrized,
-    StatusCode,
-    Unavailable,
-    WarningValue,
-    http10,
-    http11,
-)
+from httpolice.structure import (CaseInsensitive, FieldName, HTTPVersion,
+                                 Method, MultiDict, Parametrized, StatusCode,
+                                 Unavailable, WarningValue, http10, http11)
 
 
 def load_from_file(name):

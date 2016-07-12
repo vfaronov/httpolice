@@ -12,12 +12,8 @@ from httpolice import known, message, notice, structure
 from httpolice.__metadata__ import version
 from httpolice.citation import Citation
 from httpolice.header import HeaderView
-from httpolice.reports.common import (
-    expand_error,
-    expand_piece,
-    find_reason_phrase,
-    resolve_reference,
-)
+from httpolice.reports.common import (expand_error, expand_piece,
+                                      find_reason_phrase, resolve_reference)
 from httpolice.structure import Unavailable, okay
 from httpolice.util.text import nicely_join, printable
 

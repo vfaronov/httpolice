@@ -1,14 +1,7 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.parse import (
-    fill_names,
-    literal,
-    maybe,
-    pivot,
-    skip,
-    string1,
-    subst,
-)
+from httpolice.parse import (fill_names, literal, maybe, pivot, skip, string1,
+                             subst)
 from httpolice.syntax.common import DIGIT
 from httpolice.syntax.rfc7230 import RWS, comma_list
 

@@ -8,15 +8,8 @@ from httpolice.known import m, st, tc
 from httpolice.parse import ParseError, Stream, maybe, skip
 from httpolice.request import Request
 from httpolice.response import Response
-from httpolice.structure import (
-    FieldName,
-    HTTPVersion,
-    HeaderEntry,
-    Method,
-    StatusCode,
-    Unavailable,
-    okay,
-)
+from httpolice.structure import (FieldName, HeaderEntry, HTTPVersion, Method,
+                                 StatusCode, Unavailable, okay)
 from httpolice.syntax import rfc7230
 from httpolice.syntax.common import CRLF, LF, SP
 

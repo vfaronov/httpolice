@@ -2,49 +2,20 @@
 
 from datetime import datetime, timedelta
 import re
-
-# pylint: disable=import-error,no-name-in-module
-
-try:
-    from urlparse import urljoin, urlparse
-except ImportError:                                     # Python 2
-    from urllib.parse import urljoin, urlparse
-
-# pylint: enable=import-error,no-name-in-module
+from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 import six
 
 from httpolice import message
 from httpolice.blackboard import derived_property
-from httpolice.known import (
-    auth,
-    cache,
-    cache_directive,
-    h,
-    header,
-    hsts,
-    m,
-    media,
-    media_type,
-    method,
-    rel,
-    st,
-    status_code,
-    tc,
-    unit,
-    upgrade,
-    warn,
-)
+from httpolice.known import (auth, cache, cache_directive, h, header, hsts, m,
+                             media, media_type, method, rel, st, status_code,
+                             tc, unit, upgrade, warn)
 from httpolice.known.status_code import NOT_AT_ALL, NOT_BY_DEFAULT
-from httpolice.structure import (
-    EntityTag,
-    StatusCode,
-    http10,
-    http11,
-    http2,
-    okay,
-)
 from httpolice.parse import simple_parse
+from httpolice.structure import (EntityTag, StatusCode, http2, http10, http11,
+                                 okay)
 from httpolice.syntax import rfc6749
 from httpolice.syntax.rfc7230 import asterisk_form
 from httpolice.util.text import force_unicode, is_ascii

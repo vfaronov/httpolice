@@ -1,26 +1,10 @@
 # -*- coding: utf-8; -*-
 
 from httpolice.citation import RFC
-from httpolice.parse import (
-    auto,
-    can_complain,
-    literal,
-    many,
-    maybe,
-    named,
-    pivot,
-    skip,
-    string,
-    string1,
-    fill_names,
-)
-from httpolice.structure import (
-    CaseInsensitive,
-    MediaType,
-    MultiDict,
-    Parametrized,
-    RelationType,
-)
+from httpolice.parse import (auto, can_complain, fill_names, literal, many,
+                             maybe, named, pivot, skip, string, string1)
+from httpolice.structure import (CaseInsensitive, MediaType, MultiDict,
+                                 Parametrized, RelationType)
 from httpolice.syntax.common import ALPHA, DIGIT, HTAB, SP, VCHAR
 from httpolice.syntax.rfc2616 import LOALPHA
 from httpolice.syntax.rfc3986 import URI, URI_reference as URI_Reference
