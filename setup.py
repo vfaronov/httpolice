@@ -24,7 +24,6 @@ setup(
     author_email='vfaronov@gmail.com',
     license='MIT',
     install_requires=[
-        'setuptools',
         'singledispatch >=3.4.0.3',
         'six >=1.10.0',
         'lxml >=3.6.0',

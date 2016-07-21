@@ -15,9 +15,9 @@ which is a map from notice ID (:class:`int`) to :class:`Notice`.
 """
 
 import copy
+import pkgutil
 
 import lxml.etree
-import pkg_resources
 import six
 
 from httpolice import citation, structure
@@ -180,10 +180,10 @@ def _load_notices():
     ns['rfc'] = CiteRFC
     for tag in known_map:
         ns[tag] = Known
-    notices_xml = pkg_resources.resource_stream('httpolice', 'notices.xml')
-    tree = lxml.etree.parse(notices_xml, parser)
+    notices_xml = pkgutil.get_data('httpolice', 'notices.xml')
+    root = lxml.etree.fromstring(notices_xml, parser)
     r = {}
-    for elem in tree.getroot():
+    for elem in root:
         if isinstance(elem, Notice):
             assert elem.id not in r
             r[elem.id] = elem

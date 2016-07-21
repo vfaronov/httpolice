@@ -1,10 +1,10 @@
 # -*- coding: utf-8; -*-
 
 import json
+import pkgutil
 
 import dominate
 import dominate.tags as H
-import pkg_resources
 from singledispatch import singledispatch
 import six
 
@@ -18,10 +18,8 @@ from httpolice.structure import Unavailable, okay
 from httpolice.util.text import nicely_join, printable
 
 
-css_code = pkg_resources.resource_string('httpolice.reports', 'html.css'). \
-    decode('utf-8')
-js_code = pkg_resources.resource_string('httpolice.reports', 'html.js'). \
-    decode('utf-8')
+css_code = pkgutil.get_data('httpolice.reports', 'html.css').decode('utf-8')
+js_code = pkgutil.get_data('httpolice.reports', 'html.js').decode('utf-8')
 
 
 def html_report(exchanges, buf):
