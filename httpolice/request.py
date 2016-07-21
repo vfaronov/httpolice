@@ -419,5 +419,5 @@ def _accept_subsumptions(items):
         if (item1 == u'*' or item1.endswith(u'/*')) and \
                 fnmatch.fnmatch(item2, item1) and \
                 not fnmatch.fnmatch(item1, item2) and \
-                q1 >= q2:
+                q1 == q2:
             yield (item1, item2)

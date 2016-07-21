@@ -1,0 +1,16 @@
+# When the wildcard's qvalue is *greater* than that of the more specific item,
+# it starts to look intentional
+# (maybe the user really dislikes a particular format).
+
+======== BEGIN INBOUND STREAM ========
+HEAD /music/track01 HTTP/1.1
+Host: example.com
+User-Agent: demo
+Accept: audio/mpeg;q=0.8, audio/*
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: audio/ogg
+Content-Length: 709445
+

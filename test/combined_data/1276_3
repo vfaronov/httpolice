@@ -4,7 +4,7 @@
 GET / HTTP/1.1
 Host: example.com
 User-Agent: demo
-Accept-Encoding: gzip;q=0.8, deflate;q=0.6, *
+Accept-Encoding: gzip, deflate, *
 
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 200 OK
