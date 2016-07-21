@@ -15,6 +15,7 @@ Added
 - Check for missing scheme name in authorization headers (notice `1274`_).
 - Check for missing quality values in headers like Accept (notice `1276`_).
 - Check for obsolete 'X-' prefix in experimental headers (notice `1277`_).
+- Work around more problems in HAR files exported by Firefox.
 - Notice `1093`_ recognizes a few more product names as client libraries.
 
 .. _1093: http://pythonhosted.org/HTTPolice/notices.html#1093

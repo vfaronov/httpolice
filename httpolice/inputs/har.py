@@ -115,6 +115,17 @@ def _process_response(data, req, creator):
     status = data['status']
     reason = data['statusText']
 
+    if creator in FIREFOX:
+        # Firefox joins all ``Set-Cookie`` response fields with newlines.
+        # (It also joins other fields with commas,
+        # but that is permitted by RFC 7230 Section 3.2.2.)
+        header_entries = [
+            (name, value)
+            for (name, joined_value) in header_entries
+            for value in (joined_value.split(u'\n') if name == h.set_cookie
+                          else [joined_value])
+        ]
+
     # The logic for body is similar to that for requests (see above),
     # except that
     # (1) Firefox also includes a body with 304 responses;

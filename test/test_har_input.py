@@ -3,7 +3,7 @@
 import os
 
 from httpolice.inputs.har import har_input
-from httpolice.known import m
+from httpolice.known import h, m
 from httpolice.structure import Unavailable, http2, http11
 
 
@@ -118,3 +118,11 @@ def test_xhr_edge():
     assert exchanges[1].request.method == m.DELETE
     assert exchanges[1].request.body == b''
     assert exchanges[2].request.method == u'FOO-BAR'
+
+
+def test_firefox_multiple_set_cookie():
+    exchanges = load_from_file('firefox_set_cookie.har')
+    [(_, _, (_, cookie1)), (_, _, (_, cookie2))] = \
+        exchanges[0].responses[0].headers.enumerate(h.set_cookie)
+    assert cookie1 == b'foo=bar'
+    assert cookie2 == b'baz=qux'
