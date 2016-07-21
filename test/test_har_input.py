@@ -38,6 +38,7 @@ def test_http2bin_firefox():
     exchanges = load_from_file('http2bin_firefox.har')
 
     assert exchanges[0].request.version == http2
+    assert exchanges[0].request.headers.connection.is_absent
     assert exchanges[0].responses[0].body is Unavailable
     assert exchanges[0].responses[0].decoded_body is Unavailable
     assert exchanges[0].responses[0].unicode_body[:5] == u'{\n  "'

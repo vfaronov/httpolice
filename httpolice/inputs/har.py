@@ -52,6 +52,17 @@ def _process_request(data, creator):
         # SPDY exported from Chrome.
         version = None
 
+    # Firefox exports "Connection: keep-alive" on HTTP/2 requests
+    # (which triggers notice 1244)
+    # even though it does not actually send it
+    # (this can be verified with SSLKEYLOGFILE + Wireshark).
+    if creator in FIREFOX and version == http2:
+        header_entries = [
+            (name, value)
+            for (name, value) in header_entries
+            if (name, value) != (h.connection, u'keep-alive')
+        ]
+
     method = data['method']
 
     parsed = urlparse(data['url'])
