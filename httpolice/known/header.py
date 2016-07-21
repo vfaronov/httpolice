@@ -808,6 +808,7 @@ known = KnownDict([
  {'_': FieldName(u'X-Device-User-Agent'),
   '_citations': [Citation(u'W3C Mobile Web Best Practices Working Group',
                           u'http://www.w3.org/2005/MWI/BPWG/')]},
+ {'_': FieldName(u'X-Firefox-SPDY')},
  {'_': FieldName(u'X-Forwarded-For')},
  {'_': FieldName(u'X-Forwarded-Host')},
  {'_': FieldName(u'X-Forwarded-Proto')},
