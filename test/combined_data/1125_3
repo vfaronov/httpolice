@@ -4,7 +4,7 @@
 GET / HTTP/1.1
 Host: example.com
 User-Agent: demo
-X-If-Something: foo/bar
+If-Something: foo/bar
 
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 304 Not Modified

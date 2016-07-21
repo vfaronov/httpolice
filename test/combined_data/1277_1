@@ -1,21 +1,15 @@
-1030
+1277
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
 Host: example.com
 User-Agent: demo
+X-Foo: bar
 
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
-Transfer-Encoding: chunked
-Trailer: Server
+Content-Length: 14
 
-e
 Hello world!
-
-0
-Server: xnign/1.2.3
-Custom-Header: foo, bar
-

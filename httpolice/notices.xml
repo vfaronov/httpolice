@@ -2008,4 +2008,10 @@
     <explain>See <rfc num="7231" sect="5.3.1"/>.</explain>
   </error>
 
+  <comment id="1277">
+    <title>Obsolete ‘X-’ prefix in <var ref="header"/></title>
+    <explain>Adding an ‘X-’ prefix to “experimental” headers is an old practice that is now considered obsolete. See <rfc num="6648" sect="3"/>.</explain>
+    <explain>If <var ref="header"/> is a header that you created, consider removing the ‘X-’ prefix. You may wish to check the <cite title="IANA message headers registry" url="http://www.iana.org/assignments/message-headers/message-headers.xhtml"/> to avoid collisions with existing names. Or, if the header is truly private and will never be used by others, it may be a good idea to replace ‘X-’ with something like your organization’s name.</explain>
+  </comment>
+
 </notices>

@@ -56,8 +56,8 @@ def test_complex_connection():
     # every ``obs-fold`` becomes one space,
     # and these spaces are *not* stripped
     # from either end of the resulting ``field-value``.
-    assert exch2.request.header_entries[2] == (u'X-Quux', b' demo  (demo) ')
-    assert exch2.request.header_entries[3] == (u'X-Foo', b'  bar')
+    assert exch2.request.header_entries[2] == (u'Quux', b' demo  (demo) ')
+    assert exch2.request.header_entries[3] == (u'Foo', b'  bar')
     assert exch2.request.header_entries[4] == (h.accept_encoding, b'')
     assert len(exch2.responses) == 1
     assert exch2.responses[0].status == st.ok
@@ -108,8 +108,8 @@ def test_unparseable_body():
 def test_chunked():
     [exch1] = load_from_file('chunked')
     assert exch1.request.body == b'foo bar foo bar foo bar baz xyzzy'
-    assert exch1.request.trailer_entries == [(u'X-Result', b'okay')]
-    assert exch1.request.headers[u'X-Result'].value == b'okay'
+    assert exch1.request.trailer_entries == [(u'Some-Result', b'okay')]
+    assert exch1.request.headers[u'Some-Result'].value == b'okay'
 
 
 def test_chunked_empty():

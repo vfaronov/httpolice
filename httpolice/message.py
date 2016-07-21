@@ -210,6 +210,8 @@ def check_message(msg):
         _ = hdr.value
         if header.deprecated(hdr.name):
             msg.complain(1197, header=hdr)
+        if hdr.name.startswith(u'X-') and hdr.name not in h:    # not in known
+            msg.complain(1277, header=hdr)
 
     # Force checking the payload according to various rules.
     _ = msg.decoded_body

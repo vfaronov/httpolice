@@ -5,8 +5,8 @@ GET / HTTP/1.1
 Host: example.com
 User-Agent: demo
 Cache-Control: max-age=0
-X-Foo-Bar: baz
-Connection: cache-control,x-foo-bar
+Foo-Bar: baz
+Connection: cache-control,foo-bar
 
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 200 OK

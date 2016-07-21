@@ -13,13 +13,13 @@ Date: Thu, 31 Dec 2015 18:26:56 GMT
 Set-Cookie: SID=31d4d96e407aad42
 Set-Cookie: region=54
 Content-Type: text/plain
-X-Some-Extension: foo
+Some-Extension: foo
 Transfer-Encoding: chunked
-Trailer: x-some-extension
+Trailer: some-extension
 
 e
 Hello world!
 
 0
-X-Some-Extension: bar, baz
+Some-Extension: bar, baz
 

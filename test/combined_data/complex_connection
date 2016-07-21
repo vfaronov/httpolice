@@ -1,6 +1,6 @@
 1016 1023 1011 1007 1010
 
-# Mind the trailing whitespace, including tabs at the end of ``X-Foo``.
+# Mind the trailing whitespace, including tabs at the end of ``Foo``.
 
 ======== BEGIN INBOUND STREAM ========
 POST /articles/ HTTP/1.1
@@ -15,12 +15,12 @@ Hello world!
 HEAD /articles/123/ HTTP/1.1
 Host: example.com
 User-Agent: demo
-X-Quux:
+Quux:
    demo
  
         (demo)
   
-X-Foo:   
+Foo:   
    
  bar		
 Accept-Encoding:
