@@ -3,11 +3,13 @@
 """The command-line interface to HTTPolice."""
 
 import argparse
+import collections
 import sys
 
 import httpolice
 from httpolice import inputs, reports
 from httpolice.exchange import check_exchange
+from httpolice.notice import ERROR
 from httpolice.util.text import stdio_as_bytes
 
 
@@ -28,11 +30,15 @@ def run_cli(argv, stdout, stderr):
 
     input_ = inputs.formats[args.input]
     report = reports.formats[args.output]
+    n_notices = collections.Counter()
     def generate_exchanges():
         for exch in input_(args.path):
             if args.silence:
                 exch.silence(args.silence)
             check_exchange(exch)
+            n_notices.update(notice.severity
+                             for obj in [exch] + exch.children
+                             for notice in obj.notices)
             yield exch
 
     try:
@@ -50,7 +56,10 @@ def run_cli(argv, stdout, stderr):
         stderr.write('httpolice: %s\n' % exc)
         return 1
 
-    return 0
+    if n_notices[ERROR] > 0:
+        return 1
+    else:
+        return 0
 
 
 def excepthook(_type, exc, _traceback):

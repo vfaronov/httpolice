@@ -36,8 +36,8 @@ class Exchange(Blackboard):
         self.responses = resps
 
     @property
-    def _children(self):
-        r = super(Exchange, self)._children
+    def children(self):
+        r = super(Exchange, self).children
         if self.request is not None:
             r.append(self.request)
         r.extend(self.responses)

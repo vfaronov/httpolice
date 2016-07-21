@@ -12,6 +12,8 @@ Unreleased
 
 Added
 -----
+- The ``httpolice`` command-line tool now exits with a non-zero status
+  if it has found any errors in the input data.
 - Check for missing scheme name in authorization headers (notice `1274`_).
 - Check for missing quality values in headers like Accept (notice `1276`_).
 - Check for obsolete 'X-' prefix in experimental headers (notice `1277`_).

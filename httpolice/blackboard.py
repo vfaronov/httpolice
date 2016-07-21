@@ -30,7 +30,7 @@ class Blackboard(object):
         self.memoized = {}
 
     @property
-    def _children(self):
+    def children(self):
         return []
 
     def complain(self, notice_id, **kwargs):
@@ -48,7 +48,7 @@ class Blackboard(object):
           so they don't appear in :attr:`notices` or in reports.
         """
         self._silenced.update(notice_ids)
-        for child in self._children:
+        for child in self.children:
             child.silence(notice_ids)
 
     @property
