@@ -7,6 +7,8 @@ It checks them for conformance to standards and best practices.
 This manual explains all features of HTTPolice in detail.
 If you want a brief introduction, see the :doc:`quickstart`.
 
+There is also a `list of all notices`__ that HTTPolice can output.
+
 .. toctree::
    :maxdepth: 1
 
@@ -19,7 +21,5 @@ If you want a brief introduction, see the :doc:`quickstart`.
    reports
    api
    django
-
-There is also a `list of all notices`__ that HTTPolice can output.
 
 __ http://pythonhosted.org/HTTPolice/notices.html
