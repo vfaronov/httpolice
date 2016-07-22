@@ -115,7 +115,18 @@ html_theme = 'alabaster'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {
+     'description': 'Lint for HTTP',
+     'github_button': 'true',
+     'github_user': 'vfaronov',
+     'github_repo': 'httpolice',
+     'github_type': 'star',
+     'fixed_sidebar': 'true',
+     'extra_nav_links': {
+          'List of all notices':
+               'http://pythonhosted.org/HTTPolice/notices.html',
+     },
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
@@ -156,7 +167,15 @@ html_static_path = ['_static']
 #html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
+html_sidebars = {
+    '**': [
+        'about.html',
+        'navigation.html',
+        'relations.html',
+        'searchbox.html',
+        'donate.html',
+    ]
+}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
