@@ -57,8 +57,10 @@ HTML in text
 
 .. highlight:: console
 
-What if you want full details like in HTML reports, but still in plain text?
-Just use a text-mode Web browser like `w3m`__::
+What if you want full details like in HTML reports, but on a textual display?
+Perhaps you’re running HTTPolice on a remote machine via ssh.
+
+You can simply use a text-mode Web browser like `w3m`__::
 
   $ httpolice -o html ... | w3m -M -T text/html
 
