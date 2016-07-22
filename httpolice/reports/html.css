@@ -57,6 +57,18 @@ hr {
     clear: both;
 }
 
+button {
+    /* Make it look more like a pseudo-link. */
+    background: transparent;
+    border-top: none;
+    border-right: none;
+    border-bottom: thin dotted;
+    border-left: none;
+    padding: 0;
+    color: gray;
+    cursor: pointer;
+}
+
 @media print {
     button {
         display: none;
@@ -170,17 +182,7 @@ div.notice {
 .notice button {
     float: right;
     margin-left: 1em;
-
-    /* Make it look more like a pseudo-link. */
-    background: transparent;
-    border-top: none;
-    border-right: none;
-    border-bottom: thin dotted;
-    border-left: none;
-    padding: 0;
-    color: gray;
     font-size: smaller;
-    cursor: pointer;
 }
 
 @media screen {                          /* Don't collapse notices in print. */
@@ -195,6 +197,38 @@ div.notice {
 
 .highlight {
     background: navajowhite;
+}
+
+
+/****************************************************************
+ * Options
+ ****************************************************************/
+
+div.options {
+    float: right;
+}
+
+@media print {
+    .options {
+        display: none;
+    }
+}
+
+@media screen {
+    .options.collapsed form {
+        display: none;
+    }
+}
+
+.options form {
+    margin-top: 0.3em;
+    padding: 0.1em 1em;
+    background: lavender;
+    white-space: nowrap;
+}
+
+form input + label, form label + input {
+    margin-left: 0.5em;
 }
 
 

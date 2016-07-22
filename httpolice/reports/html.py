@@ -84,6 +84,7 @@ def _common_meta(document):
 
 
 def _render_exchanges(exchanges):
+    H.hr()
     for exch in exchanges:
         with H.div(_class=u'exchange'):
             # The ``hr`` elements really help readability in w3m.

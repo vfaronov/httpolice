@@ -12,6 +12,8 @@ Unreleased
 
 Added
 -----
+- `HTML reports`_ now have an "options" menu
+  to filter exchanges and notices on the fly.
 - The ``httpolice`` command-line tool now exits with a non-zero status
   if it has found any errors in the input data.
 - Check for missing scheme name in authorization headers (notice `1274`_).
@@ -20,6 +22,7 @@ Added
 - Work around more problems in HAR files exported by Firefox.
 - Notice `1093`_ recognizes a few more product names as client libraries.
 
+.. _HTML reports: http://pythonhosted.org/HTTPolice/reports.html
 .. _1093: http://pythonhosted.org/HTTPolice/notices.html#1093
 .. _1274: http://pythonhosted.org/HTTPolice/notices.html#1274
 .. _1276: http://pythonhosted.org/HTTPolice/notices.html#1276
