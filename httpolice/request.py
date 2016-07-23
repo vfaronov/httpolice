@@ -207,7 +207,7 @@ def check_request(req):
             req.headers.transfer_encoding.is_absent):
         req.complain(1021)
 
-    if (method.defines_body(req.method) == False) and (not req.body) and \
+    if (method.defines_body(req.method) == False) and (req.body == b'') and \
             req.headers.content_length.is_present:
         req.complain(1022)
 
