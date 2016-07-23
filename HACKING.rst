@@ -46,8 +46,8 @@ For example:
   - an empty bytestring, meaning that the body was absent or empty
     (RFC 7230 distinguishes between absent and empty, but we don't);
   - ``Unavailable``, meaning that the body was present but unknown
-    (for instance, HAR files never contain the raw message body,
-    only the encoded payload body);
+    (for instance, HAR files never contain the raw payload body,
+    only the ``Message.decoded_body``);
   - ``None``, meaning that we have no idea if there was or wasn't a body.
 
 - ``httpolice.known.method.is_idempotent`` can return:
