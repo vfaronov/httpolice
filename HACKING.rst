@@ -34,7 +34,7 @@ Many things in the domain model can have the special values
 in addition to the normal range of their types.
 Usually:
 
-- ``None`` means "we have no information about this this";
+- ``None`` means "we have no information about this thing";
 - ``Unavailable`` means "we know that this thing is present
   (not missing), but we don't know its value".
 
