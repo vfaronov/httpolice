@@ -4,5 +4,6 @@
 _build
 Django_HTTPolice.egg-info
 HTTPolice.egg-info
+extra_doc
 htmlcov
 mitmproxy_HTTPolice.egg-info
