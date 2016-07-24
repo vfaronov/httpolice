@@ -9,7 +9,7 @@ import sys
 import httpolice
 from httpolice import inputs, reports
 from httpolice.exchange import check_exchange
-from httpolice.notice import ERROR
+from httpolice.notice import Severity
 from httpolice.util.text import stdio_as_bytes
 
 
@@ -56,7 +56,7 @@ def run_cli(argv, stdout, stderr):
         stderr.write('httpolice: %s\n' % exc)
         return 1
 
-    if n_notices[ERROR] > 0:
+    if n_notices[Severity.error] > 0:
         return 1
     else:
         return 0

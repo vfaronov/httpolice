@@ -30,6 +30,12 @@ Added
 
 Changed
 -------
+- In the `Python API`_,
+  the constants ``httpolice.ERROR``, ``httpolice.COMMENT``, ``httpolice.DEBUG``
+  have been replaced with a single ``httpolice.Severity`` enumeration
+  and will be removed in the next release.
+
+.. _Python API: http://httpolice.readthedocs.io/en/stable/api.html
 
 Deprecated
 ----------

@@ -49,10 +49,14 @@ API reference
    
    .. attribute:: severity
    
-     The notice’s severity.
-     This is an opaque value that should only be compared to the constants
-     :data:`httpolice.ERROR`, :data:`httpolice.COMMENT`,
-     and :data:`httpolice.DEBUG`.
+     The notice’s severity,
+     as a member of the :class:`~httpolice.Severity` enumeration.
+
+|
+
+.. autoclass:: httpolice.Severity
+   :members:
+   :undoc-members:
 
 |
 

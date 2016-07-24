@@ -255,7 +255,7 @@ def _notice_to_html(the_notice, ctx, with_anchor=False):
         with H.h3():
             # See above regarding spaces.
             H.abbr(the_notice.severity_short, _class=u'severity',
-                   title=the_notice.severity)
+                   title=the_notice.severity.name)
             H.span(six.text_type(the_notice.id), _class=u'ident')
             with H.span(__pretty=False):
                 _piece_to_html(the_notice.title, ctx)

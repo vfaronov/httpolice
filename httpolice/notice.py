@@ -21,11 +21,25 @@ import lxml.etree
 import six
 
 from httpolice import citation, structure
+from httpolice.util.ordered_enum import OrderedEnum
 
 
-ERROR = 'error'
-COMMENT = 'comment'
-DEBUG = 'debug'
+class Severity(OrderedEnum):
+
+    """A notice's severity.
+
+    This is a Python 3.4 style enumeration
+    with the additional feature that its members are ordered:
+
+    >>> Severity.comment < Severity.error
+    True
+
+    The underlying values of this enumeration are **not** part of the API.
+    """
+
+    error = 2
+    comment = 1
+    debug = 0
 
 
 known_map = {
@@ -51,8 +65,8 @@ class Notice(lxml.etree.ElementBase):
     """An element that represents a single notice."""
 
     id = property(lambda self: int(self.get('id')))
-    severity = property(lambda self: self.tag)
-    severity_short = property(lambda self: self.severity[0].upper())
+    severity = property(lambda self: Severity[self.tag])
+    severity_short = property(lambda self: self.severity.name[0].upper())
     title = property(lambda self: self.find('title').content)
 
     @property
@@ -169,8 +183,8 @@ def _load_notices():
     parser = lxml.etree.XMLParser()
     parser.set_element_class_lookup(lookup)
     ns = lookup.get_namespace(None)
-    for tag in [ERROR, COMMENT, DEBUG]:
-        ns[tag] = Notice
+    for severity in Severity:
+        ns[severity.name] = Notice
     ns['title'] = Title
     ns['explain'] = Paragraph
     ns['exception'] = ExceptionDetails
