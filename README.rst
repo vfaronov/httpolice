@@ -16,12 +16,12 @@ __ https://www.djangoproject.com/
 
 Start with the `quickstart`__.
 
-__ http://pythonhosted.org/HTTPolice/quickstart.html
+__ http://httpolice.readthedocs.io/en/stable/quickstart.html
 
 A full `user manual`__ is available.
 Also, a `list of all problems`__ HTTPolice can detect.
 
-__ http://pythonhosted.org/HTTPolice/
+__ http://httpolice.readthedocs.io/en/stable/
 __ http://pythonhosted.org/HTTPolice/notices.html
 
 HTTPolice was partly inspired by `REDbot`__, another QA tool for the Web.
