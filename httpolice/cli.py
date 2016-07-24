@@ -25,6 +25,11 @@ def run_cli(argv, stdout, stderr):
                         default=u'text', help=u'output format')
     parser.add_argument(u'-s', u'--silence', metavar=u'ID', type=int,
                         action='append', help=u'silence the given notice ID')
+    parser.add_argument(u'--fail-on',
+                        choices=[severity.name for severity in Severity],
+                        help=u'exit with a non-zero status '
+                             u'if any notices with this or higher severity '
+                             u'have been reported')
     parser.add_argument(u'path', nargs='+')
     args = parser.parse_args(argv[1:])
 
@@ -56,10 +61,11 @@ def run_cli(argv, stdout, stderr):
         stderr.write('httpolice: %s\n' % exc)
         return 1
 
-    if n_notices[Severity.error] > 0:
-        return 1
-    else:
-        return 0
+    if args.fail_on is not None:
+        for severity in Severity:
+            if severity >= Severity[args.fail_on] and n_notices[severity] > 0:
+                return 1
+    return 0
 
 
 def excepthook(_type, exc, _traceback):
