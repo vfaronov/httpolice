@@ -9,6 +9,8 @@ If you want a brief introduction, see the :doc:`quickstart`.
 
 There is also a `list of all notices`__ that HTTPolice can output.
 
+__ http://pythonhosted.org/HTTPolice/notices.html
+
 .. toctree::
    :maxdepth: 1
 
@@ -17,9 +19,13 @@ There is also a `list of all notices`__ that HTTPolice can output.
    concepts
    streams
    har
-   mitmproxy
    reports
    api
-   django
 
-__ http://pythonhosted.org/HTTPolice/notices.html
+Integration packages:
+
+- `mitmproxy integration`__
+- `Django integration`__
+
+__ http://mitmproxy-httpolice.readthedocs.io/
+__ http://django-httpolice.readthedocs.io/

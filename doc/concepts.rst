@@ -77,8 +77,10 @@ you can use the ``-s`` option to specify notice IDs to silence::
 
   $ httpolice -s 1089 -s 1194 ...
 
-Every integration method has a similar mechanism.
-For example, :doc:`mitmproxy` understands the same ``-s`` option.
+Integration methods have similar mechanisms.
+For example, `mitmproxy integration`__ understands the same ``-s`` option.
+
+__ http://mitmproxy-httpolice.readthedocs.io/
 
 Silencing locally
 ~~~~~~~~~~~~~~~~~

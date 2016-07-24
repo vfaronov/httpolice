@@ -167,7 +167,7 @@ Now let’s run the tests and see what’s broken::
 In `this example`__, the app sent a wrong ``Content-Type`` header
 and HTTPolice caught it.
 
-__ https://github.com/vfaronov/httpolice/blob/bca47b2/integration/django/example/example_app/views.py#L16
+__ https://github.com/vfaronov/django-httpolice/blob/234aa3a/example/example_app/views.py#L16
 
 
 More options
