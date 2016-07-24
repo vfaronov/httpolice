@@ -49,7 +49,7 @@ that prints the path to the script file::
   $ python -m mitmproxy_httpolice
   /home/vasiliy/.local/lib/python2.7/site-packages/mitmproxy_httpolice.py
 
-``-o html`` tells HTTPolice to produce :doc:`HTML reports <reports>`
+``-o html`` tells HTTPolice to produce HTML reports
 (omit it if you want a plain text report).
 Finally, ``report.html`` is the name of the output file.
 

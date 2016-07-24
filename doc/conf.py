@@ -123,7 +123,8 @@ html_theme_options = {
      'github_type': 'star',
      'fixed_sidebar': 'true',
      'extra_nav_links': {
-          'List of all notices': 'notices.html',
+          'List of all notices':
+               'http://pythonhosted.org/HTTPolice/notices.html',
      },
 }
 
