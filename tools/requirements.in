@@ -2,6 +2,7 @@ pip-tools
 pylint
 pytest
 wheel
+twine
 
 # For ``python setup.py check --restructuredtext``.
 docutils
