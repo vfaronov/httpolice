@@ -1,6 +1,46 @@
 How to hack on HTTPolice
 ========================
 
+Development environment
+~~~~~~~~~~~~~~~~~~~~~~~
+Set up::
+
+  $ virtualenv /path/to/env
+  $ source /path/to/env/bin/activate
+  $ pip install -e .
+  $ pip install -r tools/requirements.txt
+  $ pip install ...    # any extra tools you like to have
+
+Run tests::
+
+  $ py.test
+
+Run Pylint::
+
+  $ pylint -j 2 httpolice/ *.py test/*.py tools/*.py
+
+Use isort if you like -- there's an ``.isort.cfg`` with the right options --
+but this is not enforced automatically for now.
+
+
+Dependencies
+------------
+Versions of development tools (py.test, Pylint...)
+are pinned down to help make builds/QA reproducible.
+From time to time, they are manually upgraded::
+
+  $ pip-compile tools/requirements.in
+  $ pip install -r tools/requirements.txt
+  $ # ... check that everything is OK with the new versions
+  $ # ... maybe some Pylint overrides are no longer necessary
+  $ git add tools/requirements.txt && git commit
+
+Eventually I will use pip-sync for this,
+but right now it is unusable due to `pip-tools issue #206`__.
+
+__ https://github.com/nvie/pip-tools/issues/206
+
+
 Codebase overview and caveats
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
