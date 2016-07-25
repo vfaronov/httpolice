@@ -32,4 +32,5 @@ script:
     # This also validates an actual HTML report (``showcase.html``).
     - tools/vnu.sh validate extra_docs/_build/*.html
 
+    - tools/css_validator.sh httpolice/reports/html.css
     - node_modules/.bin/jshint httpolice/reports/html.js
