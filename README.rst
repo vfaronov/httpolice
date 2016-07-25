@@ -37,4 +37,8 @@ and released under the MIT license (see ``LICENSE.txt``).
 
 __ https://github.com/vfaronov/httpolice
 
+`BrowserStack`__ kindly provide a free subscription for testing HTTPolice.
+
+__ https://www.browserstack.com/
+
 Problems, suggestions? Feel free to email the author at vfaronov@gmail.com.
