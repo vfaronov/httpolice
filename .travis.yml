@@ -21,6 +21,8 @@ install:
     - pip install -r tools/requirements.txt
     - tools/vnu.sh install
 
+cache: pip
+
 script:
     - tools/pylint_all.sh
     - py.test
