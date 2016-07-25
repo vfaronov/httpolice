@@ -24,6 +24,8 @@ Run Pylint::
 Use isort if you like -- there's an ``.isort.cfg`` with the right options --
 but this is not enforced automatically for now.
 
+You may also want to use linters for HTML, CSS, and JS (see ``.travis.yml``).
+
 
 Dependencies
 ------------
