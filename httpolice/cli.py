@@ -5,6 +5,7 @@
 import argparse
 import collections
 import sys
+import traceback
 
 import httpolice
 from httpolice import inputs, reports
@@ -13,7 +14,7 @@ from httpolice.notice import Severity
 from httpolice.util.text import stdio_as_bytes
 
 
-def run_cli(argv, stdout, stderr):
+def parse_args(argv):
     parser = argparse.ArgumentParser(
         description=u'Run HTTPolice on input files.')
     parser.add_argument(u'--version', action='version',
@@ -30,9 +31,13 @@ def run_cli(argv, stdout, stderr):
                         help=u'exit with a non-zero status '
                              u'if any notices with this or higher severity '
                              u'have been reported')
+    parser.add_argument(u'--full-traceback', action='store_true',
+                        help=u'do not hide the traceback on exceptions')
     parser.add_argument(u'path', nargs='+')
-    args = parser.parse_args(argv[1:])
+    return parser.parse_args(argv[1:])
 
+
+def run_cli(args, stdout, stderr):
     input_ = inputs.formats[args.input]
     report = reports.formats[args.output]
     n_notices = collections.Counter()
@@ -58,6 +63,8 @@ def run_cli(argv, stdout, stderr):
         # So we encode all text into UTF-8 and write directly as bytes.
         report(generate_exchanges(), stdio_as_bytes(stdout))
     except (EnvironmentError, inputs.InputError) as exc:
+        if args.full_traceback:
+            traceback.print_exc(file=stderr)
         stderr.write('httpolice: %s\n' % exc)
         return 1
 
@@ -74,8 +81,10 @@ def excepthook(_type, exc, _traceback):
 
 
 def main():
-    sys.excepthook = excepthook
-    sys.exit(run_cli(sys.argv, sys.stdout, sys.stderr))
+    args = parse_args(sys.argv)
+    if not args.full_traceback:
+        sys.excepthook = excepthook
+    sys.exit(run_cli(args, sys.stdout, sys.stderr))
 
 if __name__ == '__main__':
     main()
