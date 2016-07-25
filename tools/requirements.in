@@ -2,6 +2,7 @@ pip-tools
 check-manifest
 pylint
 pytest
+pytest-cov
 wheel
 twine
 
