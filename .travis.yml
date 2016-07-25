@@ -1,5 +1,11 @@
 language: python
 
+addons:
+    apt:
+        packages:
+            # http://superuser.com/a/1057144/34733
+            - oracle-java8-installer
+
 python:
     - "2.7"
     - "3.4"
@@ -13,8 +19,12 @@ install:
     - test "$REQUIRES" = minimum && tools/minimum_requires.sh || true
     - pip install -e .
     - pip install -r tools/requirements.txt
+    - tools/vnu.sh install
 
 script:
     - tools/pylint_all.sh
     - py.test
     - tools/build_extra_doc.sh
+
+    # This also validates an actual HTML report (``showcase.html``).
+    - tools/vnu.sh validate extra_docs/_build/*.html
