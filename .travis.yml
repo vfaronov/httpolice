@@ -5,7 +5,12 @@ python:
     - "3.4"
     - "3.5"
 
+env:
+    - REQUIRES=minimum
+    - REQUIRES=normal
+
 install:
+    - test "$REQUIRES" = minimum && tools/minimum_requires.sh || true
     - pip install -e .
     - pip install -r tools/requirements.txt
 
