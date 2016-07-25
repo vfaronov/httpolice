@@ -36,5 +36,8 @@ script:
     - tools/css_validator.sh httpolice/reports/html.css
     - node_modules/.bin/jshint httpolice/reports/html.js
 
+    # Check that the API example works.
+    - python doc/api_example.py && grep -q 1194 report.html
+
     - sphinx-build -W doc/ doc/_build/
     - python setup.py sdist bdist_wheel

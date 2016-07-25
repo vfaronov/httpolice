@@ -18,7 +18,7 @@ exchanges = [
 bad_exchanges = []
 
 for exch in exchanges:
-    exch.silence([1089, 1194])      # Errors we don't care about
+    exch.silence([1089, 1227])      # Errors we don't care about
     httpolice.check_exchange(exch)
     if any(notice.severity > httpolice.Severity.comment
            for resp in exch.responses       # We only care about responses
