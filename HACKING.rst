@@ -17,7 +17,9 @@ Run tests::
 
 Run Pylint::
 
-  $ pylint -j 2 httpolice/ *.py test/*.py tools/*.py
+  $ tools/pylint_all.sh -j 2
+  $ # ... or selectively:
+  $ pylint httpolice/response.py
 
 Use isort if you like -- there's an ``.isort.cfg`` with the right options --
 but this is not enforced automatically for now.
