@@ -1,3 +1,6 @@
+/* jshint browser: true */
+/* jshint -W097 */
+
 'use strict';
 
 function collapseAll() {
@@ -8,6 +11,7 @@ function collapseAll() {
 }
 
 function onButtonClick() {
+    /* jshint -W040 */
     this.parentElement.classList.toggle('collapsed');
 }
 
@@ -23,6 +27,7 @@ function installButtons() {
 }
 
 function highlightReferences() {
+    /* jshint -W040 */
     var i, referrers, refs, exchange, target;
 
     // Collect references from all contributing elements within this notice.

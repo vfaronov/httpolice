@@ -20,6 +20,7 @@ install:
     - pip install -e .
     - pip install -r tools/requirements.txt
     - tools/vnu.sh install
+    - npm install jshint@2.9.2
 
 cache: pip
 
@@ -30,3 +31,5 @@ script:
 
     # This also validates an actual HTML report (``showcase.html``).
     - tools/vnu.sh validate extra_docs/_build/*.html
+
+    - node_modules/.bin/jshint httpolice/reports/html.js
