@@ -26,7 +26,7 @@ cache: pip
 
 script:
     - python setup.py check --strict --restructuredtext
-    - tools/pylint_all.sh
+    - tools/pylint_all.sh -j 2
     - py.test
     - tools/build_extra_doc.sh
 
