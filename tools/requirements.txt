@@ -8,6 +8,7 @@ alabaster==0.7.8
 args==0.1.0               # via clint
 astroid==1.4.7            # via pylint
 babel==2.3.4              # via sphinx
+check-manifest==0.31
 click==6.6                # via pip-tools
 clint==0.5.1              # via twine
 docutils==0.12
