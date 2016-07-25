@@ -17,3 +17,4 @@ install:
 script:
     - tools/pylint_all.sh
     - py.test
+    - tools/build_extra_doc.sh
