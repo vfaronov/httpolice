@@ -25,6 +25,7 @@ install:
 cache: pip
 
 script:
+    - python setup.py check --strict --restructuredtext
     - tools/pylint_all.sh
     - py.test
     - tools/build_extra_doc.sh
@@ -36,3 +37,4 @@ script:
     - node_modules/.bin/jshint httpolice/reports/html.js
 
     - sphinx-build -W doc/ doc/_build/
+    - python setup.py sdist bdist_wheel

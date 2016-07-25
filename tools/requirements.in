@@ -1,6 +1,10 @@
 pip-tools
 pylint
 pytest
+wheel
+
+# For ``python setup.py check --restructuredtext``.
+docutils
 
 # Pin down the versions of Sphinx and Alabaster as used on Read the Docs
 # (you can see them in the generated page footers).
