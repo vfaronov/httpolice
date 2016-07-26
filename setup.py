@@ -21,7 +21,7 @@ with io.open('requirements.in') as f:
 setup(
     name='HTTPolice',
     version=metadata['version'],
-    description='Lint for HTTP requests and responses',
+    description='Lint for HTTP',
     long_description=long_description,
     url='https://github.com/vfaronov/httpolice',
     author='Vasiliy Faronov',
