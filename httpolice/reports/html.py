@@ -251,7 +251,7 @@ def _render_known(obj):
 
 def _notice_to_html(the_notice, ctx, with_anchor=False):
     anchor = {'id': six.text_type(the_notice.id)} if with_anchor else {}
-    with H.div(_class=u'notice %s' % the_notice.severity, **anchor):
+    with H.div(_class=u'notice %s' % the_notice.severity.name, **anchor):
         with H.h3():
             # See above regarding spaces.
             H.abbr(the_notice.severity_short, _class=u'severity',
