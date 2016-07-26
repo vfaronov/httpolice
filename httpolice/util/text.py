@@ -219,3 +219,14 @@ def normalize_whitespace(s):
     Efficient XML Interchange
     """
     return re.sub(u'\\s+', u' ', s)
+
+
+class MockStdio(object):
+
+    """Suitable as a mock stdout/stderr for tests under both Python 2 and 3."""
+
+    def __init__(self):
+        self.buffer = io.BytesIO()
+
+    def write(self, s):
+        self.buffer.write(s.encode('utf-8'))
