@@ -63,7 +63,7 @@ class RFC(Citation):
             url = u'https://www.rfc-editor.org/errata_search.php?eid=%d' % \
                 errata
         else:
-            url = u'http://tools.ietf.org/html/rfc%d' % num
+            url = u'https://tools.ietf.org/html/rfc%d' % num
             if section or appendix:
                 section_text = u'.'.join(six.text_type(n)
                                          for n in section or appendix)
