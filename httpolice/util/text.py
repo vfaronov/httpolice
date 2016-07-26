@@ -211,3 +211,11 @@ def is_ascii(s):
         return True
     except UnicodeError:
         return False
+
+
+def normalize_whitespace(s):
+    """
+    >>> print(normalize_whitespace(u'Efficient XML \\n        Interchange'))
+    Efficient XML Interchange
+    """
+    return re.sub(u'\\s+', u' ', s)

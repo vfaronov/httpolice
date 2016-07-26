@@ -36,9 +36,16 @@ def parser_for(name):
     return known.get_info(name).get('parser')
 
 
+# A few of these directives (such as ``no-cache``) actually have
+# different citations for requests and for responses;
+# but it's hard for us to know whether a given instance of ``CacheDirective``
+# refers to a request directive or a response directive,
+# so we have to use one, more general citation.
+
 known = KnownDict([
  {'_': CacheDirective(u'max-age'),
   '_citations': [RFC(7234, section=(5, 2))],
+  '_no_sync': ['_citations'],
   'argument': REQUIRED,
   'argument_form': TOKEN_PREFERRED,
   'for_request': True,
@@ -65,6 +72,7 @@ known = KnownDict([
   'for_response': True},
  {'_': CacheDirective(u'no-cache'),
   '_citations': [RFC(7234, section=(5, 2))],
+  '_no_sync': ['_citations'],
   'argument': OPTIONAL,
   'argument_form': QUOTED_STRING_PREFERRED,
   'for_request': True,
@@ -72,11 +80,13 @@ known = KnownDict([
   'parser': rfc7230.comma_list(rfc7230.field_name)},
  {'_': CacheDirective(u'no-store'),
   '_citations': [RFC(7234, section=(5, 2))],
+  '_no_sync': ['_citations'],
   'argument': NO,
   'for_request': True,
   'for_response': True},
  {'_': CacheDirective(u'no-transform'),
   '_citations': [RFC(7234, section=(5, 2))],
+  '_no_sync': ['_citations'],
   'argument': NO,
   'for_request': True,
   'for_response': True},

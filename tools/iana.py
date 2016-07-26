@@ -1,4 +1,26 @@
+#!/usr/bin/env python
 # -*- coding: utf-8; -*-
+
+"""Tool to synchronize :mod:`httpolice.known` with IANA registries.
+
+Simply run::
+
+  $ tools/iana.py
+
+and it will fetch the protocol elements registered with IANA,
+compare them with those in :mod:`httpolice.known`, and report differences.
+
+Items missing from HTTPolice are printed in a format
+that can be copy-pasted right into the appropriate module
+(run under Python 2, so that strings get the ``u`` prefix for consistency).
+
+If certain items should not be synced, add a ``_no_sync`` key to them.
+
+Items that are present in HTTPolice but not registered with IANA
+are **not** reported (there are too many ``X-`` headers that we need to know).
+
+Exits with a non-zero status if any differences have been found.
+"""
 
 from __future__ import print_function
 
@@ -7,6 +29,7 @@ import re
 from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 from six.moves.urllib.request import Request  # pylint: disable=import-error
 from six.moves.urllib.request import urlopen  # pylint: disable=import-error
+import sys
 
 import lxml.etree
 
@@ -16,6 +39,7 @@ from httpolice.structure import (AltSvcParam, AuthScheme, CacheDirective,
                                  ContentCoding, FieldName, MediaType, Method,
                                  RangeUnit, RelationType, StatusCode,
                                  TransferCoding, UpgradeToken, WarnCode)
+from httpolice.util.text import normalize_whitespace
 
 
 def yes_no(s):
@@ -66,7 +90,9 @@ class Registry(object):
                     num = int(xref.get('data')[3:])
                     yield RFC(num)
             elif xref.get('type') == 'uri':
-                yield Citation(xref.text, xref.get('data'))
+                title = normalize_whitespace(xref.text) if xref.text else None
+                url = xref.get('data')
+                yield Citation(title, url)
 
 
 class HeaderRegistry(Registry):
@@ -263,21 +289,22 @@ class AltSvcParamRegistry(Registry):
 
 
 def make_diff(here, there):
-    not_here, mismatch, not_there = [], [], []
+    missing = []
+    mismatch = []
     for key, entry in there.items():
         if key in here:
+            no_sync = here[key].pop('_no_sync', [])
             entry_diff = {k: {'here': here[key].get(k), 'there': v}
                           for k, v in entry.items()
-                          if not _info_match(k, here[key].get(k), v)}
+                          if not _info_match(k, here[key].get(k), v) and
+                             no_sync != True and k not in no_sync}
             if entry_diff:
                 entry_diff['_'] = key
                 mismatch.append(entry_diff)
         elif entry['_citations']:
             # We don't have much use for entries without citations.
-            not_here.append(entry)
-    for key in set(here) - set(there):
-        not_there.append(here[key])
-    return not_here, mismatch, not_there
+            missing.append(entry)
+    return missing, mismatch
 
 
 def _info_match(key, here, there):
@@ -285,6 +312,7 @@ def _info_match(key, here, there):
         # We consider the citation lists matching if
         # for every citation listed at IANA
         # we have the same citation or a more specific one.
+        here = here or []
         for there_cit in there:
             if not any(here_cit.subset_of(there_cit) for here_cit in here):
                 return False
@@ -294,18 +322,20 @@ def _info_match(key, here, there):
 
 
 def main():
+    exit_status = 0
     for reg in Registry.__subclasses__():
         for cls, entries in reg().get_all():
             here = httpolice.known.classes[cls]
             there = {entry['_']: entry for entry in entries}
-            not_here, mismatch, not_there = make_diff(here, there)
-            for title, updates in [('not here', not_here),
-                                   ('mismatch', mismatch),
-                                   ('not there', not_there)]:
+            missing, mismatch = make_diff(here, there)
+            for title, updates in [('missing', missing),
+                                   ('mismatch', mismatch)]:
                 if updates:
                     print('======== %s %s ========\n' % (cls.__name__, title))
                     pprint.pprint(updates)
                     print('\n')
+                    exit_status = 1
+    sys.exit(exit_status)
 
 
 if __name__ == '__main__':

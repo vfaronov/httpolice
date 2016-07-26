@@ -14,6 +14,9 @@ known = KnownDict([
   '_citations': [RFC(7230, section=(4, 2, 2))]},
  {'_': TransferCoding(u'gzip'),
   '_citations': [RFC(7230, section=(4, 2, 3))]},
+ {'_': TransferCoding(u'identity'),
+  # https://www.rfc-editor.org/errata_search.php?eid=408
+  '_no_sync': True},
  {'_': TransferCoding(u'x-compress'),
   '_citations': [RFC(7230, section=(4, 2, 1))]},
  {'_': TransferCoding(u'x-gzip'),
