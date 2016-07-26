@@ -13,8 +13,6 @@ Inputs (and thus results) are deterministic within a given combination of:
 (so, if you add a new header, you can suddenly discover unrelated bugs).
 """
 
-import io
-import pickle
 import random
 import string
 
