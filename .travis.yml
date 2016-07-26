@@ -5,6 +5,7 @@ addons:
         packages:
             # http://superuser.com/a/1057144/34733
             - oracle-java8-installer
+            - xmlstarlet
 
 python:
     - "2.7"
