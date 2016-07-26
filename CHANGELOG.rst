@@ -23,7 +23,7 @@ Added
 - Work around more problems in HAR files exported by Firefox.
 - Notice `1093`_ recognizes a few more product names as client libraries.
 
-.. _HTML reports: http://pythonhosted.org/HTTPolice/reports.html
+.. _HTML reports: http://httpolice.readthedocs.io/en/stable/reports.html
 .. _1093: http://pythonhosted.org/HTTPolice/notices.html#1093
 .. _1274: http://pythonhosted.org/HTTPolice/notices.html#1274
 .. _1276: http://pythonhosted.org/HTTPolice/notices.html#1276
@@ -66,8 +66,8 @@ Added
 - `Stale controls`_ are now recognized.
 - Checks for status code `451 (Unavailable For Legal Reasons)`_.
 
-.. _Django integration: http://pythonhosted.org/HTTPolice/django.html
-.. _silenced: http://pythonhosted.org/HTTPolice/concepts.html#silence
+.. _Django integration: http://httpolice.readthedocs.io/en/stable/django.html
+.. _silenced: http://httpolice.readthedocs.io/en/stable/concepts.html#silence
 .. _bearer tokens: http://tools.ietf.org/html/rfc6750
 .. _Content-Disposition: http://tools.ietf.org/html/rfc6266
 .. _RFC 5987: https://tools.ietf.org/html/rfc5987
@@ -80,7 +80,8 @@ Changed
 -------
 - `mitmproxy integration`_ has been moved into a separate distribution.
 
-.. _mitmproxy integration: http://pythonhosted.org/HTTPolice/mitmproxy.html
+.. _mitmproxy integration:
+   http://httpolice.readthedocs.io/en/stable/mitmproxy.html
 
 Fixed
 -----
