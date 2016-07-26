@@ -4,14 +4,13 @@
 
 Generate random, very wrong inputs, and run them through HTTPolice.
 We don't care about the results, but there must be no exceptions raised.
-If there is, the state of the random generator is dumped
-into a file with a ``.pickle`` suffix (in the current directory).
-Then, the problem can be reproduced manually like this::
+Inputs (and thus results) are deterministic within a given combination of:
 
-  import pickle, random, test_fuzz
-  state = pickle.load(open('fuzz-state-XX.pickle', 'rb'))
-  test_fuzz.test_fuzz(0, state)
+1. Python version;
+2. set of methods that HTTPolice knows;
+3. set of headers that HTTPolice knows how to parse
 
+(so, if you add a new header, you can suddenly discover unrelated bugs).
 """
 
 import io
@@ -28,7 +27,7 @@ from httpolice.reports import html_report, text_report
 from httpolice.structure import http2, http10, http11
 
 
-N_TESTS = 50
+N_TESTS = 100
 
 schemes = [u'http', u'https', u'foobar', None]
 versions = [http10, http11, http2, u'HTTP/3.0', None]
@@ -51,10 +50,9 @@ def make_headers(max_num):
             for _ in range(random.randint(0, max_num))]
 
 def make_header_value():
-    fuzzers = [make_token, make_garbage,
-               lambda: b',', lambda: b'"', lambda: b'']
-    return b' '.join(random.choice(fuzzers)()
-                     for _ in range(random.randint(0, 10)))
+    inner = random.choice([make_token] * 8 + [make_header_value, make_garbage])
+    joiner = random.choice([b',', b';', b'=', b'/', b' '])
+    return joiner.join(inner() for _ in range(random.randint(0, 3)))
 
 def make_body():
     return random.choice([b'', make_garbage()])
@@ -67,14 +65,7 @@ def make_garbage():
     return b''.join(six.int2byte(random.randint(0, 255))
                     for _ in range(10, 100))
 
-
-@pytest.mark.parametrize('i', range(N_TESTS))
-def test_fuzz(i, state=None):
-    if state is None:
-        state = random.getstate()
-    else:
-        random.setstate(state)
-
+def make_exchange():
     req = random.choice([
         None,
         Request(random.choice(schemes),
@@ -94,14 +85,16 @@ def test_fuzz(i, state=None):
                  make_headers(max_num=2))
         for _ in range(random.randint(0, 2))
     ]
+    return Exchange(req, resps)
 
-    try:
-        exch = Exchange(req, resps)
-        check_exchange(exch)
-        text_report([exch], six.BytesIO())
-        html_report([exch], six.BytesIO())
-    except Exception:
-        filename = 'fuzz-state-%02d.pickle' % i
-        with io.open(filename, 'wb') as f:
-            pickle.dump(state, f)
-        raise
+
+@pytest.mark.parametrize('i', range(N_TESTS))
+def test_fuzz(i):
+    orig_state = random.getstate()
+    random.seed(123456789 + i)      # Some arbitrary, but deterministic number.
+    exch = make_exchange()
+    random.setstate(orig_state)
+
+    check_exchange(exch)
+    text_report([exch], six.BytesIO())
+    html_report([exch], six.BytesIO())
