@@ -15,21 +15,19 @@ VERSION=16.6.29
 JAVA=/usr/lib/jvm/java-8-oracle/bin/java
 test -e "$JAVA" || JAVA=java
 
-dir=$HOME/vnu
-
 action=$1
 shift
 
 case $action in
     install)
-        rm -rf "$dir"
-        mkdir -p "$dir"
-        cd "$dir"
+        rm -rf vnu
+        mkdir vnu
+        cd vnu
         wget "$RELEASES/download/$VERSION/vnu.jar_$VERSION.zip" -O vnu.zip
         unzip vnu.zip
         ;;
 
     validate)
-        "$JAVA" -jar "$dir/dist/vnu.jar" "$@"
+        "$JAVA" -jar vnu/dist/vnu.jar "$@"
         ;;
 esac
