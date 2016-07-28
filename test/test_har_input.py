@@ -127,3 +127,14 @@ def test_firefox_multiple_set_cookie():
         exchanges[0].responses[0].headers.enumerate(h.set_cookie)
     assert cookie1 == b'foo=bar'
     assert cookie2 == b'baz=qux'
+
+
+def test_fiddler_connect():
+    exchanges = load_from_file('fiddler+ie11_connect.har')
+    assert exchanges[0].request.target == u'httpbin.org:443'
+    assert exchanges[0].request.body == b''
+    assert exchanges[0].request.decoded_body == b''
+    assert exchanges[0].responses[0].headers[u'StartTime'].is_present
+    assert exchanges[0].responses[0].headers[u'EndTime'].is_absent
+    assert exchanges[0].responses[0].body == b''
+    assert exchanges[0].responses[0].decoded_body == b''

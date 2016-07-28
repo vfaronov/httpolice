@@ -21,13 +21,14 @@ Added
 - The ``httpolice`` command-line tool now has
   a ``--fail-on`` option to exit with a non-zero status
   if any notices with a given severity have been reported.
+- Work around various problems in HAR files exported by Firefox and `Fiddler`_.
 - Check for missing scheme name in authorization headers (notice `1274`_).
 - Check for missing quality values in headers like Accept (notice `1276`_).
 - Check for obsolete 'X-' prefix in experimental headers (notice `1277`_).
-- Work around more problems in HAR files exported by Firefox.
 - Notice `1093`_ recognizes a few more product names as client libraries.
 
 .. _HTML reports: http://httpolice.readthedocs.io/en/stable/reports.html
+.. _Fiddler: http://www.telerik.com/fiddler
 .. _PyPy: http://pypy.org/
 .. _1093: http://pythonhosted.org/HTTPolice/notices.html#1093
 .. _1274: http://pythonhosted.org/HTTPolice/notices.html#1274
@@ -51,6 +52,7 @@ Removed
 
 Fixed
 -----
+- CONNECT requests in HAR files are now handled correctly.
 
 Security
 --------

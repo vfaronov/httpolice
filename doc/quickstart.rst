@@ -86,7 +86,16 @@ or from your distribution’s packages if they are recent enough
 __ https://mitmproxy.org/
 __ http://docs.mitmproxy.org/en/stable/install.html
 
-And you’ll need the integration package::
+.. note::
+
+   Another solution would be to use `Fiddler`__.
+   Especially Windows users may find it easier.
+   Use Fiddler’s `HAR 1.2 export`__ to get the data into HTTPolice.
+
+   __ http://www.telerik.com/fiddler
+   __ http://docs.telerik.com/fiddler/KnowledgeBase/ImportExportFormats
+
+You’ll need the integration package::
 
   $ pip install mitmproxy-HTTPolice
 

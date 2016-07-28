@@ -11,13 +11,15 @@ from httpolice import framing1
 from httpolice.exchange import Exchange
 from httpolice.helpers import pop_pseudo_headers
 from httpolice.inputs.common import InputError
-from httpolice.known import h, media, st
+from httpolice.known import h, m, media, st
 from httpolice.parse import ParseError, Stream
 from httpolice.request import Request
 from httpolice.response import Response
-from httpolice.structure import FieldName, Unavailable, http2, http11
+from httpolice.structure import (FieldName, StatusCode, Unavailable, http2,
+                                 http11)
 
 
+FIDDLER = [u'Fiddler']
 CHROME = [u'WebInspector']
 EDGE = [u'F12 Developer Tools']
 
@@ -74,18 +76,20 @@ def _process_request(data, creator):
     parsed = urlparse(data['url'])
     scheme = parsed.scheme
 
-    # With HAR, we can't tell if the request was to a proxy or to a server.
-    # So we force most requests into the "origin form" of the target,
-    # unless the request has no ``Host`` header,
-    # in which case we use the "absolute form" just for the user's convenience
-    # (otherwise they wouldn't be able to see the target host).
-    # To prevent this distinction from having an effect on the proxy logic,
-    # we explicitly set `Request.is_to_proxy` to `None` later.
-    if any(name == h.host for (name, _) in header_entries):
+    if method == m.CONNECT:
+        target = parsed.netloc
+    elif any(name == h.host for (name, _) in header_entries):
+        # With HAR, we can't tell if the request was to a proxy or to a server.
+        # So we force most requests into the "origin form" of the target,
         target = parsed.path
         if parsed.query:
             target += u'?' + parsed.query
     else:
+        # However, if the request has no ``Host`` header,
+        # the user won't be able to see the target host
+        # unless we set the full URL ("absolute form") as the target.
+        # To prevent this from having an effect on the proxy logic,
+        # we explicitly set `Request.is_to_proxy` to `None` later.
         target = data['url']
 
     if data['bodySize'] == 0:
@@ -104,6 +108,7 @@ def _process_request(data, creator):
     post = data.get('postData')
     if post and post.get('text'):
         text = post['text']
+
         if creator in FIREFOX and \
                 post['mimeType'] == media.application_x_www_form_urlencoded \
                 and u'\r\n' in text:
@@ -118,6 +123,12 @@ def _process_request(data, creator):
                 header_entries.extend(more_entries)
                 text = actual_text
 
+        if creator in FIDDLER and method == m.CONNECT and u'Fiddler' in text:
+            # Fiddler's HAR export adds a body with debug information
+            # to CONNECT requests.
+            text = None
+            body = b''
+
     req = Request(scheme, method, target, version, header_entries, body)
     if text is not None:
         req.unicode_body = text
@@ -129,7 +140,7 @@ def _process_response(data, req, creator):
     if data['status'] == 0:          # Indicates error in Chrome.
         return None
     (version, header_entries, _) = _process_message(data, creator)
-    status = data['status']
+    status = StatusCode(data['status'])
     reason = data['statusText']
 
     if creator in FIREFOX:
@@ -142,6 +153,14 @@ def _process_response(data, req, creator):
             for value in (joined_value.split(u'\n') if name == h.set_cookie
                           else [joined_value])
         ]
+
+    if creator in FIDDLER and req.method == m.CONNECT and status.successful:
+        # Fiddler's HAR export adds extra debug headers to CONNECT responses
+        # after the tunnel is closed.
+        header_entries = [(name, value)
+                          for (name, value) in header_entries
+                          if name not in [u'EndTime', u'ClientToServerBytes',
+                                          u'ServerToClientBytes']]
 
     # The logic for body is similar to that for requests (see above),
     # except that
@@ -164,11 +183,21 @@ def _process_response(data, req, creator):
         version = None
 
     resp = Response(version, status, reason, header_entries, body=body)
+
     if data['content'].get('text') and status != st.not_modified:
         if data['content'].get('encoding', u'').lower() == u'base64':
-            resp.decoded_body = base64.b64decode(data['content']['text'])
+            decoded_body = base64.b64decode(data['content']['text'])
+            if creator in FIDDLER and req.method == m.CONNECT and \
+                    status.successful and b'Fiddler' in decoded_body:
+                # Fiddler's HAR export adds a body with debug information
+                # to CONNECT responses.
+                resp.body = b''
+            else:
+                resp.decoded_body = decoded_body
+
         elif 'encoding' not in data['content']:
             resp.unicode_body = data['content']['text']
+
     return resp
 
 
