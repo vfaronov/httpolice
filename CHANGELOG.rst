@@ -12,16 +12,15 @@ Unreleased
 
 Added
 -----
+- HTTPolice now works under `PyPy`_ (the 2.7 variant),
+  which can make it significantly faster on large inputs.
+  You will probably need a recent version of PyPy
+  (5.3.1 works, but with 5.0.0 I get segfaults all over the place).
 - `HTML reports`_ now have an "options" menu
   to filter exchanges and notices on the fly.
 - The ``httpolice`` command-line tool now has
   a ``--fail-on`` option to exit with a non-zero status
   if any notices with a given severity have been reported.
-- HTTPolice now works under `PyPy`_ (the 2.7 variant).
-  You will probably need a recent version of PyPy
-  (5.3.1 works, but with 5.0.0 I get segfaults all over the place).
-  Actually, PyPy doesn't seem to make HTTPolice faster,
-  so this is only interesting if you already have a PyPy environment.
 - Check for missing scheme name in authorization headers (notice `1274`_).
 - Check for missing quality values in headers like Accept (notice `1276`_).
 - Check for obsolete 'X-' prefix in experimental headers (notice `1277`_).
