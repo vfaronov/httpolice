@@ -9,6 +9,7 @@ addons:
 
 python:
     - "2.7"
+    - "pypy"
     - "3.4"
     - "3.5"
 
@@ -17,11 +18,12 @@ env:
     - REQUIRES=normal
 
 install:
-    - test "$REQUIRES" = minimum && tools/minimum_requires.sh || true
+    - if [ "$TRAVIS_PYTHON_VERSION" = pypy ]; then . `tools/pypy_env.sh`; fi
+    - if [ "$REQUIRES" = minimum ]; then tools/minimum_requires.sh; fi
     - pip install -e .
     - pip install -r tools/requirements.txt
     - tools/vnu.sh install
-    - npm install jshint@2.9.2
+    - tools/jshint.sh install
 
 cache: pip
 
@@ -32,10 +34,10 @@ script:
     - tools/build_extra_doc.sh
 
     # This also validates an actual HTML report (``showcase.html``).
-    - tools/vnu.sh validate extra_doc/_build/*.html
+    - tools/vnu.sh run extra_doc/_build/*.html
 
     - tools/css_validator.sh httpolice/reports/html.css
-    - node_modules/.bin/jshint httpolice/reports/html.js
+    - tools/jshint.sh run httpolice/reports/html.js
 
     # Check that the API example works.
     - python doc/api_example.py && grep -q 1194 report.html

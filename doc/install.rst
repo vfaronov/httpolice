@@ -18,6 +18,11 @@ __ https://pip.pypa.io/en/stable/installing/
 __ https://packaging.python.org/en/latest/install_requirements_linux/
 __ http://lxml.de/installation.html
 
+`PyPy`__ (the 2.7 variant) is also supported,
+but you may experience problems with older PyPy versions (5.3.1 should be OK).
+
+__ http://pypy.org/
+
 
 On Debian/Ubuntu
 ----------------
