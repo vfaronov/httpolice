@@ -82,7 +82,9 @@ class MultiDict(object):
         return 'MultiDict(%r)' % self.sequence
 
     def __eq__(self, other):
-        return isinstance(other, MultiDict) and self.sequence == other.sequence
+        if isinstance(other, MultiDict):
+            return self.sequence == other.sequence
+        return NotImplemented
 
     def __ne__(self, other):
         return not (self == other)
@@ -140,8 +142,7 @@ class CaseInsensitive(ProtocolString):
     def __eq__(self, other):
         if isinstance(other, six.text_type):
             return self.lower() == other.lower()
-        else:
-            return False
+        return NotImplemented
 
     def __ne__(self, other):
         return not (self == other)

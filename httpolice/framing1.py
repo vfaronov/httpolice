@@ -266,7 +266,7 @@ def _decode_transfer_coding(msg, coding):
         # The outermost chunked has already been peeled off at this point.
         msg.complain(1002)
         msg.body = Unavailable
-    elif coding in [tc.gzip, tc.x_gzip]:
+    elif coding == tc.gzip or coding == tc.x_gzip:
         try:
             msg.body = decode_gzip(msg.body)
         except Exception as e:
