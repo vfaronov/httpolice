@@ -12,7 +12,8 @@ import six
 from httpolice import message
 from httpolice.blackboard import derived_property
 from httpolice.known import (auth, cache, cache_directive, cc, h, header, m,
-                             media_type, method, product, tc, upgrade)
+                             media_type, method as method_info, product, tc,
+                             upgrade)
 from httpolice.parse import mark, simple_parse
 from httpolice.structure import (EntityTag, Method, MultiDict, Parametrized,
                                  Versioned, http2, http10, http11, okay)
@@ -190,145 +191,146 @@ class Request(message.Message):
 
 def check_request(req):
     """Apply all checks to the request `req`."""
+    complain = req.complain
+    method = req.method
+    version = req.version
+    headers = req.headers
+    body = req.body
 
     req.silence(notice_id
-                for (notice_id, in_resp) in req.headers.httpolice_silence.okay
+                for (notice_id, in_resp) in headers.httpolice_silence.okay
                 if not in_resp)
 
     message.check_message(req)
 
     _ = req.target_form                 # Force check.
 
-    if req.body and req.headers.content_type.is_absent:
-        req.complain(1041)
+    if body and headers.content_type.is_absent:
+        complain(1041)
 
-    if (method.defines_body(req.method) and
-            req.headers.content_length.is_absent and
-            req.headers.transfer_encoding.is_absent):
-        req.complain(1021)
+    if (method_info.defines_body(method) and
+            headers.content_length.is_absent and
+            headers.transfer_encoding.is_absent):
+        complain(1021)
 
-    if (method.defines_body(req.method) == False) and (req.body == b'') and \
-            req.headers.content_length.is_present:
-        req.complain(1022)
+    if (method_info.defines_body(method) == False) and (body == b'') and \
+            headers.content_length.is_present:
+        complain(1022)
 
-    if tc.chunked in req.headers.te:
-        req.complain(1028)
+    if tc.chunked in headers.te:
+        complain(1028)
 
-    if req.version == http2:
-        if req.headers.te and req.headers.te.value != [u'trailers']:
-            req.complain(1244, header=req.headers.te)
+    if version == http2:
+        if headers.te and headers.te.value != [u'trailers']:
+            complain(1244, header=headers.te)
     else:
-        if req.headers.te and u'TE' not in req.headers.connection:
-            req.complain(1029)
+        if headers.te and u'TE' not in headers.connection:
+            complain(1029)
 
-    if req.version == http11 and req.headers.host.is_absent:
-        req.complain(1031)
-    if req.headers.host.is_present and req.header_entries[0].name != h.host:
-        req.complain(1032)
+    if version == http11 and headers.host.is_absent:
+        complain(1031)
+    if headers.host.is_present and req.header_entries[0].name != h.host:
+        complain(1032)
 
-    for hdr in req.headers:
+    for hdr in headers:
         if header.is_for_request(hdr.name) == False:
-            req.complain(1063, header=hdr)
-        elif header.is_representation_metadata(hdr.name) and req.body == b'':
-            req.complain(1053, header=hdr)
+            complain(1063, header=hdr)
+        elif header.is_representation_metadata(hdr.name) and body == b'':
+            complain(1053, header=hdr)
 
-    if req.body:
-        if req.method == m.GET:
-            req.complain(1056)
-        elif req.method == m.HEAD:
-            req.complain(1057)
-        elif req.method == m.DELETE:
-            req.complain(1059)
-        elif req.method == m.CONNECT:
-            req.complain(1061)
+    if body:
+        if method == m.GET:
+            complain(1056)
+        elif method == m.HEAD:
+            complain(1057)
+        elif method == m.DELETE:
+            complain(1059)
+        elif method == m.CONNECT:
+            complain(1061)
 
-    if req.method == m.OPTIONS and req.body and \
-            req.headers.content_type.is_absent:
-        req.complain(1062)
+    if method == m.OPTIONS and body and headers.content_type.is_absent:
+        complain(1062)
 
-    if req.headers.expect == u'100-continue' and req.body == b'':
-        req.complain(1066)
+    if headers.expect == u'100-continue' and body == b'':
+        complain(1066)
 
-    if req.headers.max_forwards.is_present and \
-            req.method not in [m.OPTIONS, m.TRACE]:
-        req.complain(1067)
+    if headers.max_forwards.is_present and method not in [m.OPTIONS, m.TRACE]:
+        complain(1067)
 
-    if req.headers.referer.is_okay:
+    if headers.referer.is_okay:
         if req.is_tls == False:
-            parsed = urlparse(req.headers.referer.value)
+            parsed = urlparse(headers.referer.value)
             if parsed.scheme == u'https':
-                req.complain(1068)
+                complain(1068)
 
-    if req.headers.user_agent.is_absent:
-        req.complain(1070)
-    elif req.headers.user_agent.is_okay:
-        products = [p for p in req.headers.user_agent.value
+    if headers.user_agent.is_absent:
+        complain(1070)
+    elif headers.user_agent.is_okay:
+        products = [p for p in headers.user_agent.value
                     if isinstance(p, Versioned)]
         if products and all(product.is_library(p.item) for p in products):
-            req.complain(1093, library=products[0])
+            complain(1093, library=products[0])
 
-    for x in req.headers.accept_encoding.okay:
+    for x in headers.accept_encoding.okay:
         if x.item in [cc.x_gzip, cc.x_compress] and x.param is not None:
-            req.complain(1116, coding=x.item)
+            complain(1116, coding=x.item)
 
-    if req.headers.if_match.is_okay and req.headers.if_match != u'*':
-        if any(tag.weak for tag in req.headers.if_match.value):
-            req.complain(1120)
+    if headers.if_match.is_okay and headers.if_match != u'*':
+        if any(tag.weak for tag in headers.if_match.value):
+            complain(1120)
 
-    if req.method == m.HEAD:
-        for hdr in req.headers:
+    if method == m.HEAD:
+        for hdr in headers:
             if header.is_precondition(hdr.name):
-                req.complain(1131, header=hdr)
+                complain(1131, header=hdr)
 
-    if req.method in [m.CONNECT, m.OPTIONS, m.TRACE]:
-        for hdr in req.headers:
+    if method in [m.CONNECT, m.OPTIONS, m.TRACE]:
+        for hdr in headers:
             if hdr.name in [h.if_modified_since, h.if_unmodified_since,
                             h.if_match, h.if_none_match, h.if_range]:
-                req.complain(1130, header=hdr)
-    elif req.method not in [m.GET, m.HEAD]:
-        if req.headers.if_modified_since.is_present:
-            req.complain(1122)
+                complain(1130, header=hdr)
+    elif method not in [m.GET, m.HEAD]:
+        if headers.if_modified_since.is_present:
+            complain(1122)
 
-    if req.headers.range.is_present and req.method != m.GET:
-        req.complain(1132)
+    if headers.range.is_present and method != m.GET:
+        complain(1132)
 
-    if req.headers.if_range.is_present and req.headers.range.is_absent:
-        req.complain(1134)
+    if headers.if_range.is_present and headers.range.is_absent:
+        complain(1134)
 
-    if isinstance(req.headers.if_range.value, EntityTag) and \
-            req.headers.if_range.value.weak:
-        req.complain(1135)
+    if isinstance(headers.if_range.value, EntityTag) and \
+            headers.if_range.value.weak:
+        complain(1135)
 
-    for d in req.headers.cache_control.okay:
-        if cache_directive.is_for_request(d.item) == False:
-            req.complain(1152, directive=d.item)
-        if d == cache.no_cache and d.param is not None:
-            req.complain(1159, directive=d.item)
+    for direct in headers.cache_control.okay:
+        if cache_directive.is_for_request(direct.item) == False:
+            complain(1152, directive=direct.item)
+        if direct == cache.no_cache and direct.param is not None:
+            complain(1159, directive=direct.item)
 
-    if req.headers.cache_control.no_cache and \
-            u'no-cache' not in req.headers.pragma:
-        req.complain(1161)
+    if headers.cache_control.no_cache and u'no-cache' not in headers.pragma:
+        complain(1161)
 
-    for warning in req.headers.warning.okay:
-        if 100 <= warning.code < 200:
-            req.complain(1165, code=warning.code)
+    for warning in headers.warning.okay:
+        if 100 <= warning.code <= 199:
+            complain(1165, code=warning.code)
 
-    if method.is_cacheable(req.method) == False:
-        for direct in req.headers.cache_control.okay:
+    if method_info.is_cacheable(method) == False:
+        for direct in headers.cache_control.okay:
             if direct.item in [cache.max_age, cache.max_stale, cache.min_fresh,
                                cache.no_cache, cache.no_store,
                                cache.only_if_cached]:
-                req.complain(1171, directive=direct)
+                complain(1171, directive=direct)
 
     for direct1, direct2 in [(cache.max_stale, cache.min_fresh),
                              (cache.stale_if_error, cache.min_fresh),
                              (cache.max_stale, cache.no_cache),
                              (cache.max_age, cache.no_cache)]:
-        if req.headers.cache_control[direct1] and \
-                req.headers.cache_control[direct2]:
-            req.complain(1193, directive1=direct1, directive2=direct2)
+        if headers.cache_control[direct1] and headers.cache_control[direct2]:
+            complain(1193, directive1=direct1, directive2=direct2)
 
-    for hdr in [req.headers.authorization, req.headers.proxy_authorization]:
+    for hdr in [headers.authorization, headers.proxy_authorization]:
         if hdr.is_okay:
             scheme, credentials = hdr.value
             if scheme == auth.basic:
@@ -336,43 +338,41 @@ def check_request(req):
             elif scheme == auth.bearer:
                 _check_bearer_auth(req, hdr, credentials)
             elif not credentials:
-                req.complain(1274, header=hdr)
+                complain(1274, header=hdr)
 
-    if req.method == m.PATCH and req.headers.content_type.is_okay:
-        if media_type.is_patch(req.headers.content_type.value.item) == False:
-            req.complain(1213)
+    if method == m.PATCH and headers.content_type.is_okay:
+        if media_type.is_patch(headers.content_type.value.item) == False:
+            complain(1213)
 
-    for proto in req.headers.upgrade.okay:
-        if proto.item == upgrade.h2c:
+    for protocol in headers.upgrade.okay:
+        if protocol.item == upgrade.h2c:
             if req.is_tls:
-                req.complain(1233)
-            if req.headers.http2_settings.is_absent:
-                req.complain(1231)
+                complain(1233)
+            if headers.http2_settings.is_absent:
+                complain(1231)
 
-    if req.headers.http2_settings and \
-            u'HTTP2-Settings' not in req.headers.connection:
-        req.complain(1230)
+    if headers.http2_settings and u'HTTP2-Settings' not in headers.connection:
+        complain(1230)
 
-    if req.headers.http2_settings.is_okay:
-        for c in req.headers.http2_settings.value:
-            if c not in string.ascii_letters + string.digits + '-_':
-                req.complain(1234, char=c)
+    if headers.http2_settings.is_okay:
+        if not _is_urlsafe_base64(headers.http2_settings.value):
+            complain(1234)
 
     if u'access_token' in req.query_params:
-        req.complain(1270)
+        complain(1270)
         if req.is_tls == False:
-            req.complain(1271, where=req.target)
-        if not req.headers.cache_control.no_store:
-            req.complain(1272)
+            complain(1271, where=req.target)
+        if not headers.cache_control.no_store:
+            complain(1272)
 
     if okay(req.url_encoded_data) and u'access_token' in req.url_encoded_data:
         if req.is_tls == False:
-            req.complain(1271, where=req.body)
+            complain(1271, where=body)
 
-    for hdr in [req.headers.accept, req.headers.accept_charset,
-                req.headers.accept_encoding, req.headers.accept_language]:
+    for hdr in [headers.accept, headers.accept_charset,
+                headers.accept_encoding, headers.accept_language]:
         for (wildcard, value) in _accept_subsumptions(hdr.okay):
-            req.complain(1276, header=hdr, wildcard=wildcard, value=value)
+            complain(1276, header=hdr, wildcard=wildcard, value=value)
             # No need to report more than one subsumption per header.
             break
 
@@ -421,3 +421,8 @@ def _accept_subsumptions(items):
                 not fnmatch.fnmatch(item1, item2) and \
                 q1 == q2:
             yield (item1, item2)
+
+
+def _is_urlsafe_base64(s):
+    alphabet = string.ascii_letters + string.digits + '-_'
+    return all(c in alphabet for c in s)

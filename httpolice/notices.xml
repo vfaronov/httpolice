@@ -1661,7 +1661,7 @@
 
   <error id="1234">
     <title>Malformed <h>HTTP2-Settings</h></title>
-    <explain>According to <rfc num="7540" sect="3.2.1"/>, the <h>HTTP2-Settings</h> header must use the URL- and filename-safe Base64 encoding without padding. This means that it can only contain letters, digits, dash (-), and underscore (_). But in this request, it also contained the character <var ref="char"/>.</explain>
+    <explain>According to <rfc num="7540" sect="3.2.1"/>, the <h>HTTP2-Settings</h> header must use the URL- and filename-safe Base64 encoding without padding. This means that it can only contain letters, digits, dash (-), and underscore (_).</explain>
   </error>
 
   <comment id="1235">

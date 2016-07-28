@@ -203,15 +203,18 @@ class Message(Blackboard):
 
 def check_message(msg):
     """Run all checks that apply to any message (both request and response)."""
+    complain = msg.complain
+    version = msg.version
+    headers = msg.headers
 
-    for hdr in msg.headers:
+    for hdr in headers:
         # Force parsing every header present in the message
         # according to its syntax rules.
         _ = hdr.value
         if header.deprecated(hdr.name):
-            msg.complain(1197, header=hdr)
+            complain(1197, header=hdr)
         if hdr.name.startswith(u'X-') and hdr.name not in h:    # not in known
-            msg.complain(1277, header=hdr)
+            complain(1277, header=hdr)
 
     # Force checking the payload according to various rules.
     _ = msg.decoded_body
@@ -221,61 +224,60 @@ def check_message(msg):
     _ = msg.multipart_data
     _ = msg.url_encoded_data
 
-    if msg.version == http11 and msg.headers.trailer.is_present and \
-            tc.chunked not in msg.headers.transfer_encoding:
+    if version == http11 and headers.trailer.is_present and \
+            tc.chunked not in headers.transfer_encoding:
         # HTTP/2 supports trailers but has no notion of "chunked".
-        msg.complain(1054)
+        complain(1054)
 
     for entry in msg.trailer_entries:
-        if entry.name not in msg.headers.trailer:
-            msg.complain(1030, header=entry)
+        if entry.name not in headers.trailer:
+            complain(1030, header=entry)
 
-    if msg.headers.transfer_encoding.is_present and \
-            msg.headers.content_length.is_present:
-        msg.complain(1020)
+    if headers.transfer_encoding.is_present and \
+            headers.content_length.is_present:
+        complain(1020)
 
-    for opt in msg.headers.connection.okay:
+    for opt in headers.connection.okay:
         if header.is_bad_for_connection(FieldName(opt)):
-            msg.complain(1034, header=msg.headers[FieldName(opt)])
+            complain(1034, header=headers[FieldName(opt)])
 
-    if msg.headers.content_type.is_okay:
-        if media_type.deprecated(msg.headers.content_type.value.item):
-            msg.complain(1035)
-        for name in msg.headers.content_type.value.param.duplicates():
-            msg.complain(1042, param=name)
+    if headers.content_type.is_okay:
+        if media_type.deprecated(headers.content_type.value.item):
+            complain(1035)
+        for dupe in headers.content_type.value.param.duplicates():
+            complain(1042, param=dupe)
 
-    if msg.headers.upgrade.is_present and \
-            u'upgrade' not in msg.headers.connection:
-        msg.complain(1050)
+    if headers.upgrade.is_present and u'upgrade' not in headers.connection:
+        complain(1050)
 
-    if msg.headers.date > datetime.utcnow() + timedelta(seconds=10):
-        msg.complain(1109)
+    if headers.date > datetime.utcnow() + timedelta(seconds=10):
+        complain(1109)
 
-    for warning in msg.headers.warning.okay:
+    for warning in headers.warning.okay:
         if warning.code < 100 or warning.code > 299:
-            msg.complain(1163, code=warning.code)
-        if okay(warning.date) and msg.headers.date != warning.date:
-            msg.complain(1164, code=warning.code)
+            complain(1163, code=warning.code)
+        if okay(warning.date) and headers.date != warning.date:
+            complain(1164, code=warning.code)
 
     if msg.transformed_by_proxy:
-        if warn.transformation_applied not in msg.headers.warning:
-            msg.complain(1191)
-        if msg.headers.cache_control.no_transform:
-            msg.complain(1192)
+        if warn.transformation_applied not in headers.warning:
+            complain(1191)
+        if headers.cache_control.no_transform:
+            complain(1192)
 
-    for pragma in msg.headers.pragma.okay:
+    for pragma in headers.pragma.okay:
         if pragma != u'no-cache':
-            msg.complain(1160, pragma=pragma.item)
+            complain(1160, pragma=pragma.item)
 
-    if msg.version == http2:
-        for hdr in msg.headers:
+    if version == http2:
+        for hdr in headers:
             if hdr.name in [h.connection, h.transfer_encoding, h.keep_alive]:
-                msg.complain(1244, header=hdr)
+                complain(1244, header=hdr)
             elif hdr.name == h.upgrade:
-                msg.complain(1245)
+                complain(1245)
 
-    for proto in msg.headers.upgrade.okay:
-        if proto.item == u'h2':
-            msg.complain(1228)
-        if proto.item == upgrade.h2c and msg.is_tls:
-            msg.complain(1233)
+    for protocol in headers.upgrade.okay:
+        if protocol.item == u'h2':
+            complain(1228)
+        if protocol.item == upgrade.h2c and msg.is_tls:
+            complain(1233)

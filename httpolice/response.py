@@ -1,7 +1,6 @@
 # -*- coding: utf-8; -*-
 
 from datetime import datetime, timedelta
-import re
 from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
@@ -10,15 +9,17 @@ import six
 from httpolice import message
 from httpolice.blackboard import derived_property
 from httpolice.known import (auth, cache, cache_directive, h, header, hsts, m,
-                             media, media_type, method, rel, st, status_code,
-                             tc, unit, upgrade, warn)
+                             media, media_type, method as method_info, rel, st,
+                             status_code, tc, unit, upgrade, warn)
 from httpolice.known.status_code import NOT_AT_ALL, NOT_BY_DEFAULT
 from httpolice.parse import simple_parse
 from httpolice.structure import (EntityTag, StatusCode, http2, http10, http11,
                                  okay)
 from httpolice.syntax import rfc6749
 from httpolice.syntax.rfc7230 import asterisk_form
-from httpolice.util.text import force_unicode, is_ascii
+from httpolice.util.data import duplicates
+from httpolice.util.text import (contains_percent_encodes, force_unicode,
+                                 is_ascii)
 
 
 class Response(message.Message):
@@ -196,88 +197,88 @@ def check_response_itself(resp):
 
     message.check_message(resp)
 
+    complain = resp.complain
     version = resp.version
     status = resp.status
     headers = resp.headers
     body = resp.body
 
-    if not (100 <= status < 600):
-        resp.complain(1167)
+    if not (100 <= status <= 600):
+        complain(1167)
 
     if status.informational and u'close' in headers.connection:
-        resp.complain(1198)
+        complain(1198)
 
     if status.informational or status == st.no_content:
         if headers.transfer_encoding.is_present:
-            resp.complain(1018)
+            complain(1018)
         if headers.content_length.is_present:
-            resp.complain(1023)
+            complain(1023)
 
     for hdr in headers:
         if header.is_for_response(hdr.name) == False:
-            resp.complain(1064, header=hdr)
+            complain(1064, header=hdr)
         elif header.is_representation_metadata(hdr.name) and \
                 status.informational:
-            resp.complain(1052, header=hdr)
+            complain(1052, header=hdr)
 
     if status == st.switching_protocols:
         if headers.upgrade.is_absent:
-            resp.complain(1048)
+            complain(1048)
         if version == http2:
-            resp.complain(1246)
+            complain(1246)
 
     if status == st.no_content and body:
-        resp.complain(1240)
+        complain(1240)
 
     if status == st.reset_content and body:
-        resp.complain(1076)
+        complain(1076)
 
     if headers.location.is_absent:
         if status == st.moved_permanently:
-            resp.complain(1078)
-        elif status == st.found:
-            resp.complain(1079)
-        elif status == st.see_other:
-            resp.complain(1080)
-        elif status == st.temporary_redirect:
-            resp.complain(1084)
-        elif status == st.permanent_redirect:
-            resp.complain(1205)
+            complain(1078)
+        if status == st.found:
+            complain(1079)
+        if status == st.see_other:
+            complain(1080)
+        if status == st.temporary_redirect:
+            complain(1084)
+        if status == st.permanent_redirect:
+            complain(1205)
 
     if status == st.use_proxy:
-        resp.complain(1082)
-    elif status == 306:
-        resp.complain(1083)
-    elif status == st.payment_required:
-        resp.complain(1088)
+        complain(1082)
+    if status == 306:
+        complain(1083)
+    if status == st.payment_required:
+        complain(1088)
 
-    if status == st.method_not_allowed:
-        if headers.allow.is_absent:
-            resp.complain(1089)
+    if status == st.method_not_allowed and headers.allow.is_absent:
+        complain(1089)
 
     if status == st.request_timeout and u'close' not in headers.connection:
-        resp.complain(1094)
+        complain(1094)
 
     if headers.date.is_absent and (status.successful or status.redirection or
                                    status.client_error):
-        resp.complain(1110)
+        complain(1110)
 
-    if headers.location.is_present:
-        if status == st.created:
-            if headers.location.is_okay and \
-                    urlparse(headers.location.value).fragment:
-                resp.complain(1111)
-        elif not status.redirection:
-            resp.complain(1112)
+    if status == st.created and headers.location.is_okay and \
+            urlparse(headers.location.value).fragment:
+        complain(1111)
+
+    if headers.location.is_present and \
+            not status.redirection and status != st.created:
+        complain(1112)
 
     if headers.retry_after.is_present and \
             not status.redirection and \
             status not in [st.payload_too_large, st.service_unavailable,
                            st.too_many_requests]:
-        resp.complain(1113)
+        complain(1113)
 
     if headers.date < headers.last_modified:
-        resp.complain(1118)
+        complain(1118)
 
     if status == st.not_modified:
         for hdr in headers:
@@ -288,59 +289,55 @@ def check_response_itself(resp):
             if hdr.name in [h.etag, h.last_modified]:
                 continue
             elif header.is_representation_metadata(hdr.name):
-                resp.complain(1127, header=hdr)
+                complain(1127, header=hdr)
 
     if headers.content_range.is_present and \
             status not in [st.partial_content, st.range_not_satisfiable]:
-        resp.complain(1147)
+        complain(1147)
 
     if status == st.partial_content:
         if headers.content_type == media.multipart_byteranges:
-            if okay(resp.multipart_data):
-                for i, part in enumerate(resp.multipart_data.get_payload()):
-                    if u'Content-Range' not in part:
-                        resp.complain(1141, part_num=(i + 1))
-                    if u'Content-Type' not in part:
-                        resp.complain(1142, part_num=(i + 1))
+            _check_multipart_byteranges(resp)
             if headers.content_range.is_present:
-                resp.complain(1143)
+                complain(1143)
         elif headers.content_range.is_absent:
-            resp.complain(1138)
+            complain(1138)
 
-    for d in headers.cache_control.okay:
-        if cache_directive.is_for_response(d.item) == False:
-            resp.complain(1153, directive=d.item)
+    for direct in headers.cache_control.okay:
+        if cache_directive.is_for_response(direct.item) == False:
+            complain(1153, directive=direct.item)
 
     if u'no-cache' in headers.pragma:
-        resp.complain(1162)
+        complain(1162)
 
     if resp.from_cache:
         if headers.age.is_absent:
-            resp.complain(1166)
+            complain(1166)
         if headers.cache_control.no_cache in [True, []]:
-            resp.complain(1175)
+            complain(1175)
         if headers.cache_control.no_store:
-            resp.complain(1176)
+            complain(1176)
+
         if status_code.is_cacheable(status) == NOT_AT_ALL:
-            resp.complain(1202)
+            complain(1202)
         elif status_code.is_cacheable(status) == NOT_BY_DEFAULT:
             if headers.expires.is_absent and headers.cache_control.is_absent:
-                resp.complain(1177)
+                complain(1177)
 
     if resp.heuristic_expiration:
         if headers.age > (24 * 60 * 60) and \
                 warn.heuristic_expiration not in headers.warning:
-            resp.complain(1180)
+            complain(1180)
         if headers.expires.is_present:
-            resp.complain(1181)
+            complain(1181)
         elif headers.cache_control.max_age is not None:
-            resp.complain(1182)
+            complain(1182)
 
     if resp.stale:
         if warn.response_is_stale not in headers.warning:
-            resp.complain(1186)
+            complain(1186)
         if headers.cache_control.must_revalidate:
-            resp.complain(1187)
+            complain(1187)
 
     for direct1, direct2 in [(cache.public, cache.no_store),
                              (cache.private, cache.public),
@@ -349,7 +346,7 @@ def check_response_itself(resp):
                               cache.stale_while_revalidate),
                              (cache.must_revalidate, cache.stale_if_error)]:
         if headers.cache_control[direct1] and headers.cache_control[direct2]:
-            resp.complain(1193, directive1=direct1, directive2=direct2)
+            complain(1193, directive1=direct1, directive2=direct2)
 
     for direct1, direct2 in [(cache.max_age, cache.no_cache),
                              (cache.max_age, cache.no_store),
@@ -358,17 +355,17 @@ def check_response_itself(resp):
                              (cache.s_maxage, cache.no_store)]:
         if headers.cache_control[direct1] and \
                 headers.cache_control[direct2] in [True, []]:
-            resp.complain(1238, directive1=direct1, directive2=direct2)
+            complain(1238, directive1=direct1, directive2=direct2)
 
     if headers.vary != u'*' and h.host in headers.vary.value:
-        resp.complain(1235)
+        complain(1235)
 
     if status == st.unauthorized and headers.www_authenticate.is_absent:
-        resp.complain(1194)
+        complain(1194)
 
     if status == st.proxy_authentication_required and \
             headers.proxy_authenticate.is_absent:
-        resp.complain(1195)
+        complain(1195)
 
     for hdr in [headers.www_authenticate, headers.proxy_authenticate]:
         for challenge in hdr.okay:
@@ -379,59 +376,59 @@ def check_response_itself(resp):
 
     if headers.allow.is_present and headers.accept_patch.is_present and \
             m.PATCH not in headers.allow:
-        resp.complain(1217)
+        complain(1217)
 
     if headers.strict_transport_security.is_okay:
         if hsts.max_age not in headers.strict_transport_security:
-            resp.complain(1218)
+            complain(1218)
         if headers.strict_transport_security.max_age == 0 and \
                 headers.strict_transport_security.includesubdomains:
-            resp.complain(1219)
-        seen = set()
-        for direct, _ in headers.strict_transport_security:
-            if direct in seen:
-                resp.complain(1220, directive=direct)
-            seen.add(direct)
+            complain(1219)
+        for dupe in duplicates(d.item
+                               for d in headers.strict_transport_security):
+            complain(1220, directive=dupe)
 
     for patch_type in headers.accept_patch.okay:
         if media_type.is_patch(patch_type.item) == False:
-            resp.complain(1227, patch_type=patch_type.item)
+            complain(1227, patch_type=patch_type.item)
 
     if resp.transformed_by_proxy and headers.via.is_absent:
-        resp.complain(1046)
+        complain(1046)
 
     if status == st.unavailable_for_legal_reasons:
         if not any(rel.blocked_by in link.param.get(u'rel', [])
                    for link in headers.link.okay):
-            resp.complain(1243)
+            complain(1243)
 
     if headers.content_disposition.is_okay:
         params = headers.content_disposition.value.param
         for name in params.duplicates():
-            resp.complain(1247, param=name)
+            complain(1247, param=name)
+
         filename = params.get(u'filename')
         if filename is not None:
-            if re.search(u'%[0-9A-Fa-f]{2}', filename):
-                resp.complain(1248)
+            if contains_percent_encodes(filename):
+                complain(1248)
             if u'"' in filename or u'\\' in filename:
                 # These must have been backslash-escaped.
-                resp.complain(1249)
+                complain(1249)
             if not is_ascii(filename):
-                resp.complain(1250)
+                complain(1250)
+
         filename_ext = params.get(u'filename*')
         if filename_ext is not None:
             if filename is None:
-                resp.complain(1251)
+                complain(1251)
             elif params.index(u'filename*') < params.index(u'filename'):
-                resp.complain(1252)
+                complain(1252)
             if filename_ext.charset != u'UTF-8':
-                resp.complain(1255)
+                complain(1255)
 
     if headers.alt_svc.is_present:
         if version == http2:
-            resp.complain(1258)
+            complain(1258)
         if status == st.misdirected_request:
-            resp.complain(1260)
+            complain(1260)
 
 
 def check_response_in_context(resp, req):
@@ -439,127 +436,127 @@ def check_response_in_context(resp, req):
                  for (notice_id, in_resp) in req.headers.httpolice_silence.okay
                  if in_resp)
 
-    if resp.body and resp.headers.content_type.is_absent and \
-            not (resp.status == st.partial_content and
-                 req.headers.if_range.is_present):
-        resp.complain(1041)
+    complain = resp.complain
+    method = req.method
+    status = resp.status
 
-    if req.method == m.CONNECT and resp.status.successful:
+    if resp.body and resp.headers.content_type.is_absent and \
+            (status != st.partial_content or req.headers.if_range.is_absent):
+        complain(1041)
+
+    if method == m.CONNECT and status.successful:
         if resp.headers.transfer_encoding.is_present:
-            resp.complain(1019)
+            complain(1019)
         if resp.headers.content_length.is_present:
-            resp.complain(1024)
+            complain(1024)
         if u'close' in resp.headers.connection:
-            resp.complain(1199)
-    elif req.method != m.HEAD and \
-            not resp.status.informational and \
-            resp.status not in [st.no_content, st.not_modified] and \
+            complain(1199)
+    elif method != m.HEAD and \
+            not status.informational and \
+            status not in [st.no_content, st.not_modified] and \
             resp.headers.content_length.is_absent and \
             tc.chunked not in resp.headers.transfer_encoding and \
             resp.version == http11:
-        resp.complain(1025)
+        complain(1025)
         if u'close' not in resp.headers.connection:
-            resp.complain(1047)
+            complain(1047)
 
-    if req.method == m.HEAD and resp.body:
-        resp.complain(1239)
+    if method == m.HEAD and resp.body:
+        complain(1239)
 
     if req.version == http11 and (not req.headers.host.is_okay or
-                                  len(req.headers.enumerate(h.host)) > 1):
-        if resp.status.successful or resp.status.redirection:
-            resp.complain(1033)
+                                  req.headers.host.count > 1):
+        if status.successful or status.redirection:
+            complain(1033)
 
     if resp.transformed_by_proxy and req.is_to_proxy == False:
-        resp.complain(1237)
+        complain(1237)
 
-    if req.is_to_proxy and resp.status.successful and \
-            resp.headers.via.is_absent:
+    if req.is_to_proxy and status.successful and resp.headers.via.is_absent:
         # Non-2xx responses may be generated by the proxy itself (e.g. 407).
-        resp.complain(1046)
+        complain(1046)
 
-    if resp.status == st.switching_protocols:
-        for proto in resp.headers.upgrade.okay:
-            if proto not in req.headers.upgrade:
-                resp.complain(1049)
-            elif proto.item == upgrade.h2c:
+    if status == st.switching_protocols:
+        for protocol in resp.headers.upgrade.okay:
+            if protocol not in req.headers.upgrade:
+                complain(1049)
+            elif protocol.item == upgrade.h2c:
                 if not req.headers.http2_settings.is_okay:
-                    resp.complain(1232)
+                    complain(1232)
         if req.version == http10:
-            resp.complain(1051)
-    elif resp.status.informational and req.version == http10:
-        resp.complain(1071)
+            complain(1051)
+    elif status.informational and req.version == http10:
+        complain(1071)
 
     if resp.headers.content_location.is_okay and req.effective_uri:
-        absolute_content_location = urljoin(
-            req.effective_uri, resp.headers.content_location.value)
-        if req.effective_uri == absolute_content_location:
-            if req.method in [m.GET, m.HEAD] and resp.status in [
-                    st.ok, st.non_authoritative_information,
-                    st.no_content, st.partial_content,
-                    st.not_modified]:
-                resp.complain(1055)
-            elif req.method == m.DELETE:
-                resp.complain(1060)
+        if req.effective_uri == urljoin(req.effective_uri,
+                                        resp.headers.content_location.value):
+            if method in [m.GET, m.HEAD] and \
+                    status in [st.ok, st.non_authoritative_information,
+                               st.no_content, st.partial_content,
+                               st.not_modified]:
+                complain(1055)
+            if method == m.DELETE:
+                complain(1060)
 
     if resp.headers.location.is_okay and req.effective_uri and req.scheme:
-        location = urljoin(req.effective_uri, resp.headers.location.value)
-        if req.effective_uri == location:
-            if resp.status in [st.multiple_choices, st.temporary_redirect,
-                               st.permanent_redirect]:
-                resp.complain(1085)
-            if resp.status in [st.moved_permanently, st.found, st.see_other] \
-                    and req.method != m.POST:
-                resp.complain(1085)
+        if req.effective_uri == urljoin(req.effective_uri,
+                                        resp.headers.location.value):
+            if status in [st.multiple_choices, st.temporary_redirect,
+                          st.permanent_redirect]:
+                complain(1085)
+            if status in [st.moved_permanently, st.found, st.see_other] and \
+                    method != m.POST:
+                complain(1085)
 
-    if req.method == m.PUT and req.headers.content_range.is_present and \
-            resp.status.successful:
-        resp.complain(1058)
+    if method == m.PUT and req.headers.content_range.is_present and \
+            status.successful:
+        complain(1058)
 
-    if method.is_safe(req.method):
-        if resp.status == st.created:
-            resp.complain(1072)
-        elif resp.status == st.accepted:
-            resp.complain(1074)
-        elif resp.status == st.conflict:
-            resp.complain(1095)
+    if method_info.is_safe(method):
+        if status == st.created:
+            complain(1072)
+        if status == st.accepted:
+            complain(1074)
+        if status == st.conflict:
+            complain(1095)
 
-    if resp.status == st.created and req.method == m.POST and \
+    if status == st.created and method == m.POST and \
             resp.headers.location.is_absent:
-        resp.complain(1073)
+        complain(1073)
 
-    if req.method != m.HEAD and resp.body == b'':
-        if resp.status == st.multiple_choices:
-            resp.complain(1077)
-        elif resp.status == st.see_other:
-            resp.complain(1081)
-        elif resp.status == st.not_acceptable:
-            resp.complain(1092)
-        elif resp.status == st.conflict:
-            resp.complain(1096)
-        elif resp.status == st.precondition_required:
-            resp.complain(1201)
-        elif resp.status == st.too_many_requests:
-            resp.complain(1203)
-        elif resp.status == st.unavailable_for_legal_reasons:
-            resp.complain(1242)
-        elif resp.status.client_error:
-            resp.complain(1087)
-        elif resp.status == st.http_version_not_supported:
-            resp.complain(1106)
-        elif resp.status == st.network_authentication_required:
-            resp.complain(1204)
-        elif resp.status.server_error:
-            resp.complain(1104)
+    if method != m.HEAD and resp.body == b'':
+        if status == st.multiple_choices:
+            complain(1077)
+        elif status == st.see_other:
+            complain(1081)
+        elif status == st.not_acceptable:
+            complain(1092)
+        elif status == st.conflict:
+            complain(1096)
+        elif status == st.precondition_required:
+            complain(1201)
+        elif status == st.too_many_requests:
+            complain(1203)
+        elif status == st.unavailable_for_legal_reasons:
+            complain(1242)
+        elif status.client_error:
+            complain(1087)
+        elif status == st.http_version_not_supported:
+            complain(1106)
+        elif status == st.network_authentication_required:
+            complain(1204)
+        elif status.server_error:
+            complain(1104)
 
-    if req.method == m.OPTIONS and req.target_form is asterisk_form and \
-            resp.status in [st.multiple_choices, st.moved_permanently,
-                            st.found, st.temporary_redirect,
-                            st.permanent_redirect]:
-        resp.complain(1086)
+    if method == m.OPTIONS and req.target_form is asterisk_form and \
+            status in [st.multiple_choices, st.moved_permanently,
+                       st.found, st.temporary_redirect, st.permanent_redirect]:
+        complain(1086)
 
-    if resp.status == st.not_acceptable:
+    if status == st.not_acceptable:
         if not req.headers.clearly(header.is_proactive_conneg):
-            resp.complain(1090)
+            complain(1090)
             # We used to report a separate comment notice (no. 1091)
             # in case the request had some headers we didn't know.
             # But it's unlikely that anyone would use custom conneg headers,
@@ -567,15 +564,14 @@ def check_response_in_context(resp, req):
             # (after all, it can be silenced).
         elif req.headers.clearly(header.is_proactive_conneg) == \
                 set([h.accept_language]):
-            resp.complain(1117)
+            complain(1117)
 
-    if resp.status == st.length_required and \
-            req.headers.content_length.is_okay:
-        resp.complain(1097)
+    if status == st.length_required and req.headers.content_length.is_okay:
+        complain(1097)
 
     if req.body == b'':
-        if resp.status == st.payload_too_large:
-            resp.complain(1098)
+        if status == st.payload_too_large:
+            complain(1098)
 
         # We must be careful here because we do not distinguish between
         # a request with *no body* and a request with a *body of length 0*
@@ -585,56 +581,54 @@ def check_response_in_context(resp, req):
         # It makes perfect sense for the server to look at the ``Content-Type``
         # and respond with 415 (Unsupported Media Type),
         # ignoring the fact that the body is empty.
-        if resp.status == st.unsupported_media_type and \
+        if status == st.unsupported_media_type and \
                 req.headers.content_type.is_absent:
-            resp.complain(1099)
+            complain(1099)
 
-    if resp.status == st.expectation_failed and req.headers.expect.is_absent:
-        resp.complain(1100)
+    if status == st.expectation_failed and req.headers.expect.is_absent:
+        complain(1100)
 
-    for proto in resp.headers.upgrade.okay:
-        if proto in req.headers.upgrade:
-            if resp.status == st.upgrade_required:
-                resp.complain(1102, protocol=proto)
-            elif resp.status.successful:
-                resp.complain(1103, protocol=proto)
+    for protocol in resp.headers.upgrade.okay:
+        if protocol in req.headers.upgrade:
+            if status == st.upgrade_required:
+                complain(1102, protocol=protocol)
+            elif status.successful:
+                complain(1103, protocol=protocol)
             break
 
-    if resp.status == st.upgrade_required and not resp.headers.upgrade:
-        resp.complain(1101)
+    if status == st.upgrade_required and not resp.headers.upgrade:
+        complain(1101)
 
-    if resp.status == st.http_version_not_supported and resp.version and \
+    if status == st.http_version_not_supported and resp.version and \
             resp.version == req.version:
-        resp.complain(1105)
+        complain(1105)
 
-    if resp.status == st.method_not_allowed:
-        if req.method in resp.headers.allow:
-            resp.complain(1114)
-    elif resp.status.successful:
-        if resp.headers.allow.is_present and \
-                req.method not in resp.headers.allow:
-            resp.complain(1115)
+    if status == st.method_not_allowed:
+        if method in resp.headers.allow:
+            complain(1114)
+    elif status.successful:
+        if resp.headers.allow.is_present and method not in resp.headers.allow:
+            complain(1115)
 
-    if req.method in [m.GET, m.HEAD] and resp.status.successful:
+    if method in [m.GET, m.HEAD] and status.successful:
         if req.headers.if_none_match.is_okay and resp.headers.etag.is_okay:
             if req.headers.if_none_match == u'*':
                 # In this case we could ignore the presence of ``ETag``,
                 # but then we would need a separate notice
                 # that would be pretty useless and too hard to explain.
-                resp.complain(1121)
+                complain(1121)
             elif any(tag.weak_equiv(resp.headers.etag.value)
                      for tag in req.headers.if_none_match.value):
-                resp.complain(1121)
+                complain(1121)
 
         elif req.headers.if_modified_since >= resp.headers.last_modified:
-            resp.complain(1123)
+            complain(1123)
 
-    if resp.status in [st.not_modified, st.precondition_failed]:
-        if req.method not in [m.GET, m.HEAD] and \
-                resp.status == st.not_modified:
-            resp.complain(1124)
+    if status in [st.not_modified, st.precondition_failed]:
+        if method not in [m.GET, m.HEAD] and status == st.not_modified:
+            complain(1124)
         elif not req.headers.clearly(header.is_precondition):
-            resp.complain(1125)
+            complain(1125)
             # We used to report a separate comment notice (no. 1126)
             # in case the request had some headers we didn't know.
             # But it's unlikely that anyone would use custom preconditions,
@@ -642,56 +636,56 @@ def check_response_in_context(resp, req):
             # (after all, it can be silenced).
         elif req.headers.clearly(header.is_precondition) == \
                 set([h.if_modified_since]):
-            if req.method not in [m.GET, m.HEAD]:
-                resp.complain(1128)
+            if method not in [m.GET, m.HEAD]:
+                complain(1128)
         elif req.headers.clearly(header.is_precondition).issubset(
                 set([h.if_match, h.if_none_match,
                      h.if_modified_since, h.if_unmodified_since, h.if_range])):
-            if req.method in [m.CONNECT, m.OPTIONS, m.TRACE]:
-                resp.complain(1129)
+            if method in [m.CONNECT, m.OPTIONS, m.TRACE]:
+                complain(1129)
 
-    if resp.status == st.partial_content:
+    if status == st.partial_content:
         if req.headers.range.is_absent:
-            resp.complain(1136)
-        elif req.method != m.GET:
-            resp.complain(1137)
+            complain(1136)
+        elif method != m.GET:
+            complain(1137)
 
         if (resp.headers.content_type == media.multipart_byteranges and
                 req.headers.range.is_okay and
                 req.headers.range.value.unit == unit.bytes and
                 len(req.headers.range.value.ranges) == 1):
-            resp.complain(1144)
+            complain(1144)
 
         if isinstance(req.headers.if_range.value, EntityTag) and \
                 resp.headers.etag.is_okay and \
-                not resp.headers.etag.value. \
-                    strong_equiv(req.headers.if_range.value):
-            resp.complain(1145)
+                not resp.headers.etag.value.strong_equiv(
+                        req.headers.if_range.value):
+            complain(1145)
 
         if req.headers.if_range.is_present:
             for hdr in resp.headers:
                 if header.is_representation_metadata(hdr.name) and \
                         hdr.name not in [h.etag, h.content_location]:
-                    resp.complain(1146, header=hdr)
+                    complain(1146, header=hdr)
 
-    if resp.status == st.range_not_satisfiable:
+    if status == st.range_not_satisfiable:
         if req.headers.range.is_absent:
-            resp.complain(1149)
-        elif req.headers.range.is_okay and \
-                req.headers.range.value.unit == unit.bytes:
-            if resp.headers.content_range.is_absent:
-                resp.complain(1150)
+            complain(1149)
+        if req.headers.range.is_okay and \
+                req.headers.range.value.unit == unit.bytes and \
+                resp.headers.content_range.is_absent:
+            complain(1150)
 
     if resp.from_cache:
-        if method.is_cacheable(req.method) == False:
-            resp.complain(1172)
+        if method_info.is_cacheable(method) == False:
+            complain(1172)
         if resp.headers.age > req.headers.cache_control.max_age:
-            resp.complain(1170)
+            complain(1170)
         if req.headers.cache_control.no_cache:
-            resp.complain(1173)
+            complain(1173)
         elif req.headers.cache_control.is_absent and \
                 u'no-cache' in req.headers.pragma:
-            resp.complain(1174)
+            complain(1174)
 
     if resp.stale and \
             warn.revalidation_failed not in resp.headers.warning and \
@@ -700,31 +694,29 @@ def check_response_in_context(resp, req):
             req.headers.cache_control.stale_if_error is None and \
             resp.headers.cache_control.stale_if_error is None and \
             resp.headers.cache_control.stale_while_revalidate is None:
-        resp.complain(1188)
+        complain(1188)
 
-    if resp.status == st.precondition_required:
+    if status == st.precondition_required:
         for hdr in req.headers:
             if header.is_precondition(hdr.name):
-                resp.complain(1200, header=hdr)
+                complain(1200, header=hdr)
                 break
 
-    if req.method == m.PATCH:
-        if resp.status.successful:
-            if (req.headers.content_type.is_okay and
-                    media_type.is_patch(req.headers.content_type.value.item) ==
-                    False):
-                resp.complain(1214)
-        if resp.status == st.unsupported_media_type:
-            if resp.headers.accept_patch.is_absent:
-                resp.complain(1215)
+    if method == m.PATCH:
+        if status.successful and req.headers.content_type.is_okay and \
+                media_type.is_patch(req.headers.content_type.value.item) == False:
+            complain(1214)
+        if status == st.unsupported_media_type and \
+                resp.headers.accept_patch.is_absent:
+            complain(1215)
 
-    if req.method == m.OPTIONS and m.PATCH in resp.headers.allow and \
+    if method == m.OPTIONS and m.PATCH in resp.headers.allow and \
             resp.headers.accept_patch.is_absent:
-        resp.complain(1216)
+        complain(1216)
 
     if resp.headers.strict_transport_security.is_present and \
             req.is_tls == False:
-        resp.complain(1221)
+        complain(1221)
 
 
 def _check_basic_challenge(resp, hdr, challenge):
@@ -812,3 +804,12 @@ def _check_bearer_challenge(resp, hdr, challenge):
         for param in [u'error', u'error_description', u'error_uri']:
             if param in params:
                 resp.complain(1269, param=param)
+
+
+def _check_multipart_byteranges(resp):
+    if okay(resp.multipart_data):
+        for i, part in enumerate(resp.multipart_data.get_payload()):
+            if u'Content-Range' not in part:
+                resp.complain(1141, part_num=(i + 1))
+            if u'Content-Type' not in part:
+                resp.complain(1142, part_num=(i + 1))

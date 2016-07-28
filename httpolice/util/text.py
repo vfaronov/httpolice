@@ -230,3 +230,13 @@ class MockStdio(object):
 
     def write(self, s):
         self.buffer.write(s.encode('utf-8'))
+
+
+def contains_percent_encodes(s):
+    """
+    >>> contains_percent_encodes(u'foo%E2%80%94bar')
+    True
+    >>> contains_percent_encodes(u'100% natural')
+    False
+    """
+    return bool(re.search(u'%[0-9A-Fa-f]{2}', s))

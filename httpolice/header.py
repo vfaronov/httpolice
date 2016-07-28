@@ -143,6 +143,10 @@ class HeaderView(object):
         raise NotImplementedError()
 
     @property
+    def count(self):
+        return len(self.message.headers.enumerate(self.name))
+
+    @property
     def entries(self):
         if self._entries is None:
             self._parse()
