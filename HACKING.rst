@@ -65,7 +65,7 @@ There is no need to split them into smaller functions.
 
 The important thing about these rules is that they utilize a rich domain model
 defined mostly in ``httpolice.structure`` and ``httpolice.headers``.
-This provides magic, such as in ``Parametrized`` and ``SingleHeaderView``,
+This provides magic, such as in ``Parametrized`` and ``HeaderView``,
 that makes the rules look very natural and easy to follow.
 However, **you have to know and keep in mind** how this magic actually works,
 otherwise it's easy to introduce bugs.

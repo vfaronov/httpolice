@@ -94,8 +94,7 @@ class Message(Blackboard):
     def guessed_charset(self):
         charset = 'utf-8'
         if self.headers.content_type.is_okay:
-            charset = self.headers.content_type.value.param.get(u'charset',
-                                                                charset)
+            charset = self.headers.content_type.param.get(u'charset', charset)
 
         try:
             codec = codecs.lookup(charset)
@@ -126,7 +125,7 @@ class Message(Blackboard):
     @derived_property
     def json_data(self):
         if self.headers.content_type.is_okay and \
-                media_type.is_json(self.headers.content_type.value.item) and \
+                media_type.is_json(self.headers.content_type.item) and \
                 okay(self.unicode_body) and self.content_is_full:
             try:
                 return json.loads(self.unicode_body)
@@ -139,7 +138,7 @@ class Message(Blackboard):
     @derived_property
     def xml_data(self):
         if self.headers.content_type.is_okay and \
-                media_type.is_xml(self.headers.content_type.value.item) and \
+                media_type.is_xml(self.headers.content_type.item) and \
                 okay(self.decoded_body) and self.content_is_full:
             try:
                 # It's not inconceivable that a message might contain
@@ -242,9 +241,9 @@ def check_message(msg):
             complain(1034, header=headers[FieldName(opt)])
 
     if headers.content_type.is_okay:
-        if media_type.deprecated(headers.content_type.value.item):
+        if media_type.deprecated(headers.content_type.item):
             complain(1035)
-        for dupe in headers.content_type.value.param.duplicates():
+        for dupe in headers.content_type.param.duplicates():
             complain(1042, param=dupe)
 
     if headers.upgrade.is_present and u'upgrade' not in headers.connection:

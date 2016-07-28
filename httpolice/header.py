@@ -12,7 +12,7 @@ aggregate, parse, and represent various header entries.
 They know how to combine two entries with the same name into one entry.
 They know how to parse their contents.
 And to simplify the checks code, they provide some **magic**.
-Particularly non-obvious are comparisons of :class:`SingleHeaderView` (q.v.).
+Particularly non-obvious are comparisons of :class:`HeaderView` (q.v.).
 """
 
 import operator
@@ -98,7 +98,20 @@ class HeadersView(object):
 
 class HeaderView(object):
 
-    """Wraps all headers with a particular name in a given message."""
+    """Wraps all headers with a particular name in a given message.
+
+    This class has **tricky comparison magic** to simplify checks.
+    All comparisons return `False` when the value is not :func:`okay`
+    (is absent or malformed).
+    Thus, the following expression::
+
+      msg.headers.last_modified <= date(2016, 4, 29)
+
+    is **not the same** as::
+
+      not (msg.headers.last_modified > date(2016, 4, 29))
+
+    """
 
     def __init__(self, message, name):
         self.message = message
@@ -143,7 +156,7 @@ class HeaderView(object):
         raise NotImplementedError()
 
     @property
-    def count(self):
+    def total_entries(self):
         return len(self.message.headers.enumerate(self.name))
 
     @property
@@ -178,49 +191,30 @@ class HeaderView(object):
     if sys.version_info[0] < 3:
         __nonzero__ = __bool__
 
+    def __iter__(self):
+        return iter(self.value)
 
-class UnknownHeaderView(HeaderView):
+    @property
+    def okay(self):
+        return [v for v in self if okay(v)]
 
-    """Wraps a generic header that we know nothing about."""
+    def __len__(self):
+        return len(self.value)
 
-    def _parse(self):
-        # RFC 7230 section 3.2.2 permits combining field-values with a comma
-        # even if we don't really know what the header is.
-        entries, values = self._pre_parse()
-        self._value = b','.join(values) if values else None
-        self._entries = entries
+    def __getitem__(self, i):
+        return self.value[i]           # pylint: disable=unsubscriptable-object
 
-
-class SingleHeaderView(HeaderView):
-
-    """Wraps a header that can only appear once in a message.
-
-    This class has **tricky comparison magic** to simplify checks.
-    All comparisons return `False` when the value is not :func:`okay`
-    (is absent or malformed).
-    Thus, the following expression::
-
-      msg.headers.last_modified <= date(2016, 4, 29)
-
-    is **not the same** as::
-
-      not (msg.headers.last_modified > date(2016, 4, 29))
-
-    """
-
-    def _parse(self):
-        entries, values = self._pre_parse()
-        if entries:
-            if len(entries) > 1:
-                self.message.complain(1013, header=self.name, entries=entries)
-            self._value = values[-1]
-            self._entries = [entries[-1]]
-        else:
-            self._value = None
-            self._entries = []
+    def __contains__(self, other):
+        # Since headers often contain `Parametrized` values,
+        # it's useful to be able to check membership by the item itself,
+        # ignoring its parameters.
+        # This is handled by :meth:`Parametrized.__eq__`,
+        # but it's only invoked when the `Parametrized` is on the left side.
+        # pylint: disable=not-an-iterable
+        return any(val == other for val in self)
 
     def _compare(self, other, op):
-        if isinstance(other, SingleHeaderView):
+        if isinstance(other, HeaderView):
             return self.is_okay and other.is_okay and \
                 op(self.value, other.value)
         else:
@@ -246,35 +240,39 @@ class SingleHeaderView(HeaderView):
 
     __hash__ = None
 
-
-class ListHeaderView(HeaderView):       # pylint: disable=abstract-method
-
-    """Wraps a header whose parsed value is a list, allowing iteration."""
-
-    def __iter__(self):
-        return iter(self.value)
-
-    def __len__(self):
-        return len(self.value)
-
-    def __getitem__(self, i):
-        return self.value[i]           # pylint: disable=unsubscriptable-object
-
-    def __contains__(self, other):
-        # Since multi-headers often contain `Parametrized` values,
-        # it's useful to be able to check membership by the item itself,
-        # ignoring its parameters.
-        # This is handled by :meth:`Parametrized.__eq__`,
-        # but it's only invoked when the `Parametrized` is on the left side.
-        # pylint: disable=not-an-iterable
-        return any(val == other for val in self.value)
-
-    @property
-    def okay(self):
-        return [v for v in self if okay(v)]
+    def __getattr__(self, name):
+        return getattr(self.value, name)
 
 
-class MultiHeaderView(ListHeaderView):
+class UnknownHeaderView(HeaderView):
+
+    """Wraps a generic header that we know nothing about."""
+
+    def _parse(self):
+        # RFC 7230 section 3.2.2 permits combining field-values with a comma
+        # even if we don't really know what the header is.
+        entries, values = self._pre_parse()
+        self._value = b','.join(values) if values else None
+        self._entries = entries
+
+
+class SingleHeaderView(HeaderView):
+
+    """Wraps a header that can only appear once in a message."""
+
+    def _parse(self):
+        entries, values = self._pre_parse()
+        if entries:
+            if len(entries) > 1:
+                self.message.complain(1013, header=self.name, entries=entries)
+            self._value = values[-1]
+            self._entries = [entries[-1]]
+        else:
+            self._value = None
+            self._entries = []
+
+
+class MultiHeaderView(HeaderView):
 
     """Wraps a header that can appear multiple times in a message."""
 
@@ -289,7 +287,7 @@ class MultiHeaderView(ListHeaderView):
         self._entries = entries
 
 
-class DirectivesView(ListHeaderView):       # pylint: disable=abstract-method
+class DirectivesView(HeaderView):           # pylint: disable=abstract-method
 
     """Wraps a header whose parsed value is a list of directives."""
 

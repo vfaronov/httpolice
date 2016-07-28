@@ -221,7 +221,7 @@ def check_request(req):
         complain(1028)
 
     if version == http2:
-        if headers.te and headers.te.value != [u'trailers']:
+        if headers.te and headers.te != [u'trailers']:
             complain(1244, header=headers.te)
     else:
         if headers.te and u'TE' not in headers.connection:
@@ -266,8 +266,7 @@ def check_request(req):
     if headers.user_agent.is_absent:
         complain(1070)
     elif headers.user_agent.is_okay:
-        products = [p for p in headers.user_agent.value
-                    if isinstance(p, Versioned)]
+        products = [p for p in headers.user_agent if isinstance(p, Versioned)]
         if products and all(product.is_library(p.item) for p in products):
             complain(1093, library=products[0])
 
@@ -276,7 +275,7 @@ def check_request(req):
             complain(1116, coding=x.item)
 
     if headers.if_match.is_okay and headers.if_match != u'*':
-        if any(tag.weak for tag in headers.if_match.value):
+        if any(tag.weak for tag in headers.if_match):
             complain(1120)
 
     if method == m.HEAD:
@@ -299,8 +298,7 @@ def check_request(req):
     if headers.if_range.is_present and headers.range.is_absent:
         complain(1134)
 
-    if isinstance(headers.if_range.value, EntityTag) and \
-            headers.if_range.value.weak:
+    if isinstance(headers.if_range.value, EntityTag) and headers.if_range.weak:
         complain(1135)
 
     for direct in headers.cache_control.okay:
@@ -341,7 +339,7 @@ def check_request(req):
                 complain(1274, header=hdr)
 
     if method == m.PATCH and headers.content_type.is_okay:
-        if media_type.is_patch(headers.content_type.value.item) == False:
+        if media_type.is_patch(headers.content_type.item) == False:
             complain(1213)
 
     for protocol in headers.upgrade.okay:

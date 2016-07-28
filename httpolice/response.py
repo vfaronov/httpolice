@@ -357,7 +357,7 @@ def check_response_itself(resp):
                 headers.cache_control[direct2] in [True, []]:
             complain(1238, directive1=direct1, directive2=direct2)
 
-    if headers.vary != u'*' and h.host in headers.vary.value:
+    if headers.vary != u'*' and h.host in headers.vary:
         complain(1235)
 
     if status == st.unauthorized and headers.www_authenticate.is_absent:
@@ -401,7 +401,7 @@ def check_response_itself(resp):
             complain(1243)
 
     if headers.content_disposition.is_okay:
-        params = headers.content_disposition.value.param
+        params = headers.content_disposition.param
         for name in params.duplicates():
             complain(1247, param=name)
 
@@ -465,7 +465,7 @@ def check_response_in_context(resp, req):
         complain(1239)
 
     if req.version == http11 and (not req.headers.host.is_okay or
-                                  req.headers.host.count > 1):
+                                  req.headers.host.total_entries > 1):
         if status.successful or status.redirection:
             complain(1033)
 
@@ -618,7 +618,7 @@ def check_response_in_context(resp, req):
                 # that would be pretty useless and too hard to explain.
                 complain(1121)
             elif any(tag.weak_equiv(resp.headers.etag.value)
-                     for tag in req.headers.if_none_match.value):
+                     for tag in req.headers.if_none_match):
                 complain(1121)
 
         elif req.headers.if_modified_since >= resp.headers.last_modified:
@@ -652,14 +652,13 @@ def check_response_in_context(resp, req):
 
         if (resp.headers.content_type == media.multipart_byteranges and
                 req.headers.range.is_okay and
-                req.headers.range.value.unit == unit.bytes and
-                len(req.headers.range.value.ranges) == 1):
+                req.headers.range.unit == unit.bytes and
+                len(req.headers.range.ranges) == 1):
             complain(1144)
 
         if isinstance(req.headers.if_range.value, EntityTag) and \
                 resp.headers.etag.is_okay and \
-                not resp.headers.etag.value.strong_equiv(
-                        req.headers.if_range.value):
+                not resp.headers.etag.strong_equiv(req.headers.if_range.value):
             complain(1145)
 
         if req.headers.if_range.is_present:
@@ -672,7 +671,7 @@ def check_response_in_context(resp, req):
         if req.headers.range.is_absent:
             complain(1149)
         if req.headers.range.is_okay and \
-                req.headers.range.value.unit == unit.bytes and \
+                req.headers.range.unit == unit.bytes and \
                 resp.headers.content_range.is_absent:
             complain(1150)
 
@@ -704,7 +703,7 @@ def check_response_in_context(resp, req):
 
     if method == m.PATCH:
         if status.successful and req.headers.content_type.is_okay and \
-                media_type.is_patch(req.headers.content_type.value.item) == False:
+                media_type.is_patch(req.headers.content_type.item) == False:
             complain(1214)
         if status == st.unsupported_media_type and \
                 resp.headers.accept_patch.is_absent:
@@ -755,7 +754,7 @@ def _check_bearer_challenge(resp, hdr, challenge):
         request_has_token = (
             (
                 req.headers.authorization.is_okay and
-                req.headers.authorization.value.item == auth.bearer
+                req.headers.authorization.item == auth.bearer
             ) or
             (
                 okay(req.url_encoded_data) and
@@ -784,7 +783,7 @@ def _check_bearer_challenge(resp, hdr, challenge):
 
     if resp.status == st.unauthorized and u'error' not in params and \
             req and req.headers.authorization.is_okay and \
-            req.headers.authorization.value.item == auth.bearer:
+            req.headers.authorization.item == auth.bearer:
         # We don't report this if the token was passed in the URI or body,
         # because the server may not implement those forms at all.
         resp.complain(1267)
