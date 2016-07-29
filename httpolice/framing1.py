@@ -51,14 +51,14 @@ def parse_streams(inbound, outbound, scheme=None):
             yield resp_box
 
     if inbound and not inbound.eof:
-        yield complaint_box(1007, stream=inbound,
+        yield complaint_box(1007, name=inbound.name,
                             nbytes=len(inbound.consume_rest()))
 
     if outbound and outbound.sane:
         if inbound:
             # We had some requests, but we ran out of them.
             # We'll still try to parse the remaining responses on their own.
-            yield complaint_box(1008, stream=outbound)
+            yield complaint_box(1008, name=outbound.name)
         while outbound.sane:
             (resps, resp_box) = _parse_responses(outbound, None)
             if resps:
@@ -67,7 +67,7 @@ def parse_streams(inbound, outbound, scheme=None):
                 yield resp_box
 
     if outbound and not outbound.eof:
-        yield complaint_box(1010, stream=outbound,
+        yield complaint_box(1010, name=outbound.name,
                             nbytes=len(outbound.consume_rest()))
 
 

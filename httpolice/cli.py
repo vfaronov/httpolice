@@ -4,6 +4,8 @@
 
 import argparse
 import collections
+import multiprocessing
+from six.moves import map
 import sys
 import traceback
 
@@ -24,6 +26,9 @@ def parse_args(argv):
                         help=u'input format (see the user manual)')
     parser.add_argument(u'-o', u'--output', choices=reports.formats,
                         default=u'text', help=u'output format')
+    parser.add_argument(u'-j', u'--jobs', type=int, default=1,
+                        help=u'check exchanges in this number of '
+                             u'parallel processes')
     parser.add_argument(u'-s', u'--silence', metavar=u'ID', type=int,
                         action='append', help=u'silence the given notice ID')
     parser.add_argument(u'--fail-on',
@@ -37,21 +42,39 @@ def parse_args(argv):
     return parser.parse_args(argv[1:])
 
 
+def process_exchange(exch):
+    check_exchange(exch)
+    import pickle
+    with open('exch.pickle', 'wb') as f:
+        pickle.dump(exch, f, protocol=2)
+    return exch
+
+
 def run_cli(args, stdout, stderr):
     input_ = inputs.formats[args.input]
     report = reports.formats[args.output]
     n_notices = collections.Counter()
-    def generate_exchanges():
-        for exch in input_(args.path):
-            if args.silence:
-                exch.silence(args.silence)
-            check_exchange(exch)
-            n_notices.update(notice.severity
-                             for obj in [exch] + exch.children
-                             for notice in obj.notices)
-            yield exch
+
+    def preprocess_exchange(exch):
+        if args.silence:
+            exch.silence(args.silence)
+        return exch
+
+    def postprocess_exchange(exch):
+        n_notices.update(notice.severity
+                         for obj in [exch] + exch.children
+                         for notice in obj.notices)
+        return exch
 
     try:
+        exchanges = map(preprocess_exchange, input_(args.path))
+        if args.jobs == 1:
+            exchanges = map(process_exchange, exchanges)
+        else:
+            pool = multiprocessing.Pool(args.jobs)
+            exchanges = pool.imap(process_exchange, exchanges)
+        exchanges = map(postprocess_exchange, exchanges)
+
         # We can't use stdout opened as text (as in Python 3)
         # because it may not be UTF-8 (especially on Windows).
         # Our HTML reports are meant for redirection
@@ -61,7 +84,8 @@ def run_cli(args, stdout, stderr):
         # (perhaps from pieces of input data),
         # we don't want to trip over Unicode errors.
         # So we encode all text into UTF-8 and write directly as bytes.
-        report(generate_exchanges(), stdio_as_bytes(stdout))
+        report(exchanges, stdio_as_bytes(stdout))
+
     except (EnvironmentError, inputs.InputError) as exc:
         if args.full_traceback:
             traceback.print_exc(file=stderr)

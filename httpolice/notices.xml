@@ -48,12 +48,12 @@
 
   <debug id="1007">
     <title>Stop parsing request stream</title>
-    <explain>Due to previous notices, the remaining <var ref="nbytes"/> bytes on the request stream <var ref="stream.name"/> cannot be parsed.</explain>
+    <explain>Due to previous notices, the remaining <var ref="nbytes"/> bytes on the request stream <var ref="name"/> cannot be parsed.</explain>
   </debug>
 
   <error id="1008">
     <title>Not enough requests</title>
-    <explain>There are unparsed bytes remaining on the response stream <var ref="stream.name"/>, but no requests that would correspond to them. HTTPolice will try to parse and analyze the remaining responses on their own.</explain>
+    <explain>There are unparsed bytes remaining on the response stream <var ref="name"/>, but no requests that would correspond to them. HTTPolice will try to parse and analyze the remaining responses on their own.</explain>
   </error>
 
   <error id="1009">
@@ -63,7 +63,7 @@
 
   <debug id="1010">
     <title>Stop parsing response stream</title>
-    <explain>Due to previous notices, the remaining <var ref="nbytes"/> bytes on the response stream <var ref="stream.name"/> cannot be parsed.</explain>
+    <explain>Due to previous notices, the remaining <var ref="nbytes"/> bytes on the response stream <var ref="name"/> cannot be parsed.</explain>
   </debug>
 
   <debug id="1011">

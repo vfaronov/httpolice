@@ -241,6 +241,10 @@ class HeaderView(object):
     __hash__ = None
 
     def __getattr__(self, name):
+        if name == '__setstate__':
+            # We're being unpickled; at this point there is no data in us yet.
+            raise AttributeError(name)
+
         return getattr(self.value, name)
 
 

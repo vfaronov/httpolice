@@ -32,6 +32,9 @@ class _Unavailable(object):
     def __hash__(self):
         return 1
 
+    def __reduce__(self):                   # For pickling.
+        return 'Unavailable'
+
 Unavailable = _Unavailable()
 
 
