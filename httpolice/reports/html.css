@@ -85,7 +85,7 @@ div.message-display {
     max-width: 55em;
 }
 
-p.message-source {
+p.message-remark {
     margin: 0 1em 0.5em 0;
     color: gray;
     overflow: auto;

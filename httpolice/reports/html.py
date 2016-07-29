@@ -102,8 +102,8 @@ def _render_exchanges(exchanges):
 def _render_request(req):
     with H.section():
         with H.div(_class=u'message-display'):
-            if req.source:
-                H.p(u'from %s' % req.source, _class=u'message-source')
+            if req.remark:
+                H.p(printable(req.remark), _class=u'message-remark')
             with H.h2(), H.code():      # Request line
                 # We don't insert spaces here because,
                 # without ``__pretty=False``,
@@ -121,8 +121,8 @@ def _render_request(req):
 def _render_response(resp):
     with H.section():
         with H.div(_class=u'message-display'):
-            if resp.source:
-                H.p(u'from %s' % resp.source, _class=u'message-source')
+            if resp.remark:
+                H.p(printable(resp.remark), _class=u'message-remark')
             with H.h2(), H.code():      # Status line
                 # See above regarding spaces.
                 if resp.version:

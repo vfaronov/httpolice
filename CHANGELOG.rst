@@ -22,11 +22,11 @@ Added
   a ``--fail-on`` option to exit with a non-zero status
   if any notices with a given severity have been reported.
 - Work around various problems in HAR files exported by Firefox and `Fiddler`_.
-- The name of the input file is now remembered for every request and response,
-  and can be shown in HTML reports with the "Show message sources" option
-  from the "options" menu.
-  In the `Python API`_, this corresponds to the new ``source`` argument
-  to ``Request`` and ``Response`` constructors.
+- HTML reports can now display a remark before every request and response
+  (enabled with the *Show remarks* checkbox in the "options" menu).
+  The ``httpolice`` command-line tool puts the input filename in this remark.
+  With the `Python API`_, you can put anything there
+  using the ``remark`` argument to ``Request`` and ``Response`` constructors.
 - Notices about HTTP/1.x framing errors (such as `1006`_)
   now include the input filename as well.
 - Check for missing scheme name in authorization headers (notice `1274`_).

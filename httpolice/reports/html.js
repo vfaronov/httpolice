@@ -70,10 +70,10 @@ function installHovers() {
     }
 }
 
-function toggleSources(show) {
-    var i, sources = document.querySelectorAll('.message-source');
-    for (i = 0; i < sources.length; i += 1) {
-        sources[i].hidden = !show;
+function toggleRemarks(show) {
+    var i, remarks = document.querySelectorAll('.message-remark');
+    for (i = 0; i < remarks.length; i += 1) {
+        remarks[i].hidden = !show;
     }
 }
 
@@ -84,7 +84,7 @@ function onOptionsSubmit(event) {
             document.getElementById('hideBoringNotices').checked,
         hideBoringExchanges =
             document.getElementById('hideBoringExchanges').checked,
-        showSources = document.getElementById('showSources').checked,
+        showRemarks = document.getElementById('showRemarks').checked,
         i, exchanges, exchange, isBoringExchange,
         j, notices, notice, severity, ident, isBoringNotice;
 
@@ -109,7 +109,7 @@ function onOptionsSubmit(event) {
         exchange.hidden = (hideBoringExchanges && isBoringExchange);
     }
 
-    toggleSources(showSources);
+    toggleRemarks(showRemarks);
 }
 
 function installOptions() {
@@ -173,7 +173,9 @@ function installOptions() {
     addCheckboxRow('hideBoringExchanges', 'Hide boring exchanges',
         'Hide exchanges that have no notices, ' +
         'or only debug and boring notices');
-    addCheckboxRow('showSources', 'Show message sources');
+    addCheckboxRow('showRemarks', 'Show remarks',
+        'Remarks may contain the input filenames ' +
+        'or other useful information.');
 
     p2 = document.createElement('p');
     form.appendChild(p2);
@@ -190,6 +192,6 @@ document.addEventListener('DOMContentLoaded', function () {
     collapseAll();
     installButtons();
     installHovers();
-    toggleSources(false);
+    toggleRemarks(false);
     installOptions();
 });

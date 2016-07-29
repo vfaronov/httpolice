@@ -130,7 +130,7 @@ def _process_request(data, creator, path):
             body = b''
 
     req = Request(scheme, method, target, version, header_entries, body,
-                  source=path)
+                  remark=u'from %s' % path)
     if text is not None:
         req.unicode_body = text
     req.is_to_proxy = None                      # See above.
@@ -184,7 +184,7 @@ def _process_response(data, req, creator, path):
         version = None
 
     resp = Response(version, status, reason, header_entries, body=body,
-                    source=path)
+                    remark=u'from %s' % path)
 
     if data['content'].get('text') and status != st.not_modified:
         if data['content'].get('encoding', u'').lower() == u'base64':

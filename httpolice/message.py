@@ -41,7 +41,7 @@ class Message(Blackboard):
     self_name = u'msg'
 
     def __init__(self, version, header_entries, body, trailer_entries=None,
-                 source=None):
+                 remark=None):
         super(Message, self).__init__()
         self.version = (HTTPVersion(force_unicode(version))
                         if version is not None else None)
@@ -52,7 +52,7 @@ class Message(Blackboard):
                                 for k, v in trailer_entries or []]
         self.rebuild_headers()
         self.annotations = {}
-        self.source = source
+        self.remark = remark
 
     @property
     def annotated_header_entries(self):

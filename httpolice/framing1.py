@@ -99,7 +99,7 @@ def _parse_request_heading(stream, scheme=None):
         return Unavailable
     else:
         req = Request(scheme, method_, target, version_, entries, body=None,
-                      source=u'%s, offset %d' % (stream.name, beginning))
+                      remark=u'from %s, offset %d' % (stream.name, beginning))
         stream.dump_complaints(req.complain, place=u'request heading')
         return req
 
@@ -171,8 +171,9 @@ def _parse_response_heading(req, stream):
         stream.sane = False
         return Unavailable
     else:
-        resp = Response(version_, status, reason, entries, body=None,
-                        source=u'%s, offset %d' % (stream.name, beginning))
+        resp = Response(
+            version_, status, reason, entries, body=None,
+            remark=u'from %s, offset %d' % (stream.name, beginning))
         resp.request = req
         stream.dump_complaints(resp.complain, place=u'response heading')
         return resp

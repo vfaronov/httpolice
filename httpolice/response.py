@@ -25,7 +25,7 @@ from httpolice.util.text import (contains_percent_encodes, force_unicode,
 class Response(message.Message):
 
     def __init__(self, version, status, reason, header_entries,
-                 body, trailer_entries=None, source=None):
+                 body, trailer_entries=None, remark=None):
         """
         :param version:
             The response's protocol version, as a Unicode string,
@@ -85,15 +85,16 @@ class Response(message.Message):
 
             The format is the same as for `header_entries`.
 
-        :param source:
-            If not `None`, this should be a Unicode string
-            describing where this response was obtained from.
-            For example: ``u'somefile.txt, line 2, column 4'``.
-            It may be shown in reports.
+        :param remark:
+            If not `None`, this Unicode string will be shown
+            above this response in HTML reports
+            (when the appropriate option is enabled).
+            For example, it can be used to identify the source of the data:
+            ``u'from somefile.dat, offset 1337'``.
 
         """
         super(Response, self).__init__(version, header_entries,
-                                       body, trailer_entries, source)
+                                       body, trailer_entries, remark)
         self.status = StatusCode(status)
         self.reason = force_unicode(reason) if reason is not None else None
         self.request = None
