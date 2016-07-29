@@ -87,7 +87,7 @@ def _parse_request_heading(stream, scheme=None):
         with stream:
             method_ = Method(stream.consume_regex(rfc7230.method))
             stream.consume_regex(SP)
-            target = stream.consume_regex(b'[^ \t]+', u'request target')
+            target = stream.consume_regex(b'[^\\s]+', u'request target')
             stream.consume_regex(SP)
             version_ = HTTPVersion(stream.consume_regex(rfc7230.HTTP_version))
             _parse_line_ending(stream)
