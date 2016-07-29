@@ -22,8 +22,13 @@ Added
   a ``--fail-on`` option to exit with a non-zero status
   if any notices with a given severity have been reported.
 - Work around various problems in HAR files exported by Firefox and `Fiddler`_.
+- The name of the input file is now remembered for every request and response,
+  and can be shown in HTML reports with the "Show message sources" option
+  from the "options" menu.
+  In the `Python API`_, this corresponds to the new ``source`` argument
+  to ``Request`` and ``Response`` constructors.
 - Notices about HTTP/1.x framing errors (such as `1006`_)
-  now include the input filename.
+  now include the input filename as well.
 - Check for missing scheme name in authorization headers (notice `1274`_).
 - Check for missing quality values in headers like Accept (notice `1276`_).
 - Check for obsolete 'X-' prefix in experimental headers (notice `1277`_).
@@ -32,6 +37,7 @@ Added
 .. _HTML reports: http://httpolice.readthedocs.io/en/stable/reports.html
 .. _Fiddler: http://www.telerik.com/fiddler
 .. _PyPy: http://pypy.org/
+.. _Python API: http://httpolice.readthedocs.io/en/stable/api.html
 .. _1006: http://pythonhosted.org/HTTPolice/notices.html#1006
 .. _1093: http://pythonhosted.org/HTTPolice/notices.html#1093
 .. _1274: http://pythonhosted.org/HTTPolice/notices.html#1274

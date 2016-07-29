@@ -70,6 +70,13 @@ function installHovers() {
     }
 }
 
+function toggleSources(show) {
+    var i, sources = document.querySelectorAll('.message-source');
+    for (i = 0; i < sources.length; i += 1) {
+        sources[i].hidden = !show;
+    }
+}
+
 function onOptionsSubmit(event) {
     var boringNotices =
             document.getElementById('boringNotices').value.split(/\s+/),
@@ -77,6 +84,7 @@ function onOptionsSubmit(event) {
             document.getElementById('hideBoringNotices').checked,
         hideBoringExchanges =
             document.getElementById('hideBoringExchanges').checked,
+        showSources = document.getElementById('showSources').checked,
         i, exchanges, exchange, isBoringExchange,
         j, notices, notice, severity, ident, isBoringNotice;
 
@@ -100,14 +108,14 @@ function onOptionsSubmit(event) {
         }
         exchange.hidden = (hideBoringExchanges && isBoringExchange);
     }
+
+    toggleSources(showSources);
 }
 
 function installOptions() {
     var div, button, form,
         p1, label1, input1,
-        p2, label2, input2,
-        p3, label3, input3,
-        p4, submit;
+        p2, submit;
 
     div = document.createElement('div');
     div.classList.add('options');
@@ -138,44 +146,42 @@ function installOptions() {
     input1.placeholder = 'example: 1089 1135 C';
     p1.appendChild(input1);
 
+    function addCheckboxRow(id, text, title) {
+        var p, input, label;
+
+        p = document.createElement('p');
+        form.appendChild(p);
+
+        input = document.createElement('input');
+        input.type = 'checkbox';
+        input.name = id;
+        input.id = id;
+        p.appendChild(input);
+
+        label = document.createElement('label');
+        label.htmlFor = id;
+        label.textContent = text;
+        p.appendChild(label);
+
+        if (title) {
+            input.title = title;
+            label.title = title;
+        }
+    }
+
+    addCheckboxRow('hideBoringNotices', 'Hide boring notices');
+    addCheckboxRow('hideBoringExchanges', 'Hide boring exchanges',
+        'Hide exchanges that have no notices, ' +
+        'or only debug and boring notices');
+    addCheckboxRow('showSources', 'Show message sources');
+
     p2 = document.createElement('p');
     form.appendChild(p2);
-
-    input2 = document.createElement('input');
-    input2.type = 'checkbox';
-    input2.name = 'hideBoringNotices';
-    input2.id = input2.name;
-    p2.appendChild(input2);
-
-    label2 = document.createElement('label');
-    label2.htmlFor = 'hideBoringNotices';
-    label2.textContent = 'Hide boring notices';
-    p2.appendChild(label2);
-
-    p3 = document.createElement('p');
-    form.appendChild(p3);
-
-    input3 = document.createElement('input');
-    input3.type = 'checkbox';
-    input3.name = 'hideBoringExchanges';
-    input3.id = input3.name;
-    input3.title = 'Hide exchanges that have no notices, ' +
-        'or only debug and boring notices';
-    p3.appendChild(input3);
-
-    label3 = document.createElement('label');
-    label3.htmlFor = 'hideBoringExchanges';
-    label3.textContent = 'Hide boring exchanges';
-    label3.title = input3.title;
-    p3.appendChild(label3);
-
-    p4 = document.createElement('p');
-    form.appendChild(p4);
 
     submit = document.createElement('input');
     submit.type = 'submit';
     submit.value = 'Apply';
-    p4.appendChild(submit);
+    p2.appendChild(submit);
 
     document.body.insertBefore(div, document.querySelector('h1'));
 }
@@ -184,5 +190,6 @@ document.addEventListener('DOMContentLoaded', function () {
     collapseAll();
     installButtons();
     installHovers();
+    toggleSources(false);
     installOptions();
 });

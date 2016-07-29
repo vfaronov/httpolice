@@ -83,6 +83,7 @@ def _parse_request(stream, scheme=None):
 
 
 def _parse_request_heading(stream, scheme=None):
+    beginning = stream.point
     try:
         with stream:
             method_ = Method(stream.consume_regex(rfc7230.method))
@@ -97,7 +98,8 @@ def _parse_request_heading(stream, scheme=None):
         stream.complain(1006, error=e)
         return Unavailable
     else:
-        req = Request(scheme, method_, target, version_, entries, body=None)
+        req = Request(scheme, method_, target, version_, entries, body=None,
+                      source=u'%s, offset %d' % (stream.name, beginning))
         stream.dump_complaints(req.complain, place=u'request heading')
         return req
 
@@ -154,6 +156,7 @@ def _parse_responses(stream, req):
 
 
 def _parse_response_heading(req, stream):
+    beginning = stream.point
     try:
         with stream:
             version_ = HTTPVersion(stream.consume_regex(rfc7230.HTTP_version))
@@ -168,7 +171,8 @@ def _parse_response_heading(req, stream):
         stream.sane = False
         return Unavailable
     else:
-        resp = Response(version_, status, reason, entries, body=None)
+        resp = Response(version_, status, reason, entries, body=None,
+                        source=u'%s, offset %d' % (stream.name, beginning))
         resp.request = req
         stream.dump_complaints(resp.complain, place=u'response heading')
         return resp

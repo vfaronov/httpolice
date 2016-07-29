@@ -85,6 +85,12 @@ div.message-display {
     max-width: 55em;
 }
 
+p.message-source {
+    margin: 0 1em 0.5em 0;
+    color: gray;
+    overflow: auto;
+}
+
 .message-display h2 {
     font-weight: bolder;
     margin: 0;

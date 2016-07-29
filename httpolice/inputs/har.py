@@ -40,7 +40,7 @@ def har_input(paths):
             try:
                 creator = data['log']['creator']['name']
                 for entry in data['log']['entries']:
-                    yield _process_entry(entry, creator)
+                    yield _process_entry(entry, creator, path)
             except (TypeError, KeyError) as exc:
                 six.raise_from(
                     InputError('%s: cannot understand HAR file: %r' %
@@ -48,13 +48,13 @@ def har_input(paths):
                     exc)
 
 
-def _process_entry(data, creator):
-    req = _process_request(data['request'], creator)
-    resp = _process_response(data['response'], req, creator)
+def _process_entry(data, creator, path):
+    req = _process_request(data['request'], creator, path)
+    resp = _process_response(data['response'], req, creator, path)
     return Exchange(req, [resp] if resp is not None else [])
 
 
-def _process_request(data, creator):
+def _process_request(data, creator, path):
     (version, header_entries, pseudo_headers) = _process_message(data, creator)
     if creator in CHROME and version == http11 and u':host' in pseudo_headers:
         # SPDY exported from Chrome.
@@ -129,14 +129,15 @@ def _process_request(data, creator):
             text = None
             body = b''
 
-    req = Request(scheme, method, target, version, header_entries, body)
+    req = Request(scheme, method, target, version, header_entries, body,
+                  source=path)
     if text is not None:
         req.unicode_body = text
     req.is_to_proxy = None                      # See above.
     return req
 
 
-def _process_response(data, req, creator):
+def _process_response(data, req, creator, path):
     if data['status'] == 0:          # Indicates error in Chrome.
         return None
     (version, header_entries, _) = _process_message(data, creator)
@@ -182,7 +183,8 @@ def _process_response(data, req, creator):
         # Helps with SPDY in Chrome.
         version = None
 
-    resp = Response(version, status, reason, header_entries, body=body)
+    resp = Response(version, status, reason, header_entries, body=body,
+                    source=path)
 
     if data['content'].get('text') and status != st.not_modified:
         if data['content'].get('encoding', u'').lower() == u'base64':
