@@ -15,7 +15,9 @@ def load_from_file(name):
 def test_http2bin_chrome():
     exchanges = load_from_file('http2bin_chrome.har')
 
+    assert u'http2bin_chrome.har' in exchanges[0].request.remark
     assert exchanges[0].request.version is None
+    assert u'http2bin_chrome.har' in exchanges[0].responses[0].remark
     assert exchanges[0].responses[0].version is None
     assert exchanges[0].responses[0].body is Unavailable
 

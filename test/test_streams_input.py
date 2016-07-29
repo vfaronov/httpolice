@@ -16,6 +16,7 @@ def test_complex_connection():
     [exch1, exch2, exch3, exch4, exch5, exch6] = \
         load_from_file('complex_connection')
 
+    assert u'complex_connection' in exch1.request.remark
     assert exch1.request.method == m.POST
     assert exch1.request.target == u'/articles/'
     assert exch1.request.version == http11
@@ -35,6 +36,7 @@ def test_complex_connection():
     assert repr(exch1.request) == '<Request POST>'
 
     assert len(exch1.responses) == 3
+    assert u'complex_connection' in exch1.responses[0].remark
     assert exch1.responses[0].status == st.continue_
     assert repr(exch1.responses[0].status) == 'StatusCode(100)'
     assert exch1.responses[0].body == b''
