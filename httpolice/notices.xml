@@ -33,7 +33,7 @@
 
   <error id="1004">
     <title>Incomplete message according to <h>Content-Length</h></title>
-    <explain>This message’s <h>Content-Length</h> header indicates that the body is <var ref="msg.headers.content_length.value"/> bytes long, but there are fewer bytes remaining on the stream.</explain>
+    <explain>This message’s <h>Content-Length</h> header indicates that the body is <var ref="msg.headers.content_length.value"/> bytes long, but there are fewer bytes remaining on the stream <var ref="error.name"/>.</explain>
   </error>
 
   <error id="1005">
@@ -48,12 +48,12 @@
 
   <debug id="1007">
     <title>Stop parsing request stream</title>
-    <explain>Due to previous notices, the remaining <var ref="nbytes"/> bytes on the request stream cannot be parsed.</explain>
+    <explain>Due to previous notices, the remaining <var ref="nbytes"/> bytes on the request stream <var ref="stream.name"/> cannot be parsed.</explain>
   </debug>
 
   <error id="1008">
     <title>Not enough requests</title>
-    <explain>There are unparsed bytes remaining on the response stream, but no requests that would correspond to them. HTTPolice will try to parse and analyze the remaining responses on their own.</explain>
+    <explain>There are unparsed bytes remaining on the response stream <var ref="stream.name"/>, but no requests that would correspond to them. HTTPolice will try to parse and analyze the remaining responses on their own.</explain>
   </error>
 
   <error id="1009">
@@ -63,7 +63,7 @@
 
   <debug id="1010">
     <title>Stop parsing response stream</title>
-    <explain>Due to previous notices, the remaining <var ref="nbytes"/> bytes on the response stream cannot be parsed.</explain>
+    <explain>Due to previous notices, the remaining <var ref="nbytes"/> bytes on the response stream <var ref="stream.name"/> cannot be parsed.</explain>
   </debug>
 
   <debug id="1011">

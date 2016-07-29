@@ -583,9 +583,10 @@ class Stream(object):
 
     """Wraps a string of bytes that are the input to parsers."""
 
-    def __init__(self, data, annotate_classes=None):
+    def __init__(self, data, name=None, annotate_classes=None):
         self._stack = []
         self.data = data
+        self.name = name
         self.point = 0
         self._sane = True
         self.complaints = []
@@ -632,7 +633,7 @@ class Stream(object):
     def consume_n_bytes(self, n):
         r = self.peek(n)
         if len(r) < n:
-            raise ParseError(point=self.point,
+            raise ParseError(name=self.name, point=self.point,
                              found=u'%d bytes' % len(r),
                              expected=[(u'%d bytes' % n,)])
         else:
@@ -652,7 +653,7 @@ class Stream(object):
         match = regex.match(self.data, self.point)
         if match is None:
             raise ParseError(
-                self.point, found=None,
+                self.name, self.point, found=None,
                 expected=[(target if name is None else name, None)])
         else:
             r = match.group(0)
@@ -697,9 +698,10 @@ class Stream(object):
 
 class ParseError(Exception):
 
-    def __init__(self, point, found, expected):
+    def __init__(self, name, point, found, expected):
         super(ParseError, self).__init__(u'unexpected %r at byte position %r' %
                                          (found, point))
+        self.name = name
         self.point = point
         self.found = found
         self.expected = expected
@@ -1018,7 +1020,8 @@ def _build_parse_error(stream, target_symbol, chart):
             # so if the input data just stopped there, that would work, too,
             expected[u'end of data'] = None
 
-    return ParseError(stream.point + i, found, list(expected.items()))
+    return ParseError(stream.name, stream.point + i,
+                      found, list(expected.items()))
 
 
 def _find_pivots(chart, symbol, start, stack=None):

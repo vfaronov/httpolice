@@ -4,36 +4,50 @@ from collections import OrderedDict
 import io
 import os
 import re
+import sys
 
 from httpolice.framing1 import parse_streams
 from httpolice.inputs.common import InputError
+from httpolice.parse import Stream
+
+
+fs_encoding = sys.getfilesystemencoding()
+
+def _decode_path(path):
+    if isinstance(path, bytes):
+        return path.decode(fs_encoding, 'replace')
+    else:
+        return path
 
 
 def streams_input(paths):
     if len(paths) % 2 != 0:
         raise InputError('even number of input streams required')
     while paths:
-        with io.open(paths.pop(0), 'rb') as f:
-            inbound_data = f.read()
-        with io.open(paths.pop(0), 'rb') as f:
-            outbound_data = f.read()
-        for exch in parse_streams(inbound_data, outbound_data, scheme=u'http'):
+        inbound_path = paths.pop(0)
+        with io.open(inbound_path, 'rb') as f:
+            inbound = Stream(f.read(), name=_decode_path(inbound_path))
+        outbound_path = paths.pop(0)
+        with io.open(outbound_path, 'rb') as f:
+            outbound = Stream(f.read(), name=_decode_path(outbound_path))
+        for exch in parse_streams(inbound, outbound, scheme=u'http'):
             yield exch
 
 
 def req_stream_input(paths):
     while paths:
-        with io.open(paths.pop(0), 'rb') as f:
-            data = f.read()
-        for exch in parse_streams(data, None, scheme=u'http'):
+        path = paths.pop(0)
+        with io.open(path, 'rb') as f:
+            inbound = Stream(f.read(), name=_decode_path(path))
+        for exch in parse_streams(inbound, None, scheme=u'http'):
             yield exch
 
 
 def resp_stream_input(paths):
     while paths:
         with io.open(paths.pop(0), 'rb') as f:
-            data = f.read()
-        for exch in parse_streams(None, data, scheme=u'http'):
+            outbound = Stream(f.read(), name=_decode_path(f.name))
+        for exch in parse_streams(None, outbound, scheme=u'http'):
             yield exch
 
 
@@ -146,6 +160,9 @@ def parse_combined(path):
     parts2 = rest.split(b'======== BEGIN OUTBOUND STREAM ========\r\n', 1)
     if len(parts2) != 2:
         raise InputError('%s: bad combined file: no outbound marker' % path)
-    (inbound, outbound) = parts2
+    (inbound_data, outbound_data) = parts2
+
+    inbound = Stream(inbound_data, name=_decode_path(path) + u' (inbound)')
+    outbound = Stream(outbound_data, name=_decode_path(path) + u' (outbound)')
 
     return (inbound, outbound, scheme, preamble)

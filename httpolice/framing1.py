@@ -5,7 +5,7 @@
 from httpolice.codings import decode_deflate, decode_gzip
 from httpolice.exchange import Exchange, complaint_box
 from httpolice.known import m, st, tc
-from httpolice.parse import ParseError, Stream, maybe, skip
+from httpolice.parse import ParseError, maybe, skip
 from httpolice.request import Request
 from httpolice.response import Response
 from httpolice.structure import (FieldName, HeaderEntry, HTTPVersion, Method,
@@ -33,8 +33,6 @@ def parse_streams(inbound, outbound, scheme=None):
         containing neither request nor responses,
         but only a notice that indicates some general problem with the streams.
     """
-    inbound = None if inbound is None else Stream(inbound)
-    outbound = None if outbound is None else Stream(outbound)
     while inbound and inbound.sane:
         (req, req_box) = _parse_request(inbound, scheme)
         (resps, resp_box) = ([], None)
@@ -53,13 +51,14 @@ def parse_streams(inbound, outbound, scheme=None):
             yield resp_box
 
     if inbound and not inbound.eof:
-        yield complaint_box(1007, nbytes=len(inbound.consume_rest()))
+        yield complaint_box(1007, stream=inbound,
+                            nbytes=len(inbound.consume_rest()))
 
     if outbound and outbound.sane:
         if inbound:
             # We had some requests, but we ran out of them.
             # We'll still try to parse the remaining responses on their own.
-            yield complaint_box(1008)
+            yield complaint_box(1008, stream=outbound)
         while outbound.sane:
             (resps, resp_box) = _parse_responses(outbound, None)
             if resps:
@@ -68,7 +67,8 @@ def parse_streams(inbound, outbound, scheme=None):
                 yield resp_box
 
     if outbound and not outbound.eof:
-        yield complaint_box(1010, nbytes=len(outbound.consume_rest()))
+        yield complaint_box(1010, stream=outbound,
+                            nbytes=len(outbound.consume_rest()))
 
 
 def _parse_request(stream, scheme=None):
@@ -124,9 +124,9 @@ def _parse_request_body(req, stream):
         else:
             try:
                 req.body = stream.consume_n_bytes(n)
-            except ParseError:
+            except ParseError as exc:
                 req.body = Unavailable
-                req.complain(1004)
+                req.complain(1004, error=exc)
                 stream.sane = False
 
     else:
@@ -211,9 +211,9 @@ def _parse_response_body(resp, stream):
         else:
             try:
                 resp.body = stream.consume_n_bytes(n)
-            except ParseError:
+            except ParseError as exc:
                 resp.body = Unavailable
-                resp.complain(1004)
+                resp.complain(1004, error=exc)
                 stream.sane = False
 
     else:
@@ -231,7 +231,7 @@ def _parse_line_ending(stream):
 def parse_header_fields(stream):
     """Parse a block of HTTP/1.x header fields.
 
-    :param stream: The :class:`Stream` from which to parse.
+    :param stream: The :class:`~httpolice.parse.Stream` from which to parse.
     :return: A list of :class:`HeaderEntry`.
     :raises: :class:`ParseError`
     """

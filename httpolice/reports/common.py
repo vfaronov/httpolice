@@ -49,7 +49,8 @@ def expand_error(error):
 
 @expand_error.register(ParseError)
 def expand_parse_error(error):
-    paras = [[u'Parse error at offset %d.' % error.point]]
+    paras = [[error.name]] if error.name else []
+    paras.append([u'Parse error at offset %d.' % error.point])
     if error.found == b'':
         paras.append([u'Found end of data.'])
     elif error.found is not None:
