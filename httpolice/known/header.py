@@ -795,6 +795,7 @@ known = KnownDict([
  # Many of these are taken from Wikipedia:
  # https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
  {'_': FieldName(u'X-ATT-DeviceId')},
+ {'_': FieldName(u'X-Aspnet-Version')},
  {'_': FieldName(u'X-Content-Duration')},
  {'_': FieldName(u'X-Content-Security-Policy')},
  {'_': FieldName(u'X-Content-Type-Options')},
@@ -822,11 +823,13 @@ known = KnownDict([
  {'_': FieldName(u'X-Frame-Options'),
   '_citations': [RFC(7034)],
   'iana_status': 'informational'},
+ {'_': FieldName(u'X-GitHub-Request-ID')},
  {'_': FieldName(u'X-HTTP-Method-Override')},
  {'_': FieldName(u'X-Powered-By')},
  {'_': FieldName(u'X-Requested-With')},
  {'_': FieldName(u'X-UA-Compatible')},
  {'_': FieldName(u'X-UIDH')},
+ {'_': FieldName(u'X-Varnish')},
  {'_': FieldName(u'X-Wap-Profile')},
  {'_': FieldName(u'X-WebKit-CSP')},
  {'_': FieldName(u'X-XSRF-Token')},
