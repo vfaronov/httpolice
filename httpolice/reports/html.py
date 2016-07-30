@@ -108,7 +108,7 @@ def _render_request(req):
                 # without ``__pretty=False``,
                 # Dominate renders each element on its own line,
                 # thus implicitly creating whitespace.
-                with H.span(**_for_object(req.method)):
+                with H.span(__pretty=False, **_for_object(req.method)):
                     _render_known(req.method)
                 H.span(printable(req.target), **_for_object(req.target))
                 if req.version:
