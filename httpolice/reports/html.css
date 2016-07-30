@@ -103,7 +103,8 @@ pre.header-entry {
     margin: 0;
     white-space: pre-wrap;
     overflow: auto;
-    padding: 0.3em 0;
+    padding: 0.2em 0;
+    line-height: 140%;
 
     /* Indent all lines after the first one, a la ``obs-fold``. */
     padding-left: 2em;
@@ -144,6 +145,7 @@ div.complaints {
 div.notice {
     max-width: 55em;
     page-break-inside: avoid;
+    line-height: 135%;
 }
 
 .notice:not(.collapsed) + div.notice {
