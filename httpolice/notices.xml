@@ -285,21 +285,21 @@
     <title>Bad JSON body</title>
     <explain>According to <h>Content-Type</h>, this message’s body is JSON, but HTTPolice tried to parse it as JSON and got the following error:</explain>
     <exception/>
-    <ref to="msg.body"/>
+    <ref to="msg.displayable_body"/>
   </error>
 
   <error id="1039">
     <title>Bad XML body</title>
     <explain>According to <h>Content-Type</h>, this message’s body is XML, but HTTPolice tried to parse it as XML and got the following error:</explain>
     <exception/>
-    <ref to="msg.body"/>
+    <ref to="msg.displayable_body"/>
   </error>
 
   <error id="1040">
     <title>Bad URL-encoded body</title>
     <explain>According to <h>Content-Type</h>, this message’s body is URL-encoded. But it doesn’t look like a proper URL-encoded string, as defined by <cite title="HTML5" url="http://www.w3.org/TR/html/forms.html#url-encoded-form-data"/>, because it contains the character: <var ref="char"/>.</explain>
     <explain>This often means that the <h>Content-Type</h> header is wrong.</explain>
-    <ref to="msg.body"/>
+    <ref to="msg.displayable_body"/>
   </error>
 
   <comment id="1041">
@@ -310,7 +310,7 @@
    intended media type of the enclosed representation is unknown to the
    sender.
     </rfc>
-    <ref to="msg.body"/>
+    <ref to="msg.displayable_body"/>
   </comment>
 
   <comment id="1042">
@@ -412,7 +412,7 @@
    sending a payload body on a GET request might cause some existing
    implementations to reject the request.
     </rfc>
-    <ref to="msg.body"/>
+    <ref to="msg.displayable_body"/>
   </comment>
 
   <comment id="1057">
@@ -443,7 +443,7 @@
    sending a payload body on a DELETE request might cause some existing
    implementations to reject the request.
     </rfc>
-    <ref to="msg.body"/>
+    <ref to="msg.displayable_body"/>
   </comment>
 
   <error id="1060">
@@ -458,7 +458,7 @@
    sending a payload body on a CONNECT request might cause some existing
    implementations to reject the request.
     </rfc>
-    <ref to="msg.body"/>
+    <ref to="msg.displayable_body"/>
   </comment>
 
   <error id="1062">
@@ -541,7 +541,7 @@
       Since the 205 status code implies that no additional content will be
    provided, a server MUST NOT generate a payload in a 205 response.
     </rfc>
-    <ref to="msg.body"/>
+    <ref to="msg.displayable_body"/>
   </error>
 
   <comment id="1077">
@@ -1021,7 +1021,7 @@
     <title>Multipart boundary not found</title>
     <explain>The multipart boundary declared in this message’s <h>Content-Type</h> was not found in the body.</explain>
     <explain>See <rfc num="2046" sect="5.1.1"/>.</explain>
-    <ref to="msg.body"/>
+    <ref to="msg.displayable_body"/>
   </error>
 
   <error id="1141">
@@ -1031,7 +1031,7 @@
    the server MUST generate a <h ref="no">Content-Range</h> header field corresponding
    to the range being enclosed in that body part.
     </rfc>
-    <ref to="msg.body"/>
+    <ref to="msg.displayable_body"/>
     <ref to="msg.headers.content_type"/>
   </error>
 
@@ -1043,7 +1043,7 @@
    (OK) response, the server SHOULD generate that same Content-Type
    field in the header area of each body part.
     </rfc>
-    <ref to="msg.body"/>
+    <ref to="msg.displayable_body"/>
     <ref to="msg.headers.content_type"/>
   </comment>
 
@@ -1694,7 +1694,7 @@
       The <m>HEAD</m> method is identical to <m>GET</m> except that the server MUST NOT
    send a message body in the response
     </rfc>
-    <ref to="msg.body"/>
+    <ref to="msg.displayable_body"/>
   </error>
 
   <error id="1240">
@@ -1704,7 +1704,7 @@
    successfully fulfilled the request and that there is no additional
    content to send in the response payload body.
     </rfc>
-    <ref to="msg.body"/>
+    <ref to="msg.displayable_body"/>
   </error>
 
   <error id="1241">
@@ -1997,7 +1997,7 @@
   <comment id="1275">
     <title>XML with entity declarations</title>
     <explain>This message’s XML content includes entity declarations (&lt;!ENTITY&gt;). Many XML applications do not process such declarations because they can lead to denial-of-service attacks.</explain>
-    <ref to="msg.body"/>
+    <ref to="msg.displayable_body"/>
   </comment>
 
   <error id="1276">

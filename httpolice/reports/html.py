@@ -1,6 +1,5 @@
 # -*- coding: utf-8; -*-
 
-import json
 import pkgutil
 
 import dominate
@@ -14,7 +13,7 @@ from httpolice.citation import Citation
 from httpolice.header import HeaderView
 from httpolice.reports.common import (expand_error, expand_piece,
                                       find_reason_phrase, resolve_reference)
-from httpolice.structure import Unavailable, okay
+from httpolice.structure import Unavailable
 from httpolice.util.text import nicely_join, printable
 
 
@@ -138,9 +137,9 @@ def _render_response(resp):
 def _render_message(msg):
     _render_header_entries(msg.annotated_header_entries)
 
-    body, transforms = _displayable_body(msg)
+    body, transforms = msg.displayable_body
     if body != u'':
-        with H.div(**_for_object(msg.body, u'body-display')):
+        with H.div(**_for_object(msg.displayable_body, u'body-display')):
             if body is None:
                 H.h3(u'Body is unknown')
             elif body is Unavailable:
@@ -328,42 +327,3 @@ def _placeholder_to_html(placeholder, _):
 
 for _cls in known.classes:
     _piece_to_html.register(_cls, lambda obj, _: _render_known(obj))
-
-
-def _displayable_body(msg):
-    removing_te = [u'removing Transfer-Encoding'] \
-        if msg.headers.transfer_encoding else []
-    removing_ce = [u'removing Content-Encoding'] \
-        if msg.headers.content_encoding else []
-    decoding_charset = [u'decoding from %s' % msg.guessed_charset] \
-        if msg.guessed_charset and msg.guessed_charset != 'utf-8' else []
-    pretty_printing = [u'pretty-printing']
-
-    if okay(msg.json_data):
-        r = json.dumps(msg.json_data, indent=2, ensure_ascii=False)
-        transforms = \
-            removing_te + removing_ce + decoding_charset + pretty_printing
-    elif okay(msg.unicode_body):
-        r = msg.unicode_body
-        transforms = removing_te + removing_ce + decoding_charset
-    elif okay(msg.decoded_body):
-        r = msg.decoded_body.decode('utf-8', 'replace')
-        transforms = removing_te + removing_ce
-    elif okay(msg.body):
-        r = msg.body.decode('utf-8', 'replace')
-        transforms = removing_te
-    else:
-        return msg.body, []
-
-    limit = 1000
-    if len(r) > limit:
-        r = r[:limit]
-        transforms += [u'taking the first %d characters' % limit]
-
-    pr = printable(r)
-    if r != pr:
-        r = pr
-        transforms += [u'replacing non-printable characters '
-                       u'with the \ufffd sign']
-
-    return r, transforms

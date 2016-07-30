@@ -19,7 +19,7 @@ from httpolice.header import HeadersView
 from httpolice.known import cc, h, header, media, media_type, tc, upgrade, warn
 from httpolice.structure import (FieldName, HeaderEntry, HTTPVersion,
                                  Unavailable, http2, http11, okay)
-from httpolice.util.text import force_unicode, format_chars
+from httpolice.util.text import force_unicode, format_chars, printable
 
 
 # This list is taken from the HTML specification --
@@ -189,6 +189,46 @@ class Message(Blackboard):
             return parse_qs(self.decoded_body.decode('ascii'))
         else:
             return None
+
+    @derived_property
+    def displayable_body(self):
+        removing_te = [u'removing Transfer-Encoding'] \
+            if self.headers.transfer_encoding else []
+        removing_ce = [u'removing Content-Encoding'] \
+            if self.headers.content_encoding else []
+        decoding_charset = [u'decoding from %s' % self.guessed_charset] \
+            if self.guessed_charset and self.guessed_charset != 'utf-8' else []
+        pretty_printing = [u'pretty-printing']
+
+        if okay(self.json_data):
+            r = json.dumps(self.json_data, indent=2, ensure_ascii=False)
+            transforms = \
+                removing_te + removing_ce + decoding_charset + pretty_printing
+        elif okay(self.unicode_body):
+            r = self.unicode_body
+            transforms = removing_te + removing_ce + decoding_charset
+        elif okay(self.decoded_body):
+            # pylint: disable=no-member
+            r = self.decoded_body.decode('utf-8', 'replace')
+            transforms = removing_te + removing_ce
+        elif okay(self.body):
+            r = self.body.decode('utf-8', 'replace')
+            transforms = removing_te
+        else:
+            return self.body, []
+
+        limit = 1000
+        if len(r) > limit:
+            r = r[:limit]
+            transforms += [u'taking the first %d characters' % limit]
+
+        pr = printable(r)
+        if r != pr:
+            r = pr
+            transforms += [u'replacing non-printable characters '
+                           u'with the \ufffd sign']
+
+        return r, transforms
 
     @derived_property
     def transformed_by_proxy(self):
