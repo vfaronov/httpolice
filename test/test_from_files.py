@@ -18,11 +18,8 @@ import six
 from httpolice.exchange import check_exchange
 from httpolice.inputs.har import har_input
 from httpolice.inputs.streams import combined_input, parse_combined
-from httpolice.notice import notices
 from httpolice.reports import html_report, text_report
 
-
-covered = set()
 
 base_path = os.path.dirname(__file__)
 
@@ -56,11 +53,6 @@ def test_from_file(input_from_file):    # pylint: disable=redefined-outer-name
     actual = sorted(int(ln[2:6])
                     for ln in buf.getvalue().decode('utf-8').splitlines()
                     if not ln.startswith(u'----'))
-    covered.update(actual)
     assert expected == actual
 
     html_report(exchanges, six.BytesIO())     # Just check that it doesn't fail
-
-
-def test_all_notices_covered():
-    assert covered == set(notices)

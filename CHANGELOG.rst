@@ -46,6 +46,11 @@ Added
 
 Changed
 -------
+- For the `tcpick and tcpflow input`_ modes,
+  you now have to use different options to tcpick/tcpflow (consult the manual).
+
+.. _tcpick and tcpflow input:
+   http://httpolice.readthedocs.io/en/stable/streams.html
 
 Deprecated
 ----------
@@ -61,7 +66,12 @@ Removed
 
 Fixed
 -----
+- The `tcpick and tcpflow input`_ modes should now be more reliable,
+  although they still suffer from certain problems.
 - CONNECT requests in HAR files are now handled correctly.
+
+.. _tcpick and tcpflow input:
+   http://httpolice.readthedocs.io/en/stable/streams.html
 
 Security
 --------

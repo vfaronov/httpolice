@@ -6,6 +6,7 @@ import os
 import re
 import sys
 
+from httpolice.exchange import complaint_box
 from httpolice.framing1 import parse_streams
 from httpolice.inputs.common import InputError
 from httpolice.parse import Stream
@@ -20,58 +21,53 @@ def _decode_path(path):
         return path
 
 
-def streams_input(paths):
-    if len(paths) % 2 != 0:
-        raise InputError('even number of input streams required')
-    while paths:
-        inbound_path = paths.pop(0)
-        with io.open(inbound_path, 'rb') as f:
-            inbound = Stream(f.read(), name=_decode_path(inbound_path))
-        outbound_path = paths.pop(0)
-        with io.open(outbound_path, 'rb') as f:
-            outbound = Stream(f.read(), name=_decode_path(outbound_path))
+def _path_pairs_input(path_pairs):
+    for (inbound_path, outbound_path) in path_pairs:
+        inbound = outbound = None
+        if inbound_path is not None:
+            with io.open(inbound_path, 'rb') as f:
+                inbound = Stream(f.read(), name=_decode_path(inbound_path))
+        if outbound_path is not None:
+            with io.open(outbound_path, 'rb') as f:
+                outbound = Stream(f.read(), name=_decode_path(outbound_path))
         for exch in parse_streams(inbound, outbound, scheme=u'http'):
             yield exch
 
 
+def streams_input(paths):
+    if len(paths) % 2 != 0:
+        raise InputError('even number of input streams required')
+    for exch in _path_pairs_input((paths[i], paths[i + 1])
+                                   for i in range(0, len(paths), 2)):
+        yield exch
+
+
 def req_stream_input(paths):
-    while paths:
-        path = paths.pop(0)
-        with io.open(path, 'rb') as f:
-            inbound = Stream(f.read(), name=_decode_path(path))
-        for exch in parse_streams(inbound, None, scheme=u'http'):
-            yield exch
+    for exch in _path_pairs_input((path, None) for path in paths):
+        yield exch
 
 
 def resp_stream_input(paths):
-    while paths:
-        with io.open(paths.pop(0), 'rb') as f:
-            outbound = Stream(f.read(), name=_decode_path(f.name))
-        for exch in parse_streams(None, outbound, scheme=u'http'):
-            yield exch
+    for exch in _path_pairs_input((None, path) for path in paths):
+        yield exch
 
 
 def tcpick_input(paths):
     for dir_path in paths:
         # Parse tcpick filenames in order to combine them into pairs.
+        # We rely on the counter produced by the ``-F2`` option.
         streams_info = []
         for name in os.listdir(dir_path):
-            path = os.path.join(dir_path, name)
             match = re.match(
-                r'^tcpick_([^_]+)_([^_]+)_([^.]+).(serv|clnt)(\.[^.]+)?\.dat$',
-                name)
+                r'^tcpick_(\d+)_([^_]+)_([^_]+)_[^.]+.(serv|clnt)\.dat$', name)
             if not match:
-                continue
-            (src, dest, port, direction, counter) = match.groups()
-            if counter:
-                counter = int(counter.lstrip('.'), base=16)
-            else:
-                counter = 0
-            sort_key = (os.stat(path).st_ctime, counter)
-            conn_key = (port, counter)
+                raise InputError('wrong tcpick filename %s '
+                                 '(did you use the -F2 option?)' % name)
+            (counter, src, dest, direction) = match.groups()
+            counter = int(counter)
             if direction == 'serv':
                 (src, dest) = (dest, src)
-            streams_info.append((sort_key, conn_key, src, dest, name))
+            streams_info.append((counter, counter, src, dest, name))
         for exch in _directory_input(dir_path, streams_info):
             yield exch
 
@@ -79,17 +75,27 @@ def tcpick_input(paths):
 def tcpflow_input(paths):
     for dir_path in paths:
         # Parse tcpflow filenames in order to combine them into pairs.
+        # We rely on the 4-tuple of
+        # "source address, source port, destination address, destination port",
+        # keeping track of its uniqueness.
+        # See https://github.com/simsong/tcpflow/issues/128 .
+        # For sorting, we rely on the timestamp.
         streams_info = []
+        seen = {}
         for name in os.listdir(dir_path):
-            match = re.match(r'^(\d+)-(\d+)-([^-]+)-([^-]+)$', name)
-            if not match:
+            if name == 'report.xml':
                 continue
-            (timestamp, counter, src, dest) = match.groups()
+            match = re.match(r'^(\d+)-([^-]+-\d+)-([^-]+-\d+)-\d+$', name)
+            if not match:
+                raise InputError('wrong tcpflow filename %s '
+                                 '(did you use the right -T option?)' % name)
+            (timestamp, src, dest) = match.groups()
             timestamp = int(timestamp)
-            counter = int(counter)
-            sort_key = (timestamp, counter)
-            conn_key = counter
-            streams_info.append((sort_key, conn_key, src, dest, name))
+            if (src, dest) in seen:
+                raise InputError('duplicate source+destination address+port: '
+                                 '%s vs. %s' % (name, seen[(src, dest)]))
+            seen[(src, dest)] = name
+            streams_info.append((timestamp, None, src, dest, name))
         for exch in _directory_input(dir_path, streams_info):
             yield exch
 
@@ -97,9 +103,7 @@ def tcpflow_input(paths):
 def _directory_input(dir_path, streams_info):
     streams_map = OrderedDict(
         ((conn_key, src, dest), name)
-        for (sort_key, conn_key, src, dest, name) in sorted(streams_info)
-        if sort_key is not None)
-    paired_paths = []
+        for (sort_key, conn_key, src, dest, name) in sorted(streams_info))
 
     while streams_map:
         ((conn_key, src, dest), name) = streams_map.popitem(last=False)
@@ -107,25 +111,24 @@ def _directory_input(dir_path, streams_info):
 
         # Do we have a corresponding stream file in the reverse direction?
         try:
-            other_name = streams_map[(conn_key, dest, src)]
+            other_name = streams_map.pop((conn_key, dest, src))
         except KeyError:
-            raise InputError('%s: no corresponding reverse stream' % path)
-
-        other_path = os.path.join(dir_path, other_name)
-        del streams_map[(conn_key, dest, src)]
+            other_path = None
+            yield complaint_box(1278, path=path)
+        else:
+            other_path = os.path.join(dir_path, other_name)
 
         # Which of the two streams is outbound?
         if _sniff_outbound_stream(path):
-            paired_paths.extend((other_path, path))
-        elif _sniff_outbound_stream(other_path):
-            paired_paths.extend((path, other_path))
+            pair = (other_path, path)
+        elif other_path is None or _sniff_outbound_stream(other_path):
+            pair = (path, other_path)
         else:
-            raise InputError(
-                '%s and %s: cannot detect streams direction (not HTTP/1.x?)' %
-                (path, other_path))
+            yield complaint_box(1279, path=path, other_path=other_path)
+            continue
 
-    for exch in streams_input(paired_paths):
-        yield exch
+        for exch in _path_pairs_input([pair]):
+            yield exch
 
 
 def _sniff_outbound_stream(path):

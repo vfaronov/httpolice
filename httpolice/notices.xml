@@ -2014,4 +2014,17 @@
     <explain>If <var ref="header"/> is a header that you created, consider removing the ‘X-’ prefix. You may wish to check the <cite title="IANA message headers registry" url="http://www.iana.org/assignments/message-headers/message-headers.xhtml"/> to avoid collisions with existing names. Or, if the header is truly private and will never be used by others, it may be a good idea to replace ‘X-’ with something like your organization’s name.</explain>
   </comment>
 
+  <comment id="1278">
+    <title>Missing reverse stream</title>
+    <explain>There is a stream file <var ref="path"/>, but there is no corresponding stream file for the reverse direction. HTTPolice will try to process this file on its own.</explain>
+  </comment>
+
+  <error id="1279">
+    <title>Unprocessable streams</title>
+    <explain>HTTPolice has found this pair of stream files:</explain>
+    <explain><var ref="path"/></explain>
+    <explain><var ref="other_path"/></explain>
+    <explain>but cannot detect which of them is the inbound stream and which is the outbound. This can happen if the streams are malformed or not HTTP/1.x. They will not be processed.</explain>
+  </error>
+
 </notices>

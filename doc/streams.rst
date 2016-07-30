@@ -13,68 +13,79 @@ __ https://en.wikipedia.org/wiki/Packet_analyzer
 HTTPolice can parse HTTP/1.x streams from the ground up.
 HTTP/2 is not yet supported.
 
+
+Using tcpflow
+-------------
 You may be familiar with `tcpdump`__, but it won’t work:
-HTTPolice needs the raw TCP streams—just the data sent or received.
-There are two Unix tools to dump TCP streams: `tcpick`__ and `tcpflow`__.
-Unfortunately, both **sometimes produce incorrect files**,
-so this may not be 100% reliable.
+HTTPolice needs the reassembled TCP streams, not individual packets.
+You can get these streams with a tool called `tcpflow`__::
+
+  $ mkdir dump
+
+  $ cd dump/
+
+  $ sudo tcpflow -T'%t-%A-%a-%B-%b-%#' port 80
+  tcpflow: listening on wlp4s0
 
 __ https://en.wikipedia.org/wiki/Tcpdump
-__ http://tcpick.sourceforge.net/
 __ https://github.com/simsong/tcpflow
 
+(Note the ``-T`` option—it is necessary to get the right output.)
 
-tcpick
-------
-I have had more success with tcpick.
-Here’s how it can be used::
-
-  $ mkdir dump
-
-  $ cd dump/
-
-  $ sudo tcpick -wR 'port 80'
-  Starting tcpick 0.2.1 at 2016-04-13 05:11 MSK
-  Timeout for connections is 600
-  tcpick: listening on wlp4s0
-  setting filter: "port 80"
-
-tcpick starts capturing all connections to or from TCP port 80.
+tcpflow starts capturing all connections to or from TCP port 80.
 For example, you can launch a Web browser and go to an ‘http:’ site.
-Once you are done, exit the browser, then stop tcpick with Ctrl+C.
-(It is important that connections are closed before tcpick shuts down,
+Once you are done, exit the browser, then stop tcpflow with Ctrl+C.
+(It is important that connections are closed before tcpflow shuts down,
 otherwise they may be incomplete.)
 
-Now you have one or more pairs of files in this directory::
+Now you have one or more pairs of stream files::
 
   $ ls
-  tcpick_172.16.0.102_185.72.247.137_http.clnt.dat
-  tcpick_172.16.0.102_185.72.247.137_http.serv.dat
+  1469847441-054.175.219.008-00080-172.016.000.100-38656-0  report.xml
+  1469847441-172.016.000.100-38656-054.175.219.008-00080-0
 
-Then you tell HTTPolice to use the ``tcpick`` input format::
-
-  $ httpolice -i tcpick .
-
-
-tcpflow
--------
-Very similar to tcpick::
-
-  $ mkdir dump
-
-  $ cd dump/
-
-  $ sudo tcpflow -T'%t-%#-%A-%B' port 80
-  tcpflow: listening on wlp4s0
-  ^Ctcpflow: terminating
-
-  $ ls
-  1460513796-0-172.016.000.102-185.072.247.137  alerts.txt
-  1460513796-0-185.072.247.137-172.016.000.102  report.xml
+Tell HTTPolice to read this directory with the ``tcpflow`` input format::
 
   $ httpolice -i tcpflow .
 
-The cryptic ``-T`` option is necessary to get the right filenames.
+HTTPolice will combine the files into pairs based on their filenames.
+Due to a `limitation in tcpflow`__, this only works if
+every combination of source+destination address+port is unique.
+If there are duplicates, you will get an error.
+
+__ https://github.com/simsong/tcpflow/issues/128
+
+
+Using tcpick
+------------
+`tcpick`__ is another tool for reassembling TCP streams.
+It doesn’t have the “unique port” limitation of tcpflow,
+but it has a different problem:
+sometimes it produces files that are clearly invalid HTTP streams
+(HTTPolice will fail to parse them with notices like `1009`__).
+
+__ http://tcpick.sourceforge.net/
+__ http://pythonhosted.org/HTTPolice/notices.html#1009
+
+Anyway, using it is very similar to using tcpflow::
+
+  $ mkdir dump
+
+  $ cd dump/
+
+  $ sudo tcpick -wR -F2 'port 80'
+  Starting tcpick 0.2.1 at 2016-07-30 06:14 MSK
+  Timeout for connections is 600
+  tcpick: listening on wlp4s0
+  setting filter: "port 80"
+  [...]
+  ^C
+  3837 packets captured
+  30 tcp sessions detected
+
+  $ httpolice -i tcpick .
+
+(Note the ``-wR -F2`` options.)
 
 
 Other sniffers
