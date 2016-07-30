@@ -65,3 +65,24 @@ You can simply use a text-mode Web browser like `w3m`__::
   $ httpolice -o html ... | w3m -M -T text/html
 
 __ http://w3m.sourceforge.net/
+
+
+Exit status
+-----------
+When using the ``httpolice`` command-line tool,
+there’s another channel of information besides the report itself:
+the command’s exit status.
+If you pass the ``--fail-on`` option, the exit status will be non-zero
+if any notices with the given severity (or higher) have been reported.
+For example::
+
+  $ httpolice -i combined --fail-on=comment test/combined_data/1125_1
+  ------------ request : GET /
+  ------------ response : 304 Not Modified
+  E 1125 Probably wrong use of status code 304
+
+  $ echo $?
+  1
+
+This can be used to take automated action (like failing tests)
+without parsing the report itself.
