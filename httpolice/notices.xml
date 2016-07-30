@@ -1519,12 +1519,12 @@
     </rfc>
   </error>
 
-  <error id="1213">
+  <comment id="1213">
     <title><m>PATCH</m> with <h>Content-Type</h>: <var ref="msg.headers.content_type.value"/></title>
-    <explain>The <m>PATCH</m> method only makes sense with media types that define how to apply the patch. <var ref="msg.headers.content_type.value"/> is not such a media type.</explain>
+    <explain>The <m>PATCH</m> method should only be used with media types that define how to apply the patch. <var ref="msg.headers.content_type.value"/> is not such a media type.</explain>
     <explain>See <rfc num="5789" errata="3169"/>.</explain>
     <explain>For example, <media>application/merge-patch+json</media> would be a suitable patch format for JSON.</explain>
-  </error>
+  </comment>
 
   <comment id="1214">
     <title>Successful application of a <var ref="msg.request.headers.content_type.value"/> patch</title>
@@ -1615,12 +1615,12 @@
     </rfc>
   </comment>
 
-  <error id="1227">
+  <comment id="1227">
     <title><h>Accept-Patch</h>: <var ref="patch_type"/></title>
-    <explain>The <m>PATCH</m> method only makes sense with media types that define how to apply the patch. <var ref="patch_type"/> is not such a media type. But this response’s <h>Accept-Patch</h> header invites the client to send patches of type <var ref="patch_type"/>.</explain>
+    <explain>The <m>PATCH</m> method should only be used with media types that define how to apply the patch. <var ref="patch_type"/> is not such a media type. But this response’s <h>Accept-Patch</h> header invites the client to send patches of type <var ref="patch_type"/>.</explain>
     <explain>See <rfc num="5789" errata="3169"/>.</explain>
     <explain>For example, <media>application/merge-patch+json</media> would be a suitable patch format for JSON.</explain>
-  </error>
+  </comment>
 
   <error id="1228">
     <title><h>Upgrade</h>: h2</title>
