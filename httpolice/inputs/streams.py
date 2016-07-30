@@ -6,6 +6,8 @@ import os
 import re
 import sys
 
+import six
+
 from httpolice.exchange import complaint_box
 from httpolice.framing1 import parse_streams
 from httpolice.inputs.common import InputError
@@ -159,7 +161,10 @@ def parse_combined(path):
     if len(parts1) != 2:
         raise InputError('%s: bad combined file: no inbound marker' % path)
     (preamble, rest) = parts1
-    preamble = preamble.decode('utf-8')
+    try:
+        preamble = preamble.decode('utf-8')
+    except UnicodeError as exc:
+        six.raise_from(InputError('%s: invalid UTF-8 in preamble' % path), exc)
     parts2 = rest.split(b'======== BEGIN OUTBOUND STREAM ========\r\n', 1)
     if len(parts2) != 2:
         raise InputError('%s: bad combined file: no outbound marker' % path)
