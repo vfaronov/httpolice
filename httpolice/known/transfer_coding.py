@@ -5,7 +5,7 @@ from httpolice.known.base import KnownDict
 from httpolice.structure import TransferCoding
 
 
-known = KnownDict([
+known = KnownDict(TransferCoding, [
  {'_': TransferCoding(u'chunked'),
   '_citations': [RFC(7230, section=(4, 1))]},
  {'_': TransferCoding(u'compress'),

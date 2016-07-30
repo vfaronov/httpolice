@@ -5,7 +5,7 @@ from httpolice.known.base import KnownDict
 from httpolice.structure import AuthScheme
 
 
-known = KnownDict([
+known = KnownDict(AuthScheme, [
  {'_': AuthScheme(u'Basic'), '_citations': [RFC(7617)]},
  {'_': AuthScheme(u'Bearer'), '_citations': [RFC(6750)]},
  {'_': AuthScheme(u'Digest'), '_citations': [RFC(7616)]},

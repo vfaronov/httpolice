@@ -5,7 +5,7 @@ from httpolice.known.base import KnownDict
 from httpolice.structure import RelationType
 
 
-known = KnownDict([
+known = KnownDict(RelationType, [
  {'_': RelationType(u'about'), '_citations': [RFC(6903, section=(2,))]},
  {'_': RelationType(u'alternate'),
   '_citations': [Citation(None,

@@ -46,7 +46,7 @@ def parser_for(name):
     return known.get_info(name).get('parser')
 
 
-known = KnownDict([
+known = KnownDict(FieldName, [
  {'_': FieldName(u'A-IM'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Accept'),
   '_citations': [RFC(7231, section=(5, 3, 2))],

@@ -3,6 +3,7 @@
 from httpolice import structure
 from httpolice.known.alt_svc_param import known as altsvc
 from httpolice.known.auth_scheme import known as auth
+from httpolice.known.base import KnownDict
 from httpolice.known.cache_directive import known as cache
 from httpolice.known.content_coding import known as cc
 from httpolice.known.header import known as h
@@ -17,27 +18,18 @@ from httpolice.known.transfer_coding import known as tc
 from httpolice.known.upgrade_token import known as upgrade
 from httpolice.known.warn_code import known as warn
 
-classes = {
-    structure.AltSvcParam: altsvc,
-    structure.AuthScheme: auth,
-    structure.CacheDirective: cache,
-    structure.ContentCoding: cc,
-    structure.FieldName: h,
-    structure.HSTSDirective: hsts,
-    structure.MediaType: media,
-    structure.Method: m,
-    structure.ProductName: prod,
-    structure.RangeUnit: unit,
-    structure.RelationType: rel,
-    structure.StatusCode: st,
-    structure.TransferCoding: tc,
-    structure.UpgradeToken: upgrade,
-    structure.WarnCode: warn,
-}
+
+def _collect():
+    gs = globals()
+    return {gs[name].cls: (gs[name], name)
+            for name in gs
+            if isinstance(gs[name], KnownDict)}
+
+classes = _collect()   # This dict contains items like: ``Method: (m, 'm')``
 
 
 def get_info(obj):
-    for cls, known in classes.items():
+    for cls, (known, _) in classes.items():
         if isinstance(obj, cls):
             return known.get_info(obj)
 

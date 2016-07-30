@@ -20,7 +20,7 @@ import pkgutil
 import lxml.etree
 import six
 
-from httpolice import citation, structure
+from httpolice import citation, known
 from httpolice.util.ordered_enum import OrderedEnum
 
 
@@ -42,19 +42,7 @@ class Severity(OrderedEnum):
     debug = 0
 
 
-known_map = {
-    'auth': structure.AuthScheme,
-    'cache': structure.CacheDirective,
-    'cc': structure.ContentCoding,
-    'h': structure.FieldName,
-    'hsts': structure.HSTSDirective,
-    'm': structure.Method,
-    'media': structure.MediaType,
-    'rel': structure.RelationType,
-    'st': structure.StatusCode,
-    'tc': structure.TransferCoding,
-    'warn': structure.WarnCode,
-}
+known_map = {name: cls for (cls, (_, name)) in known.classes.items()}
 
 
 # pylint: disable=property-on-old-class

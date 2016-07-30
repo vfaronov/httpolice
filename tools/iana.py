@@ -325,7 +325,7 @@ def main():
     exit_status = 0
     for reg in Registry.__subclasses__():
         for cls, entries in reg().get_all():
-            here = httpolice.known.classes[cls]
+            (here, _) = httpolice.known.classes[cls]
             there = {entry['_']: entry for entry in entries}
             missing, mismatch = make_diff(here, there)
             for title, updates in [('missing', missing),

@@ -5,7 +5,7 @@ from httpolice.known.base import KnownDict
 from httpolice.structure import UpgradeToken
 
 
-known = KnownDict([
+known = KnownDict(UpgradeToken, [
  {'_': UpgradeToken(u'HTTP'),
   '_citations': [RFC(7230, section=(2, 6))],
   '_title': u'Hypertext Transfer Protocol'},

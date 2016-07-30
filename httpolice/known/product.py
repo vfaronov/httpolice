@@ -8,7 +8,7 @@ def is_library(name):
     return known.get_info(name).get('library')
 
 
-known = KnownDict([
+known = KnownDict(ProductName, [
  {'_': ProductName(u'android-async-http'),
   'library': True},
  {'_': ProductName(u'Apache-HttpAsyncClient'),

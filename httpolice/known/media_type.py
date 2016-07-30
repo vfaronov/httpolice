@@ -21,7 +21,7 @@ def is_patch(name):
     return known.get_info(name).get('patch')
 
 
-known = KnownDict([
+known = KnownDict(MediaType, [
  {'_': MediaType(u'application/1d-interleaved-parityfec'),
   '_citations': [RFC(6015)]},
  {'_': MediaType(u'application/alto-costmap+json'), '_citations': [RFC(7285)]},

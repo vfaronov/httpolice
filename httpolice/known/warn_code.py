@@ -5,7 +5,7 @@ from httpolice.known.base import KnownDict
 from httpolice.structure import WarnCode
 
 
-known = KnownDict([
+known = KnownDict(WarnCode, [
  {'_': WarnCode(110),
   '_citations': [RFC(7234, section=(5, 5, 1))],
   '_title': u'Response is Stale'},

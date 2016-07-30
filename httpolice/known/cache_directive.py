@@ -42,7 +42,7 @@ def parser_for(name):
 # refers to a request directive or a response directive,
 # so we have to use one, more general citation.
 
-known = KnownDict([
+known = KnownDict(CacheDirective, [
  {'_': CacheDirective(u'max-age'),
   '_citations': [RFC(7234, section=(5, 2))],
   '_no_sync': ['_citations'],

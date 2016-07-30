@@ -14,7 +14,7 @@ def is_cacheable(code):
     return known.get_info(code).get('cacheable')
 
 
-known = KnownDict([
+known = KnownDict(StatusCode, [
  {'_': StatusCode(100),
   '_citations': [RFC(7231, section=(6, 2, 1))],
   '_title': u'Continue',

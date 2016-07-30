@@ -21,7 +21,7 @@ def parser_for(name):
     return known.get_info(name).get('parser')
 
 
-known = KnownDict([
+known = KnownDict(HSTSDirective, [
  {'_': HSTSDirective(u'includeSubDomains'),
   '_citations': [RFC(6797, section=(6, 1, 2))],
   'argument': NO},

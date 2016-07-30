@@ -17,6 +17,9 @@ def is_safe(name):
 
 class KnownMethods(KnownDict):
 
+    def __init__(self, *args, **kwargs):
+        super(KnownMethods, self).__init__(Method, *args, **kwargs)
+
     @classmethod
     def _name_for(cls, item):
         return item['_'].replace(u'-', u'_')

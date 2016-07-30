@@ -10,7 +10,7 @@ def parser_for(name):
     return known.get_info(name).get('parser')
 
 
-known = KnownDict([
+known = KnownDict(AltSvcParam, [
  {'_': AltSvcParam(u'ma'),
   '_citations': [RFC(7838, section=(3, 1))],
   'parser': rfc7838.ma},
