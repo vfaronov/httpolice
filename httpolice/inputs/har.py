@@ -179,7 +179,7 @@ def _process_response(data, req, creator, path):
             any(name == u'x-firefox-spdy' for (name, _) in header_entries):
         # Helps with SPDY in Firefox.
         version = None
-    if version != req.version:
+    if creator in CHROME and version != req.version:
         # Helps with SPDY in Chrome.
         version = None
 
