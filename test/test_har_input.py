@@ -131,6 +131,12 @@ def test_firefox_multiple_set_cookie():
     assert cookie2 == b'baz=qux'
 
 
+def test_firefox_gif():
+    exchanges = load_from_file('firefox_gif.har')
+    assert exchanges[0].responses[0].body is Unavailable
+    assert exchanges[0].responses[0].decoded_body is Unavailable
+
+
 def test_fiddler_connect():
     exchanges = load_from_file('fiddler+ie11_connect.har')
     assert exchanges[0].request.target == u'httpbin.org:443'

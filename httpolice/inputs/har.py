@@ -188,14 +188,21 @@ def _process_response(data, req, creator, path):
 
     if data['content'].get('text') and status != st.not_modified:
         if data['content'].get('encoding', u'').lower() == u'base64':
-            decoded_body = base64.b64decode(data['content']['text'])
-            if creator in FIDDLER and req.method == m.CONNECT and \
-                    status.successful and b'Fiddler' in decoded_body:
-                # Fiddler's HAR export adds a body with debug information
-                # to CONNECT responses.
-                resp.body = b''
+            try:
+                decoded_body = base64.b64decode(data['content']['text'])
+            except ValueError:
+                # Firefox sometimes marks normal, unencoded text as "base64"
+                # (see ``test/har_data/firefox_gif.har``).
+                # But let's not try to guess.
+                pass
             else:
-                resp.decoded_body = decoded_body
+                if creator in FIDDLER and req.method == m.CONNECT and \
+                        status.successful and b'Fiddler' in decoded_body:
+                    # Fiddler's HAR export adds a body with debug information
+                    # to CONNECT responses.
+                    resp.body = b''
+                else:
+                    resp.decoded_body = decoded_body
 
         elif 'encoding' not in data['content']:
             resp.unicode_body = data['content']['text']
