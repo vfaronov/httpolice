@@ -35,12 +35,12 @@ __ http://jshint.com/
 Now that you have the HAR file, you can feed it into HTTPolice::
 
   $ httpolice -i har /path/to/file.har
-  ------------ request 6 : GET /ga.js
-  ------------ response 6 : 200 OK
+  ------------ request: GET /ga.js
+  ------------ response: 200 OK
   C 1035 Deprecated media type text/javascript
   D 1168 Response from cache
-  ------------ request 7 : GET /r/__utm.gif?utmwv=5.6.7&utm...
-  ------------ response 7 : 200 OK
+  ------------ request: GET /r/__utm.gif?utmwv=5.6.7&utm...
+  ------------ response: 200 OK
   E 1108 Wrong day of week in Expires
   C 1162 Pragma: no-cache in a response
 
@@ -162,9 +162,9 @@ Now let’s run the tests and see what’s broken::
     File "[...]/django_httpolice/middleware.py", line 81, in process_response
       raise ProtocolError(exchange)
   django_httpolice.common.ProtocolError: HTTPolice found errors in this response:
-  ------------ request 1 : GET /api/v1/?name=Martha&format=plain
+  ------------ request: GET /api/v1/?name=Martha&format=plain
   C 1070 No User-Agent header
-  ------------ response 1 : 200 OK
+  ------------ response: 200 OK
   E 1038 Bad JSON body
   
   

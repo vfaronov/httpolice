@@ -25,27 +25,23 @@ def text_report(exchanges, buf):
         It must be opened in binary mode (not text).
 
     """
-    req_i = resp_i = 1
     f1 = codecs.getwriter('utf-8')(buf)
     for exch in exchanges:
-        with write_if_any(_exchange_marker(exch, req_i), f1) as f2:
+        with write_if_any(_exchange_marker(exch), f1) as f2:
             if exch.request:
-                req_i += 1
                 for complaint in exch.request.complaints:
                     _write_complaint_line(complaint, f2)
             for resp in exch.responses:
-                with write_if_any(_response_marker(resp, resp_i), f2) as f3:
-                    resp_i += 1
+                with write_if_any(_response_marker(resp), f2) as f3:
                     for complaint in resp.complaints:
                         _write_complaint_line(complaint, f3)
             for complaint in exch.complaints:
                 _write_complaint_line(complaint, f2)
 
 
-def _exchange_marker(exchange, req_i):
+def _exchange_marker(exchange):
     if exchange.request:
-        marker = u'------------ request %d : %s %s' % (
-            req_i,
+        marker = u'------------ request: %s %s' % (
             printable(exchange.request.method),
             printable(exchange.request.target))
     elif exchange.responses:
@@ -55,9 +51,8 @@ def _exchange_marker(exchange, req_i):
     return ellipsize(marker, 80) + u'\n'
 
 
-def _response_marker(response, resp_i):
-    return ellipsize(u'------------ response %d : %d %s' % (
-                        resp_i,
+def _response_marker(response):
+    return ellipsize(u'------------ response: %d %s' % (
                         response.status,
                         printable(find_reason_phrase(response)))) + u'\n'
 

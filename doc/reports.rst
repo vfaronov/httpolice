@@ -7,14 +7,13 @@ Text reports
 ------------
 By default, HTTPolice produces simple plain text reports like this::
 
-  ------------ request 1 : PUT /articles/109226/
+  ------------ request: PUT /articles/109226/
   E 1000 Malformed If-Match header
   C 1093 User-Agent contains no actual product
-  ------------ response 1 : 100 Continue
-  ------------ response 2 : 204 No Content
+  ------------ response: 204 No Content
   C 1110 204 response with no Date header
   E 1221 Strict-Transport-Security without TLS
-  ------------ request 2 : POST /articles/109226/comments/
+  ------------ request: POST /articles/109226/comments/
   ...
 
 They are intended to be suitable for grep and other Unix-like tools.
@@ -77,8 +76,8 @@ if any notices with the given severity (or higher) have been reported.
 For example::
 
   $ httpolice -i combined --fail-on=comment test/combined_data/1125_1
-  ------------ request : GET /
-  ------------ response : 304 Not Modified
+  ------------ request: GET /
+  ------------ response: 304 Not Modified
   E 1125 Probably wrong use of status code 304
 
   $ echo $?
