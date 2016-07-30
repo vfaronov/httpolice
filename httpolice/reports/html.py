@@ -67,8 +67,8 @@ def list_notices(buf):
         H.h1(title)
         with H.div(_class=u'notices-list'):
             placeholder = Placeholder()
-            for id_ in sorted(notice.notices.keys()):
-                _notice_to_html(notice.notices[id_], placeholder,
+            for id_ in sorted(notice.all_notices.keys()):
+                _notice_to_html(notice.all_notices[id_], placeholder,
                                 with_anchor=True)
     buf.write(document.render().encode('utf-8'))
 
@@ -177,8 +177,7 @@ def _render_complaints(obj):
     if obj.complaints:
         with H.div(_class=u'complaints'):
             for complaint in obj.complaints:
-                the_notice = notice.notices[complaint.notice_id]
-                _notice_to_html(the_notice, complaint.context)
+                _notice_to_html(complaint.notice, complaint.context)
 
 
 _seen_ids = {}

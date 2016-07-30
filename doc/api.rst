@@ -41,16 +41,8 @@ API reference
 
 |
 
-.. class:: Notice
-
-   .. attribute:: id
-   
-     The notice’s ID (an integer).
-   
-   .. attribute:: severity
-   
-     The notice’s severity,
-     as a member of the :class:`~httpolice.Severity` enumeration.
+.. autoclass:: httpolice.Complaint
+   :members: id, severity
 
 |
 

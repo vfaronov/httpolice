@@ -46,9 +46,9 @@ def run_cli(args, stdout, stderr):
             if args.silence:
                 exch.silence(args.silence)
             check_exchange(exch)
-            n_notices.update(notice.severity
+            n_notices.update(complaint.severity
                              for obj in [exch] + exch.children
-                             for notice in obj.notices)
+                             for complaint in obj.complaints)
             yield exch
 
     try:

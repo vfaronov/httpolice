@@ -62,7 +62,7 @@ known_map = {
 
 class Notice(lxml.etree.ElementBase):
 
-    """An element that represents a single notice."""
+    """An element that represents a single notice, as template."""
 
     id = property(lambda self: int(self.get('id')))
     severity = property(lambda self: Severity[self.tag])
@@ -203,4 +203,4 @@ def _load_notices():
             r[elem.id] = elem
     return r, parser
 
-(notices, _parser) = _load_notices()
+(all_notices, _parser) = _load_notices()

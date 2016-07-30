@@ -63,10 +63,10 @@ def _response_marker(response, resp_i):
 
 
 def _write_complaint_line(complaint, f):
-    the_notice = notice.notices[complaint.notice_id]
     title = detypographize(
-        _piece_to_text(the_notice.title, complaint.context).strip())
-    f.write(u'%s %d %s\n' % (the_notice.severity_short, the_notice.id, title))
+        _piece_to_text(complaint.notice.title, complaint.context).strip())
+    f.write(u'%s %d %s\n' %
+            (complaint.notice.severity_short, complaint.notice.id, title))
 
 
 @singledispatch

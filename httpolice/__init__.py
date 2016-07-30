@@ -2,6 +2,7 @@
 
 from httpolice import helpers
 from httpolice.__metadata__ import version as __version__
+from httpolice.blackboard import Complaint
 from httpolice.exchange import Exchange, check_exchange
 from httpolice.notice import Severity
 from httpolice.reports.html import html_report
@@ -15,6 +16,7 @@ COMMENT = Severity.comment
 DEBUG = Severity.debug
 
 __all__ = [
+    'Complaint',
     'Exchange',
     'Request',
     'Response',

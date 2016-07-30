@@ -3,14 +3,27 @@
 from collections import namedtuple
 import functools
 
-from httpolice import notice
+from httpolice.notice import all_notices
 
 
-class Complaint(namedtuple('Complaint', ('notice_id', 'context'))):
+class Complaint(namedtuple('Complaint', ('notice', 'context'))):
 
-    """An instance of a notice in a particular place (context)."""
+    """A notice as reported in a particular place."""
 
     __slots__ = ()
+
+    @property
+    def id(self):
+        """The notice's ID (an integer)."""
+        return self.notice.id
+
+    @property
+    def severity(self):
+        """
+        The notice's severity,
+        as a member of the :class:`~httpolice.Severity` enumeration.
+        """
+        return self.notice.severity
 
 
 class Blackboard(object):
@@ -35,8 +48,9 @@ class Blackboard(object):
 
     def complain(self, notice_id, **kwargs):
         """Report a notice on this blackboard."""
+        notice = all_notices[notice_id]
         context = dict({self.self_name: self}, **kwargs)
-        complaint = Complaint(notice_id, context)
+        complaint = Complaint(notice, context)
         if complaint not in self._complaints:
             self._complaints.append(complaint)
 
@@ -53,14 +67,18 @@ class Blackboard(object):
 
     @property
     def complaints(self):
+        """
+        A list of :class:`~httpolice.Complaint` instances
+        reported on this object.
+        """
         return [complaint for complaint in self._complaints
-                if complaint.notice_id not in self._silenced]
+                if complaint.notice.id not in self._silenced]
 
-    @property
-    def notices(self):
-        """A list of :class:`Notice` objects reported on this object."""
-        return [notice.notices[complaint.notice_id]
-                for complaint in self.complaints]
+    # Inside our codebase, there is a clear distinction
+    # between a notice and a complaint.
+    # But I don't think we should bother the user with this detail.
+    # The less we mention the word "complaint", the better.
+    notices = complaints
 
 
 def derived_property(getter):
