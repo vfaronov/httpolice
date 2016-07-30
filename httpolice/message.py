@@ -278,7 +278,7 @@ def check_message(msg):
             headers.content_length.is_present:
         complain(1020)
 
-    for opt in headers.connection.okay:
+    for opt in headers.connection:
         if header.is_bad_for_connection(FieldName(opt)):
             complain(1034, header=headers[FieldName(opt)])
 
@@ -294,7 +294,7 @@ def check_message(msg):
     if headers.date > datetime.utcnow() + timedelta(seconds=10):
         complain(1109)
 
-    for warning in headers.warning.okay:
+    for warning in headers.warning:
         if warning.code < 100 or warning.code > 299:
             complain(1163, code=warning.code)
         if okay(warning.date) and headers.date != warning.date:
@@ -306,7 +306,7 @@ def check_message(msg):
         if headers.cache_control.no_transform:
             complain(1192)
 
-    for pragma in headers.pragma.okay:
+    for pragma in headers.pragma:
         if pragma != u'no-cache':
             complain(1160, pragma=pragma.item)
 
@@ -317,7 +317,7 @@ def check_message(msg):
             elif hdr.name == h.upgrade:
                 complain(1245)
 
-    for protocol in headers.upgrade.okay:
+    for protocol in headers.upgrade:
         if protocol.item == u'h2':
             complain(1228)
         if protocol.item == upgrade.h2c and msg.is_tls:

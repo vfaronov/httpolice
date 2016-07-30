@@ -128,7 +128,7 @@ class Response(message.Message):
             self.complain(1168)
             return True
 
-        for warning in self.headers.warning.okay:
+        for warning in self.headers.warning:
             if 100 <= warning.code < 200:
                 self.complain(1169, code=warning.code)
                 return True
@@ -200,7 +200,7 @@ def check_response(resp):
 
 def check_response_itself(resp):
     resp.silence(notice_id
-                 for (notice_id, _) in resp.headers.httpolice_silence.okay)
+                 for (notice_id, _) in resp.headers.httpolice_silence)
 
     message.check_message(resp)
 
@@ -310,7 +310,7 @@ def check_response_itself(resp):
         elif headers.content_range.is_absent:
             complain(1138)
 
-    for direct in headers.cache_control.okay:
+    for direct in headers.cache_control:
         if cache_directive.is_for_response(direct.item) == False:
             complain(1153, directive=direct.item)
 
@@ -375,7 +375,7 @@ def check_response_itself(resp):
         complain(1195)
 
     for hdr in [headers.www_authenticate, headers.proxy_authenticate]:
-        for challenge in hdr.okay:
+        for challenge in hdr:
             if challenge.item == auth.basic:
                 _check_basic_challenge(resp, hdr, challenge)
             if challenge.item == auth.bearer:
@@ -395,7 +395,7 @@ def check_response_itself(resp):
                                for d in headers.strict_transport_security):
             complain(1220, directive=dupe)
 
-    for patch_type in headers.accept_patch.okay:
+    for patch_type in headers.accept_patch:
         if media_type.is_patch(patch_type.item) == False:
             complain(1227, patch_type=patch_type.item)
 
@@ -404,7 +404,7 @@ def check_response_itself(resp):
 
     if status == st.unavailable_for_legal_reasons:
         if not any(rel.blocked_by in link.param.get(u'rel', [])
-                   for link in headers.link.okay):
+                   for link in headers.link):
             complain(1243)
 
     if headers.content_disposition.is_okay:
@@ -440,7 +440,7 @@ def check_response_itself(resp):
 
 def check_response_in_context(resp, req):
     resp.silence(notice_id
-                 for (notice_id, in_resp) in req.headers.httpolice_silence.okay
+                 for (notice_id, in_resp) in req.headers.httpolice_silence
                  if in_resp)
 
     complain = resp.complain
@@ -484,7 +484,7 @@ def check_response_in_context(resp, req):
         complain(1046)
 
     if status == st.switching_protocols:
-        for protocol in resp.headers.upgrade.okay:
+        for protocol in resp.headers.upgrade:
             if protocol not in req.headers.upgrade:
                 complain(1049)
             elif protocol.item == upgrade.h2c:
@@ -595,7 +595,7 @@ def check_response_in_context(resp, req):
     if status == st.expectation_failed and req.headers.expect.is_absent:
         complain(1100)
 
-    for protocol in resp.headers.upgrade.okay:
+    for protocol in resp.headers.upgrade:
         if protocol in req.headers.upgrade:
             if status == st.upgrade_required:
                 complain(1102, protocol=protocol)

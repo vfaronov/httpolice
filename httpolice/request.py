@@ -205,7 +205,7 @@ def check_request(req):
     body = req.body
 
     req.silence(notice_id
-                for (notice_id, in_resp) in headers.httpolice_silence.okay
+                for (notice_id, in_resp) in headers.httpolice_silence
                 if not in_resp)
 
     message.check_message(req)
@@ -277,7 +277,7 @@ def check_request(req):
         if products and all(product.is_library(p.item) for p in products):
             complain(1093, library=products[0])
 
-    for x in headers.accept_encoding.okay:
+    for x in headers.accept_encoding:
         if x.item in [cc.x_gzip, cc.x_compress] and x.param is not None:
             complain(1116, coding=x.item)
 
@@ -308,7 +308,7 @@ def check_request(req):
     if isinstance(headers.if_range.value, EntityTag) and headers.if_range.weak:
         complain(1135)
 
-    for direct in headers.cache_control.okay:
+    for direct in headers.cache_control:
         if cache_directive.is_for_request(direct.item) == False:
             complain(1152, directive=direct.item)
         if direct == cache.no_cache and direct.param is not None:
@@ -317,12 +317,12 @@ def check_request(req):
     if headers.cache_control.no_cache and u'no-cache' not in headers.pragma:
         complain(1161)
 
-    for warning in headers.warning.okay:
+    for warning in headers.warning:
         if 100 <= warning.code <= 199:
             complain(1165, code=warning.code)
 
     if method_info.is_cacheable(method) == False:
-        for direct in headers.cache_control.okay:
+        for direct in headers.cache_control:
             if direct.item in [cache.max_age, cache.max_stale, cache.min_fresh,
                                cache.no_cache, cache.no_store,
                                cache.only_if_cached]:
@@ -349,7 +349,7 @@ def check_request(req):
         if media_type.is_patch(headers.content_type.item) == False:
             complain(1213)
 
-    for protocol in headers.upgrade.okay:
+    for protocol in headers.upgrade:
         if protocol.item == upgrade.h2c:
             if req.is_tls:
                 complain(1233)
@@ -376,7 +376,7 @@ def check_request(req):
 
     for hdr in [headers.accept, headers.accept_charset,
                 headers.accept_encoding, headers.accept_language]:
-        for (wildcard, value) in _accept_subsumptions(hdr.okay):
+        for (wildcard, value) in _accept_subsumptions(hdr):
             complain(1276, header=hdr, wildcard=wildcard, value=value)
             # No need to report more than one subsumption per header.
             break

@@ -194,10 +194,6 @@ class HeaderView(object):
     def __iter__(self):
         return iter(self.value)
 
-    @property
-    def okay(self):
-        return [v for v in self if okay(v)]
-
     def __len__(self):
         return len(self.value)
 
@@ -286,6 +282,10 @@ class MultiHeaderView(HeaderView):
                 self._value.extend(sub_values)
         self._entries = entries
 
+    def __iter__(self):
+        # pylint: disable=not-an-iterable
+        return iter(v for v in self.value if okay(v))
+
 
 class DirectivesView(HeaderView):           # pylint: disable=abstract-method
 
@@ -318,7 +318,7 @@ class DirectivesView(HeaderView):           # pylint: disable=abstract-method
         return self[getattr(self.knowledge_module.known, key)]
 
     def __getitem__(self, key):
-        for directive, argument in self.okay:
+        for directive, argument in self:
             if directive == key:
                 return True if argument is None else argument
         return None
