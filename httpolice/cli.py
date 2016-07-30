@@ -77,7 +77,6 @@ def run_cli(args, stdout, stderr):
 
 def excepthook(_type, exc, _traceback):
     sys.stderr.write('httpolice: unhandled exception: %r\n' % exc)
-    sys.exit(1)
 
 
 def main():
