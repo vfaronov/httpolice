@@ -1,0 +1,33 @@
+1277 1277 1277 1277 1277
+
+# There was a bug here: 1277 was not reported for ``X-Accepted-Oauth-Scopes``
+# because it compared equal to ``X-Oauth-Scopes``.
+
+======== BEGIN INBOUND STREAM ========
+POST /auth/github HTTP/1.1
+host: api.travis-ci.org
+User-Agent: Travis/1.8.2 (Ubuntu 16.04 like Linux; Ruby 2.3.1-p112; RubyGems 2.5.1; command login) Faraday/0.9.2 Typhoeus/0.8.0
+Accept: application/vnd.travis-ci.2+json
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 53
+
+github_token=f67aaa7bd2a485b42255ca0f14cce4c116496523======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Connection: keep-alive
+Server: nginx
+Date: Sun, 31 Jul 2016 11:27:38 GMT
+Content-Type: application/json
+Content-Length: 43
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Expose-Headers: Content-Type, Cache-Control, Expires, Etag, Last-Modified
+Strict-Transport-Security: max-age=31536000
+X-Endpoint: Travis::Api::App::Endpoint::Authorization
+X-Pattern: /github
+X-Oauth-Scopes: public
+X-Accepted-Oauth-Scopes: public
+Vary: Accept,Accept-Encoding
+X-Rack-Cache: pass
+Via: 1.1 vegur
+
+{"access_token":"VvBfwHnpjL_swMZs_su4WW"}

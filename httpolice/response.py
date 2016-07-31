@@ -284,7 +284,7 @@ def check_response_itself(resp):
                            st.too_many_requests]:
         complain(1113)
 
-    if headers.date < headers.last_modified:
+    if headers.date < headers.last_modified.value:
         complain(1118)
 
     if status == st.not_modified:
@@ -628,7 +628,7 @@ def check_response_in_context(resp, req):
                      for tag in req.headers.if_none_match):
                 complain(1121)
 
-        elif req.headers.if_modified_since >= resp.headers.last_modified:
+        elif req.headers.if_modified_since >= resp.headers.last_modified.value:
             complain(1123)
 
     if status in [st.not_modified, st.precondition_failed]:

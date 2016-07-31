@@ -210,9 +210,27 @@ class HeaderView(object):
         return any(val == other for val in self)
 
     def _compare(self, other, op):
+        # It would be nice to be able to compare headers by values, as in::
+        #
+        #   response.headers.etag == request.headers.if_match
+        #
+        # Unfortunately, there are places
+        # (such as :meth:`httpolice.blackboard.Blackboard.complain`)
+        # where we need header-to-header equality to be less magical
+        # (see ``test/combined_data/1277_4.https``).
+        # And if we can't do this magic for equality,
+        # there's no sense in doing it for other operations.
+        # So we just say that comparing headers to headers is `NotImplemented`
+        # (fall back to comparing their object identities).
+        #
+        # Now, the following form still works::
+        #
+        #   response.headers.etag == request.headers.if_match.value
+        #
+        # so we don't lose all that much.
+
         if isinstance(other, HeaderView):
-            return self.is_okay and other.is_okay and \
-                op(self.value, other.value)
+            return NotImplemented
         else:
             return self.is_okay and okay(other) and op(self.value, other)
 
