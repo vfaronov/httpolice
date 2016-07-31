@@ -62,6 +62,7 @@ deploy:
     user: vfaronov
     password:
         secure: dlLrrEWu99XENO7U7qubqogu/RlSKsxcmWE2mIdz8e+w0RKzv8ahDjohEarwI06a4oX8rQYm6azTnNt+yeY0dL9fjucuFbIvJ1Tui2SLjhYgD6BeFAL2sGalJikVBalWy6j2cK9kaun2zY0jhLT+Y+auMOlJAOohcdfq6o8W+5dDLPo+SZElI1vNrgPWwsm1ENBWFuzQF3j/sjRzpqJhhZlWmZdwrWaYysNDT4Saflu9By1jLk4yDTyqsGHtRXqe4bc5vfVFXXE3FthEB86ry89jMHnjmYodUyJktDBFfOqodj2OOzKhxv1R3oVkUhUufiOVa5Ji7tR9D2F5gll/g8R1K59ifRpiCEbQVrk+320M/HPBjpcWuILCkm3OTE56M2Ncft+NpQ+A9escyU+A64YR/PYFMRWAfRwAxUZUVD/YDXh8Ar+pRygPnorINXrFcceEcClwxX9VYcYX0PBRbmNafpXkW/t05m3Nh50jD3+y17BeKBTAvzmosj1TuJ88TRlpTBocF6CkUIv9lIuJ9c0l0gh5aJR6CBWv8jMuKDDpAYPaBEbU9SZvyQvBva0nx/v/lncO6epLefhoYfCh/DDYRLucr+zy3ChmCd/BeJRo3gw/piZOqWmWU4H48DRrrkEJXC4dSSgEuNElq/GgZ1lK3X1zWjYCSNGDTpNqH5Q=
+    distributions: "sdist bdist_wheel"
     # Also upload files to pythonhosted.org.
     skip_cleanup: true
     docs_dir: extra_doc/_build
