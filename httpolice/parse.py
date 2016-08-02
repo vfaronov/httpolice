@@ -31,7 +31,7 @@ Also, the input string can be annotated with parsed objects.
 For example, in an HTML report,
 the ``text/xml`` in ``Accept: text/xml;q=0.9`` becomes a hyperlink to RFC,
 because it is parsed into a :class:`~httpolice.structure.MediaType` object.
-The list of classes to annotate must be passed to :meth:`Stream.__init__`.
+The list of classes to annotate must be passed to :meth:`Stream.parse`.
 Also, the object (in this case, ``MediaType(u'text/xml')``)
 must be the end result of a distinct :class:`Nonterminal`,
 **not** buried inside some :class:`Rule`.
@@ -581,27 +581,40 @@ def can_complain(func):
 
 class Stream(object):
 
+    # pylint: disable=attribute-defined-outside-init
+
     """Wraps a string of bytes that are the input to parsers."""
 
-    def __init__(self, data, name=None, annotate_classes=None):
-        self._stack = []
+    _cache = OrderedDict()
+
+    # Obtained by running under ``/usr/bin/time -v`` on a large tcpflow input
+    # and increasing until the results stopped improving.
+    _cache_size = 200
+
+    def __init__(self, data, name=None):
         self.data = data
         self.name = name
-        self.point = 0
         self._sane = True
-        self.complaints = []
-        self.annotations = []
-        self.annotate_classes = tuple(annotate_classes or ())
+        self._set_state((0, [], []))
+        self._stack = []
+
+    def _get_state(self):
+        return (self.point, self.complaints[:], self.annotations[:])
+
+    def _set_state(self, state):
+        (self.point, self.complaints, self.annotations) = state
+
+    def _is_empty_state(self):
+        return self.point == 0 and not self.complaints and not self.annotations
 
     def __enter__(self):
-        self._stack.append((self.point,
-                            self.complaints[:], self.annotations[:]))
+        self._stack.append(self._get_state())
         return self
 
     def __exit__(self, exc_type, _1, _2):
-        frame = self._stack.pop()
+        state = self._stack.pop()
         if exc_type is not None:
-            (self.point, self.complaints, self.annotations) = frame
+            self._set_state(state)
         return False
 
     def peek(self, n):
@@ -666,8 +679,30 @@ class Stream(object):
         except ParseError:
             return None
 
-    def parse(self, target, to_eof=False):
-        return parse(self, target.as_nonterminal(), to_eof)
+    def parse(self, target, to_eof=False, annotate_classes=None):
+        annotate_classes = tuple(annotate_classes or ())
+        key = None
+        if self._is_empty_state() and to_eof:
+            # Caching is really only useful
+            # when we're parsing something small in its entirety,
+            # like a header value.
+            # The above ``if`` means that the cache won't get in our way
+            # when we're parsing something big in chunks,
+            # like HTTP/1.x framing.
+            key = (self.data, target, annotate_classes)
+            item = self._cache.pop(key, None)
+            if item is not None:
+                (r, state) = item
+                self._set_state(state)
+                self._cache[key] = item
+                return r
+
+        r = parse(self, target.as_nonterminal(), to_eof, annotate_classes)
+        if key is not None:
+            self._cache[key] = (r, self._get_state())
+            while len(self._cache) > self._cache_size:
+                self._cache.popitem()
+        return r
 
     def complain(self, notice_id, **context):
         self.complaints.append((notice_id, context))
@@ -737,7 +772,7 @@ def _add_item(items, items_idx, items_set, symbol, rule, pos, start):
             (symbol, rule, pos, start))
 
 
-def parse(stream, target_symbol, to_eof=False):
+def parse(stream, target_symbol, to_eof=False, annotate_classes=()):
     (items, items_idx, items_set) = ([], {}, set())
 
     # Seed the initial items inventory with rules for `target_symbol`.
@@ -812,7 +847,8 @@ def parse(stream, target_symbol, to_eof=False):
         i += 1
 
     if (last_good_i is not None) and (last_good_i == i or not to_eof):
-        results = _find_results(stream, target_symbol, chart, last_good_i)
+        results = _find_results(stream, target_symbol, chart, last_good_i,
+                                [], annotate_classes)
         for start_i, _, result, complaints, annotations in results:
             # There may be multiple valid parses in case of ambiguities,
             # but in practice we just want
@@ -826,7 +862,8 @@ def parse(stream, target_symbol, to_eof=False):
     raise _build_parse_error(stream, target_symbol, chart)
 
 
-def _find_results(stream, symbol, chart, end_i, outer_parents=None):
+def _find_results(stream, symbol, chart, end_i,
+                  outer_parents, annotate_classes):
     # The trivial base case is to find the parse result of a terminal.
     if isinstance(symbol, Terminal):
         if end_i > 0:
@@ -848,8 +885,6 @@ def _find_results(stream, symbol, chart, end_i, outer_parents=None):
         # We don't want to consider items that are
         # already being processed further up the stack.
         # Otherwise, we would fall into unbounded recursion.
-        if outer_parents is None:
-            outer_parents = []
         if item in outer_parents:
             continue
 
@@ -918,7 +953,7 @@ def _find_results(stream, symbol, chart, end_i, outer_parents=None):
                     result = nodes
 
                 # Finally, annotate if needed.
-                if isinstance(result, stream.annotate_classes):
+                if isinstance(result, annotate_classes):
                     all_annotations.append((start_i, end_i, result))
 
                 # And that's one complete parse for `target_symbol`
@@ -936,7 +971,8 @@ def _find_results(stream, symbol, chart, end_i, outer_parents=None):
                         inner_symbol = rule.symbols[-len(frames) - 1]
                     # Recursively get an iterator
                     # over possible results for this symbol.
-                    rs = _find_results(stream, inner_symbol, chart, i, parents)
+                    rs = _find_results(stream, inner_symbol, chart, i, parents,
+                                       annotate_classes)
 
                 # Get the next result for this symbol.
                 r = next(rs, None)
@@ -1040,14 +1076,21 @@ def _find_pivots(chart, symbol, start, stack=None):
 ###############################################################################
 # Miscellaneous helpers.
 
-def simple_parse(data, symbol, complain, fail_notice_id, **extra_context):
+def simple_parse(data, symbol, complain, fail_notice_id, annotate_classes=None,
+                 **extra_context):
     """(Try to) parse an entire string as a single grammar symbol."""
     stream = Stream(force_bytes(data))
+
     try:
-        r = stream.parse(symbol, to_eof=True)
+        r = stream.parse(symbol, to_eof=True,
+                         annotate_classes=annotate_classes)
     except ParseError as e:
         complain(fail_notice_id, error=e, **extra_context)
         r = Unavailable
     else:
         stream.dump_complaints(complain, **extra_context)
-    return r
+
+    if annotate_classes is None:
+        return r
+    else:
+        return (r, stream.collect_annotations())

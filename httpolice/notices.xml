@@ -3,7 +3,7 @@
 <notices>
 
   <error id="1000">
-    <title>Malformed <var ref="entry"/> header</title>
+    <title>Malformed <var ref="place"/> header</title>
     <exception/>
   </error>
 

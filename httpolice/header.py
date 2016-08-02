@@ -15,13 +15,14 @@ And to simplify the checks code, they provide some **magic**.
 Particularly non-obvious are comparisons of :class:`HeaderView` (q.v.).
 """
 
+import copy
 import operator
 import sys
 
 from httpolice import known
 from httpolice.known import alt_svc_param, cache_directive, h, header
 import httpolice.known.hsts_directive
-from httpolice.parse import ParseError, Stream, simple_parse
+from httpolice.parse import simple_parse
 from httpolice.structure import Parametrized, Unavailable, okay
 from httpolice.syntax.rfc7230 import quoted_string, token
 
@@ -135,17 +136,13 @@ class HeaderView(object):
             if parser is None:
                 parsed = entry.value
             else:
-                stream = Stream(entry.value, annotate_classes=known.classes)
-                try:
-                    parsed = stream.parse(parser, to_eof=True)
-                except ParseError as e:
-                    self.message.complain(1000, entry=entry, error=e)
-                    parsed = Unavailable
-                else:
+                (parsed, annotations) = simple_parse(
+                    entry.value, parser,
+                    self.message.complain, 1000, place=entry,
+                    annotate_classes=known.classes)
+                if parsed is not Unavailable:
                     parsed = self._process_parsed(entry, parsed)
-                    self.message.annotations[(from_trailer, i)] = \
-                        stream.collect_annotations()
-                    stream.dump_complaints(self.message.complain, place=entry)
+                    self.message.annotations[(from_trailer, i)] = annotations
             values.append(parsed)
         return entries, values
 
@@ -372,6 +369,7 @@ class AltSvcView(SingleHeaderView):
             return parsed
 
         # Parse every parameter's value according to its defined parser.
+        parsed = copy.deepcopy(parsed)
         for alternative in parsed:
             params = alternative.param.sequence
             for i in range(len(params)):

@@ -12,10 +12,11 @@ Unreleased
 
 Added
 -----
-- HTTPolice now works under `PyPy`_ (the 2.7 variant),
-  which can make it significantly faster on large inputs.
-  You will probably need a recent version of PyPy
-  (5.3.1 works, but with 5.0.0 I get segfaults all over the place).
+- HTTPolice now caches more intermediate values in memory,
+  which makes it significantly faster in many cases.
+- HTTPolice now works correctly under `PyPy`_ (the 2.7 variant),
+  which, too, can make it faster on large inputs.
+  You will probably need a recent version of PyPy (5.3.1 is OK).
 - `HTML reports`_ now have an "options" menu
   to filter exchanges and notices on the fly.
 - The ``httpolice`` command-line tool now has
