@@ -386,7 +386,7 @@ def check_request(req):
 
     if okay(req.url_encoded_data) and u'access_token' in req.url_encoded_data:
         if req.is_tls == False:
-            complain(1271, where=body)
+            complain(1271, where=req.displayable_body)
 
     for hdr in [headers.accept, headers.accept_charset,
                 headers.accept_encoding, headers.accept_language]:
