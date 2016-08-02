@@ -72,9 +72,13 @@ Fixed
 - The `tcpick and tcpflow input`_ modes should now be more reliable,
   although they still suffer from certain problems.
 - CONNECT requests in HAR files are now handled correctly.
+- Notices `1053`_ and `1066`_ are no longer reported
+  on requests with bodies of length 0.
 
 .. _tcpick and tcpflow input:
    http://httpolice.readthedocs.io/en/stable/streams.html
+.. _1053: http://pythonhosted.org/HTTPolice/notices.html#1053
+.. _1066: http://pythonhosted.org/HTTPolice/notices.html#1066
 
 Security
 --------

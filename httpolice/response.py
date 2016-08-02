@@ -580,14 +580,9 @@ def check_response_in_context(resp, req):
         if status == st.payload_too_large:
             complain(1098)
 
-        # We must be careful here because we do not distinguish between
-        # a request with *no body* and a request with a *body of length 0*
-        # (even though RFC 7230 does).
-        # For example, consider a POST request with ``Content-Length: 0``
-        # and a ``Content-Type`` that the server does not like.
-        # It makes perfect sense for the server to look at the ``Content-Type``
-        # and respond with 415 (Unsupported Media Type),
-        # ignoring the fact that the body is empty.
+        # Even if the request actually has no body,
+        # it makes sense for the server to look at the ``Content-Type``
+        # and respond with 415 (Unsupported Media Type) anyway.
         if status == st.unsupported_media_type and \
                 req.headers.content_type.is_absent:
             complain(1099)

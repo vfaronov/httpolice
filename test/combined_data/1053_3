@@ -1,0 +1,17 @@
+# Even an empty request payload is still a payload.
+
+======== BEGIN INBOUND STREAM ========
+POST /articles/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Length: 0
+Content-Language: en
+Content-Type: text/plain
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!

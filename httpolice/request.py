@@ -195,6 +195,19 @@ class Request(message.Message):
             return {}
         return parse_qs(urlparse(self.effective_uri).query)
 
+    @derived_property
+    def has_body(self):
+        # Even though our input data does not distinguish
+        # between "no body" and "empty body",
+        # we can reconstruct this distinction later
+        # according to the rules of RFC 7230 Section 3.3.
+        if self.body:
+            return True
+        if self.version in [http10, http11]:
+            return (self.headers.content_length.is_present or
+                    self.headers.transfer_encoding.is_present)
+        return None
+
 
 def check_request(req):
     """Apply all checks to the request `req`."""
@@ -242,7 +255,8 @@ def check_request(req):
     for hdr in headers:
         if header.is_for_request(hdr.name) == False:
             complain(1063, header=hdr)
-        elif header.is_representation_metadata(hdr.name) and body == b'':
+        elif header.is_representation_metadata(hdr.name) and \
+                req.has_body == False:
             complain(1053, header=hdr)
 
     if body:
@@ -258,7 +272,7 @@ def check_request(req):
     if method == m.OPTIONS and body and headers.content_type.is_absent:
         complain(1062)
 
-    if headers.expect == u'100-continue' and body == b'':
+    if headers.expect == u'100-continue' and req.has_body == False:
         complain(1066)
 
     if headers.max_forwards.is_present and method not in [m.OPTIONS, m.TRACE]:
