@@ -31,7 +31,7 @@ script:
     # Basic stuff.
     - python setup.py check --strict --restructuredtext
     - tools/pylint_all.sh -j 2
-    - py.test
+    - tools/pytest_all.sh
 
     # Build the files to be uploaded to pythonhosted.org.
     - tools/build_extra_doc.sh
