@@ -92,9 +92,6 @@ class HeadersView(object):
     def clearly(self, predicate):
         return set(name for name in self.names if predicate(name))
 
-    def possibly(self, predicate):
-        return set(name for name in self.names if predicate(name) != False)
-
 
 class HeaderView(object):
 
@@ -161,7 +158,7 @@ class HeaderView(object):
 
     @property
     def entries(self):
-        if self._entries is None:
+        if self._entries is None:   # pragma: no cover
             self._parse()
         return self._entries
 
@@ -188,17 +185,11 @@ class HeaderView(object):
     def __bool__(self):
         return bool(self.value)
 
-    if sys.version_info[0] < 3:
+    if sys.version_info[0] < 3:     # pragma: no cover
         __nonzero__ = __bool__
 
     def __iter__(self):
         return iter(self.value)
-
-    def __len__(self):
-        return len(self.value)
-
-    def __getitem__(self, i):
-        return self.value[i]           # pylint: disable=unsubscriptable-object
 
     def __contains__(self, other):
         # Since headers often contain `Parametrized` values,
@@ -238,7 +229,7 @@ class HeaderView(object):
         return self._compare(other, operator.lt)
 
     def __le__(self, other):
-        return self._compare(other, operator.le)
+        return self._compare(other, operator.le)    # pragma: no cover
 
     def __eq__(self, other):
         return self._compare(other, operator.eq)

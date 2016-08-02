@@ -1,0 +1,15 @@
+1127
+
+# Make sure we don't try to parse JSON in 304 responses.
+
+======== BEGIN INBOUND STREAM ========
+GET /data/index.json HTTP/1.1
+Host: example.com
+User-Agent: demo
+If-None-Match: W/"foobar123"
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 304 Not Modified
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: application/json
+

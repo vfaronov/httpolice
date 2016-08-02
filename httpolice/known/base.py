@@ -24,7 +24,7 @@ class KnownDict(object):
         else:
             raise AttributeError(name)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key):         # pragma: no cover
         return self._by_key[key]
 
     def __iter__(self):

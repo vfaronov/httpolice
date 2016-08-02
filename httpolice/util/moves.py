@@ -4,12 +4,12 @@
 # These are like `six.moves`, but we cannot add them with `six.add_move`
 # because we are a library and we must not touch that shared namespace.
 
-try:
+try:        # pragma: no cover
     from email import message_from_bytes
-except ImportError:                             # Python 2
+except ImportError:                       # Python 2; pragma: no cover
     from email import message_from_string as message_from_bytes
 
-try:
+try:        # pragma: no cover
     from urllib.parse import unquote_to_bytes
-except ImportError:         # Python 2
+except ImportError:                       # Python 2; pragma: no cover
     from urllib import unquote as unquote_to_bytes

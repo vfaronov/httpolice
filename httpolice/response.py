@@ -182,7 +182,7 @@ class Response(message.Message):
     def is_tls(self):
         if okay(self.request):
             return self.request.is_tls
-        else:
+        else:   # pragma: no cover
             return None
 
 
@@ -743,7 +743,7 @@ def _check_bearer_challenge(resp, hdr, challenge):
     # If this is ever extended to proxies, the notices must be adjusted.
     # Also note that some text in RFC 6750 only applies to servers
     # (where it says "resource server").
-    if hdr.name != h.www_authenticate:
+    if hdr.name != h.www_authenticate:      # pragma: no cover
         return
 
     req = resp.request

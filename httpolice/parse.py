@@ -289,7 +289,7 @@ class RepeatedNonterminal(Nonterminal):
         self.inner = inner
         self._rules = None
 
-    def group(self):
+    def group(self):    # pragma: no cover
         return self
 
     @property
@@ -313,7 +313,7 @@ class RepeatedNonterminal(Nonterminal):
     def build_regex(self):
         if self.max_count is None:
             return self.inner.as_regex() + b'*'
-        else:
+        else:       # pragma: no cover
             return self.inner.as_regex() + (b'{0,%d}' % self.max_count)
 
 
@@ -612,7 +612,7 @@ class Stream(object):
             return self.data[(self.point + i):(self.point + i + 1)]
         elif i == len(self.data) - self.point:
             return b''
-        else:
+        else:   # pragma: no cover
             raise IndexError(i)
 
     @property

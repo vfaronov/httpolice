@@ -1,14 +1,13 @@
 # -*- coding: utf-8; -*-
 
 import codecs
-import re
 
 from singledispatch import singledispatch
 import six
 
 from httpolice import notice
-from httpolice.reports.common import (expand_error, expand_piece,
-                                      find_reason_phrase, resolve_reference)
+from httpolice.reports.common import (expand_piece, find_reason_phrase,
+                                      resolve_reference)
 from httpolice.util.text import (detypographize, ellipsize, printable,
                                  write_if_any)
 
@@ -76,29 +75,7 @@ def _text_to_text(text, _):
 def _list_to_text(xs, ctx):
     return u''.join(_piece_to_text(x, ctx) for x in xs)
 
-@_piece_to_text.register(notice.Paragraph)
-def _para_to_text(para, ctx):
-    return _piece_to_text(para.content, ctx) + u'\n'
-
-@_piece_to_text.register(notice.Cite)
-def _cite_to_text(cite, ctx):
-    quote = cite.content
-    if quote:
-        quote = re.sub(u'\\s+', u' ', _piece_to_text(quote, ctx)).strip()
-        return u'“%s” (%s)' % (quote, cite.info)
-    else:
-        return six.text_type(cite.info)
-
 @_piece_to_text.register(notice.Var)
 def _var_to_text(var, ctx):
     target = resolve_reference(ctx, var.reference)
     return _piece_to_text(target, ctx)
-
-@_piece_to_text.register(notice.ExceptionDetails)
-def _exc_to_text(_, ctx):
-    return u''.join(_piece_to_text(para, ctx) + u'\n'
-                    for para in expand_error(ctx['error']))
-
-@_piece_to_text.register(notice.Ref)
-def _ref_to_text(_ref, _ctx):
-    return u''

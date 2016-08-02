@@ -70,7 +70,7 @@ def link_extension(exclude_builtin):
         exclude1 = [name for name in _builtin_params if not name.endswith('*')]
         exclude2 = [name.rstrip('*')
                     for name in _builtin_params if name.endswith('*')]
-    else:
+    else:       # pragma: no cover
         exclude1 = exclude2 = None
     return (
         (

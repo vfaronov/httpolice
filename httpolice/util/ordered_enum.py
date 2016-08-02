@@ -3,7 +3,7 @@
 import enum
 
 
-class OrderedEnum(enum.Enum):
+class OrderedEnum(enum.Enum):       # pragma: no cover
 
     """An ordered variant of :class:`enum.Enum`.
 

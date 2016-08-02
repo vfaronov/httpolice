@@ -117,7 +117,7 @@ def _process_request(data, creator, path):
             try:
                 stream = Stream((wtf + u'\r\n').encode('iso-8859-1'))
                 more_entries = framing1.parse_header_fields(stream)
-            except (UnicodeError, ParseError):
+            except (UnicodeError, ParseError):      # pragma: no cover
                 pass
             else:
                 header_entries.extend(more_entries)

@@ -80,11 +80,19 @@ def test_har():
     assert stderr == b''
 
 
-def test_bad_har_file():
+def test_bad_har_file_1():
     (code, stdout, stderr) = run(['-i', 'har'], ['combined_data/simple_ok'])
     assert code > 0
     assert stdout == b''
     assert b'bad HAR file' in stderr
+    assert b'Traceback' not in stderr
+
+
+def test_bad_har_file_2():
+    (code, stdout, stderr) = run(['-i', 'har'], ['misc_data/bad.har'])
+    assert code > 0
+    assert stdout == b''
+    assert b'cannot understand HAR file' in stderr
     assert b'Traceback' not in stderr
 
 

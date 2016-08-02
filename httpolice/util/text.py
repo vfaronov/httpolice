@@ -118,10 +118,8 @@ def force_bytes(x):
 
 
 def stdio_as_bytes(f):
-    if hasattr(f, 'buffer'):        # Python 3
-        return f.buffer
-    else:                           # Python 2
-        return f
+    # Accommodate Python 2 vs. 3 difference.
+    return f.buffer if hasattr(f, 'buffer') else f
 
 
 class WriteIfAny(io.StringIO):

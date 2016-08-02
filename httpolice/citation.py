@@ -16,17 +16,17 @@ class Citation(object):
         self.title = title
         self.url = url
 
-    def __eq__(self, other):
+    def __eq__(self, other):        # pragma: no cover
         return isinstance(other, Citation) and \
             self.title == other.title and self.url == other.url
 
-    def __ne__(self, other):
+    def __ne__(self, other):        # pragma: no cover
         return not self == other
 
-    def subset_of(self, other):
+    def subset_of(self, other):     # pragma: no cover
         return self == other
 
-    def __hash__(self):
+    def __hash__(self):             # pragma: no cover
         return hash((self.title, self.url))
 
 
@@ -78,7 +78,7 @@ class RFC(Citation):
         return tuple(int(part) if part.isdigit() else part
                      for part in s.split('.'))
 
-    def subset_of(self, other):
+    def subset_of(self, other):     # pragma: no cover
         if self.num != other.num:
             return False
         if other.section:

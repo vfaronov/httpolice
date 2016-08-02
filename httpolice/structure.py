@@ -29,7 +29,7 @@ class _Unavailable(object):
     def __eq__(self, other):
         return False
 
-    def __hash__(self):
+    def __hash__(self):     # pragma: no cover
         return 1
 
 Unavailable = _Unavailable()
@@ -55,7 +55,7 @@ class Parametrized(namedtuple('Parametrized', ('item', 'param'))):
         else:
             return self.item != other
 
-    def __hash__(self):
+    def __hash__(self):     # pragma: no cover
         return hash(self.item)
 
 
@@ -84,9 +84,9 @@ class MultiDict(object):
     def __eq__(self, other):
         if isinstance(other, MultiDict):
             return self.sequence == other.sequence
-        return NotImplemented
+        return NotImplemented           # pragma: no cover
 
-    def __ne__(self, other):
+    def __ne__(self, other):            # pragma: no cover
         return not (self == other)
 
     def __getitem__(self, name):
@@ -316,13 +316,10 @@ class WarningValue(namedtuple('WarningValue',
         else:
             return self.code == other
 
-    def __ne__(self, other):
-        if isinstance(other, tuple):
-            return super(WarningValue, self).__ne__(other)
-        else:
-            return self.code != other
+    def __ne__(self, other):        # pragma: no cover
+        return not (self == other)
 
-    def __hash__(self):
+    def __hash__(self):             # pragma: no cover
         return hash(self.code)
 
 

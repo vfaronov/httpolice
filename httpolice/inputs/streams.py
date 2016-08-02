@@ -16,7 +16,7 @@ from httpolice.parse import Stream
 
 fs_encoding = sys.getfilesystemencoding()
 
-def _decode_path(path):
+def _decode_path(path):     # pragma: no cover
     if isinstance(path, bytes):
         return path.decode(fs_encoding, 'replace')
     else:
@@ -163,10 +163,10 @@ def parse_combined(path):
     (preamble, rest) = parts1
     try:
         preamble = preamble.decode('utf-8')
-    except UnicodeError as exc:
+    except UnicodeError as exc:     # pragma: no cover
         six.raise_from(InputError('%s: invalid UTF-8 in preamble' % path), exc)
     parts2 = rest.split(b'======== BEGIN OUTBOUND STREAM ========\r\n', 1)
-    if len(parts2) != 2:
+    if len(parts2) != 2:            # pragma: no cover
         raise InputError('%s: bad combined file: no outbound marker' % path)
     (inbound_data, outbound_data) = parts2
 

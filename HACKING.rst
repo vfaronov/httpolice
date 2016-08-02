@@ -101,3 +101,14 @@ For example:
   - ``None``, which means "don't know"
 
   (this is why you see comparisons to ``False`` all over the place).
+
+
+Code coverage
+-------------
+The delivery pipeline (Travis CI) requires "100%" statement coverage in tests.
+This is *not* meant to enforce that every line has been tested,
+but rather to ensure that no line has been *forgotten*.
+Feel free to add ``pragma: no cover`` to code
+that would be hard to cover with a natural, functional test.
+
+To run tests with coverage checks locally, use ``tools/pytest_all.sh``.

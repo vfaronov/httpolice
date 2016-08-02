@@ -75,11 +75,11 @@ def run_cli(args, stdout, stderr):
     return 0
 
 
-def excepthook(_type, exc, _traceback):
+def excepthook(_type, exc, _traceback):     # pragma: no cover
     sys.stderr.write('httpolice: unhandled exception: %r\n' % exc)
 
 
-def main():
+def main():     # pragma: no cover
     args = parse_args(sys.argv)
     if not args.full_traceback:
         sys.excepthook = excepthook
