@@ -1,0 +1,9 @@
+HTTP/1.1 401 UNAUTHORIZED
+Server: nginx
+Date: Tue, 02 Aug 2016 10:59:01 GMT
+Content-Length: 0
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+WWW-Authenticate: Basic realm="Fake Realm"
+Access-Control-Allow-Credentials: true
+

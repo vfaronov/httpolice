@@ -1,0 +1,10 @@
+HTTP/1.1 402 PAYMENT REQUIRED
+Server: nginx
+Date: Tue, 02 Aug 2016 10:57:19 GMT
+Content-Length: 17
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+x-more-info: http://vimeo.com/22053820
+Access-Control-Allow-Credentials: true
+
+Fuck you, pay me!

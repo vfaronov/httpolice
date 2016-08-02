@@ -2,7 +2,11 @@
 
 import os
 
-from httpolice.inputs.streams import combined_input
+import pytest
+
+from httpolice.inputs import InputError
+from httpolice.inputs.streams import (combined_input, tcpflow_input,
+                                      tcpick_input)
 from httpolice.known import h, m, st, upgrade
 from httpolice.structure import Unavailable, Versioned, http11
 
@@ -10,6 +14,16 @@ from httpolice.structure import Unavailable, Versioned, http11
 def load_from_file(name):
     path = os.path.join(os.path.dirname(__file__), 'combined_data', name)
     return list(combined_input([path]))
+
+
+def load_from_tcpflow(name):
+    path = os.path.join(os.path.dirname(__file__), 'tcpflow_data', name)
+    return list(tcpflow_input([path]))
+
+
+def load_from_tcpick(name):
+    path = os.path.join(os.path.dirname(__file__), 'tcpick_data', name)
+    return list(tcpick_input([path]))
 
 
 def test_complex_connection():
@@ -122,3 +136,110 @@ def test_chunked_empty():
 def test_implicit_response_framing():
     [exch1] = load_from_file('1025_2')
     assert exch1.responses[0].body == b'Hello world!\r\n'
+
+
+def test_tcpflow():
+    exchanges = load_from_tcpflow('httpbin')
+
+    assert exchanges[0].request.method == m.GET
+    assert exchanges[0].request.target == u'/get'
+    assert exchanges[0].request.version == http11
+
+    assert u'n → ∞' in exchanges[3].responses[0].unicode_body
+
+    assert b'"gzipped": true' in exchanges[4].responses[0].decoded_body
+
+    assert b'"deflated": true' in exchanges[5].responses[0].decoded_body
+
+    assert exchanges[6].responses[0].status == st.no_content
+    assert exchanges[6].responses[0].reason == u'NO CONTENT'
+
+    assert exchanges[8].responses[0].body.count(b'{"url":') == 10
+
+    assert len(exchanges[9].responses[0].body) == 1024
+
+
+def test_tcpflow_multiple_connections():
+    [exch1, exch2, exch3] = load_from_tcpflow('multiple_connections')
+    assert exch1.request.target == u'/status/400'
+    assert exch2.request.target == u'/status/401'
+    assert exch3.request.target == u'/status/402'
+
+
+def test_tcpflow_request_timeout():
+    [box, exch1] = load_from_tcpflow('request_timeout')
+
+    # The first exchange is only a box for no. 1278.
+    assert box.request is None
+    assert box.responses == []
+    assert [complaint.id for complaint in box.complaints] == [1278]
+
+    # The second exchange contains only the 408 response.
+    assert exch1.request is None
+    [resp] = exch1.responses
+    assert resp.status == st.request_timeout
+    assert resp.body == b'How long am I supposed to wait?\r\n'
+
+
+def test_tcpflow_response_timeout():
+    [box, exch1] = load_from_tcpflow('response_timeout')
+
+    # The first exchange is only a box for no. 1278.
+    assert box.request is None
+    assert box.responses == []
+    assert [complaint.id for complaint in box.complaints] == [1278]
+
+    # The second exchange contains only the request.
+    assert exch1.request.method == m.GET
+    assert exch1.request.target == u'/delay/20'
+    assert exch1.responses == []
+
+
+def test_tcpflow_source_port_reused():
+    with pytest.raises(InputError):
+        load_from_tcpflow('source_port_reused')
+
+
+def test_tcpflow_wrong_filenames():
+    with pytest.raises(InputError):
+        load_from_tcpflow('wrong_filenames')
+
+
+def test_tcpflow_tls():
+    [box] = load_from_tcpflow('tls')
+    assert box.request is None
+    assert box.responses == []
+    assert [complaint.id for complaint in box.complaints] == [1279]
+
+
+def test_tcpick():
+    exchanges = load_from_tcpick('httpbin')
+
+    assert exchanges[0].request.method == m.GET
+    assert exchanges[0].request.target == u'/get'
+    assert exchanges[0].request.version == http11
+
+    assert u'n → ∞' in exchanges[3].responses[0].unicode_body
+
+    assert b'"gzipped": true' in exchanges[4].responses[0].decoded_body
+
+    assert b'"deflated": true' in exchanges[5].responses[0].decoded_body
+
+    assert exchanges[6].responses[0].status == st.no_content
+    assert exchanges[6].responses[0].reason == u'NO CONTENT'
+
+    assert exchanges[8].responses[0].body.count(b'{"url":') == 10
+
+    assert len(exchanges[9].responses[0].body) == 1024
+
+
+def test_tcpick_multiple_connections():
+    [exch1, exch2, exch3] = load_from_tcpick('multiple_connections')
+    assert exch1.request.target == u'/status/400'
+    assert exch2.request.target == u'/status/401'
+    assert exch3.request.target == u'/status/402'
+
+
+def test_tcpick_wrong_filenames():
+    with pytest.raises(InputError):
+        load_from_tcpick('wrong_filenames')

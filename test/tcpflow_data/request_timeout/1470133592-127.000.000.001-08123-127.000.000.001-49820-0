@@ -1,0 +1,6 @@
+HTTP/1.1 408 Request Timeout
+Date: Tue, 02 Aug 2016 10:25:16 GMT
+Content-Length: 33
+Connection: close
+
+How long am I supposed to wait?

@@ -1,0 +1,475 @@
+HTTP/1.1 200 OK
+Server: nginx
+Date: Tue, 02 Aug 2016 10:48:08 GMT
+Content-Type: application/json
+Content-Length: 394
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+
+{
+  "args": {}, 
+  "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", 
+    "Accept-Encoding": "gzip, deflate", 
+    "Accept-Language": "en-US,en;q=0.5", 
+    "Host": "httpbin.org", 
+    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"
+  }, 
+  "origin": "95.84.210.114", 
+  "url": "http://httpbin.org/get"
+}
+HTTP/1.1 404 NOT FOUND
+Server: nginx
+Date: Tue, 02 Aug 2016 10:48:09 GMT
+Content-Type: text/html
+Content-Length: 233
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<title>404 Not Found</title>
+<h1>Not Found</h1>
+<p>The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.</p>
+HTTP/1.1 404 NOT FOUND
+Server: nginx
+Date: Tue, 02 Aug 2016 10:48:09 GMT
+Content-Type: text/html
+Content-Length: 233
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<title>404 Not Found</title>
+<h1>Not Found</h1>
+<p>The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.</p>
+HTTP/1.1 200 OK
+Server: nginx
+Date: Tue, 02 Aug 2016 10:48:15 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 14239
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+
+<h1>Unicode Demo</h1>
+
+<p>Taken from <a
+href="http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-demo.txt">http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-demo.txt</a></p>
+
+<pre>
+
+UTF-8 encoded sample plain-text file
+â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾â€¾
+
+Markus Kuhn [ËˆmaÊ³kÊŠs kuËn] <http://www.cl.cam.ac.uk/~mgk25/> â€” 2002-07-25
+
+
+The ASCII compatible UTF-8 encoding used in this plain-text file
+is defined in Unicode, ISO 10646-1, and RFC 2279.
+
+
+Using Unicode/UTF-8, you can write in emails and source code things such as
+
+Mathematics and sciences:
+
+  âˆ® Eâ‹…da = Q,  n â†’ âˆ, âˆ‘ f(i) = âˆ g(i),      â§â¡â›â”Œâ”€â”€â”€â”€â”€â”ââ¤â«
+                                            âªâ¢âœâ”‚aÂ²+bÂ³ âŸâ¥âª
+  âˆ€xâˆˆâ„: âŒˆxâŒ‰ = âˆ’âŒŠâˆ’xâŒ‹, Î± âˆ§ Â¬Î² = Â¬(Â¬Î± âˆ¨ Î²),    âªâ¢âœâ”‚â”€â”€â”€â”€â”€ âŸâ¥âª
+                                            âªâ¢âœâ· câ‚ˆ   âŸâ¥âª
+  â„• âŠ† â„•â‚€ âŠ‚ â„¤ âŠ‚ â„š âŠ‚ â„ âŠ‚ â„‚,                   â¨â¢âœ       âŸâ¥â¬
+                                            âªâ¢âœ âˆ     âŸâ¥âª
+  âŠ¥ < a â‰  b â‰¡ c â‰¤ d â‰ª âŠ¤ â‡’ (âŸ¦AâŸ§ â‡” âŸªBâŸ«),      âªâ¢âœ â²     âŸâ¥âª
+                                            âªâ¢âœ â³aâ±-bâ±âŸâ¥âª
+  2Hâ‚‚ + Oâ‚‚ â‡Œ 2Hâ‚‚O, R = 4.7 kÎ©, âŒ€ 200 mm     â©â£âi=1    â â¦â­
+
+Linguistics and dictionaries:
+
+  Ã°i Ä±ntÉ™ËˆnÃ¦ÊƒÉ™nÉ™l fÉ™ËˆnÉ›tÄ±k É™soÊŠsiËˆeÄ±Êƒn
+  Y [ËˆÊpsilÉ”n], Yen [jÉ›n], Yoga [ËˆjoËgÉ‘]
+
+APL:
+
+  ((Vâ³V)=â³â´V)/Vâ†,V    âŒ·â†â³â†’â´âˆ†âˆ‡âŠƒâ€¾ââ•âŒˆ
+
+Nicer typography in plain text files:
+
+  â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+  â•‘                                          â•‘
+  â•‘   â€¢ â€˜singleâ€™ and â€œdoubleâ€ quotes         â•‘
+  â•‘                                          â•‘
+  â•‘   â€¢ Curly apostrophes: â€œWeâ€™ve been hereâ€ â•‘
+  â•‘                                          â•‘
+  â•‘   â€¢ Latin-1 apostrophe and accents: 'Â´`  â•‘
+  â•‘                                          â•‘
+  â•‘   â€¢ â€šdeutscheâ€˜ â€AnfÃ¼hrungszeichenâ€œ       â•‘
+  â•‘                                          â•‘
+  â•‘   â€¢ â€ , â€¡, â€°, â€¢, 3â€“4, â€”, âˆ’5/+5, â„¢, â€¦      â•‘
+  â•‘                                          â•‘
+  â•‘   â€¢ ASCII safety test: 1lI|, 0OD, 8B     â•‘
+  â•‘                      â•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®         â•‘
+  â•‘   â€¢ the euro symbol: â”‚ 14.95 â‚¬ â”‚         â•‘
+  â•‘                      â•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯         â•‘
+  â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+Combining characters:
+
+  STARGÎ›ÌŠTE SG-1, a = vÌ‡ = rÌˆ, aâƒ‘ âŠ¥ bâƒ‘
+
+Greek (in Polytonic):
+
+  The Greek anthem:
+
+  Î£á½² Î³Î½Ï‰Ïá½·Î¶Ï‰ á¼€Ï€á½¸ Ï„á½´Î½ Îºá½¹ÏˆÎ·
+  Ï„Î¿á¿¦ ÏƒÏ€Î±Î¸Î¹Î¿á¿¦ Ï„á½´Î½ Ï„ÏÎ¿Î¼ÎµÏá½µ,
+  Ïƒá½² Î³Î½Ï‰Ïá½·Î¶Ï‰ á¼€Ï€á½¸ Ï„á½´Î½ á½„ÏˆÎ·
+  Ï€Î¿á½º Î¼á½² Î²á½·Î± Î¼ÎµÏ„Ïá½±ÎµÎ¹ Ï„á½´ Î³á¿†.
+
+  á¾¿Î‘Ï€á¾¿ Ï„á½° Îºá½¹ÎºÎºÎ±Î»Î± Î²Î³Î±Î»Î¼á½³Î½Î·
+  Ï„á¿¶Î½ á¿¾Î•Î»Î»á½µÎ½Ï‰Î½ Ï„á½° á¼±ÎµÏá½±
+  ÎºÎ±á½¶ Ïƒá½°Î½ Ï€Ïá¿¶Ï„Î± á¼€Î½Î´ÏÎµÎ¹Ï‰Î¼á½³Î½Î·
+  Ï‡Î±á¿–ÏÎµ, á½¦ Ï‡Î±á¿–ÏÎµ, á¾¿Î•Î»ÎµÏ…Î¸ÎµÏÎ¹á½±!
+
+  From a speech of Demosthenes in the 4th century BC:
+
+  ÎŸá½Ï‡á½¶ Ï„Î±á½Ï„á½° Ï€Î±Ïá½·ÏƒÏ„Î±Ï„Î±á½· Î¼Î¿Î¹ Î³Î¹Î³Î½á½½ÏƒÎºÎµÎ¹Î½, á½¦ á¼„Î½Î´ÏÎµÏ‚ á¾¿Î‘Î¸Î·Î½Î±á¿–Î¿Î¹,
+  á½…Ï„Î±Î½ Ï„á¾¿ Îµá¼°Ï‚ Ï„á½° Ï€Ïá½±Î³Î¼Î±Ï„Î± á¼€Ï€Î¿Î²Î»á½³ÏˆÏ‰ ÎºÎ±á½¶ á½…Ï„Î±Î½ Ï€Ïá½¸Ï‚ Ï„Î¿á½ºÏ‚
+  Î»á½¹Î³Î¿Ï…Ï‚ Î¿á½“Ï‚ á¼€ÎºÎ¿á½»Ï‰Î‡ Ï„Î¿á½ºÏ‚ Î¼á½²Î½ Î³á½°Ï Î»á½¹Î³Î¿Ï…Ï‚ Ï€ÎµÏá½¶ Ï„Î¿á¿¦
+  Ï„Î¹Î¼Ï‰Ïá½µÏƒÎ±ÏƒÎ¸Î±Î¹ Î¦á½·Î»Î¹Ï€Ï€Î¿Î½ á½Ïá¿¶ Î³Î¹Î³Î½Î¿Î¼á½³Î½Î¿Ï…Ï‚, Ï„á½° Î´á½² Ï€Ïá½±Î³Î¼Î±Ï„á¾¿
+  Îµá¼°Ï‚ Ï„Î¿á¿¦Ï„Î¿ Ï€ÏÎ¿á½µÎºÎ¿Î½Ï„Î±,  á½¥ÏƒÎ¸á¾¿ á½…Ï€Ï‰Ï‚ Î¼á½´ Ï€ÎµÎ¹Ïƒá½¹Î¼ÎµÎ¸á¾¿ Î±á½Ï„Î¿á½¶
+  Ï€Ïá½¹Ï„ÎµÏÎ¿Î½ ÎºÎ±Îºá¿¶Ï‚ ÏƒÎºá½³ÏˆÎ±ÏƒÎ¸Î±Î¹ Î´á½³Î¿Î½. Î¿á½Î´á½³Î½ Î¿á½–Î½ á¼„Î»Î»Î¿ Î¼Î¿Î¹ Î´Î¿ÎºÎ¿á¿¦ÏƒÎ¹Î½
+  Î¿á¼± Ï„á½° Ï„Î¿Î¹Î±á¿¦Ï„Î± Î»á½³Î³Î¿Î½Ï„ÎµÏ‚ á¼¢ Ï„á½´Î½ á½‘Ï€á½¹Î¸ÎµÏƒÎ¹Î½, Ï€ÎµÏá½¶ á¼§Ï‚ Î²Î¿Ï…Î»Îµá½»ÎµÏƒÎ¸Î±Î¹,
+  Î¿á½Ï‡á½¶ Ï„á½´Î½ Î¿á½–ÏƒÎ±Î½ Ï€Î±ÏÎ¹ÏƒÏ„á½±Î½Ï„ÎµÏ‚ á½‘Î¼á¿–Î½ á¼Î¼Î±ÏÏ„á½±Î½ÎµÎ¹Î½. á¼Î³á½¼ Î´á½³, á½…Ï„Î¹ Î¼á½³Î½
+  Ï€Î¿Ï„á¾¿ á¼Î¾á¿†Î½ Ï„á¿‡ Ï€á½¹Î»ÎµÎ¹ ÎºÎ±á½¶ Ï„á½° Î±á½‘Ï„á¿†Ï‚ á¼”Ï‡ÎµÎ¹Î½ á¼€ÏƒÏ†Î±Î»á¿¶Ï‚ ÎºÎ±á½¶ Î¦á½·Î»Î¹Ï€Ï€Î¿Î½
+  Ï„Î¹Î¼Ï‰Ïá½µÏƒÎ±ÏƒÎ¸Î±Î¹, ÎºÎ±á½¶ Î¼á½±Î»á¾¿ á¼€ÎºÏÎ¹Î²á¿¶Ï‚ Î¿á¼¶Î´Î±Î‡ á¼Ï€á¾¿ á¼Î¼Î¿á¿¦ Î³á½±Ï, Î¿á½ Ï€á½±Î»Î±Î¹
+  Î³á½³Î³Î¿Î½ÎµÎ½ Ï„Î±á¿¦Ï„á¾¿ á¼€Î¼Ï†á½¹Ï„ÎµÏÎ±Î‡ Î½á¿¦Î½ Î¼á½³Î½Ï„Î¿Î¹ Ï€á½³Ï€ÎµÎ¹ÏƒÎ¼Î±Î¹ Ï„Î¿á¿¦Î¸á¾¿ á¼±ÎºÎ±Î½á½¸Î½
+  Ï€ÏÎ¿Î»Î±Î²Îµá¿–Î½ á¼¡Î¼á¿–Î½ Îµá¼¶Î½Î±Î¹ Ï„á½´Î½ Ï€Ïá½½Ï„Î·Î½, á½…Ï€Ï‰Ï‚ Ï„Î¿á½ºÏ‚ ÏƒÏ…Î¼Î¼á½±Ï‡Î¿Ï…Ï‚
+  Ïƒá½½ÏƒÎ¿Î¼ÎµÎ½. á¼á½°Î½ Î³á½°Ï Ï„Î¿á¿¦Ï„Î¿ Î²ÎµÎ²Î±á½·Ï‰Ï‚ á½‘Ï€á½±ÏÎ¾á¿ƒ, Ï„á½¹Ï„Îµ ÎºÎ±á½¶ Ï€ÎµÏá½¶ Ï„Î¿á¿¦
+  Ï„á½·Î½Î± Ï„Î¹Î¼Ï‰Ïá½µÏƒÎµÏ„Î±á½· Ï„Î¹Ï‚ ÎºÎ±á½¶ á½ƒÎ½ Ï„Ïá½¹Ï€Î¿Î½ á¼Î¾á½³ÏƒÏ„Î±Î¹ ÏƒÎºÎ¿Ï€Îµá¿–Î½Î‡ Ï€Ïá½¶Î½ Î´á½²
+  Ï„á½´Î½ á¼€ÏÏ‡á½´Î½ á½€ÏÎ¸á¿¶Ï‚ á½‘Ï€Î¿Î¸á½³ÏƒÎ¸Î±Î¹, Î¼á½±Ï„Î±Î¹Î¿Î½ á¼¡Î³Î¿á¿¦Î¼Î±Î¹ Ï€ÎµÏá½¶ Ï„á¿†Ï‚
+  Ï„ÎµÎ»ÎµÏ…Ï„á¿†Ï‚ á½Î½Ï„Î¹Î½Î¿á¿¦Î½ Ï€Î¿Î¹Îµá¿–ÏƒÎ¸Î±Î¹ Î»á½¹Î³Î¿Î½.
+
+  Î”Î·Î¼Î¿ÏƒÎ¸á½³Î½Î¿Ï…Ï‚, Î“á¿½ á¾¿ÎŸÎ»Ï…Î½Î¸Î¹Î±Îºá½¸Ï‚
+
+Georgian:
+
+  From a Unicode conference invitation:
+
+  áƒ’áƒ—áƒ®áƒáƒ•áƒ— áƒáƒ®áƒšáƒáƒ•áƒ” áƒ’áƒáƒ˜áƒáƒ áƒáƒ— áƒ áƒ”áƒ’áƒ˜áƒ¡áƒ¢áƒ áƒáƒªáƒ˜áƒ Unicode-áƒ˜áƒ¡ áƒ›áƒ”áƒáƒ—áƒ” áƒ¡áƒáƒ”áƒ áƒ—áƒáƒ¨áƒáƒ áƒ˜áƒ¡áƒ
+  áƒ™áƒáƒœáƒ¤áƒ”áƒ áƒ”áƒœáƒªáƒ˜áƒáƒ–áƒ” áƒ“áƒáƒ¡áƒáƒ¡áƒ¬áƒ áƒ”áƒ‘áƒáƒ“, áƒ áƒáƒ›áƒ”áƒšáƒ˜áƒª áƒ’áƒáƒ˜áƒ›áƒáƒ áƒ—áƒ”áƒ‘áƒ 10-12 áƒ›áƒáƒ áƒ¢áƒ¡,
+  áƒ¥. áƒ›áƒáƒ˜áƒœáƒªáƒ¨áƒ˜, áƒ’áƒ”áƒ áƒ›áƒáƒœáƒ˜áƒáƒ¨áƒ˜. áƒ™áƒáƒœáƒ¤áƒ”áƒ áƒ”áƒœáƒªáƒ˜áƒ áƒ¨áƒ”áƒ°áƒ™áƒ áƒ”áƒ‘áƒ¡ áƒ”áƒ áƒ—áƒáƒ“ áƒ›áƒ¡áƒáƒ¤áƒšáƒ˜áƒáƒ¡
+  áƒ”áƒ¥áƒ¡áƒáƒ”áƒ áƒ¢áƒ”áƒ‘áƒ¡ áƒ˜áƒ¡áƒ”áƒ— áƒ“áƒáƒ áƒ’áƒ”áƒ‘áƒ¨áƒ˜ áƒ áƒáƒ’áƒáƒ áƒ˜áƒªáƒáƒ áƒ˜áƒœáƒ¢áƒ”áƒ áƒœáƒ”áƒ¢áƒ˜ áƒ“áƒ Unicode-áƒ˜,
+  áƒ˜áƒœáƒ¢áƒ”áƒ áƒœáƒáƒªáƒ˜áƒáƒœáƒáƒšáƒ˜áƒ–áƒáƒªáƒ˜áƒ áƒ“áƒ áƒšáƒáƒ™áƒáƒšáƒ˜áƒ–áƒáƒªáƒ˜áƒ, Unicode-áƒ˜áƒ¡ áƒ’áƒáƒ›áƒáƒ§áƒ”áƒœáƒ”áƒ‘áƒ
+  áƒáƒáƒ”áƒ áƒáƒªáƒ˜áƒ£áƒš áƒ¡áƒ˜áƒ¡áƒ¢áƒ”áƒ›áƒ”áƒ‘áƒ¡áƒ, áƒ“áƒ áƒ’áƒáƒ›áƒáƒ§áƒ”áƒœáƒ”áƒ‘áƒ˜áƒ— áƒáƒ áƒáƒ’áƒ áƒáƒ›áƒ”áƒ‘áƒ¨áƒ˜, áƒ¨áƒ áƒ˜áƒ¤áƒ¢áƒ”áƒ‘áƒ¨áƒ˜,
+  áƒ¢áƒ”áƒ¥áƒ¡áƒ¢áƒ”áƒ‘áƒ˜áƒ¡ áƒ“áƒáƒ›áƒ£áƒ¨áƒáƒ•áƒ”áƒ‘áƒáƒ¡áƒ áƒ“áƒ áƒ›áƒ áƒáƒ•áƒáƒšáƒ”áƒœáƒáƒ•áƒáƒœ áƒ™áƒáƒ›áƒáƒ˜áƒ£áƒ¢áƒ”áƒ áƒ£áƒš áƒ¡áƒ˜áƒ¡áƒ¢áƒ”áƒ›áƒ”áƒ‘áƒ¨áƒ˜.
+
+Russian:
+
+  From a Unicode conference invitation:
+
+  Ğ—Ğ°Ñ€ĞµĞ³Ğ¸ÑÑ‚Ñ€Ğ¸Ñ€ÑƒĞ¹Ñ‚ĞµÑÑŒ ÑĞµĞ¹Ñ‡Ğ°Ñ Ğ½Ğ° Ğ”ĞµÑÑÑ‚ÑƒÑ ĞœĞµĞ¶Ğ´ÑƒĞ½Ğ°Ñ€Ğ¾Ğ´Ğ½ÑƒÑ ĞšĞ¾Ğ½Ñ„ĞµÑ€ĞµĞ½Ñ†Ğ¸Ñ Ğ¿Ğ¾
+  Unicode, ĞºĞ¾Ñ‚Ğ¾Ñ€Ğ°Ñ ÑĞ¾ÑÑ‚Ğ¾Ğ¸Ñ‚ÑÑ 10-12 Ğ¼Ğ°Ñ€Ñ‚Ğ° 1997 Ğ³Ğ¾Ğ´Ğ° Ğ² ĞœĞ°Ğ¹Ğ½Ñ†Ğµ Ğ² Ğ“ĞµÑ€Ğ¼Ğ°Ğ½Ğ¸Ğ¸.
+  ĞšĞ¾Ğ½Ñ„ĞµÑ€ĞµĞ½Ñ†Ğ¸Ñ ÑĞ¾Ğ±ĞµÑ€ĞµÑ‚ ÑˆĞ¸Ñ€Ğ¾ĞºĞ¸Ğ¹ ĞºÑ€ÑƒĞ³ ÑĞºÑĞ¿ĞµÑ€Ñ‚Ğ¾Ğ² Ğ¿Ğ¾  Ğ²Ğ¾Ğ¿Ñ€Ğ¾ÑĞ°Ğ¼ Ğ³Ğ»Ğ¾Ğ±Ğ°Ğ»ÑŒĞ½Ğ¾Ğ³Ğ¾
+  Ğ˜Ğ½Ñ‚ĞµÑ€Ğ½ĞµÑ‚Ğ° Ğ¸ Unicode, Ğ»Ğ¾ĞºĞ°Ğ»Ğ¸Ğ·Ğ°Ñ†Ğ¸Ğ¸ Ğ¸ Ğ¸Ğ½Ñ‚ĞµÑ€Ğ½Ğ°Ñ†Ğ¸Ğ¾Ğ½Ğ°Ğ»Ğ¸Ğ·Ğ°Ñ†Ğ¸Ğ¸, Ğ²Ğ¾Ğ¿Ğ»Ğ¾Ñ‰ĞµĞ½Ğ¸Ñ Ğ¸
+  Ğ¿Ñ€Ğ¸Ğ¼ĞµĞ½ĞµĞ½Ğ¸Ñ Unicode Ğ² Ñ€Ğ°Ğ·Ğ»Ğ¸Ñ‡Ğ½Ñ‹Ñ… Ğ¾Ğ¿ĞµÑ€Ğ°Ñ†Ğ¸Ğ¾Ğ½Ğ½Ñ‹Ñ… ÑĞ¸ÑÑ‚ĞµĞ¼Ğ°Ñ… Ğ¸ Ğ¿Ñ€Ğ¾Ğ³Ñ€Ğ°Ğ¼Ğ¼Ğ½Ñ‹Ñ…
+  Ğ¿Ñ€Ğ¸Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸ÑÑ…, ÑˆÑ€Ğ¸Ñ„Ñ‚Ğ°Ñ…, Ğ²ĞµÑ€ÑÑ‚ĞºĞµ Ğ¸ Ğ¼Ğ½Ğ¾Ğ³Ğ¾ÑĞ·Ñ‹Ñ‡Ğ½Ñ‹Ñ… ĞºĞ¾Ğ¼Ğ¿ÑŒÑÑ‚ĞµÑ€Ğ½Ñ‹Ñ… ÑĞ¸ÑÑ‚ĞµĞ¼Ğ°Ñ….
+
+Thai (UCS Level 2):
+
+  Excerpt from a poetry on The Romance of The Three Kingdoms (a Chinese
+  classic 'San Gua'):
+
+  [----------------------------|------------------------]
+    à¹ à¹à¸œà¹ˆà¸™à¸”à¸´à¸™à¸®à¸±à¹ˆà¸™à¹€à¸ªà¸·à¹ˆà¸­à¸¡à¹‚à¸—à¸£à¸¡à¹à¸ªà¸™à¸ªà¸±à¸‡à¹€à¸§à¸Š  à¸à¸£à¸°à¸›à¸à¹€à¸à¸¨à¸à¸­à¸‡à¸šà¸¹à¹Šà¸à¸¹à¹‰à¸‚à¸¶à¹‰à¸™à¹ƒà¸«à¸¡à¹ˆ
+  à¸ªà¸´à¸šà¸ªà¸­à¸‡à¸à¸©à¸±à¸•à¸£à¸´à¸¢à¹Œà¸à¹ˆà¸­à¸™à¸«à¸™à¹‰à¸²à¹à¸¥à¸–à¸±à¸”à¹„à¸›       à¸ªà¸­à¸‡à¸­à¸‡à¸„à¹Œà¹„à¸‹à¸£à¹‰à¹‚à¸‡à¹ˆà¹€à¸‚à¸¥à¸²à¹€à¸šà¸²à¸›à¸±à¸à¸à¸²
+    à¸—à¸£à¸‡à¸™à¸±à¸šà¸–à¸·à¸­à¸‚à¸±à¸™à¸—à¸µà¹€à¸›à¹‡à¸™à¸—à¸µà¹ˆà¸à¸¶à¹ˆà¸‡           à¸šà¹‰à¸²à¸™à¹€à¸¡à¸·à¸­à¸‡à¸ˆà¸¶à¸‡à¸§à¸´à¸›à¸£à¸´à¸•à¹€à¸›à¹‡à¸™à¸™à¸±à¸à¸«à¸™à¸²
+  à¹‚à¸®à¸ˆà¸´à¹‹à¸™à¹€à¸£à¸µà¸¢à¸à¸—à¸±à¸à¸—à¸±à¹ˆà¸§à¸«à¸±à¸§à¹€à¸¡à¸·à¸­à¸‡à¸¡à¸²         à¸«à¸¡à¸²à¸¢à¸ˆà¸°à¸†à¹ˆà¸²à¸¡à¸”à¸Šà¸±à¹ˆà¸§à¸•à¸±à¸§à¸ªà¸³à¸„à¸±à¸
+    à¹€à¸«à¸¡à¸·à¸­à¸™à¸‚à¸±à¸šà¹„à¸ªà¹„à¸¥à¹ˆà¹€à¸ªà¸·à¸­à¸ˆà¸²à¸à¹€à¸„à¸«à¸²      à¸£à¸±à¸šà¸«à¸¡à¸²à¸›à¹ˆà¸²à¹€à¸‚à¹‰à¸²à¸¡à¸²à¹€à¸¥à¸¢à¸­à¸²à¸ªà¸±à¸
+  à¸à¹ˆà¸²à¸¢à¸­à¹‰à¸­à¸‡à¸­à¸¸à¹‰à¸™à¸¢à¸¸à¹à¸¢à¸à¹ƒà¸«à¹‰à¹à¸•à¸à¸à¸±à¸™          à¹ƒà¸Šà¹‰à¸ªà¸²à¸§à¸™à¸±à¹‰à¸™à¹€à¸›à¹‡à¸™à¸Šà¸™à¸§à¸™à¸Šà¸·à¹ˆà¸™à¸Šà¸§à¸™à¹ƒà¸ˆ
+    à¸à¸¥à¸±à¸™à¸¥à¸´à¸‰à¸¸à¸¢à¸à¸¸à¸¢à¸à¸µà¸à¸¥à¸±à¸šà¸à¹ˆà¸­à¹€à¸«à¸•à¸¸          à¸Šà¹ˆà¸²à¸‡à¸­à¸²à¹€à¸à¸¨à¸ˆà¸£à¸´à¸‡à¸«à¸™à¸²à¸Ÿà¹‰à¸²à¸£à¹‰à¸­à¸‡à¹„à¸«à¹‰
+  à¸•à¹‰à¸­à¸‡à¸£à¸šà¸£à¸²à¸†à¹ˆà¸²à¸Ÿà¸±à¸™à¸ˆà¸™à¸šà¸£à¸£à¸¥à¸±à¸¢           à¸¤à¹…à¸«à¸²à¹ƒà¸„à¸£à¸„à¹‰à¸³à¸Šà¸¹à¸à¸¹à¹‰à¸šà¸£à¸£à¸¥à¸±à¸‡à¸à¹Œ à¸¯
+
+  (The above is a two-column text. If combining characters are handled
+  correctly, the lines of the second column should be aligned with the
+  | character above.)
+
+Ethiopian:
+
+  Proverbs in the Amharic language:
+
+  áˆ°áˆ›á‹­ áŠ á‹­á‰³áˆ¨áˆµ áŠ•áŒ‰áˆ¥ áŠ á‹­áŠ¨áˆ°áˆµá¢
+  á‰¥áˆ‹ áŠ«áˆˆáŠ áŠ¥áŠ•á‹°áŠ á‰£á‰´ á‰ á‰†áˆ˜áŒ áŠá¢
+  áŒŒáŒ¥ á‹«áˆˆá‰¤á‰± á‰áˆáŒ¥áŠ“ áŠá‹á¢
+  á‹°áˆ€ á‰ áˆ•áˆáˆ™ á‰…á‰¤ á‰£á‹­áŒ áŒ£ áŠ•áŒ£á‰µ á‰ áŒˆá‹°áˆˆá‹á¢
+  á‹¨áŠ á á‹ˆáˆˆáˆá‰³ á‰ á‰…á‰¤ áŠ á‹­á‰³áˆ½áˆá¢
+  áŠ á‹­áŒ¥ á‰ á‰ áˆ‹ á‹³á‹‹ á‰°áˆ˜á‰³á¢
+  áˆ²á‰°áˆ¨áŒ‰áˆ™ á‹­á‹°áˆ¨áŒáˆ™á¢
+  á‰€áˆµ á‰ á‰€áˆµá¥ á‹•áŠ•á‰áˆ‹áˆ á‰ áŠ¥áŒáˆ© á‹­áˆ„á‹³áˆá¢
+  á‹µáˆ­ á‰¢á‹«á‰¥áˆ­ áŠ áŠ•á‰ áˆ³ á‹«áˆµáˆ­á¢
+  áˆ°á‹ áŠ¥áŠ•á‹°á‰¤á‰± áŠ¥áŠ•áŒ… áŠ¥áŠ•á‹° áŒ‰áˆ¨á‰¤á‰± áŠ á‹­á‰°á‹³á‹°áˆ­áˆá¢
+  áŠ¥áŒá‹œáˆ­ á‹¨áŠ¨áˆá‰°á‹áŠ• áŒ‰áˆ®áˆ® áˆ³á‹­á‹˜áŒ‹á‹ áŠ á‹­á‹µáˆ­áˆá¢
+  á‹¨áŒáˆ¨á‰¤á‰µ áˆŒá‰£á¥ á‰¢á‹«á‹©á‰µ á‹­áˆµá‰… á‰£á‹«á‹©á‰µ á‹«áŒ áˆá‰…á¢
+  áˆ¥áˆ« áŠ¨áˆ˜áá‰³á‰µ áˆáŒ„áŠ• áˆ‹á‹á‰³á‰µá¢
+  á‹“á‰£á‹­ áˆ›á‹°áˆªá‹« á‹¨áˆˆá‹á¥ áŒáŠ•á‹µ á‹­á‹ á‹­á‹áˆ«áˆá¢
+  á‹¨áŠ¥áˆµáˆ‹áˆ áŠ áŒˆáˆ© áˆ˜áŠ« á‹¨áŠ áˆáˆ« áŠ áŒˆáˆ© á‹‹áˆ­áŠ«á¢
+  á‰°áŠ•áŒ‹áˆ á‰¢á‰°á‰ á‰°áˆ˜áˆáˆ¶ á‰£á‰á¢
+  á‹ˆá‹³áŒ…áˆ… áˆ›áˆ­ á‰¢áˆ†áŠ• áŒ¨áˆ­áˆµáˆ… áŠ á‰µáˆ‹áˆ°á‹á¢
+  áŠ¥áŒáˆ­áˆ…áŠ• á‰ ááˆ«áˆ½áˆ… áˆáŠ­ á‹˜áˆ­áŒ‹á¢
+
+Runes:
+
+  áš»á›– áš³áš¹áš«áš¦ áš¦áš«á› áš»á›– á›’áš¢á›á›– áš©áš¾ áš¦áš«á›— á›šášªáš¾á›á›– áš¾áš©áš±áš¦áš¹á›–ášªáš±á›áš¢á›— áš¹á›áš¦ áš¦ášª áš¹á›–á›¥áš«
+
+  (Old English, which transcribed into Latin reads 'He cwaeth that he
+  bude thaem lande northweardum with tha Westsae.' and means 'He said
+  that he lived in the northern land near the Western Sea.')
+
+Braille:
+
+  â¡Œâ â §â ‘ â ¼â â ’  â¡â œâ ‡â ‘â ¹â °â  â¡£â •â Œ
+
+  â¡â œâ ‡â ‘â ¹ â ºâ â  â ™â ‘â â ™â ’ â â • â ƒâ ‘â ›â ” â ºâ Šâ ¹â ² â¡¹â »â ‘ â Šâ  â â • â ™â ³â ƒâ 
+  â ±â â â ‘â §â » â â ƒâ ³â  â ¹â â â ² â¡¹â ‘ â —â ‘â ›â Šâ Œâ » â •â ‹ â ™â Šâ  â ƒâ ¥â —â Šâ â ‡ â ºâ â 
+  â â Šâ ›â â « â ƒâ ¹ â ¹â ‘ â Šâ ‡â »â ›â ¹â â â â ‚ â ¹â ‘ â Šâ ‡â »â …â ‚ â ¹â ‘ â ¥â â ™â »â â â …â »â ‚
+  â â â ™ â ¹â ‘ â ¡â Šâ ‘â ‹ â â ³â —â â »â ² â¡â Šâ —â •â •â ›â ‘ â â Šâ ›â â « â Šâ â ² â¡â â ™
+  â¡â Šâ —â •â •â ›â ‘â °â  â â â â ‘ â ºâ â  â ›â •â •â ™ â ¥â â •â  â °â¡¡â â â ›â ‘â ‚ â ‹â •â — â â â ¹â ¹â ”â › â ™â ‘
+  â ¡â •â â ‘ â â • â â ¥â  â ™â Šâ  â ™â â â ™ â â •â ²
+
+  â¡•â ‡â ™ â¡â œâ ‡â ‘â ¹ â ºâ â  â â  â ™â ‘â â ™ â â  â  â ™â •â •â —â ¤â â â Šâ ‡â ²
+
+  â¡â ”â ™â – â¡Š â ™â •â â °â  â â ‘â â  â â • â â â ¹ â ¹â â  â¡Š â …â â ªâ ‚ â •â ‹ â â ¹
+  â ªâ  â …â â ªâ ‡â «â ›â ‘â ‚ â ±â â  â ¹â »â ‘ â Šâ  â â œâ â Šâ Šâ ¥â ‡â œâ ‡â ¹ â ™â ‘â â ™ â â ƒâ ³â 
+  â  â ™â •â •â —â ¤â â â Šâ ‡â ² â¡Š â â Šâ £â  â ™â â §â ‘ â ƒâ ‘â ² â ”â Šâ ‡â ”â «â ‚ â â ¹â â ‘â ‡â ‹â ‚ â â •
+  â —â ‘â ›â œâ ™ â  â Šâ •â ‹â ‹â ”â ¤â â â Šâ ‡ â â  â ¹â ‘ â ™â ‘â â ™â ‘â Œ â â Šâ ‘â Šâ ‘ â •â ‹ â Šâ —â •â â â •â â ›â »â ¹
+  â ” â ¹â ‘ â â —â â ™â ‘â ² â¡ƒâ ¥â  â ¹â ‘ â ºâ Šâ â ™â •â  â •â ‹ â ³â — â â â Šâ ‘â Œâ •â —â 
+  â Šâ  â ” â ¹â ‘ â â Šâ â Šâ ‡â ‘â † â â â ™ â â ¹ â ¥â â ™â â ‡â ‡â ªâ « â ™â â â ™â 
+  â ©â â ‡â ‡ â â •â  â ™â Šâ Œâ ¥â —â ƒ â Šâ â ‚ â •â — â ¹â ‘ â¡Šâ ³â â â —â ¹â °â  â ™â •â â ‘ â ‹â •â —â ² â¡¹â ³
+  â ºâ Šâ ‡â ‡ â ¹â »â ‘â ‹â •â —â ‘ â â »â â Šâ  â â ‘ â â • â —â ‘â â ‘â â â ‚ â ‘â â â ™â â â Šâ Šâ â ‡â ‡â ¹â ‚ â ¹â â 
+  â¡â œâ ‡â ‘â ¹ â ºâ â  â â  â ™â ‘â â ™ â â  â  â ™â •â •â —â ¤â â â Šâ ‡â ²
+
+  (The first couple of paragraphs of "A Christmas Carol" by Dickens)
+
+Compact font selection example text:
+
+  ABCDEFGHIJKLMNOPQRSTUVWXYZ /0123456789
+  abcdefghijklmnopqrstuvwxyz Â£Â©ÂµÃ€Ã†Ã–ÃÃŸÃ©Ã¶Ã¿
+  â€“â€”â€˜â€œâ€â€â€ â€¢â€¦â€°â„¢Å“Å Å¸Å¾â‚¬ Î‘Î’Î“Î”Î©Î±Î²Î³Î´Ï‰ ĞĞ‘Ğ’Ğ“Ğ”Ğ°Ğ±Ğ²Ğ³Ğ´
+  âˆ€âˆ‚âˆˆâ„âˆ§âˆªâ‰¡âˆ â†‘â†—â†¨â†»â‡£ â”â”¼â•”â•˜â–‘â–ºâ˜ºâ™€ ï¬ï¿½â‘€â‚‚á¼ á¸‚Ó¥áº„ÉËâ×Ô±áƒ
+
+Greetings in various languages:
+
+  Hello world, ÎšÎ±Î»Î·Î¼á½³ÏÎ± Îºá½¹ÏƒÎ¼Îµ, ã‚³ãƒ³ãƒ‹ãƒãƒ
+
+Box drawing alignment tests:                                          â–ˆ
+                                                                      â–‰
+  â•”â•â•â•¦â•â•â•—  â”Œâ”€â”€â”¬â”€â”€â”  â•­â”€â”€â”¬â”€â”€â•®  â•­â”€â”€â”¬â”€â”€â•®  â”â”â”â”³â”â”â”“  â”â”’â”â”‘   â•·  â•» â”â”¯â”“ â”Œâ”°â”    â–Š â•±â•²â•±â•²â•³â•³â•³
+  â•‘â”Œâ”€â•¨â”€â”â•‘  â”‚â•”â•â•§â•â•—â”‚  â”‚â•’â•â•ªâ•â••â”‚  â”‚â•“â”€â•â”€â•–â”‚  â”ƒâ”Œâ”€â•‚â”€â”â”ƒ  â”—â•ƒâ•„â”™  â•¶â”¼â•´â•ºâ•‹â•¸â” â”¼â”¨ â”â•‹â”¥    â–‹ â•²â•±â•²â•±â•³â•³â•³
+  â•‘â”‚â•² â•±â”‚â•‘  â”‚â•‘   â•‘â”‚  â”‚â”‚ â”‚ â”‚â”‚  â”‚â•‘ â”ƒ â•‘â”‚  â”ƒâ”‚ â•¿ â”‚â”ƒ  â”â•…â•†â”“   â•µ  â•¹ â”—â”·â”› â””â”¸â”˜    â–Œ â•±â•²â•±â•²â•³â•³â•³
+  â• â•¡ â•³ â•â•£  â”œâ•¢   â•Ÿâ”¤  â”œâ”¼â”€â”¼â”€â”¼â”¤  â”œâ•«â”€â•‚â”€â•«â”¤  â”£â”¿â•¾â”¼â•¼â”¿â”«  â”•â”›â”–â”š     â”Œâ”„â”„â” â• â”â”…â”…â”“ â”‹ â– â•²â•±â•²â•±â•³â•³â•³
+  â•‘â”‚â•± â•²â”‚â•‘  â”‚â•‘   â•‘â”‚  â”‚â”‚ â”‚ â”‚â”‚  â”‚â•‘ â”ƒ â•‘â”‚  â”ƒâ”‚ â•½ â”‚â”ƒ  â–‘â–‘â–’â–’â–“â–“â–ˆâ–ˆ â”Š  â”† â• â•  â”‡ â”‹ â–
+  â•‘â””â”€â•¥â”€â”˜â•‘  â”‚â•šâ•â•¤â•â•â”‚  â”‚â•˜â•â•ªâ•â•›â”‚  â”‚â•™â”€â•€â”€â•œâ”‚  â”ƒâ””â”€â•‚â”€â”˜â”ƒ  â–‘â–‘â–’â–’â–“â–“â–ˆâ–ˆ â”Š  â”† â• â•  â”‡ â”‹ â–
+  â•šâ•â•â•©â•â•â•  â””â”€â”€â”´â”€â”€â”˜  â•°â”€â”€â”´â”€â”€â•¯  â•°â”€â”€â”´â”€â”€â•¯  â”—â”â”â”»â”â”â”›  â–—â–„â––â–›â–€â–œ   â””â•Œâ•Œâ”˜ â• â”—â•â•â”› â”‹  â–â–‚â–ƒâ–„â–…â–†â–‡â–ˆ
+                                               â–â–€â–˜â–™â–„â–Ÿ
+
+</pre>HTTP/1.1 200 OK
+Server: nginx
+Date: Tue, 02 Aug 2016 10:48:37 GMT
+Content-Type: application/json
+Content-Length: 282
+Connection: keep-alive
+Content-Encoding: gzip
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+
+‹ …z Wÿ]1oƒ0…w~…å©MÁàRÔ!CšéÔ"u«¸«`Sc*+Qş{m"1Dºáî»§÷Nw	Âü,új¼AF"Ï`5èÁ±‹ØVôÆÍØ€5qcº6d}ßŠŠ¡dl=y²÷´k‹ß—„¬ÃE¼˜ºO³c´“•ª…äŞÚ_¢N-3p/<0ÉGÆÁAFåGr²Ìfå›¦cú£Di>ïÊt´å 'Å»:‹¶eqFôğEiÊã(ÍX ƒ£E6_}¯Òé¿MúL’G´‡êGÅË„&®(zNÊÆ~‰]Àõö¶L£ü'ñ~÷y‹ÆJ.¤gëŒä)YÒ„Pšâàüİ
+  HTTP/1.1 200 OK
+Server: nginx
+Date: Tue, 02 Aug 2016 10:48:39 GMT
+Content-Type: application/json
+Content-Length: 269
+Connection: keep-alive
+Content-Encoding: deflate
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+
+xœ]1oƒ0…÷ü
+ËS›‚#HIP‡i:¤SƒÔ­ràb¬‚M©¬DùïÅ¤bˆtÃİwOïî2C—pª¹…¯‘5=ÈÃ
+x	¦Øe°)
+hí0cÎÒÊ6uÀÛ¶–·R+ê<yr÷´©³Ÿ—ˆ¬‚9]ŠÇ€É1ÜªB—R	o-Î²ĞÿA÷Â=W¢ç¼T˜ FËdR¾én<±²¶=JE´Ó.ïÀ„jT¼ë³¬kN¡‡OÆ2”{eûí¥êréòkgÈü®ãg=¢ßš."ÅĞ«4pÒú%®··5`+í?‰wÛÃ-k#…T­’ÆdÁ"ÂXŒg×Ù‰elGHTTP/1.1 204 NO CONTENT
+Server: nginx
+Date: Tue, 02 Aug 2016 10:48:45 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 0
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+
+HTTP/1.1 304 NOT MODIFIED
+Server: nginx
+Date: Tue, 02 Aug 2016 10:48:50 GMT
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+
+HTTP/1.1 200 OK
+Server: nginx
+Date: Tue, 02 Aug 2016 10:48:55 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+
+e60
+{"url": "http://httpbin.org/stream/10", "headers": {"Host": "httpbin.org", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"}, "args": {}, "id": 0, "origin": "95.84.210.114"}
+{"url": "http://httpbin.org/stream/10", "headers": {"Host": "httpbin.org", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"}, "args": {}, "id": 1, "origin": "95.84.210.114"}
+{"url": "http://httpbin.org/stream/10", "headers": {"Host": "httpbin.org", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"}, "args": {}, "id": 2, "origin": "95.84.210.114"}
+{"url": "http://httpbin.org/stream/10", "headers": {"Host": "httpbin.org", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"}, "args": {}, "id": 3, "origin": "95.84.210.114"}
+{"url": "http://httpbin.org/stream/10", "headers": {"Host": "httpbin.org", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"}, "args": {}, "id": 4, "origin": "95.84.210.114"}
+{"url": "http://httpbin.org/stream/10", "headers": {"Host": "httpbin.org", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"}, "args": {}, "id": 5, "origin": "95.84.210.114"}
+{"url": "http://httpbin.org/stream/10", "headers": {"Host": "httpbin.org", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"}, "args": {}, "id": 6, "origin": "95.84.210.114"}
+{"url": "http://httpbin.org/stream/10", "headers": {"Host": "httpbin.org", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"}, "args": {}, "id": 7, "origin": "95.84.210.114"}
+{"url": "http://httpbin.org/stream/10", "headers": {"Host": "httpbin.org", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"}, "args": {}, "id": 8, "origin": "95.84.210.114"}
+{"url": "http://httpbin.org/stream/10", "headers": {"Host": "httpbin.org", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"}, "args": {}, "id": 9, "origin": "95.84.210.114"}
+
+0
+
+HTTP/1.1 200 OK
+Server: nginx
+Date: Tue, 02 Aug 2016 10:49:00 GMT
+Content-Type: application/octet-stream
+Transfer-Encoding: chunked
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+
+400
+-“ÖT¸j@Ç€Yé†«œÔàÊù=î|ıø¬‘¡®ãäæ˜-³ÅG0ÈÿšÀ¤Í$(ké–«w;®Ã§1!·¯Z(#¡v9²(bŞr âŞ—İ€ëÍ8EB„—Ÿ(o‡Iò.íÌñ@]6R¼båuŸDlqöÛÒ‡oµQ …Íowğ\O‘KÚø,(QØÂƒèjq$ªÔ›nÎXàüåZ>—À·+rz­ğUqª™˜¶Bø8F"Õ@Vß›…"Î‰éç5µz¹xêgTœUb	›:£.ÜUÂ|€Âh–Ğ´ïdTÜ`ºÚ4o zÌ?*‚”©º?š¤G>dş[÷õJÀÓèIŸƒø cnzYm!ÔëĞêˆ/a¶°çhX¸<k…imNvËp²ºYåâ(©Æ]<€š^yâ2p›)ëi$l9'„:PºÊÙEşVå¬ö.éä¬‰
+1£Íj4xË¤ş Èö]ÂöoXgÎLk"GLp`y×Ğ÷m¬(ŒÅıügo2š7˜î¾Ì§ƒ}9MĞ@}¾©fÈà¡?V½d¾‡nBÏéïóÁâ ĞÁ¢©“¢—Q=ŸEÀ¿½q¹Qñ£%˜-Â÷’²å£ 'àğ»W½İßõ«9=£7¯d[ŸzÄGõâšI‹ØÍâBÅ¥Å†İÃ#%ö°Š	O_j ÃÍ&hœ5wn*Bˆ(oR£ÓÑ–Vúo‚Bq€`Lè«şÚFiŠù#)³n™7ç@21¦ì~R€Ÿ¸Ğô~´•îMhı«ùÓ0{yPäğŸi CÓqv[gàí0ÀñµGwõMÕ÷¿['¢’ŠîÂÕ%Ş·cÔƒ¹ÂëÎÁõ†şË7å{ğëF÷"ÿìÜ³ï
+­Îe@±Çwº²Çh‰×õTòS™m«¬o"ĞóĞÚîF)~àßÔ&s™L'¤¨ãŸÊ×Ï‹ªGaª¾4u­ÕŸ^ÁS»ó8(šX µËnÑŠv¬oÉX‰­œèoæS­´yø;!gôÊuüü2èõãÃ7CŞÇ`eošTÇ<¼¹dHSzÏæŠ½Z
+Ëu¼~:Ót;r³Z.<c£l·³t"îÛêêË€àç» †”P)g7ë ò…íı¿a×?ÕúÃKÖæx(‚OÔ1OZÎ¦5]z„¨wÂ—#ùÈY³3­Ì™À,úÚiùºZËNƒŞ’Dª°¡Y¯Úèe´_Ç/”ÙúëğÙLÇËwp,ºÅ˜ ²uó@~èÈïÃ“Åå‘lYpw’ÆRö5o®Ü\ˆ’Ã½¨¯İä6¤œx€ó¬üZ®¨YQvCeÏÃ ã
+øÄw3p…
+0
+
+HTTP/1.1 200 OK
+Server: nginx
+Date: Tue, 02 Aug 2016 10:49:08 GMT
+Content-Type: image/png
+Content-Length: 8090
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+
+‰PNG
+
+   IHDR   d   d   ÿ€  aIDATxœİ}wXSÙÖşJ#¡Á ¡ÁJEøtl(êØFGGT¬Ÿ\ëŒVÔ±Üaä
+¶EAQA”&‚¢B EzoI ’óûc‡!Ä$Dw¾÷áá99gg­uŞ³÷>{¯½ÖÃ0 `³ÙÇKJJÊÉÉéìì$“É
+…ÜUUUfjjjbbbjjŠTTT`À0¬¼¼¼°°Á`0Œòòr&“Éb±˜L&“Éäóùê"000°ì‰‰	@ŒêöööÒÒÒ?~üø|úô‰ÍfwŠ€ÃáÉd;;;77·   UUUÑ©©©&&&2éÃãñvvvAAAwïŞmmmÅ¤Fyyù™3g¦OŸ®¬¬,ß­*))9;;;v¬¤¤Dz½­­­wïŞ
+
+²³³Ããñ2i411IMMÅ0Çf³­¬¬ÊËËÀÖÔt2®©¢Âár;¹ÜN.´wu•74|¬«këèè/‹@ ØÙÙyyy-_¾ÜÈÈH¬¾üüüèèè˜˜˜ìììşWUÉdš†²²†ŠŠ:…¢¡¢‚`r8mííèYCƒXÕcÆŒñóóóõõ?~¼X½åååááá÷îİËÉÉáñxıh(+›j¤««¢¤D&‘($™DB­ííi……¯>~ ##£‚‚Ü¾}ûöìÙ !‹móõ^  hb±Jëë?ÖÕ½)+{òömzQQ'—+¼ŠÇãgÎœ¹zõj///ÀãñÒÒÒbbbbbbJJJDåëêÎ°±cdd5|¸Õğá†::8N²êêææ‚ªªÂªªwòò
+«ªD¯úøøøùù¹ºº’H$wïŞ½?ÿü3!!Ïç‹‘I¤‰®£G566:ÔDOOGMM²ŞÃ11Û¯\€}ûöá¦L™’’’2FË=|Y\ÑØøWròÓwïğ8‡Ããñd"ÑÖÔt’¥¥ƒ……6j½  ÀárŸ>~û6177K„{{û—/_VTTˆ*¶¦Ñ|ííıìímMM%›øETVÆdgGgff£nAWW×ŞŞ>77·ººZxÒŞÜÜÃÆfêèÑt:…D€f6;ÁH/*zÁ`d·¶·›Q©Ë§Nİ0s¦º²2 `f³mÛëOŸ¦L™‚³°°(**
+˜2%rız Èûôiüİâj, àp8ºÁ´1cÖÍ˜1røpÑKoÊÊşLJºœšÚÂf‹'ÎVV~&øŒo¢§7Hú£¦¥%6;;:++9?_´š€–ªêbgçÕnncÑ>†İËÉ9ôæ(Åı±rÚ´°Ÿ~BÇKşøãRJŠ……=}--taOTbjŒ‘‘šÏçcX›]XUÅÇ0Ã
+*+*+Ï>xà>nÜfoowkkôÅ±ÆÆ^vváõò¯9sæNš$Z}-­Õnn«İÜ˜1ÙÙnŞdôÔ)—‹Zúx95u÷õëëê„ßEÏŞÑÒÒHWáñù7ÓÓ*+/$'ÿº`USSHNuu5±»» =/Ÿ ;ÿç.\(jS[GGVqqzQÑã·o“óó1KÌËKÌË{<}Ü¸¢êê ÈÈ¸—/QaM•~~ÊJJ_‹¤~PWV^ìì¼ÀÑ1ìÑ£}7nÔ¶¶rºº~8vlêèÑ'–-£jj.ıã>†!ó–º¸L7n’¥åuõ>rV»¹yÿş»šÚPt‘Óİİ£R©µµµkİİÏ®\	 ,çS}ı(CC	=nQuõ™ÄÄ‹O°8œ‡ÿú×Íôô?>ìæó@‰H\ëîş¯9súñ-ÁâpÅÅ‹cq8 €ÃáüœÚÚÛKëëW»¹-suU£P¤—öó_{ğ€J¥âètzaa¡¿“Ó•d2ˆÃå–Ö×/:y2çãGdĞ|GÇß,0£Re’óõP×ÚºïæÍ°¤$. Ã†ÅnÛfõyW+Ÿ>}%5•N§ã555@ì(F2r>|pİ³1å<rdæÁƒ×ÿ{˜€¡ššgV¬x{ü¸Ÿ½= UWOÜµ+áÕ+Yå w¥¦¦¦€,Ñw§4¸øäÉÔ}ûj[[`³·÷ã={Æ››ËjÄ·Å°aw¶n=€ÇáZÛÛ½ÿıh\œLzÉÒÒÒ€&KÊoòøü ÈÈÏíêîV"Ã×®=¶d	AÆ	Ä·Ç–Y³âvìĞPVæcØÖK—–9Ógœ!ˆ---<š |¨­•<î@hmo÷:tèøİ» @ÕÔ|¼gÏS§â¾)<mm_üöê("Ÿ>uİ»·¦¥å‹ßÂ0ìCm- ã­¬¬  £««²©Iò×Jjkş÷óò ÀÆÄ$ë÷ßéôÁßÃ·Ä(CÃÌƒ]G€ô¢"û;sKK%¥²©©£« èt:ŞsÃE55¾ƒêš‘ı0qbÚFC†(ä¾1†¨«?şiút ¨hlô<tHr-ÒòYŒÏ§¦¢àñùóOœ@Lm™5+jÓ&2Yaæs„ó«V	 €êæf¿#GPİ!-t:O¥RQ/¡fm»|µ¾&N<¼xñ=ÿl™5k‡ d—”üxöì@Å-ZZZT* ¨ÛzÁ`ˆ-}ñÉÔ£Û˜˜D¬[÷ƒ)„ĞeË¦ ×Ÿ?ÿõÖ-±e-ˆ"< ¸¸¸ @fq1³ßĞôyaáOş	 TMÍØíÛÿÑ­¯?ˆÂÍ›GèëÀî¨¨;™™}
+0;:2‹‹¡‡"< L›6 ºy¼§ïŞ‰-olœ}ô(OİŞ²åÚ£K†¶ªjÜöíš**†œ>÷é“èÕ§ïŞ!¢ NNNd2 ’Ş¼–kïìô;|ÑÏ¯Zõ%H«áÃÿŞ¸‘€Ç³;;}BBêZ[…—!d2ÙÉÉ	YÊÊÊ ğH„¬­—/£yßfoïĞÈS>Ì°±9¼x1 ”54¬	G„8::¢åÁ4U³üòr4Z-ª®ş3)	 œGDRşÏc³··¿“ ÜÉÌ|^X jkóËË¡‡’5wî\tpñÉ Øqõj7‡Ãáÿæ}ŠÂÑ€ ôÛzù2ôP"äˆ°´´DÍ2âéÓg·32 `¾£ã­/ák`˜¶öFOO x^XxãÅ‹ˆ§OÀÉÉÉÒÒÀ	çÏááá+V¬  5
+…Åá(‰ïOœø¯òO}´ut˜­_ßÈdRH$— .\X¾|9ºÚK‹Å6l«ÇW³ÑËëÄÒ¥ƒWÏãóßUT …2{sóQ††
+l×õmmBÉz=.óA"ôŞ½MèXMM­ººZ­gm'ê™ùñÇ/^¼ š**%§OÒÎåñ~½}ûD|¼¾¾ äææVÕÔlòô=›4ˆxÃÎ'%…ÄÅ±8œïlmàå«WjÊöY³Ö¸¹rÑÕİM,­¯€€€€ÈÈHá%¢h9CCCt°ÃÏoLUWÏ;uÊĞÂ¢€Á000¯ªªúiÅŠ	ÁÁQ6X&‡äªææ¥çÏ·áp1÷ï[÷,Ä@^^ŞêåËoggG¬Yc ­-·åJDâNŸ òç3–ŞÁãñ.]º †C†zzÊ­ ¸<ŞÜS§–®[—PUUµpáBsssssó…VUUÅ%$,]·nî©SÜ–r%€aóN²÷ğx™ÉårE%s¹Üç™™öóNâKáÈ” ''k ®_¿Ş"â ìm†)))hôïÕ«W»¹FYğõëo::bîİ;qâÄ¶mÛĞÒ$‘H<|øğ¦M›|½¼Æ*+ÿ:¾L’İ½_ZšôäIhh¨XÉ7ntsuõ41	òöÌ-Äfgû> K–,A'{É
+
+
+:~ü8‘@¨ûë¯Á¬!wuwë®ZÅ(..++sttì»B ?nlll9bDCX˜‘(VNğøü!+W¾zıº¾¾^‚d===Ûqãÿúk0o.7tåÊ6{öìÙ·z½âbbb ÀÙÊj«íoÊÊLõõõCBBÄFùğx¼}}}Scã7eeÒK~[^n ¯ojj*Y²©©©¾şÛòrùï€D xÚÚ@bb"‡ÃA'dåçç£¨ ¿	£ ²JJlìì  ³ŸÇCtÉÆÎ.ëóP¤/K¶µ•J²­­L’Å­6²Ùì¤¤$tF@Vtt4:ğ *Lzğø|Æ(öáÊğx @ x"ÁS_‹ÃQSW—F²šº:«§:È66d	DÈ…Ú 56ø¨ ñff¹99 `oo?Pt)7'ç;33é%÷Õ$‹…º²ò÷cÆ @\\ŠˆÃ@EEŠ^ôØéambÂ()ijjÚ¼y³Øñ!‡Û¼ysSS£¤ÄF–XV;SÓ÷›Í–,™Íf¿g0ì/=-±®®îÅ‹€ÈŠ½6HPH¤Unn~şÙÅÅe÷îİıìŞ½ÛÅÅeÃÏ?¯rsCqxRB…L;iÒö-[$KŞ¾eËÜI“â÷?=ÔòğĞÓ&uu½ˆğÛ¼yÏEDDìİ»711ñûï¿×ÖÖÖÖÖşşûï÷îİ‘ñìÙoóæÉ*ùD@@Ü;ñññI»sçD@€BnD_KËaÄè!ÇçóUUU;::V»¹ı{õj…è €¼OŸæ<i?yòçÎi‹L>š››×¯]›•–v#0’eEZaáÜ“'.^üÛ¡C‘0+‡³kçÎk—/ßœ¬8'øo·oÿı7 455ËËË;:: `Ì QÙ}Ñİ--Àb‡<@¡€šhkƒÈÜØšFË=thçõë4#£q£G7a ¼ÌÌ|ıöíS§æ:$w3™L§¿		ùùâE3ÍqâÄï àeFÆóôtg:ıMHˆ˜Y­t6‹…0Ê²   ÷àÁwww @_°´¦½ï10p8@}-ººĞÏÿÅîìÌùğAèH±33SUĞzZi}}VqqÖÇ `ojj?b„øW¹ì6‹¢ ²rä¦M Ndô¬­~!$Çƒ²2`³Ï>x<VôŸ@ ƒúzhoDæªd²óÈ‘Î#GÊD„40ÑÓ3ÑÓ›;i’Âm…•JÀãy|~AA±°°İ’¡$ÓÖîî^­|¾@+|>€Ç›åå cgÔÖÑñ‚Á(©©©okk`2˜L ĞUW×UW×ÓĞ0××Ÿdi©!GúŠ"lV"MôôJjk‰(®Ÿ¦§'ÉgVS#ĞÚİ<@7€@1 İ ÀdBc#|iEÃ°äüü[i……ùee’*xnŒ±ñd:}ƒÃ÷cÆHåŞSœÍ4=½’ÚÚºº:"“É IÏË…¦&AMF*…ºQ•Fõ™@ NP¦¶tt`€[ªokûÏãÇa÷EÁãñÚºÚÚ ĞĞÜÜÜÖ††Î|{ıéÓëOŸÎ=x0B_Õ´i?N*É¬P›9L&³‡,	ùp--e<à)	uóù€Ç´" ¾‡ƒè'“ÇçŸNHØ%ªP¡Pmm'ÛÚ:ÚÚÚXYéji‰¦lñùü†––Ü‚‚ç¯^¥½zõüÕ«v§¸¦fû•+¿Ş¾½Ş¼_fÎï‡QœÍBrX,­P¨Kˆg2­]ôAq¹½Š‘¹H:‰aĞÖÖGqvIÉªÿ[i7zÄˆ5óç/ññÑ8ÕÇÕÑqwttwt€6+26öüõëo‹‹™›""">ûé'1ëu
+²‘Ãd2ñ_®Y =/]€Ï˜°G@¢Å˜LQ·32œwïFLYĞhñçÏçÇÄ¬÷÷—ÀTh¨©­÷÷Ï‰‰?Ş‚F€ÜÒRçİ»Ñ*§ÂmîÕ«¢" u
+’:LÄºğ=7ô¢{U¤Ã>›˜8÷øq—K"üòË›èè™ÎÎ_æf`Ìtv~}à—_HD"‡Ë{üøÙÄDÅÚ,
+œ  ¯®® Ì/zP¿(ì PF¤°SD}úØÓ®/§¦®»paêªª÷Î^³†¬ˆ„²’Rğš5÷ÎSWUåcØº.§¦*Êæ>@ä¨««Èj“4@&¤ãñ‚ÿx<‰@"’H@$
+N
+Ëàp ¦ EÕÕkÃÂ `ˆ–VJdätGGùé‡é)‘‘C´´ `mXX‘0Çp6÷"§—,I5KM­WM şˆÄŞã>eTUy|ş‚ĞP‡ƒÃá"´±²R,S6VVâp8‡³ 4Tàz•×f±*d©Y::‚‡ ª‰H%¥Şÿ¢vàñ ¢dòíŒáµ1 ÀËÅå+%€—‹ËÆ€  ÈùøQĞÙËk³Xù½5-—54h‹’hk÷>T™QMFZ……OÌÈ Nß¿ :šš¿*œ >ø50PGSS¨Tn›Å¢¼± tuuñ(¦­££º¹y@[ôõAYYğDŸ‰¨>Ô0|8HoÊÊRß¿€U?ü "KrŸ|P¡PVığ ¤¾/X^“İf±’»y<àgii‰œ4 8˜š‚Š
+‰‚?%¥Ş*Ğñğá ­ Â•¨sæ(	*¨–İf±(­¯GaVVV½dJ  03ƒ¡C
+ĞcA()Š
+XZBëÍû”H$s)}Šƒ†¹‘‘‰$T-‡Íb!Ì¸¶²²"š˜˜())uuu½û|[1Àá€J…!C ½Z[ÅÈdPS55 PDg¡%55 @30u{¹ÇãiEŸ>•ˆÎÏe±Y,„´Ğét"@pppHMM}—'•QD"hhÀ—"ÇPÕ%ösÚ6¶´œˆŒ¼“”ô?nn›–,Ò“õ/%[ZB.\¸ığáìéÓ·-_®ûyóAêÄçHg³X ÌW6tèP" øùù¥¦¦VUTVÊ‘B,(m¡´ª
+Ã0Q÷ÓóçO^º ïJJXíí¡;vÈ$6äÂ…#áá p$<œÇãÛ¶Mx	Ã°Òª*¡j… ™ÍNyÿ ||| -…ùùù¡k1â6Š‘æT* tp8µµ¢çoˆLânô™ĞI[¯£QB*jk;8¡j…àîË—(ÃQ„ 33³1cÆ @ôÀ²B¸Ô|©gÁ]dÆã.ûìÇ}òdá±çç³q¡"™V¹%#:+ ´µµ§L™ÂXÄ\Fq±4™°ÒÀÁÂ}æÚ5®HÈYğš5s¦O§És¦O^³FV±;V®\èé©¦¢²ĞÓsWÏö' Àíî>sí Ø˜˜8XX(à 8\nbn. xyy‰D’åëë †Å*®%ş2s& TÕÕï	ş s#£›¡¡m™™7CCåUĞ®9Òš‘qõÈšH¨êñˆˆªº:¡R…àáë×ìÎNè!„d?Eß¢Š§ø;9¡0úà“'Ó?Õ’¤ö‹>Ã‘ô¼¼à“'ÀŒJE)%
+ê”ÈdòŒ3z…×P‡ŸœŸß?ëP>PH¤¿7n$İ<ŞÂ­[Ë%æ`Ëòšš…[·vóx$áïeŠ4‘ >†¡­u¦M›&Œƒï%u[\®ß‰öææıı ´²r’¿ÿë’eåÆkc’¿ie% ô÷·W\òÌãüüú¶6*€(Y®®®T* Ü¼9ĞşYr ÈÛ{« TÖÖ:\–q·	¸çPY[ [}|Ü»£¢ €B¡øŠìV×K‰DBAOŒêê°G¥‡Ã^¼øÄÒ¥8®Å
+Ø±ÃuÙ²ü¢¢ÁÈÌ/*r]¶,`Ç6‡ÃXºT±iî1YY(‹nÃ†C‡ÿ,…Ëå5ª¸¸˜ª©Y|ú´Lû&}±ÙÙkÃÂªš›íèì¼fş|Oggé'|>?>5õüõë	©©hÅ@[ûÜªUƒƒÏô¾²R[[ûÃ‡Z"2\Ÿ]U¢¢¢æÏŸ {çÎİÓ“g§(0;:vGENHÆİéë{89M¶µu´±±`0É(-}››öêUâ³gÂ·ÿeæÌıóæ©Ë»…ç@¸œ¼òüy 8zôhPPè¥¾da6aÂ„ììl5
+¥äôé¡ššŠ5 ŞUTüqÿş•ÔÔ>ûP)S(Cuttµµuµ´  ¡¥¥¡¹¹®©©ãóõeåEÎÎëgÌÕ“i¤@ttuYlØPÙÔD£Ñ
+ûäîô% ’““Q¢ëÏgV¬P¸AìÎÎ¿ÓÒned¼`0úì©(Zªª“,-ç88,˜<YQ^ıñ{tôÎ«W 222 _¬¥² `ÆŒ‰‰‰$áíñãòånÀÎ«WŸÏ™ã!’»Õ†½­¨H+((©­„µµ€®†† äˆJle5ZâÎz p/'gû•+>ãÇ÷Ù­Pz4±Xæ¿üÒÂf[[[çääôïLÅ“•——gkk‹a˜Ÿ½ı­[åÓmˆò–¹º_ºôëí)ÙÌfşç?—RR ÀÖÔ4'$D>9kÃÂÎ?| ÷ïß÷ğğè_@ü›ÈÚÚzÑ¢E •%ë>fBÜ
+
+BáÏŸ<µi“'R¢ˆÉÊµibÊÁÂâš¼+Iá#¦ÜÜÜÄ2Õ, hnnvpp(**Âãpq;v ¬YÑÍã‰İwó&ÚÍû»ïB-RTÇ\PY¹ãêÕ˜¬,  HûçÏßìí-_&Ø³‚‚iû÷wuwëééeff´-÷€d@AAÁÄ‰[[[5”•_üö›Ü7ù¾²rÅ¹sh¿|êÔ}óæD²iMKË¨¨ÉÉhâH§‡¯]KqBÈ„²†û;ëZ[I$Ò£GœZ‘D $$$x{{óù|3*5óàA¹sùv!9yoT”ª’ÉkÜİ—L™2NÆèÓ÷••áÉÉç<@Î“á::ûçÏ_æêŠ—wøÎîìœŒ¶ 	[¹r¥„Â_  =ºuëV p=úApğ`Á;ººBïİ‰‰n^9ÊĞĞßÉiÁäÉ’}ÁLæµ´´È§O…Ë‘ÊÊ;üü6zyf“]Ã~8~­ø†††J.ÿe² `éÒ¥(	ı§éÓÏ¯Z%·qM,Ö±¸¸È””ŠÆFáIs*u„¾¾•jN¥šëë«S(Å55ŒêjFu5£ªêC]pno ­½ÄÅ%hÖ,İAo²»'*jÿÍ› àîîÿÅ0Š¬ÎÎNWW×ôôt 8°eÖ¬AZ	 |{úîİ•ÔÔ›ééÒì’ªB&Ï0a‰‹Ë´±cånt¢¸”’²ôÌÃètzzzº–‹rR‘ 555ööö(|‡Gè²eı×åC'—ûğõë·jkKjk?ÔÖ–54ğ1l˜–Ö}}s}}s*ÕjøpkkEMì1Û{ãÆ[·0ÓÒÒÊÈÈ.ËK†´d@nn®§§'Ú}ÚØ±76oşJãÌnËã}¥¿ÙKşøõSZZZÑÑÑ.R‡CÉ@ TVVúùù¡LÎúúqÛ·+jQöÛ ¬¡Á'$½ûètzll¬”u
+A¶!ÜğáÃSRR§¸¦fâ®]÷sse’ğÿÏ
+
+ìwîDL¹»»§§§ËÄÈJ (++ÿı÷ßÀõìëŒöšü/GøãÇÓöïG[ÔÆÇÇKÓ£÷lÍPwîÜ	`³Ù àïät4 `0ƒò¯‡&k×µkhŞG"‘Î=+yä)ò“ yyy>>>eee  B&oôôÜîç'OúÖ×AGW×Éøø˜ä/ÓÓÓ»uë–„ÙÌ1(²  ®®nÍš5wîÜA‡¨«Ïı³‡‡ô›¦|ğøüÿ<~¼÷Æá¾Énnnaaa²şpU–,„çÏŸoÛ¶---}4ÑÓ;°`¿““BF²"&+kçÕ«ï++ÑGkkë¼.2A1d!DGGïÜ¹³   }´¦ÑöÏŸ?ÓÖv0ÓIéÁÇ°Çùù»£¢Ğ* Ğh´,Z´HQÑ‡Š$ x<Ş…öîİ+üA%-UUO[[?{û66
+_‰ —ûğõëèÌÌ¸—/Ñ2 hkkïÚµkıúõd…zëL›Í>qâÄáÃ‡™"yVdéû1cüìí}Æ×—ıµİÍlöİ—/£³²ss‘»B¡lØ°açÎrŒ¾ˆ¯BBKKK\\\LLLbb"Kä72p8œÃˆŞß}7ÖØØrØ03*Uš·A7WZ_Ï¨®~WQ‘ğêUÊû÷¢1
+ÅÍÍÍ×××××Wï+üÈ–Àò¯G–ÉÉÉ±±±±±±UıÈ	x¼‰äŸì+olüP[Û?²VWW×ÛÛÛ×××İİ}?N)¾YB`–óFdgYaaa*‘££ã7‡oL–(ZZZú™ÑÂÂÂŠŠ
+)fÔÒÒòë54ÉøºçwÂ˜Sl£    IEND®B`‚HTTP/1.1 200 OK
+Server: nginx
+Date: Tue, 02 Aug 2016 10:49:14 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 1397
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+  <!-- Example form from HTML5 spec http://www.w3.org/TR/html5/forms.html#writing-a-form's-user-interface -->
+  <form method="post" action="/post">
+   <p><label>Customer name: <input name="custname"></label></p>
+   <p><label>Telephone: <input type=tel name="custtel"></label></p>
+   <p><label>E-mail address: <input type=email name="custemail"></label></p>
+   <fieldset>
+    <legend> Pizza Size </legend>
+    <p><label> <input type=radio name=size value="small"> Small </label></p>
+    <p><label> <input type=radio name=size value="medium"> Medium </label></p>
+    <p><label> <input type=radio name=size value="large"> Large </label></p>
+   </fieldset>
+   <fieldset>
+    <legend> Pizza Toppings </legend>
+    <p><label> <input type=checkbox name="topping" value="bacon"> Bacon </label></p>
+    <p><label> <input type=checkbox name="topping" value="cheese"> Extra Cheese </label></p>
+    <p><label> <input type=checkbox name="topping" value="onion"> Onion </label></p>
+    <p><label> <input type=checkbox name="topping" value="mushroom"> Mushroom </label></p>
+   </fieldset>
+   <p><label>Preferred delivery time: <input type=time min="11:00" max="21:00" step="900" name="delivery"></label></p>
+   <p><label>Delivery instructions: <textarea name="comments"></textarea></label></p>
+   <p><button>Submit order</button></p>
+  </form>
+  </body>
+</html>HTTP/1.1 200 OK
+Server: nginx
+Date: Tue, 02 Aug 2016 10:49:21 GMT
+Content-Type: application/json
+Content-Length: 764
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+
+{
+  "args": {}, 
+  "data": "", 
+  "files": {}, 
+  "form": {
+    "comments": "", 
+    "custemail": "", 
+    "custname": "", 
+    "custtel": "dqedqwed", 
+    "delivery": "", 
+    "topping": [
+      "cheese", 
+      "onion"
+    ]
+  }, 
+  "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", 
+    "Accept-Encoding": "gzip, deflate", 
+    "Accept-Language": "en-US,en;q=0.5", 
+    "Content-Length": "86", 
+    "Content-Type": "application/x-www-form-urlencoded", 
+    "Host": "httpbin.org", 
+    "Referer": "http://httpbin.org/forms/post", 
+    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"
+  }, 
+  "json": null, 
+  "origin": "95.84.210.114", 
+  "url": "http://httpbin.org/post"
+}

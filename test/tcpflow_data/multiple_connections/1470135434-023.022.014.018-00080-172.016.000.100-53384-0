@@ -1,0 +1,9 @@
+HTTP/1.1 400 BAD REQUEST
+Server: nginx
+Date: Tue, 02 Aug 2016 10:57:14 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 0
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+

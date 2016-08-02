@@ -1,0 +1,19 @@
+HTTP/1.1 200 OK
+Server: nginx
+Date: Tue, 02 Aug 2016 10:32:01 GMT
+Content-Type: application/json
+Content-Length: 186
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+
+{
+  "args": {}, 
+  "headers": {
+    "Accept": "*/*", 
+    "Host": "httpbin.org", 
+    "User-Agent": "curl/7.47.0"
+  }, 
+  "origin": "95.84.210.114", 
+  "url": "http://httpbin.org/get"
+}

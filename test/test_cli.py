@@ -88,6 +88,22 @@ def test_bad_har_file():
     assert b'Traceback' not in stderr
 
 
+def test_tcpflow():
+    (code, stdout, stderr) = run(['-i', 'tcpflow'],
+                                 ['tcpflow_data/request_timeout'])
+    assert code == 0
+    assert b'C 1278' in stdout
+    assert stderr == b''
+
+
+def test_bad_tcpflow_directory():
+    (code, stdout, stderr) = run(['-i', 'tcpflow'],
+                                 ['tcpflow_data/wrong_filenames'])
+    assert code > 0
+    assert stdout == b''
+    assert b'wrong tcpflow filename' in stderr
+
+
 def test_full_traceback():
     (code, stdout, stderr) = run(['-i', 'har', '--full-traceback'],
                                  ['combined_data/simple_ok'])

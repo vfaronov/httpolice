@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dfxml xmloutputversion='1.0'>
+  <metadata 
+  xmlns='http://afflib.org/tcpflow/' 
+  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' 
+  xmlns:dc='http://purl.org/dc/elements/1.1/'>
+    <dc:type>Feature Extraction</dc:type>
+  </metadata>
+  <creator version='1.0'>
+    <program>TCPFLOW</program>
+    <version>1.4.5</version>
+    <build_environment>
+      <compiler>5.2.1 (5.2.1 20151022)</compiler>
+      <CPPFLAGS>-pthread -I/usr/local/include -I/usr/local/include -D_FORTIFY_SOURCE=2 -DUTC_OFFSET=+0000 </CPPFLAGS>
+      <CFLAGS>-g   -pthread -g -O3 -fstack-protector-strong -Wformat -Werror=format-security -MD -Wpointer-arith -Wmissing-declarations -Wmissing-prototypes -Wshadow -Wwrite-strings -Wcast-align -Waggregate-return -Wbad-function-cast -Wcast-qual -Wundef -Wredundant-decls -Wdisabled-optimization -Wfloat-equal -Wmultichar -Wc++-compat -Wmissing-noreturn -Wall -Wstrict-prototypes -MD -D_FORTIFY_SOURCE=2 -Wpointer-arith -Wmissing-declarations -Wmissing-prototypes -Wshadow -Wwrite-strings -Wcast-align -Waggregate-return -Wbad-function-cast -Wcast-qual -Wundef -Wredundant-decls -Wdisabled-optimization -Wfloat-equal -Wmultichar -Wc++-compat -Wmissing-noreturn -Wall -Wstrict-prototypes</CFLAGS>
+      <CXXFLAGS>-g -pthread -g -O3 -fstack-protector-strong -Wformat -Werror=format-security -Wall -MD -D_FORTIFY_SOURCE=2 -Wpointer-arith -Wshadow -Wwrite-strings -Wcast-align -Wredundant-decls -Wdisabled-optimization -Wfloat-equal -Wmultichar -Wmissing-noreturn -Woverloaded-virtual -Wsign-promo -funit-at-a-time -Weffc++ -std=c++11 -Wall -MD -D_FORTIFY_SOURCE=2 -Wpointer-arith -Wshadow -Wwrite-strings -Wcast-align -Wredundant-decls -Wdisabled-optimization -Wfloat-equal -Wmultichar -Wmissing-noreturn -Woverloaded-virtual -Wsign-promo -funit-at-a-time -Wstrict-null-sentinel -Weffc++ </CXXFLAGS>
+      <LDFLAGS>-L/usr/local/lib -L/usr/local/lib -Wl,-Bsymbolic-functions -Wl,-z,relro</LDFLAGS>
+      <LIBS>-lpcap -lcairo -lfontconfig -lfreetype -lpixman-1 -lexpat  -lssl -lcrypto -lssl -lcrypto -ldl -lz </LIBS>
+      <compilation_date>2015-10-24T03:49:33</compilation_date>
+      <library name="boost" version="105800"/>
+    </build_environment>
+    <execution_environment>
+      <os_sysname>Linux</os_sysname>
+      <os_release>4.4.0-31-generic</os_release>
+      <os_version>#50-Ubuntu SMP Wed Jul 13 00:07:12 UTC 2016</os_version>
+      <host>pergamon</host>
+      <arch>x86_64</arch>
+      <command_line>tcpflow -T%t-%A-%a-%B-%b-%# port 80</command_line>
+      <uid>0</uid>
+      <start_time>2016-08-02T10:33:36Z</start_time>
+    </execution_environment>
+  </creator>
+  <configuration>
+  </configuration>
+  <tdelta>0</tdelta>
+  <configuration>
+    <fileobject>
+      <filename>1470134049-172.016.000.100-15061-054.175.219.008-00080-0</filename>
+      <filesize>78</filesize>
+      <tcpflow startime='2016-08-02T13:34:09.657630Z' endtime='2016-08-02T13:34:10.077593Z' src_ipn='172.16.0.100' dst_ipn='54.175.219.8' mac_daddr='58:6d:8f:d1:d7:9f' mac_saddr='80:19:34:c5:86:ae' packets='5' srcport='15061' dstport='80' family='2' />
+    </fileobject>
+    <fileobject>
+      <filename>1470134049-054.175.219.008-00080-172.016.000.100-15061-0</filename>
+      <filesize>406</filesize>
+      <tcpflow startime='2016-08-02T13:34:09.872282Z' endtime='2016-08-02T13:34:10.281769Z' src_ipn='54.175.219.8' dst_ipn='172.16.0.100' mac_daddr='80:19:34:c5:86:ae' mac_saddr='58:6d:8f:d1:d7:9f' packets='4' srcport='80' dstport='15061' family='2' />
+    </fileobject>
+    <fileobject>
+      <filename>1470134125-172.016.000.100-15061-054.175.219.008-00080-0</filename>
+      <filesize>88</filesize>
+      <tcpflow startime='2016-08-02T13:35:25.600235Z' endtime='2016-08-02T13:35:25.965947Z' src_ipn='172.16.0.100' dst_ipn='54.175.219.8' mac_daddr='58:6d:8f:d1:d7:9f' mac_saddr='80:19:34:c5:86:ae' packets='8' srcport='15061' dstport='80' family='2' />
+    </fileobject>
+    <fileobject>
+      <filename>1470134125-054.175.219.008-00080-172.016.000.100-15061-0</filename>
+      <filesize>14469</filesize>
+      <tcpflow startime='2016-08-02T13:35:25.755676Z' endtime='2016-08-02T13:35:26.165270Z' src_ipn='54.175.219.8' dst_ipn='172.16.0.100' mac_daddr='80:19:34:c5:86:ae' mac_saddr='58:6d:8f:d1:d7:9f' packets='7' srcport='80' dstport='15061' family='2' />
+    </fileobject>
