@@ -70,7 +70,7 @@ class Message(Blackboard):
     @derived_property
     def decoded_body(self):
         r = self.body
-        codings = list(self.headers.content_encoding)
+        codings = self.headers.content_encoding.value[:]
         while codings and okay(r) and r:
             coding = codings.pop()
             if coding in [cc.gzip, cc.x_gzip]:

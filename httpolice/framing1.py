@@ -108,7 +108,7 @@ def _parse_request_body(req, stream):
     # RFC 7230 section 3.3.3.
 
     if req.headers.transfer_encoding:
-        codings = list(req.headers.transfer_encoding)
+        codings = req.headers.transfer_encoding.value[:]
         if codings.pop() == tc.chunked:
             _parse_chunked(req, stream)
         else:
@@ -199,7 +199,7 @@ def _parse_response_body(resp, stream):
         resp.body = b''
 
     elif resp.headers.transfer_encoding:
-        codings = list(resp.headers.transfer_encoding)
+        codings = resp.headers.transfer_encoding.value[:]
         if codings[-1] == tc.chunked:
             codings.pop()
             _parse_chunked(resp, stream)
@@ -283,8 +283,9 @@ def _decode_transfer_coding(msg, coding):
         except Exception as e:
             msg.complain(1027, coding=coding, error=e)
             msg.body = Unavailable
-    else:
+    elif okay(coding):
         msg.complain(1003, coding=coding)
+    else:
         msg.body = Unavailable
 
 

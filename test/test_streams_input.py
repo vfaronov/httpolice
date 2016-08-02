@@ -316,3 +316,14 @@ def test_resp_stream():
     assert exch2.responses[0].status == st.unauthorized
     assert not exch2.responses[0].complaints
     assert not exch2.complaints
+
+
+def test_bad_content_encoding():
+    [exch1] = load_from_file('bad_content_encoding')
+    assert exch1.responses[0].decoded_body is Unavailable
+
+
+def test_bad_transfer_encoding():
+    [exch1] = load_from_file('bad_transfer_encoding')
+    assert exch1.request.body is Unavailable
+    assert exch1.responses[0].body is Unavailable
