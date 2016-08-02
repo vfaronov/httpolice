@@ -104,16 +104,16 @@ class Response(message.Message):
 
     @derived_property
     def content_is_full(self):
-        if self.request is None:
-            return None
-        if self.request.method == m.HEAD:
-            return False
         if self.status == st.not_modified:
             return False
         if self.status == st.partial_content and \
                 self.headers.content_type != media.multipart_byteranges:
             return False
-        return True
+        if okay(self.request):
+            return self.request.method != m.HEAD
+        if self.body:
+            return True
+        return None         # pragma: no cover
 
     @derived_property
     def from_cache(self):

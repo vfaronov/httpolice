@@ -1,0 +1,11 @@
+HTTP/1.1 408 Request Timeout
+Date: Tue, 02 Aug 2016 14:22:57 GMT
+Content-Type: application/problem+xml
+Content-Language: en
+Connection: close
+
+<?xml version="1.0" encoding="UTF-8"?>
+<problem xmlns="urn:ietf:rfc:7807">
+    <type>http://example.com/id/problems/timeout</type>
+    <title>Cannot wait for request any longer</title>
+</problem>

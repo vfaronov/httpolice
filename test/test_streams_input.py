@@ -9,7 +9,7 @@ from httpolice.inputs.streams import (combined_input, req_stream_input,
                                       resp_stream_input, streams_input,
                                       tcpflow_input, tcpick_input)
 from httpolice.known import h, m, st, upgrade
-from httpolice.structure import Unavailable, Versioned, http11
+from httpolice.structure import Unavailable, Versioned, http11, okay
 
 
 def load_from_file(name):
@@ -244,6 +244,21 @@ def test_tcpick_multiple_connections():
     assert exch1.request.target == u'/status/400'
     assert exch2.request.target == u'/status/401'
     assert exch3.request.target == u'/status/402'
+
+
+def test_tcpick_request_timeout():
+    [box, exch1] = load_from_tcpick('request_timeout')
+
+    # The first exchange is only a box for no. 1278.
+    assert box.request is None
+    assert box.responses == []
+    assert [complaint.id for complaint in box.complaints] == [1278]
+
+    # The second exchange contains only the 408 response.
+    assert exch1.request is None
+    [resp] = exch1.responses
+    assert resp.status == st.request_timeout
+    assert okay(resp.xml_data)
 
 
 def test_tcpick_wrong_filenames():
