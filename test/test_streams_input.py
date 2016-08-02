@@ -5,8 +5,9 @@ import os
 import pytest
 
 from httpolice.inputs import InputError
-from httpolice.inputs.streams import (combined_input, tcpflow_input,
-                                      tcpick_input)
+from httpolice.inputs.streams import (combined_input, req_stream_input,
+                                      resp_stream_input, streams_input,
+                                      tcpflow_input, tcpick_input)
 from httpolice.known import h, m, st, upgrade
 from httpolice.structure import Unavailable, Versioned, http11
 
@@ -24,6 +25,11 @@ def load_from_tcpflow(name):
 def load_from_tcpick(name):
     path = os.path.join(os.path.dirname(__file__), 'tcpick_data', name)
     return list(tcpick_input([path]))
+
+
+def load(input_func, paths):
+    return list(input_func([os.path.join(os.path.dirname(__file__), path)
+                            for path in paths]))
 
 
 def test_complex_connection():
@@ -243,3 +249,70 @@ def test_tcpick_multiple_connections():
 def test_tcpick_wrong_filenames():
     with pytest.raises(InputError):
         load_from_tcpick('wrong_filenames')
+
+
+def test_streams():
+    [exch1, exch2] = load(streams_input, [
+        'tcpflow_data/multiple_connections/'
+        '1470135434-172.016.000.100-53384-023.022.014.018-00080-0',
+        'tcpflow_data/multiple_connections/'
+        '1470135434-023.022.014.018-00080-172.016.000.100-53384-0',
+        'tcpflow_data/multiple_connections/'
+        '1470135436-172.016.000.100-57422-054.175.219.008-00080-0',
+        'tcpflow_data/multiple_connections/'
+        '1470135437-054.175.219.008-00080-172.016.000.100-57422-0',
+    ])
+    assert exch1.request.target == u'/status/400'
+    assert exch2.request.target == u'/status/401'
+
+
+def test_streams_not_enough_files():
+    with pytest.raises(InputError):
+        load(streams_input, [
+            'tcpflow_data/multiple_connections/'
+            '1470135434-172.016.000.100-53384-023.022.014.018-00080-0',
+            'tcpflow_data/multiple_connections/'
+            '1470135434-023.022.014.018-00080-172.016.000.100-53384-0',
+            'tcpflow_data/multiple_connections/'
+            '1470135436-172.016.000.100-57422-054.175.219.008-00080-0',
+        ])
+
+
+def test_req_stream():
+    [exch1, exch2] = load(req_stream_input, [
+        'tcpflow_data/multiple_connections/'
+        '1470135434-172.016.000.100-53384-023.022.014.018-00080-0',
+        'tcpflow_data/multiple_connections/'
+        '1470135436-172.016.000.100-57422-054.175.219.008-00080-0',
+    ])
+
+    assert exch1.request.target == u'/status/400'
+    assert not exch1.request.complaints
+    assert not exch1.responses
+    assert not exch1.complaints
+
+    assert exch2.request.target == u'/status/401'
+    assert not exch2.request.complaints
+    assert not exch2.responses
+    assert not exch2.complaints
+
+
+def test_resp_stream():
+    [exch1, exch2] = load(resp_stream_input, [
+        'tcpflow_data/multiple_connections/'
+        '1470135434-023.022.014.018-00080-172.016.000.100-53384-0',
+        'tcpflow_data/multiple_connections/'
+        '1470135437-054.175.219.008-00080-172.016.000.100-57422-0',
+    ])
+
+    assert not exch1.request
+    assert len(exch1.responses) == 1
+    assert exch1.responses[0].status == st.bad_request
+    assert not exch1.responses[0].complaints
+    assert not exch1.complaints
+
+    assert not exch2.request
+    assert len(exch2.responses) == 1
+    assert exch2.responses[0].status == st.unauthorized
+    assert not exch2.responses[0].complaints
+    assert not exch2.complaints
