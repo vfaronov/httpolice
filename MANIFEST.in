@@ -6,6 +6,7 @@ include LICENSE.txt
 include CHANGELOG.rst
 include HACKING.rst
 
+include .coveragerc
 include .isort.cfg
 include pylintrc
 include pytest.ini
