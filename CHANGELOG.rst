@@ -51,6 +51,7 @@ Changed
   you now have to use different options to tcpick/tcpflow (consult the manual).
 - `Text reports`_ no longer show request/response numbers.
   If you parse these reports, you may need to adjust.
+- Styles in HTML reports have been tweaked to make them more readable.
 
 .. _Text reports: http://httpolice.readthedocs.io/en/stable/reports.html
 .. _tcpick and tcpflow input:

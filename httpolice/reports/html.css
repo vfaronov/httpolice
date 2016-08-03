@@ -3,7 +3,7 @@
  ****************************************************************/
 
 body {
-    background: white;
+    background: whitesmoke;
     color: black;
     font-family: sans-serif;
     quotes: '“' '”';
@@ -16,12 +16,13 @@ body {
 
 @media screen {                             /* Print margins are OK already. */
     body {
-        margin: 3em;
+        margin: 2em;
     }
 }
 
 h1 {
     font-size: x-large;
+    margin-bottom: 0;
 }
 
 h2, h3 {
@@ -80,9 +81,27 @@ button {
  * Request and response data
  ****************************************************************/
 
-div.message-display {
+div.exchange {
+    background: white;
     margin-top: 3em;
+}
+
+@media screen {
+    div.exchange {
+        /* Bottom padding is smaller
+         * because there is an invisible ``hr`` there. */
+        padding: 2em 2em 1.5em 2em;
+        border: solid thin darkgray;
+    }
+}
+
+div.message-display {
     max-width: 55em;
+}
+
+.exchange > section:not(:first-child) div.message-display {
+    /* Spacing between messages within one exchange. */
+    margin-top: 2em;
 }
 
 p.message-remark {
@@ -120,7 +139,7 @@ div.body-display, div.trailer {
     border: thin dashed;
     padding: 0.3em 0.5em;
     margin: 0;
-    color: dimgray;
+    color: darkgray;
 }
 
 .body-display pre {
@@ -137,9 +156,12 @@ div.body-display, div.trailer {
  ****************************************************************/
 
 div.complaints {
-    margin-top: 2em;
     padding-left: 1em;
     border-left: thin solid lightgray;
+}
+
+.exchange > section:not(:first-child) div.complaints {
+    margin-top: 2em;
 }
 
 div.notice {
@@ -232,6 +254,7 @@ div.options {
     margin-top: 0.3em;
     padding: 0.1em 1em;
     background: lavender;
+    border: solid thin darkgray;
     white-space: nowrap;
 }
 
