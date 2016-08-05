@@ -31,8 +31,13 @@ what was sent on the wire. For example, in an HTTP/1.x request,
 a header may have been split into two physical lines,
 but will be rendered as one line in the report.
 
-In the top right hand corner of an HTML report,
-there’s an *options* menu that allows you to filter the report on the fly:
+Options
+~~~~~~~
+In the top right hand corner of an HTML report, there’s an *options* menu.
+
+The first three options allow you to filter the report on the fly.
+This is independent from :ref:`silencing <silence>`:
+you cannot undo silencing with these options.
 
 *Hide boring exchanges*
     Check this to hide all exchanges where no problems were found
@@ -41,14 +46,21 @@ there’s an *options* menu that allows you to filter the report on the fly:
 *Boring notices*
     Additional notice IDs or severities that should not be considered problems.
     For example: ``1089 1135 C`` (C for “comment”).
-    This will hide all exchanges that have only these notices.
 
 *Hide boring notices*
     Check this if you don’t want to see those boring notices at all.
     They will be hidden even from exchanges that have other problems.
 
-Filtering is independent from :ref:`silencing <silence>`.
-You cannot undo silencing with these filtering options.
+Other options:
+
+*Show remarks*
+    Check this to show remarks before requests and responses, if any.
+    The nature of these remarks depends on where the data comes from.
+    If you use the ``httpolice`` command-line tool,
+    remarks will contain the names of the input files
+    and (for :doc:`streams input <streams>` only)
+    the byte offsets within those files.
+    This can help with debugging.
 
 
 HTML in text
