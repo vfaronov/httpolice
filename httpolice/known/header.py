@@ -9,9 +9,8 @@ from httpolice.syntax import (internal, rfc5789, rfc5988, rfc6266, rfc6797,
 
 
 SINGLE = 1
-SINGLE_LIST = 2
-MULTI = 3
-SET_COOKIE = 4
+MULTI = 2
+SET_COOKIE = 3
 
 
 def deprecated(name):
@@ -686,7 +685,7 @@ known = KnownDict(FieldName, [
   'for_response': True,
   'iana_status': u'standard',
   'parser': rfc6797.Strict_Transport_Security,
-  'rule': SINGLE_LIST},
+  'rule': SINGLE},
  {'_': FieldName(u'SubOK'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Subst'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Surrogate-Capability'), '_citations': [RFC(4229)]},

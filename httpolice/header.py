@@ -55,7 +55,7 @@ class HeadersView(object):
             # For the rest, we only need to know
             # a generic "rule" for combining multiple entries,
             # and a parser to parse the value.
-            elif rule in [header.SINGLE, header.SINGLE_LIST]:
+            elif rule == header.SINGLE:
                 cls = SingleHeaderView
             elif rule == header.MULTI:
                 cls = MultiHeaderView
