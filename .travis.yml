@@ -48,6 +48,9 @@ script:
     - python doc/api_example.py && grep -q 1194 report.html
     - sphinx-build -W doc/ doc/_build/
 
+    # Check the assorted reStructuredText documents at the top of the repo.
+    - tools/check_rst.sh
+
     # Check that the source distribution includes everything it should,
     # and nothing it shouldn't (including all the files we just built).
     - check-manifest
