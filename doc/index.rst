@@ -11,6 +11,10 @@ There is also a `list of all notices`__ that HTTPolice can output.
 
 __ http://pythonhosted.org/HTTPolice/notices.html
 
+For recent changes in HTTPolice, see the `changelog`__.
+
+__ https://github.com/vfaronov/httpolice/blob/master/CHANGELOG.rst
+
 .. toctree::
    :maxdepth: 1
 
