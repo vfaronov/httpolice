@@ -21,15 +21,17 @@ def parse_streams(inbound, outbound, scheme=None):
     is unreliable, because response framing depends on the request.
 
     :param inbound:
-        The inbound (request) stream as a byte string, or `None`.
+        The inbound (request) stream as a :class:`~httpolice.parse.Stream`,
+        or `None`.
     :param outbound:
-        The outbound (response) stream as a byte string, or `None`.
+        The outbound (response) stream as a :class:`~httpolice.parse.Stream`,
+        or `None`.
     :param scheme:
         The scheme of the request URI, as a Unicode string,
         or `None` if unknown.
     :return:
         An iterable of :class:`Exchange` objects.
-        Some of the exchanges may be "empty",
+        Some of the exchanges may be "empty" (aka "complaint boxes"):
         containing neither request nor responses,
         but only a notice that indicates some general problem with the streams.
     """
@@ -51,6 +53,7 @@ def parse_streams(inbound, outbound, scheme=None):
             yield resp_box
 
     if inbound and not inbound.eof:
+        # Some data remains on the inbound stream, but we can't parse it.
         yield complaint_box(1007, stream=inbound,
                             nbytes=len(inbound.consume_rest()))
 
@@ -67,6 +70,7 @@ def parse_streams(inbound, outbound, scheme=None):
                 yield resp_box
 
     if outbound and not outbound.eof:
+        # Some data remains on the outbound stream, but we can't parse it.
         yield complaint_box(1010, stream=outbound,
                             nbytes=len(outbound.consume_rest()))
 

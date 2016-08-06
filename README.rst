@@ -34,6 +34,7 @@ __ https://redbot.org/
 
 HTTPolice is hosted `on GitHub`__
 and released under the MIT license (see ``LICENSE.txt``).
+If you want to hack on HTTPolice, check out ``HACKING.rst``.
 
 __ https://github.com/vfaronov/httpolice
 

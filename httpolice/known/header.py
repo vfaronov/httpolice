@@ -45,6 +45,45 @@ def parser_for(name):
     return known.get_info(name).get('parser')
 
 
+# When adding a new header, fill in the fields as follows:
+#
+#   ``_``, ``_citations``
+#     Obvious, and usually filled by ``tools/iana.py``.
+#
+#   ``rule``
+#     Usually, if the header is defined as a comma-separated list,
+#     set this to ``MULTI``
+#     to indicate that it can appear multiple times in a single message
+#     (see RFC 7230 Section 3.2.2);
+#     otherwise, set to ``SINGLE``.
+#
+#   ``parser``
+#     The grammar symbol that can be used to parse
+#     *one occurrence* of this header (i.e. one `HeaderEntry.value`).
+#
+#   ``for_request``, ``for_response``
+#     Whether this header can appear in requests and responses, respectively.
+#
+#   ``precondition``
+#     Whether this header is a precondition (RFC 7232).
+#
+#   ``proactive_conneg``
+#     Whether this header is for proactive content negotiation
+#     (RFC 7231 Section 5.3).
+#
+#   ``bad_for_connection``
+#     You can set this to ``True`` if
+#     the presence of this header in a ``Connection`` header
+#     should trigger notice 1034.
+#
+#   ``bad_for_trailer``
+#     You can set this to ``True`` if
+#     the presence of this header in a trailer
+#     should trigger notice 1026.
+#
+#   ``iana_status``
+#     Filled by ``tools/iana.py``. You should not need to change it.
+
 known = KnownDict(FieldName, [
  {'_': FieldName(u'A-IM'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Accept'),

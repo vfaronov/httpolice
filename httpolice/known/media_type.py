@@ -21,6 +21,26 @@ def is_patch(name):
     return known.get_info(name).get('patch')
 
 
+# When adding a new media type, fill in the fields as follows:
+#
+#   ``_``, ``_citations``
+#     Obvious, and usually filled by ``tools/iana.py``.
+#
+#   ``patch``
+#     Whether this media type is a patch, usable with the PATCH method
+#     (see RFC 5789 errata).
+#
+#   ``is_json``
+#     Set this to ``True`` if the media type uses JSON syntax
+#     but **does not end** with ``+json``.
+#
+#   ``is_xml``
+#     Set this to ``True`` if the media type uses XML syntax
+#     but **does not end** with ``+xml``.
+#
+#   ``deprecated``
+#     Filled by ``tools/iana.py``. You should not need to change it.
+
 known = KnownDict(MediaType, [
  {'_': MediaType(u'application/1d-interleaved-parityfec'),
   '_citations': [RFC(6015)]},

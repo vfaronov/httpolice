@@ -1,5 +1,8 @@
 # -*- coding: utf-8; -*-
 
+# Most modules in this package are
+# synchronized with IANA registries using ``tools/iana.py``.
+
 from httpolice import structure
 from httpolice.known.alt_svc_param import known as altsvc
 from httpolice.known.auth_scheme import known as auth

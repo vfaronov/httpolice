@@ -41,6 +41,8 @@ def okay(x):
 
 class Parametrized(namedtuple('Parametrized', ('item', 'param'))):
 
+    """Anything that consists of some "item" + some parameters to that item."""
+
     __slots__ = ()
 
     def __eq__(self, other):
@@ -60,6 +62,8 @@ class Parametrized(namedtuple('Parametrized', ('item', 'param'))):
 
 
 class MultiDict(object):
+
+    """A bunch of key-value pairs where keys are not unique."""
 
     __slots__ = ('sequence',)
 
@@ -117,6 +121,8 @@ class MultiDict(object):
 @six.python_2_unicode_compatible
 class Versioned(namedtuple('Versioned', ('item', 'version'))):
 
+    """Anything that consists of some "item" + a version of that item."""
+
     __slots__ = ()
 
     def __str__(self):
@@ -127,6 +133,8 @@ class Versioned(namedtuple('Versioned', ('item', 'version'))):
 
 
 class ProtocolString(six.text_type):
+
+    """Base class for various constant strings used in HTTP."""
 
     __slots__ = ()
 
@@ -226,6 +234,8 @@ class ContentCoding(CaseInsensitive):
 
 class ConnectionOption(CaseInsensitive):
 
+    """A connection option (RFC 7230 Section 6.1)."""
+
     __slots__ = ()
 
 
@@ -249,17 +259,24 @@ class MediaType(CaseInsensitive):
 
 class UpgradeToken(ProtocolString):
 
-    # https://github.com/httpwg/http11bis/issues/8
+    """A protocol name for the ``Upgrade`` header (RFC 7230 Section 6.7).
+
+    It is case-sensitive; see https://github.com/httpwg/http11bis/issues/8 .
+    """
 
     __slots__ = ()
 
 
 class LanguageTag(CaseInsensitive):
 
+    """A language tag (RFC 5646)."""
+
     __slots__ = ()
 
 
 class ProductName(ProtocolString):
+
+    """A product name (RFC 7231 Section 5.5.3, 7.4.2)."""
 
     __slots__ = ()
 
@@ -274,29 +291,39 @@ class EntityTag(namedtuple('EntityTag', ('weak', 'opaque_tag'))):
     __slots__ = ()
 
     def weak_equiv(self, other):
+        """Weak comparison of entity tags (RFC 7232 Section 2.3.2)."""
         return self.opaque_tag == other.opaque_tag
 
     def strong_equiv(self, other):
+        """Strong comparison of entity tags (RFC 7232 Section 2.3.2)."""
         return not self.weak and not other.weak and \
             self.opaque_tag == other.opaque_tag
 
 
 class RangeUnit(CaseInsensitive):
 
+    """A range unit (RFC 7233 Section 2)."""
+
     __slots__ = ()
 
 
 class RangeSpecifier(namedtuple('RangeSpecifier', ('unit', 'ranges'))):
+
+    """A request range specifier (RFC 7233 Section 3.1)."""
 
     __slots__ = ()
 
 
 class ContentRange(namedtuple('ContentRange', ('unit', 'range'))):
 
+    """A response content range (RFC 7233 Section 4.2)."""
+
     __slots__ = ()
 
 
 class CacheDirective(CaseInsensitive):
+
+    """A cache directive name (RFC 7234 Section 5.2)."""
 
     __slots__ = ()
 
@@ -304,9 +331,11 @@ class CacheDirective(CaseInsensitive):
 class WarningValue(namedtuple('WarningValue',
                               ('code', 'agent', 'text', 'date'))):
 
+    """A value from a ``Warning`` header (RFC 7234 Section 5.5)."""
+
     __slots__ = ()
 
-    # Allow comparing directly to warning codes
+    # Allow comparing directly to warn codes
     # so that we can do stuff like ``299 in msg.headers.warning``
     # (like with :class:`Parametrized`).
 
@@ -324,6 +353,8 @@ class WarningValue(namedtuple('WarningValue',
 
 
 class WarnCode(int):
+
+    """A warn code (RFC 7234 Section 5.5)."""
 
     __slots__ = ()
 
@@ -343,16 +374,20 @@ class HSTSDirective(CaseInsensitive):
 
 class RelationType(CaseInsensitive):
 
+    """A registered link relation type (RFC 5988 Section 4)."""
+
     __slots__ = ()
 
 
 class ExtValue(namedtuple('ExtValue', ('charset', 'language', 'value_bytes'))):
 
-    """An ``ext-value`` as defined in RFC 5987."""
+    """An ``ext-value`` (RFC 5987)."""
 
     __slots__ = ()
 
 
 class AltSvcParam(ProtocolString):
+
+    """An ``Alt-Svc`` parameter name (RFC 7838 Section 3)."""
 
     __slots__ = ()

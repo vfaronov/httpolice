@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<!--
+
+The vocabulary here should mostly be obvious after studying some examples.
+See also :mod:`httpolice.notice`.
+
+One non-obvious thing is how references work
+(i.e. the mousover highlights in HTML reports):
+
+- Constants marked up with elements like ``<h/>`` and ``<st/>``
+  are magically highlighted where they appear in the corresponding message(s)
+  (see :func:`httpolice.reports.html._magic_references` for details).
+  For example, if a notice includes ``<st>401</st>``
+  and appears in a response whose status code is 401,
+  then hovering the mouse on the notice will highlight the status code.
+  Sometimes you need to disable this with a ``ref="no"`` attribute.
+
+- Anything referenced by a ``<var/>`` element is magically highlighted.
+
+- If you want to highlight something else,
+  add an explicit ``<ref/>`` element at the end of the ``<notice/>``.
+
+-->
+
 <notices>
 
   <error id="1000">

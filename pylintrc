@@ -1,5 +1,6 @@
 [MASTER]
 
+# Do not remember and compare with previous results. That's just noise.
 persistent=no
 
 

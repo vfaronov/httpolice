@@ -17,6 +17,10 @@ from httpolice.structure import Unavailable
 from httpolice.util.text import nicely_join, printable
 
 
+###############################################################################
+# High-level templates.
+
+
 css_code = pkgutil.get_data('httpolice.reports', 'html.css').decode('utf-8')
 js_code = pkgutil.get_data('httpolice.reports', 'html.js').decode('utf-8')
 
@@ -46,6 +50,8 @@ def html_report(exchanges, buf):
 
 class Placeholder(object):
 
+    """A magical placeholder used for rendering the notices list."""
+
     def __init__(self, name=None):
         self.name = name
 
@@ -60,6 +66,7 @@ class Placeholder(object):
 
 
 def list_notices(buf):
+    """Render the list of all notices to the file-like `buf`."""
     title = u'HTTPolice notices'
     document = dominate.document(title=title)
     _common_meta(document)
@@ -83,10 +90,10 @@ def _common_meta(document):
 
 
 def _render_exchanges(exchanges):
+    # The ``hr`` elements really help readability in w3m.
     H.hr()
     for exch in exchanges:
         with H.div(_class=u'exchange'):
-            # The ``hr`` elements really help readability in w3m.
             if exch.request:
                 _render_request(exch.request)
                 H.hr()
@@ -165,6 +172,7 @@ def _render_header_entries(annotated_entries):
 
 
 def _render_annotated(pieces):
+    """Render an annotated string as produced by :mod:`httpolice.parse`."""
     for piece in pieces:
         if isinstance(piece, bytes):
             H.span(printable(piece.decode('iso-8859-1')))
@@ -180,8 +188,15 @@ def _render_complaints(obj):
                 _notice_to_html(complaint.notice, complaint.context)
 
 
-_seen_ids = {}
+###############################################################################
+# Support for references (mouseover highlights).
 
+# These references directly correspond to Python object references.
+# However, we do not include the raw ``id()`` of objects in the report files,
+# but instead "anonymize" them.
+# See http://security.stackexchange.com/q/121238/108469
+
+_seen_ids = {}
 
 def _anonymize_id(id_):
     if id_ not in _seen_ids:
@@ -214,6 +229,10 @@ def _referring_to(obj):
 
 
 def _magic_references(elem, ctx):
+    """Find "magical" references from an element in a notice.
+    
+    See the comment in ``httpolice/notices.xml``.
+    """
     if elem.get('ref') == u'no':
         return []
     obj = elem.content
@@ -237,7 +256,12 @@ def _magic_references(elem, ctx):
     return []
 
 
+###############################################################################
+# Templates for pieces of notice explanations.
+
+
 def _render_known(obj):
+    """Render an instance of one of the :data:`httpolice.known.classes`."""
     cls = type(obj).__name__
     text = printable(six.text_type(obj))
     cite = known.citation(obj)

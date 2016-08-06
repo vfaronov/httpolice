@@ -21,10 +21,11 @@ Run Pylint::
   $ # ... or selectively:
   $ pylint httpolice/response.py
 
+The delivery pipeline (Travis CI) enforces various other checks;
+if you want to run them locally before pushing to GitHub, see ``.travis.yml``.
+
 Use isort if you like -- there's an ``.isort.cfg`` with the right options --
 but this is not enforced automatically for now.
-
-You may also want to use linters for HTML, CSS, and JS (see ``.travis.yml``).
 
 
 Dependencies
@@ -112,3 +113,60 @@ Feel free to add ``pragma: no cover`` to code
 that would be hard to cover with a natural, functional test.
 
 To run tests with coverage checks locally, use ``tools/pytest_all.sh``.
+
+
+Typical workflows
+~~~~~~~~~~~~~~~~~
+
+Handling a new header
+---------------------
+Let's say RFC 9999 defines a new header called ``Foo-Bar``,
+and you want HTTPolice to understand it.
+
+#. Read RFC 9999.
+#. Check for any updates and errata to RFC 9999
+   (these are shown at the top of the page
+   if you're using the HTML viewer at `tools.ietf.org`__).
+   Note that not all errata are relevant: some may have been "rejected".
+#. Rewrite the ABNF rules for ``Foo-Bar`` from RFC 9999
+   into a new module ``httpolice.syntax.rfc9999``,
+   using the parser combinators from ``httpolice.parse``.
+   Consult other modules in ``httpolice.syntax`` to get the hang of it.
+#. Add information about ``Foo-Bar`` into ``httpolice.known.header``.
+   Consult the comments in that module regarding the fields you can fill in.
+#. Some complex headers may need special-casing in ``httpolice.header``.
+   See ``CacheControlView`` for an example.
+
+__ https://tools.ietf.org/
+
+All the basic checks for this header (no. 1000, 1063, etc.) should now work.
+
+
+Adding a notice
+---------------
+#. Write your notice at the end of ``httpolice/notices.xml``.
+   Let's say the last notice in HTTPolice has an ID of 1678,
+   so your new notice becomes 1679.
+#. In ``test/combined_data/``, copy ``simple_ok`` to ``1679_1``.
+   For some notices, it's convenient to start with another file (like ``put``)
+   or use HAR files instead (``test/har_data/``).
+#. Change the ``1679_1`` file in such a way that it should trigger notice 1679.
+#. Write "1679" at the top of that file
+   to indicate the expected outcome of this test case.
+   In HAR files, use the ``_expected`` key instead.
+   You can also write comments there. Consult existing files.
+#. If necessary, add more test cases: ``1679_2``, and so on.
+#. Run your tests and make sure they fail as expected::
+
+     $ py.test -k1679
+
+#. Write the actual checks logic.
+   Usually it goes into one of the four big functions described above,
+   but sometimes a better place is in ``httpolice.syntax`` (see e.g. no. 1015)
+   or somewhere else.
+#. Run the tests again and make sure they pass.
+#. Check the report for your test cases
+   to make sure the explanation looks good::
+
+     $ httpolice -i combined -o html test/combined_data/1679* >/tmp/report.html
+     $ open /tmp/report.html

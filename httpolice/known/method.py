@@ -25,6 +25,20 @@ class KnownMethods(KnownDict):
         return item['_'].replace(u'-', u'_')
 
 
+# When adding a new method, fill in the fields as follows:
+#
+#   ``_``, ``_citations``, ``safe``, ``idempotent``
+#     Obvious, and usually filled by ``tools/iana.py``.
+#
+#   ``defines_body``
+#     Whether a meaning is defined for a payload body with this method.
+#     (For example, RFC 7231 Section 4.3.1 says
+#     "a payload within a GET request message has no defined semantics",
+#     so ``defines_body`` is ``False``.)
+#
+#   ``cacheable``
+#     Whether responses to this method can be cached (RFC 7234).
+
 known = KnownMethods([
  {'_': Method(u'ACL'),
   '_citations': [RFC(3744, section=(8, 1))],

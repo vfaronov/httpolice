@@ -45,7 +45,7 @@ def expand_header(hdr):
 
 @singledispatch
 def expand_error(error):
-    return [error]
+    return [error]      # A single paragraph consisting of the error message.
 
 @expand_error.register(ParseError)
 def expand_parse_error(error):

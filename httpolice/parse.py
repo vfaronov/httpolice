@@ -11,7 +11,7 @@ We don't need to transform them, add lookaheads etc.
 They just work. And we get detailed error messages for free.
 
 However, Earley is not very fast (at least this implementation).
-We use it for headers, which have complex grammars.
+We use it for headers, which have complex grammars but are easy to memoize.
 For HTTP/1.x message framing, we just use regexes,
 which are derived automatically from the same code (:meth:`Symbol.as_regex`).
 
@@ -583,7 +583,13 @@ class Stream(object):
 
     # pylint: disable=attribute-defined-outside-init
 
-    """Wraps a string of bytes that are the input to parsers."""
+    """Wraps a string of bytes that are the input to parsers.
+
+    This class is directly used in :mod:`httpolice.framing1`,
+    and it encapsulates some state that is passed around there,
+    including complaints that are later "dumped" into the parsed message.
+    In most other cases, you probably want :func:`simple_parse` instead.
+    """
 
     _cache = OrderedDict()
 
@@ -683,7 +689,7 @@ class Stream(object):
         annotate_classes = tuple(annotate_classes or ())
         key = None
         if self._is_empty_state() and to_eof:
-            # Caching is really only useful
+            # Memoization is really only useful
             # when we're parsing something small in its entirety,
             # like a header value.
             # The above ``if`` means that the cache won't get in our way
@@ -1078,7 +1084,10 @@ def _find_pivots(chart, symbol, start, stack=None):
 
 def simple_parse(data, symbol, complain, fail_notice_id, annotate_classes=None,
                  **extra_context):
-    """(Try to) parse an entire string as a single grammar symbol."""
+    """(Try to) parse an entire string as a single grammar symbol.
+
+    This wraps :class:`Stream` in a simpler interface for the common case.
+    """
     stream = Stream(force_bytes(data))
 
     try:

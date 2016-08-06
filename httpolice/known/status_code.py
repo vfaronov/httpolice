@@ -14,6 +14,20 @@ def is_cacheable(code):
     return known.get_info(code).get('cacheable')
 
 
+# When adding a new status code, fill in the fields as follows:
+#
+#   ``_``, ``_citations``
+#     Obvious, and usually filled by ``tools/iana.py``.
+#
+#   ``_title``
+#     The default reason phrase, usually filled by ``tools/iana.py``.
+#
+#   ``cacheable``
+#     If the status code is defined as cacheable by default,
+#     set this to ``BY_DEFAULT``.
+#     If it is defined as never cacheable, set to ``NOT_AT_ALL``.
+#     Otherwise, set to ``NOT_BY_DEFAULT``.
+
 known = KnownDict(StatusCode, [
  {'_': StatusCode(100),
   '_citations': [RFC(7231, section=(6, 2, 1))],
