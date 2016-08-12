@@ -2,8 +2,8 @@
 
 set -e
 
-VERSION=3.2.2
-BASE=$HOME/install-eslint
+VERSION=2.9.2
+BASE=$HOME/install-jshint
 
 action=$1
 shift
@@ -13,10 +13,10 @@ case $action in
         rm -rf "$BASE"
         mkdir "$BASE"
         cd "$BASE"
-        npm install eslint@$VERSION
+        npm install jshint@$VERSION
         ;;
 
     run)
-        "$BASE/node_modules/.bin/eslint" "$@"
+        "$BASE/node_modules/.bin/jshint" "$@"
         ;;
 esac
