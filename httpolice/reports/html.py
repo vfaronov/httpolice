@@ -42,6 +42,8 @@ def html_report(exchanges, buf):
     _common_meta(document)
     with document.head:
         H.script(type=u'text/javascript').add_raw_string(js_code)
+    with document.body:
+        H.attr(_class=u'report')
     with document:
         H.h1(title)
         _render_exchanges(exchanges)
@@ -70,13 +72,14 @@ def list_notices(buf):
     title = u'HTTPolice notices'
     document = dominate.document(title=title)
     _common_meta(document)
+    with document.body:
+        H.attr(_class=u'notices-list')
     with document:
         H.h1(title)
-        with H.div(_class=u'notices-list'):
-            placeholder = Placeholder()
-            for id_ in sorted(notice.all_notices.keys()):
-                _notice_to_html(notice.all_notices[id_], placeholder,
-                                with_anchor=True)
+        placeholder = Placeholder()
+        for id_ in sorted(notice.all_notices.keys()):
+            _notice_to_html(notice.all_notices[id_], placeholder,
+                            with_anchor=True)
     buf.write(document.render().encode('utf-8'))
 
 

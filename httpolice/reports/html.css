@@ -3,7 +3,6 @@
  ****************************************************************/
 
 body {
-    background: whitesmoke;
     color: black;
     font-family: sans-serif;
     quotes: '“' '”';
@@ -80,6 +79,10 @@ button {
 /****************************************************************
  * Request and response data
  ****************************************************************/
+
+body.report {
+    background: whitesmoke;
+}
 
 div.exchange {
     background: white;
