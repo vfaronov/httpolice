@@ -75,7 +75,7 @@ def tcpflow_input(paths):
         streams_info = []
         seen = {}
         for name in os.listdir(dir_path):
-            if name == 'report.xml':
+            if name in ['report.xml', 'alerts.txt']:
                 continue
             match = re.match(r'^(\d+)-([^-]+-\d+)-([^-]+-\d+)-\d+$', name)
             if not match:
