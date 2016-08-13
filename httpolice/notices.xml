@@ -1036,7 +1036,7 @@ One non-obvious thing is how references work
 
   <error id="1139">
     <title>Multipart boundary not declared</title>
-    <explain>According to <h>Content-Type</h>, this message has a multipart body, but Content-Type not include the ‘boundary’ parameter that is necessary to parse such a body.</explain>
+    <explain>According to <h>Content-Type</h>, this message has a multipart body, but Content-Type does not include the ‘boundary’ parameter that is necessary to parse such a body.</explain>
     <explain>See <rfc num="2046" sect="5.1.1"/>.</explain>
   </error>
 
