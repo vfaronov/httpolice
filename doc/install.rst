@@ -48,11 +48,23 @@ Check that the installation was successful::
 
 On Windows
 ----------
-After `installing Python 2.7`__, something like this should do the trick::
+Unless you have a toolchain for building Python extensions,
+you probably want to install a precompiled version of `lxml`__.
+For example, at the time of writing,
+`lxml 3.6.0`__ has precompiled packages for some versions of Python on Windows,
+but `lxml 3.6.1`__ doesn't have any.
+Therefore, you can `install Python 2.7`__ and ask for lxml 3.6.0::
+
+  C:\>Python27\Scripts\pip install lxml==3.6.0
+
+__ https://pypi.python.org/pypi/lxml
+__ https://pypi.python.org/pypi/lxml/3.6.0
+__ https://pypi.python.org/pypi/lxml/3.6.1
+__ https://www.python.org/downloads/windows/
+
+Then you can install HTTPolice itself::
 
   C:\>Python27\Scripts\pip install HTTPolice
 
   C:\>Python27\Scripts\httpolice --version
   HTTPolice 0.1.0
-
-__ https://www.python.org/downloads/windows/
