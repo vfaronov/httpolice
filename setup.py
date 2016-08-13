@@ -13,10 +13,6 @@ with io.open(os.path.join('httpolice', '__metadata__.py'), 'rb') as f:
 with io.open('README.rst') as f:
     long_description = f.read()
 
-with io.open('requirements.in') as f:
-    install_requires = [line for line in f
-                        if line and not line.startswith('#')]
-
 
 setup(
     name='HTTPolice',
@@ -27,7 +23,23 @@ setup(
     author='Vasiliy Faronov',
     author_email='vfaronov@gmail.com',
     license='MIT',
-    install_requires=install_requires,
+
+    # XXX: when updating these fields,
+    # make sure you don't break ``tools/minimum_requires.sh``.
+    install_requires=[
+        'singledispatch >= 3.4.0.3',
+        'six >= 1.10.0',
+        'lxml >= 3.6.0',
+        'bitstring >= 3.1.4',
+        'dominate >= 2.2.0',
+        'defusedxml >= 0.4.1',
+    ],
+    extras_require={
+        ':python_version == "2.7"': [
+            'enum34 >= 1.1.6',
+        ],
+    },
+
     packages=[
         'httpolice',
         'httpolice.inputs',
