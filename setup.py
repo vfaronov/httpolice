@@ -24,7 +24,7 @@ setup(
     author_email='vfaronov@gmail.com',
     license='MIT',
 
-    # XXX: when updating these fields,
+    # NB: when updating these fields,
     # make sure you don't break ``tools/minimum_requires.sh``.
     install_requires=[
         'singledispatch >= 3.4.0.3',
