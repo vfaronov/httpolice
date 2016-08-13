@@ -1,3 +1,3 @@
 # -*- coding: utf-8; -*-
 
-version = '0.3.0.dev4'
+version = '0.3.0rc1'
