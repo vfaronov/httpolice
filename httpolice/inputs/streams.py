@@ -4,23 +4,13 @@ from collections import OrderedDict
 import io
 import os
 import re
-import sys
 
 import six
 
 from httpolice.exchange import complaint_box
 from httpolice.framing1 import parse_streams
-from httpolice.inputs.common import InputError
+from httpolice.inputs.common import InputError, decode_path
 from httpolice.parse import Stream
-
-
-fs_encoding = sys.getfilesystemencoding()
-
-def _decode_path(path):     # pragma: no cover
-    if isinstance(path, bytes):
-        return path.decode(fs_encoding, 'replace')
-    else:
-        return path
 
 
 def _path_pairs_input(path_pairs):
@@ -28,10 +18,10 @@ def _path_pairs_input(path_pairs):
         inbound = outbound = None
         if inbound_path is not None:
             with io.open(inbound_path, 'rb') as f:
-                inbound = Stream(f.read(), name=_decode_path(inbound_path))
+                inbound = Stream(f.read(), name=decode_path(inbound_path))
         if outbound_path is not None:
             with io.open(outbound_path, 'rb') as f:
-                outbound = Stream(f.read(), name=_decode_path(outbound_path))
+                outbound = Stream(f.read(), name=decode_path(outbound_path))
         for exch in parse_streams(inbound, outbound, scheme=u'http'):
             yield exch
 
@@ -170,7 +160,7 @@ def parse_combined(path):
         raise InputError('%s: bad combined file: no outbound marker' % path)
     (inbound_data, outbound_data) = parts2
 
-    inbound = Stream(inbound_data, name=_decode_path(path) + u' (inbound)')
-    outbound = Stream(outbound_data, name=_decode_path(path) + u' (outbound)')
+    inbound = Stream(inbound_data, name=decode_path(path) + u' (inbound)')
+    outbound = Stream(outbound_data, name=decode_path(path) + u' (outbound)')
 
     return (inbound, outbound, scheme, preamble)
