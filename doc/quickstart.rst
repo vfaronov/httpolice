@@ -135,7 +135,7 @@ __ https://www.djangoproject.com/
 
 Add the HTTPolice middleware to the top of your middleware list::
 
-  MIDDLEWARE_CLASSES = [
+  MIDDLEWARE = [
       'django_httpolice.HTTPoliceMiddleware',
       'django.middleware.common.CommonMiddleware',
       # ...
@@ -144,37 +144,37 @@ Add the HTTPolice middleware to the top of your middleware list::
 Add a couple settings::
 
   HTTPOLICE_ENABLE = True
-  HTTPOLICE_RAISE = True
+  HTTPOLICE_RAISE = 'error'
 
 .. highlight:: console
 
 Now let’s run the tests and see what’s broken::
 
   $ python manage.py test
-  .E.
+  ...E
   ======================================================================
-  ERROR: test_get_plain (example_app.test.ExampleTestCase)
+  ERROR: test_query_plain (example_app.test.ExampleTestCase)
   ----------------------------------------------------------------------
   Traceback (most recent call last):
     [...]
-    File "[...]/django_httpolice/middleware.py", line 81, in process_response
+    File "[...]/django_httpolice/middleware.py", line 92, in process_response
       raise ProtocolError(exchange)
-  django_httpolice.common.ProtocolError: HTTPolice found errors in this response:
-  ------------ request: GET /api/v1/?name=Martha&format=plain
+  django_httpolice.common.ProtocolError: HTTPolice found problems in this response:
+  ------------ request: GET /api/v1/words/?query=er
   C 1070 No User-Agent header
   ------------ response: 200 OK
   E 1038 Bad JSON body
-  
-  
+
+
   ----------------------------------------------------------------------
-  Ran 3 tests in 0.351s
-  
+  Ran 4 tests in 0.380s
+
   FAILED (errors=1)
 
 In `this example`__, the app sent a wrong ``Content-Type`` header
 and HTTPolice caught it.
 
-__ https://github.com/vfaronov/django-httpolice/blob/234aa3a/example/example_app/views.py#L16
+__ https://github.com/vfaronov/django-httpolice/blob/d382aa7/example/example_app/views.py#L43
 
 
 More options
