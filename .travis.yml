@@ -28,6 +28,9 @@ install:
 cache: pip
 
 script:
+    # Make sure there are no "FIXME" marks in the codebase.
+    - test ! "$( git grep -l FIXME | grep -Fv .travis.yml )"
+
     # Basic stuff.
     - python setup.py check --strict --restructuredtext
     - tools/pylint_all.sh -j 2
