@@ -45,10 +45,4 @@ do
 EOF
 done
 
-echo 'Zipping...'
-cd "$build_dir/"
-zip -r extra_doc.zip ./*
-cd - >/dev/null
-mv "$build_dir/extra_doc.zip" "$dir/"
-
 echo 'All done.'
