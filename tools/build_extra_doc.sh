@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Prepare files to be uploaded to pythonhosted.org.
-# Because pythonhosted.org does not support versioning like Read the Docs does,
-# these files should only be uploaded when releasing a new "stable" version.
+# XXX: when changing this file,
+# you may also need to change ``extra_doc_hack.sh``.
 
 set -e
 

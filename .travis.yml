@@ -58,6 +58,11 @@ script:
     # and nothing it shouldn't (including all the files we just built).
     - check-manifest
 
+before_deploy:
+    # If we're going to upload a development release,
+    # we need to revert back to the "stable" version of extra docs.
+    - tools/extra_doc_hack.sh
+
 deploy:
     on:
         tags: true
