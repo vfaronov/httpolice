@@ -47,7 +47,8 @@ def _exchange_marker(exchange):
         marker = u'------------ unknown request'
     else:
         marker = u'------------'
-    return ellipsize(marker, 80) + u'\n'
+    # The number 79 fits the default ``cmd.exe`` size in Windows.
+    return ellipsize(marker, 79) + u'\n'
 
 
 def _response_marker(response):
