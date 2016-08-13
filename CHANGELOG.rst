@@ -7,8 +7,8 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 (which means it is unstable until 1.0).
 
 
-Unreleased
-~~~~~~~~~~
+0.3.0 - 2016-08-14
+~~~~~~~~~~~~~~~~~~
 
 Added
 -----
@@ -66,9 +66,6 @@ Deprecated
 
 .. _Python API: http://httpolice.readthedocs.io/en/stable/api.html
 
-Removed
--------
-
 Fixed
 -----
 - The `tcpick and tcpflow input`_ modes should now be more reliable,
@@ -81,9 +78,6 @@ Fixed
    http://httpolice.readthedocs.io/en/stable/streams.html
 .. _1053: http://pythonhosted.org/HTTPolice/notices.html#1053
 .. _1066: http://pythonhosted.org/HTTPolice/notices.html#1066
-
-Security
---------
 
 
 0.2.0 - 2016-05-08
