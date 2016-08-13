@@ -27,19 +27,9 @@ if you want to run them locally before pushing to GitHub, see ``.travis.yml``.
 Use isort if you like -- there's an ``.isort.cfg`` with the right options --
 but this is not enforced automatically for now.
 
-
-Dependencies
-------------
 Versions of development tools (py.test, Pylint...)
 are pinned down to help make builds/QA reproducible.
-From time to time, they are manually upgraded::
-
-  $ pip-compile tools/requirements.in
-  $ pip install -r tools/requirements.txt
-  $ # ... check that everything is OK with the new versions
-  $ # ... maybe some Pylint overrides are no longer necessary
-  $ git add tools/requirements.txt && git commit
-
+From time to time, they are manually upgraded (see the "Maintenance" section).
 Eventually I will use pip-sync for this,
 but right now it is unusable due to `pip-tools issue #206`__.
 
@@ -170,3 +160,78 @@ Adding a notice
 
      $ httpolice -i combined -o html test/combined_data/1679* >/tmp/report.html
      $ open /tmp/report.html
+
+
+Releasing a new version
+-----------------------
+
+#. Make sure that you're on master, it's clean and synced with GitHub,
+   and that Travis is green.
+
+#. Sync with IANA registries by running (under Python 2)::
+
+     $ tools/iana.py
+
+   and propagating any changes to ``httpolice.known``.
+
+#. If necessary, update the version number in ``httpolice/__metadata__.py``
+   (e.g. 0.12.0.dev4 → 0.12.0).
+
+#. If releasing a "stable" version,
+   replace the "Unreleased" heading in ``CHANGELOG.rst``
+   with "<version> - <release date>", e.g. "0.12.0 - 2016-08-14".
+
+#. Commit as necessary.
+
+#. Apply a Git tag equal to the version number, for example::
+
+     $ git tag -a 0.12.0
+
+#. Push master and tags.
+
+#. Watch as Travis builds and uploads stuff to PyPI.
+
+#. Log in to PyPI and update version visibility:
+
+   - if releasing a development version, hide it;
+   - conversely, if releasing a "stable" version, hide the previous one.
+
+#. If releasing a "stable" version,
+   check that Read the Docs has built it and updated the "stable" pointer.
+   (You may need to refresh the page to see it.)
+   If it hasn't, log in to readthedocs.org and force versions/builds manually.
+
+#. Bump the version number in ``httpolice/__metadata__.py``
+   (e.g. 0.12.0 → 0.13.0.dev1).
+
+#. Commit and push.
+
+
+Maintenance
+~~~~~~~~~~~
+
+- Watch for new versions of related software
+  and make sure they are compatible with HTTPolice:
+
+  - main dependencies (``install_requires``);
+  - sources of input data (tcpflow, major Web browsers, Fiddler).
+
+- Update development dependencies:
+
+  #. Review and update ``tools/requirements.in``.
+
+  #. Pin down new versions::
+
+       $ pip-compile tools/requirements.in
+       $ pip install -r tools/requirements.txt
+
+  #. Update other pinned versions:
+
+     - PyPy (in ``tools/pypy_env.sh``);
+     - Nu Html Checker (in ``tools/vnu.sh``);
+     - JSHint (in ``tools/jshint.sh``).
+
+  #. Check that everything is OK with the new versions.
+     Maybe some Pylint overrides are no longer necessary, etc.
+
+- Look at Travis build logs and make sure nothing strange is going on there.
