@@ -6,6 +6,7 @@ from httpolice.structure import ContentCoding
 
 
 known = KnownDict(ContentCoding, [
+ {'_': ContentCoding(u'br'), '_citations': [RFC(7932)]},
  {'_': ContentCoding(u'compress'),
   '_citations': [RFC(7230, section=(4, 2, 1))]},
  {'_': ContentCoding(u'deflate'),
