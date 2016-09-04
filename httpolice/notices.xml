@@ -320,7 +320,7 @@ One non-obvious thing is how references work
 
   <error id="1040">
     <title>Bad URL-encoded body</title>
-    <explain>According to <h>Content-Type</h>, this message’s body is URL-encoded. But it doesn’t look like a proper URL-encoded string, as defined by <cite title="HTML5" url="http://www.w3.org/TR/html/forms.html#url-encoded-form-data"/>, because it contains the character: <var ref="char"/>.</explain>
+    <explain>According to <h>Content-Type</h>, this message’s body is URL-encoded. But it doesn’t look like a proper URL-encoded string, as defined by <cite title="HTML5" url="https://www.w3.org/TR/html5/forms.html#url-encoded-form-data"/>, because it contains the character: <var ref="char"/>.</explain>
     <explain>This often means that the <h>Content-Type</h> header is wrong.</explain>
     <ref to="msg.displayable_body"/>
   </error>
