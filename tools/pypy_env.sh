@@ -5,7 +5,7 @@
 
 set -e
 
-VERSION=pypy2-v5.3.1-linux64
+VERSION=pypy2-v5.4.0-linux64
 BASE=$HOME/install-pypy
 
 rm -rf "$BASE"

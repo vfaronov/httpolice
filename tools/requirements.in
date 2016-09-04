@@ -12,4 +12,4 @@ twine
 # This will have to be checked and synchronized from time to time.
 # Not sure if good idea.
 Sphinx==1.3.5
-alabaster==0.7.8
+alabaster==0.7.9

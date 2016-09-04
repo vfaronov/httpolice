@@ -4,36 +4,36 @@
 #
 #    pip-compile --output-file tools/requirements.txt tools/requirements.in
 #
-alabaster==0.7.8
+alabaster==0.7.9
 args==0.1.0               # via clint
-astroid==1.4.7            # via pylint
+astroid==1.4.8            # via pylint
 babel==2.3.4              # via sphinx
-check-manifest==0.31
+check-manifest==0.33
 click==6.6                # via pip-tools
 clint==0.5.1              # via twine
-coverage==4.1             # via pytest-cov
+coverage==4.2             # via pytest-cov
 docutils==0.12
 first==2.0.1              # via pip-tools
 isort==4.2.5              # via pylint
 Jinja2==2.8               # via sphinx
 lazy-object-proxy==1.2.2  # via astroid
 MarkupSafe==0.23          # via jinja2
-mccabe==0.5.0             # via pylint
+mccabe==0.5.2             # via pylint
 pip-tools==1.7.0
 pkginfo==1.3.2            # via twine
 py==1.4.31                # via pytest
 Pygments==2.1.3           # via sphinx
 pylint==1.6.4
-pytest-cov==2.3.0
-pytest==2.9.2
+pytest-cov==2.3.1
+pytest==3.0.2
 pytz==2016.6.1            # via babel
 requests-toolbelt==0.7.0  # via twine
-requests==2.10.0          # via requests-toolbelt, twine
+requests==2.11.1          # via requests-toolbelt, twine
 six==1.10.0               # via astroid, pip-tools, pylint, sphinx
 snowballstemmer==1.2.1    # via sphinx
 sphinx-rtd-theme==0.1.9   # via sphinx
 Sphinx==1.3.5             # via sphinx-rtd-theme
-twine==1.7.4
+twine==1.8.1
 wheel==0.29.0
 wrapt==1.10.8             # via astroid
 

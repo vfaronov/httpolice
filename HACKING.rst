@@ -13,7 +13,7 @@ Set up::
 
 Run tests::
 
-  $ py.test
+  $ pytest
 
 Run Pylint::
 
@@ -27,7 +27,7 @@ if you want to run them locally before pushing to GitHub, see ``.travis.yml``.
 Use isort if you like -- there's an ``.isort.cfg`` with the right options --
 but this is not enforced automatically for now.
 
-Versions of development tools (py.test, Pylint...)
+Versions of development tools (pytest, Pylint...)
 are pinned down to help make builds/QA reproducible.
 From time to time, they are manually upgraded (see the "Maintenance" section).
 Eventually I will use pip-sync for this,
@@ -148,7 +148,7 @@ Adding a notice
 #. If necessary, add more test cases: ``1679_2``, and so on.
 #. Run your tests and make sure they fail as expected::
 
-     $ py.test -k1679
+     $ pytest -k1679
 
 #. Write the actual checks logic.
    Usually it goes into one of the four big functions described above,
@@ -222,6 +222,7 @@ Maintenance
 
   #. Pin down new versions::
 
+       $ rm tools/requirements.txt
        $ pip-compile tools/requirements.in
        $ pip install -r tools/requirements.txt
 
