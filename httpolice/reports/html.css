@@ -270,6 +270,14 @@ form input + label, form label + input {
  * List of all notices
  ****************************************************************/
 
+@media screen {
+    body.notices-list {
+        max-width: 55em;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
 .notices-list div.notice {
     margin-top: 4em !important;
 }
