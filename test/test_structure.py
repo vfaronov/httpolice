@@ -197,3 +197,8 @@ def test_alt_svc():
             MultiDict([(u'foo', u'bar')])
         ),
     ]
+
+
+def test_decode_brotli():
+    [exch1] = load_from_file('content_encoding_br')
+    assert exch1.responses[0].decoded_body.startswith(b'Lorem ipsum dolor')

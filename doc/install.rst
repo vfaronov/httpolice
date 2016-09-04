@@ -12,11 +12,10 @@ __ https://pypi.python.org/pypi/HTTPolice
 
 If you’re not familiar with pip,
 you may need to install it `manually`__ or `from your OS distribution`__.
-You may also need development files and tools for `lxml`__ dependencies.
+You may also need development files and tools to compile dependencies.
 
 __ https://pip.pypa.io/en/stable/installing/
 __ https://packaging.python.org/en/latest/install_requirements_linux/
-__ http://lxml.de/installation.html
 
 `PyPy`__ (the 2.7 variant) is also supported,
 but you may experience problems with older PyPy versions (5.3.1 should be OK).
@@ -29,8 +28,7 @@ On Debian/Ubuntu
 
 ::
 
-  $ sudo apt-get install python-dev libxml2-dev libxslt1-dev zlib1g-dev
-  $ sudo apt-get install python-pip
+  $ sudo apt-get install python-pip python-dev libxml2-dev libxslt1-dev zlib1g-dev libffi-dev
 
 Then, to install the HTTPolice command-line tool into ``~/.local/bin``::
 
@@ -61,6 +59,10 @@ __ https://pypi.python.org/pypi/lxml
 __ https://pypi.python.org/pypi/lxml/3.6.0
 __ https://pypi.python.org/pypi/lxml/3.6.1
 __ https://www.python.org/downloads/windows/
+
+The same applies to `brotlipy`__.
+
+__ https://pypi.python.org/pypi/brotlipy
 
 Then you can install HTTPolice itself::
 

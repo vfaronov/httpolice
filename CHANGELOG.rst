@@ -10,6 +10,14 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 Unreleased
 ~~~~~~~~~~
 
+Added
+-----
+- Decompression of `brotli`_ compressed payloads (``Content-Encoding: br``).
+
+.. _brotli: https://tools.ietf.org/html/rfc7932
+
+Removed
+-------
 - The deprecated constants
   ``httpolice.ERROR``, ``httpolice.COMMENT``, ``httpolice.DEBUG``
   have been removed. Use ``httpolice.Severity`` instead.

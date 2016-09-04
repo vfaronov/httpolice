@@ -14,7 +14,7 @@ import defusedxml.ElementTree
 import six
 
 from httpolice.blackboard import Blackboard, derived_property
-from httpolice.codings import decode_deflate, decode_gzip
+from httpolice.codings import decode_brotli, decode_deflate, decode_gzip
 from httpolice.header import HeadersView
 from httpolice.known import cc, h, header, media, media_type, tc, upgrade, warn
 from httpolice.structure import (FieldName, HeaderEntry, HTTPVersion,
@@ -73,15 +73,13 @@ class Message(Blackboard):
         codings = self.headers.content_encoding.value[:]
         while codings and okay(r) and r:
             coding = codings.pop()
-            if coding in [cc.gzip, cc.x_gzip]:
+            decoder = {cc.gzip: decode_gzip,
+                       cc.x_gzip: decode_gzip,
+                       cc.deflate: decode_deflate,
+                       cc.br: decode_brotli}.get(coding)
+            if decoder is not None:
                 try:
-                    r = decode_gzip(r)
-                except Exception as e:
-                    self.complain(1037, coding=coding, error=e)
-                    r = Unavailable
-            elif coding == cc.deflate:
-                try:
-                    r = decode_deflate(r)
+                    r = decoder(r)
                 except Exception as e:
                     self.complain(1037, coding=coding, error=e)
                     r = Unavailable

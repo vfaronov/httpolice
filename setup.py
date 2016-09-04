@@ -33,6 +33,7 @@ setup(
         'bitstring >= 3.1.4',
         'dominate >= 2.2.0',
         'defusedxml >= 0.4.1',
+        'brotlipy >= 0.5.1',
     ],
     extras_require={
         ':python_version == "2.7"': [
