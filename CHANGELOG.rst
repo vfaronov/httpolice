@@ -10,8 +10,6 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 Unreleased
 ~~~~~~~~~~
 
-Removed
--------
 - The deprecated constants
   ``httpolice.ERROR``, ``httpolice.COMMENT``, ``httpolice.DEBUG``
   have been removed. Use ``httpolice.Severity`` instead.
@@ -135,6 +133,4 @@ Fixed
 0.1.0 - 2016-04-25
 ~~~~~~~~~~~~~~~~~~
 
-Added
------
 - Initial release.
