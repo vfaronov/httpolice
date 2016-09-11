@@ -22,6 +22,12 @@ Removed
   ``httpolice.ERROR``, ``httpolice.COMMENT``, ``httpolice.DEBUG``
   have been removed. Use ``httpolice.Severity`` instead.
 
+Other
+-----
+- There is now a third-party `Chrome extension`_ for HTTPolice.
+
+.. _Chrome extension: https://chrome.google.com/webstore/detail/httpolice-devtool/hnlnhebgfcfemjaphgbeokdnfpgbnhgn
+
 
 0.3.0 - 2016-08-14
 ~~~~~~~~~~~~~~~~~~
