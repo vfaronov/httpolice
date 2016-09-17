@@ -44,6 +44,13 @@ Check that the installation was successful::
   HTTPolice 0.1.0
 
 
+On Fedora
+---------
+Same as above, but use the following command to install dependencies::
+
+  $ sudo dnf install python-pip gcc gcc-c++ redhat-rpm-config python-devel libxml2-devel libxslt-devel libffi-devel
+
+
 On Windows
 ----------
 Unless you have a toolchain for building Python extensions,
