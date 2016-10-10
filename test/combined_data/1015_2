@@ -1,0 +1,26 @@
+1015
+
+# RFC 7230 errata ID: 4667.
+
+======== BEGIN INBOUND STREAM ========
+POST / HTTP/1.1
+Host: example.com
+Content-Type: text/plain
+User-Agent: demo
+Transfer-Encoding: chunked
+Trailer: some-result
+
+1c
+foo bar foo bar foo bar baz 
+5; ext1 = value1; ext2 = "value2 value3"
+xyzzy
+0
+Some-Result: okay
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!

@@ -164,8 +164,10 @@ Trailer = comma_list1(field_name)                                       > pivot
 chunk_size = (lambda s: int(s, 16)) << string1(HEXDIG)                  > pivot
 chunk_ext_name = token                                                  > auto
 chunk_ext_val = token | quoted_string                                   > auto
-chunk_ext = many(skip(';') * chunk_ext_name *
-                 maybe(skip('=') * chunk_ext_val))                      > pivot
+
+# As updated by RFC 7230 errata ID: 4667.
+chunk_ext = many(skip(BWS * ';' * BWS) * chunk_ext_name *
+                 maybe(skip(BWS * '=' * BWS) * chunk_ext_val))          > pivot
 
 Host = uri_host + maybe_str(':' + port)                                 > pivot
 
