@@ -139,8 +139,8 @@ div.body-display, div.trailer {
 
 .body-display h3, .trailer h3 {
     display: inline-block;
-    border: thin dashed;
-    padding: 0.3em 0.5em;
+    border-bottom: thin dashed;
+    padding: 0.3em 0;
     margin: 0;
     color: darkgray;
 }
