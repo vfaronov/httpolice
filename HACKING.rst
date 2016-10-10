@@ -236,3 +236,6 @@ Maintenance
      Maybe some Pylint overrides are no longer necessary, etc.
 
 - Look at Travis build logs and make sure nothing strange is going on there.
+- Check links in notices::
+
+    $ linkchecker --check-extern extra_doc/_build/notices.html
