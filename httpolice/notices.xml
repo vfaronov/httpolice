@@ -2050,4 +2050,19 @@ One non-obvious thing is how references work
     <explain>but cannot detect which of them is the inbound stream and which is the outbound. This can happen if the streams are malformed or not HTTP/1.x. They will not be processed.</explain>
   </error>
 
+  <comment id="1280">
+    <title><var ref="header"/>: <media>application/json</media> with charset</title>
+    <explain>The <media>application/json</media> media type does not have a ‘charset’ parameter. <rfc num="7159" sect="11">Adding one really has no effect on compliant recipients.</rfc></explain>
+    <explain>See also <rfc num="7159" sect="8.1"/>.</explain>
+  </comment>
+
+  <error id="1281">
+    <title>JSON encoded in <var ref="msg.guessed_charset"/></title>
+    <rfc num="7159" sect="8.1">
+      JSON text SHALL be encoded in UTF-8, UTF-16, or UTF-32.
+    </rfc>
+    <ref to="msg.headers.content_type"/>
+    <ref to="msg.displayable_body"/>
+  </error>
+
 </notices>

@@ -128,10 +128,17 @@ class Message(Blackboard):
                 media_type.is_json(self.headers.content_type.item) and \
                 okay(self.unicode_body) and self.content_is_full:
             try:
-                return json.loads(self.unicode_body)
+                r = json.loads(self.unicode_body)
             except ValueError as e:
                 self.complain(1038, error=e)
-                return Unavailable
+                r = Unavailable
+            else:
+                if self.guessed_charset not in ['ascii', 'utf-8', 'utf-16',
+                                                'utf-16-le', 'utf-16-be',
+                                                'utf-32', 'utf-32-le',
+                                                'utf-32-be']:
+                    self.complain(1281)
+            return r
         else:
             return None
 
@@ -285,6 +292,10 @@ def check_message(msg):
             complain(1035)
         for dupe in headers.content_type.param.duplicates():
             complain(1042, param=dupe)
+
+    if headers.content_type == media.application_json and \
+            u'charset' in headers.content_type.param:
+        complain(1280, header=headers.content_type)
 
     if headers.upgrade.is_present and u'upgrade' not in headers.connection:
         complain(1050)

@@ -13,8 +13,11 @@ Unreleased
 Added
 -----
 - Decompression of `brotli`_ compressed payloads (``Content-Encoding: br``).
+- Checks for JSON charsets (notices `1280`_ and `1281`_).
 
 .. _brotli: https://tools.ietf.org/html/rfc7932
+.. _1280: http://pythonhosted.org/HTTPolice/notices.html#1280
+.. _1281: http://pythonhosted.org/HTTPolice/notices.html#1281
 
 Removed
 -------
