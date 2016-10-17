@@ -77,9 +77,7 @@ How do you get this into HTTPolice?
 
 One way is to use `mitmproxy`__,
 an advanced tool for intercepting HTTP traffic.
-You can install it `manually`__,
-or from your distribution’s packages if they are recent enough
-(0.15 should work).
+See its `installation instructions`__.
 
 __ https://mitmproxy.org/
 __ http://docs.mitmproxy.org/en/stable/install.html
