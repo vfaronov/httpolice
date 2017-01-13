@@ -15,7 +15,7 @@ Run tests::
 
   $ pytest
 
-Run Pylint::
+Run Pylint (currently doesn't work under Python 3.6)::
 
   $ tools/pylint_all.sh -j 2
   $ # ... or selectively:
