@@ -55,7 +55,7 @@ class Placeholder(object):
     """A magical placeholder used for rendering the notices list."""
 
     def __init__(self, name=None):
-        self.name = name
+        self.__name = name
 
     def get(self, name, _=None):
         return Placeholder(name)
@@ -65,6 +65,9 @@ class Placeholder(object):
 
     def __getattr__(self, name):
         return self.get(name)
+
+    def __str__(self):
+        return self.__name
 
 
 def list_notices(buf):
@@ -349,7 +352,7 @@ def _ref_to_html(ref, ctx):
 
 @_piece_to_html.register(Placeholder)
 def _placeholder_to_html(placeholder, _):
-    H.var(placeholder.name)
+    H.var(str(placeholder))
 
 for _cls in known.classes:
     _piece_to_html.register(_cls, lambda obj, _: _render_known(obj))
