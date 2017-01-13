@@ -12,6 +12,7 @@ Unreleased
 
 Added
 -----
+- Python 3.6 compatibility.
 - Decompression of `brotli`_ compressed payloads (``Content-Encoding: br``).
 - Checks for JSON charsets (notices `1280`_ and `1281`_).
 
@@ -24,6 +25,14 @@ Removed
 - The deprecated constants
   ``httpolice.ERROR``, ``httpolice.COMMENT``, ``httpolice.DEBUG``
   have been removed. Use ``httpolice.Severity`` instead.
+- When checking XML payloads, HTTPolice
+  no longer takes precautions against denial-of-service attacks,
+  because the `defusedxml`_ module does not currently work with Python 3.6.
+  DoS attacks against HTTPolice are considered unlikely and non-critical.
+- Notice 1275 ("XML with entity declarations") has been removed
+  for the same reason.
+
+.. _defusedxml: https://pypi.python.org/pypi/defusedxml/
 
 Other
 -----
