@@ -563,6 +563,11 @@ known = KnownDict(MediaType, [
   'deprecated': True},
  {'_': MediaType(u'text/encaprtp'), '_citations': [RFC(6849)]},
  {'_': MediaType(u'text/enriched'), '_citations': [RFC(1896)]},
+ {'_': MediaType(u'text/event-stream'),
+  '_citations': [Citation(u'Server-Sent Events',
+                          u'https://www.w3.org/TR/eventsource/'
+                          u'#text-event-stream')],
+  'patch': False},
  {'_': MediaType(u'text/example'), '_citations': [RFC(4735)]},
  {'_': MediaType(u'text/fwdred'), '_citations': [RFC(6354)]},
  {'_': MediaType(u'text/grammar-ref-list'), '_citations': [RFC(6787)]},
