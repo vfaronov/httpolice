@@ -181,13 +181,17 @@ Releasing a new version
    replace the "Unreleased" heading in ``CHANGELOG.rst``
    with "<version> - <release date>", e.g. "0.12.0 - 2016-08-14".
 
-#. Commit as necessary.
+#. Commit as necessary, for example::
+
+     $ git commit -am 'Version 0.12.0'
 
 #. Apply a Git tag equal to the version number, for example::
 
-     $ git tag -a 0.12.0
+     $ git tag -a 0.12.0 -m 'Version 0.12.0'
 
-#. Push master and tags.
+#. Push master and tags::
+
+     $ git push --tags origin master
 
 #. Watch as Travis builds and uploads stuff to PyPI.
 
@@ -204,7 +208,10 @@ Releasing a new version
 #. Bump the version number in ``httpolice/__metadata__.py``
    (e.g. 0.12.0 → 0.13.0.dev1).
 
-#. Commit and push.
+#. Commit and push::
+
+     $ git commit -am 'Bump version to 0.13.0.dev1'
+     $ git push
 
 
 Maintenance
