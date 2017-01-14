@@ -77,29 +77,20 @@ How do you get this into HTTPolice?
 
 One way is to use `mitmproxy`__,
 an advanced tool for intercepting HTTP traffic.
-See its `installation instructions`__.
+Install it in a Python 3.5+ environment with HTTPolice integration::
+
+  $ pip3 install mitmproxy-HTTPolice
+
+(see also the instructions for `installing mitmproxy from source`__).
 
 __ https://mitmproxy.org/
-__ http://docs.mitmproxy.org/en/stable/install.html
-
-.. note::
-
-   Another solution would be to use `Fiddler`__.
-   Especially Windows users may find it easier.
-   Use Fiddler’s `HAR 1.2 export`__ to get the data into HTTPolice.
-
-   __ http://www.telerik.com/fiddler
-   __ http://docs.telerik.com/fiddler/KnowledgeBase/ImportExportFormats
-
-You’ll need the integration package::
-
-  $ pip install mitmproxy-HTTPolice
+__ http://docs.mitmproxy.org/en/stable/install.html#advanced-installation
 
 Now, we’re going to use mitmproxy’s command-line tool—`mitmdump`__.
 The following command will start mitmdump as an HTTP proxy on port 8080
 with HTTPolice integration::
 
-  $ mitmdump -s "`python -m mitmproxy_httpolice` -o html report.html"
+  $ mitmdump -s "`python3 -m mitmproxy_httpolice` -o html report.html"
 
 __ http://docs.mitmproxy.org/en/latest/mitmdump.html
 
@@ -113,6 +104,14 @@ With mitmdump running, tell curl to use it as a proxy::
 In the output of mitmdump, you will see that it has intercepted the exchange.
 Now, when you stop mitmdump (Ctrl+C),
 HTTPolice will write an HTML report to ``report.html``.
+
+.. note::
+
+   Another such tool is `Fiddler`__. Especially Windows users may prefer it.
+   Use Fiddler’s `HAR 1.2 export`__ to get the data into HTTPolice.
+
+   __ http://www.telerik.com/fiddler
+   __ http://docs.telerik.com/fiddler/KnowledgeBase/ImportExportFormats
 
 
 Django integration
