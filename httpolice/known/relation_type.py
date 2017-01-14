@@ -35,6 +35,7 @@ known = KnownDict(RelationType, [
  {'_': RelationType(u'contents'),
   '_citations': [Citation(None,
                           u'http://www.w3.org/TR/1999/REC-html401-19991224')]},
+ {'_': RelationType(u'convertedFrom'), '_citations': [RFC(7991)]},
  {'_': RelationType(u'copyright'),
   '_citations': [Citation(None,
                           u'http://www.w3.org/TR/1999/REC-html401-19991224')]},
