@@ -2059,4 +2059,9 @@ One non-obvious thing is how references work
     <ref to="msg.displayable_body"/>
   </error>
 
+  <error id="1282">
+    <title>Wrong media type ‘<var ref="bad"/>’ in <var ref="place"/></title>
+    <explain>There is no such media type ‘<var ref="bad"/>’. Probably ‘<var ref="good"/>’ was intended.</explain>
+  </error>
+
 </notices>

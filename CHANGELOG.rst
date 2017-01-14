@@ -15,10 +15,13 @@ Added
 - Python 3.6 compatibility.
 - Decompression of `brotli`_ compressed payloads (``Content-Encoding: br``).
 - Checks for JSON charsets (notices `1280`_ and `1281`_).
+- Checks for some wrong media types,
+  currently ``plain/text`` and ``text/json`` (notice `1282`_).
 
 .. _brotli: https://tools.ietf.org/html/rfc7932
 .. _1280: http://pythonhosted.org/HTTPolice/notices.html#1280
 .. _1281: http://pythonhosted.org/HTTPolice/notices.html#1281
+.. _1282: http://pythonhosted.org/HTTPolice/notices.html#1282
 
 Removed
 -------

@@ -24,6 +24,18 @@ _DAY_NAMES = [u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday',
               u'Saturady', u'Sunday']
 
 
+_BAD_MEDIA_TYPES = {
+    MediaType(u'plain/text'): MediaType(u'text/plain'),
+    MediaType(u'text/json'): MediaType(u'application/json'),
+}
+
+@can_complain
+def _check_media_type(complain, mtype):
+    if mtype in _BAD_MEDIA_TYPES:
+        complain(1282, bad=mtype, good=_BAD_MEDIA_TYPES[mtype])
+    return mtype
+
+
 def parameter(exclude=None):
     return (
         (CaseInsensitive << token__excluding(exclude or [])) *
@@ -33,7 +45,7 @@ def parameter(exclude=None):
 type_ = token                                                           > pivot
 subtype = token                                                         > pivot
 media_type = Parametrized << (
-    (MediaType << type_ + '/' + subtype) *
+    (_check_media_type << (MediaType << type_ + '/' + subtype)) *
     (MultiDict << many(skip(OWS * ';' * OWS) * parameter())))           > pivot
 
 content_coding = ContentCoding << token                                 > pivot
@@ -175,7 +187,7 @@ def media_range(no_q=False):
         (
             literal('*/*') |
             type_ + '/' + '*' |
-            MediaType << type_ + '/' + subtype
+            _check_media_type << (MediaType << type_ + '/' + subtype)
         ) *
         (
             MultiDict << many(
