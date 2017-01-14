@@ -41,7 +41,7 @@ Or, to install it system-wide::
 Check that the installation was successful::
 
   $ httpolice --version
-  HTTPolice 0.1.0
+  HTTPolice 0.4.0
 
 
 On Fedora
@@ -53,27 +53,33 @@ Same as above, but use the following command to install dependencies::
 
 On Windows
 ----------
-Unless you have a toolchain for building Python extensions,
-you probably want to install a precompiled version of `lxml`__.
-For example, at the time of writing,
-`lxml 3.6.0`__ has precompiled packages for some versions of Python on Windows,
-but `lxml 3.6.1`__ doesn't have any.
-Therefore, you can `install Python 2.7`__ and ask for lxml 3.6.0::
-
-  C:\>Python27\Scripts\pip install lxml==3.6.0
+HTTPolice uses libraries (`lxml`__ and `brotlipy`__) that include binary
+CPython extensions. You probably want precompiled versions of these extensions,
+and to get them, you may need specific versions of Python, lxml and brotlipy.
 
 __ https://pypi.python.org/pypi/lxml
-__ https://pypi.python.org/pypi/lxml/3.6.0
-__ https://pypi.python.org/pypi/lxml/3.6.1
-__ https://www.python.org/downloads/windows/
-
-The same applies to `brotlipy`__.
-
 __ https://pypi.python.org/pypi/brotlipy
 
-Then you can install HTTPolice itself::
+For example, at the time of writing, you can `install Python 3.5`__
+(**not** 3.6) and then simply do::
 
-  C:\>Python27\Scripts\pip install HTTPolice
+  C:\Users\Vasiliy\...\Python35>Scripts\pip install HTTPolice
 
-  C:\>Python27\Scripts\httpolice --version
-  HTTPolice 0.1.0
+Check that the installation was successful::
+
+  C:\Users\Vasiliy\...\Python35>Scripts\httpolice --version
+  HTTPolice 0.4.0
+
+__ https://www.python.org/downloads/release/python-352/
+
+However, it’s possible that new versions of lxml and brotlipy
+might not have precompiled binaries for your version of Python,
+and then you will have to check the `PyPI`__ pages of these libraries
+to find a version that has suitable binaries (look for ``*-win32.whl``),
+and install those specific versions **before** installing HTTPolice.
+For example::
+
+  C:\Users\Vasiliy\...\Python35>Scripts\pip install lxml==3.7.2
+  C:\Users\Vasiliy\...\Python35>Scripts\pip install brotlipy==0.6.0
+
+__ https://pypi.python.org/pypi
