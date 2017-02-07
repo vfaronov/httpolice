@@ -322,4 +322,4 @@ def _parse_chunked(msg, stream):
         msg.body = b''.join(data)
         msg.trailer_entries = trailer
         if trailer:
-            msg.rebuild_headers()           # Rebuid the `HeadersView` cache
+            msg.rebuild_headers()           # Rebuild the `HeadersView` cache
