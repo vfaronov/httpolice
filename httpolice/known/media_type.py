@@ -340,7 +340,7 @@ known = KnownDict(MediaType, [
  {'_': MediaType(u'application/widget'),
   '_citations': [Citation(u'ISO/IEC 19757-2:2003/FDAM-1',
                           u'http://www.w3.org/TR/widgets/'
-                          u'#media-type-registration-for-applicationw')]},
+                          u'#media-type-registration-for-application/widget')]},
  {'_': MediaType(u'application/x-www-form-urlencoded'),
   '_citations': [Citation(None,
                           u'http://www.w3.org/TR/html/iana.html'
