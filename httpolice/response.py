@@ -210,7 +210,7 @@ def check_response_itself(resp):
     headers = resp.headers
     body = resp.body
 
-    if not (100 <= status <= 600):
+    if not (100 <= status <= 599):
         complain(1167)
 
     if status.informational and u'close' in headers.connection:
