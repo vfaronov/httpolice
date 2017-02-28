@@ -6,7 +6,9 @@ body {
     color: black;
     font-family: sans-serif;
     quotes: '“' '”';
+}
 
+body.report {
     /* I hate this line with a passion, but so far I can't figure out
      * how else to make both sans-serif and monospace fonts look reasonable
      * on a wide range of browsers and platforms. */
