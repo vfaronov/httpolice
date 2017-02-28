@@ -195,11 +195,6 @@ Releasing a new version
 
 #. Watch as Travis builds and uploads stuff to PyPI.
 
-#. Log in to PyPI and update version visibility:
-
-   - if releasing a development version, hide it;
-   - conversely, if releasing a "stable" version, hide the previous one.
-
 #. If releasing a "stable" version,
    check that Read the Docs has built it and updated the "stable" pointer.
    (You may need to refresh the page to see it.)
