@@ -230,7 +230,7 @@ Maintenance
 
   #. Update other pinned versions:
 
-     - PyPy (in ``tools/pypy_env.sh``);
+     - PyPy (in ``.travis.yml``);
      - Nu Html Checker (in ``tools/vnu.sh``);
      - JSHint (in ``tools/jshint.sh``).
 

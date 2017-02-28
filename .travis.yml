@@ -9,7 +9,7 @@ addons:
 
 python:
     - "2.7"
-    - "pypy"
+    - "pypy-5.4.1"
     - "3.4"
     - "3.5"
     - "3.6"
@@ -19,7 +19,6 @@ env:
     - REQUIRES=normal
 
 install:
-    - if [ "$TRAVIS_PYTHON_VERSION" = pypy ]; then . `tools/pypy_env.sh`; fi
     - if [ "$REQUIRES" = minimum ]; then tools/minimum_requires.sh; fi
     - pip install -e .
     - pip install -r tools/requirements.txt
