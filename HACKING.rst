@@ -102,7 +102,7 @@ but rather to ensure that no line has been *forgotten*.
 Feel free to add ``pragma: no cover`` to code
 that would be hard to cover with a natural, functional test.
 
-To run tests with coverage checks locally, use ``tools/pytest_all.sh``.
+Use ``pytest --no-cov`` to skip coverage checks when iterating on some code.
 
 
 Typical workflows
@@ -148,7 +148,7 @@ Adding a notice
 #. If necessary, add more test cases: ``1679_2``, and so on.
 #. Run your tests and make sure they fail as expected::
 
-     $ pytest -k1679
+     $ pytest --no-cov -k1679
 
 #. Write the actual checks logic.
    Usually it goes into one of the four big functions described above,
