@@ -9,6 +9,8 @@ from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
 import xml.etree.ElementTree
 
 from bitstring import Bits
+import defusedxml
+import defusedxml.ElementTree
 import six
 
 from httpolice.blackboard import Blackboard, derived_property
@@ -146,7 +148,12 @@ class Message(Blackboard):
                 media_type.is_xml(self.headers.content_type.item) and \
                 okay(self.decoded_body) and self.content_is_full:
             try:
-                return xml.etree.ElementTree.fromstring(self.decoded_body)
+                # It's not inconceivable that a message might contain
+                # maliciously constructed XML data, so we use `defusedxml`.
+                return defusedxml.ElementTree.fromstring(self.decoded_body)
+            except defusedxml.EntitiesForbidden:
+                self.complain(1275)
+                return Unavailable
             except xml.etree.ElementTree.ParseError as e:
                 self.complain(1039, error=e)
                 return Unavailable

@@ -1,0 +1,18 @@
+1275
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/xml
+Content-Length: 96
+Vary: accept, accept-encoding
+
+<!DOCTYPE doc [<!ENTITY foo "world">]>
+<doc>
+  <item type="text">Hello &foo;!</item>
+</doc>

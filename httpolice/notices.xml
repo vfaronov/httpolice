@@ -2017,6 +2017,12 @@ One non-obvious thing is how references work
     <!-- This is an error, not a comment, because it's hard to imagine a conformant use of ``credentials`` consisting only of the ``auth-scheme`` (in particular, none of the schemes registered with IANA allow this), whereas forgetting the ``auth-scheme`` is a common mistake. -->
   </error>
 
+  <comment id="1275">
+    <title>XML with entity declarations</title>
+    <explain>This message’s XML content includes entity declarations (&lt;!ENTITY&gt;). Many XML applications do not process such declarations because they can lead to denial-of-service attacks.</explain>
+    <ref to="msg.displayable_body"/>
+  </comment>
+
   <error id="1276">
     <title><var ref="header"/>: <var ref="wildcard"/> is as good as <var ref="value"/></title>
     <explain>The <var ref="header"/> header is not an ordered list. Whether <var ref="wildcard"/> comes before or after <var ref="value"/>, does not affect its priority. Only explicit quality values (q=) count.</explain>

@@ -7,6 +7,11 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 (which means it is unstable until 1.0).
 
 
+Unreleased
+~~~~~~~~~~
+- The XML-related features removed in 0.4.0 have been restored.
+
+
 0.4.0 - 2017-01-14
 ~~~~~~~~~~~~~~~~~~
 
