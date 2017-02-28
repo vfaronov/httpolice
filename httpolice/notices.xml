@@ -2077,4 +2077,14 @@ One non-obvious thing is how references work
     <explain>See <rfc num="7540" errata="4666"/>.</explain>
   </comment>
 
+  <comment id="1284">
+    <title><st>202</st> response with no body</title>
+    <rfc num="7231" sect="6.3.3">
+      The representation sent with this
+   response ought to describe the request's current status and point to
+   (or embed) a status monitor that can provide the user with an
+   estimate of when the request will be fulfilled.
+    </rfc>
+  </comment>
+
 </notices>

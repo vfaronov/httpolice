@@ -533,7 +533,9 @@ def check_response_in_context(resp, req):
         complain(1073)
 
     if method != m.HEAD and resp.body == b'':
-        if status == st.multiple_choices:
+        if status == st.accepted:
+            complain(1284)
+        elif status == st.multiple_choices:
             complain(1077)
         elif status == st.see_other:
             complain(1081)
