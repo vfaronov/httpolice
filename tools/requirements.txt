@@ -40,6 +40,5 @@ twine==1.8.1
 wheel==0.29.0
 wrapt==1.10.8             # via astroid
 
-# The following packages are commented out because they are
-# considered to be unsafe in a requirements file:
+# The following packages are considered to be unsafe in a requirements file:
 # setuptools                # via pytest, twine
