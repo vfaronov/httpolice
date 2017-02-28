@@ -2070,4 +2070,11 @@ One non-obvious thing is how references work
     <explain>There is no such media type ‘<var ref="bad"/>’. Probably ‘<var ref="good"/>’ was intended.</explain>
   </error>
 
+  <comment id="1283">
+    <title>Cacheable <st>421</st> response</title>
+    <explain><st>421</st> responses are defined as cacheable by default. However, because of how an HTTP cache works (<rfc num="7234" sect="2"/>), it is harmful to cache a 421 response, as it would be returned on subsequent requests to the same URI, without even trying to connect to the right server.</explain>
+    <explain>To avoid this, a 421 response to <var ref="msg.request.method"/> should be marked as non-cacheable with a header like “<h>Cache-Control</h>: <cache>no-store</cache>”.</explain>
+    <explain>See <rfc num="7540" errata="4666"/>.</explain>
+  </comment>
+
 </notices>

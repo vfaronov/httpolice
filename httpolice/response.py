@@ -719,6 +719,10 @@ def check_response_in_context(resp, req):
             req.is_tls == False:
         complain(1221)
 
+    if status == st.misdirected_request and method_info.is_cacheable(method) \
+            and not resp.headers.cache_control.no_store:
+        complain(1283)
+
 
 def _check_basic_challenge(resp, hdr, challenge):
     if isinstance(challenge.param, six.text_type):      # ``token68`` form

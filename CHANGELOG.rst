@@ -10,6 +10,9 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 Unreleased
 ~~~~~~~~~~
 - The XML-related features removed in 0.4.0 have been restored.
+- Check for cacheable 421 (Misdirected Request) responses (notice `1283`_).
+
+.. _1283: http://pythonhosted.org/HTTPolice/notices.html#1283
 
 
 0.4.0 - 2017-01-14

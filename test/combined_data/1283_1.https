@@ -1,4 +1,4 @@
-1260
+1283
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
@@ -11,7 +11,5 @@ HTTP/1.1 421 Misdirected Request
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 43
-Alt-Svc: http%2F1.1="balancer4-eu.example.com:8000"
-Cache-Control: no-cache, no-store
 
 No idea what you're talking about, sorry.
