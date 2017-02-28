@@ -5,31 +5,34 @@
 #    pip-compile --output-file tools/requirements.txt tools/requirements.in
 #
 alabaster==0.7.9
+appdirs==1.4.2            # via setuptools
 args==0.1.0               # via clint
-astroid==1.4.8            # via pylint
+astroid==1.4.9            # via pylint
 babel==2.3.4              # via sphinx
-check-manifest==0.33
-click==6.6                # via pip-tools
+check-manifest==0.35
+click==6.7                # via pip-tools
 clint==0.5.1              # via twine
-coverage==4.2             # via pytest-cov
-docutils==0.12
+coverage==4.3.4           # via pytest-cov
+docutils==0.13.1
 first==2.0.1              # via pip-tools
 isort==4.2.5              # via pylint
-Jinja2==2.8               # via sphinx
+Jinja2==2.9.5             # via sphinx
 lazy-object-proxy==1.2.2  # via astroid
 MarkupSafe==0.23          # via jinja2
-mccabe==0.5.2             # via pylint
-pip-tools==1.7.0
-pkginfo==1.3.2            # via twine
-py==1.4.31                # via pytest
-Pygments==2.1.3           # via sphinx
-pylint==1.6.4
-pytest-cov==2.3.1
-pytest==3.0.2
-pytz==2016.6.1            # via babel
-requests-toolbelt==0.7.0  # via twine
-requests==2.11.1          # via requests-toolbelt, twine
-six==1.10.0               # via astroid, pip-tools, pylint, sphinx
+mccabe==0.6.1             # via pylint
+packaging==16.8           # via setuptools
+pip-tools==1.8.0
+pkginfo==1.4.1            # via twine
+py==1.4.32                # via pytest
+Pygments==2.2.0           # via sphinx
+pylint==1.6.5
+pyparsing==2.1.10         # via packaging
+pytest-cov==2.4.0
+pytest==3.0.6
+pytz==2016.10             # via babel
+requests-toolbelt==0.7.1  # via twine
+requests==2.13.0          # via requests-toolbelt, twine
+six==1.10.0               # via astroid, packaging, pip-tools, pylint, setuptools, sphinx
 snowballstemmer==1.2.1    # via sphinx
 sphinx-rtd-theme==0.1.9   # via sphinx
 Sphinx==1.3.5             # via sphinx-rtd-theme
@@ -39,4 +42,4 @@ wrapt==1.10.8             # via astroid
 
 # The following packages are commented out because they are
 # considered to be unsafe in a requirements file:
-# setuptools                # via twine
+# setuptools                # via pytest, twine

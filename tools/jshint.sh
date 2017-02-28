@@ -2,7 +2,7 @@
 
 set -e
 
-VERSION=2.9.3
+VERSION=2.9.4
 BASE=$HOME/install-jshint
 
 action=$1
