@@ -13,7 +13,7 @@ check-manifest==0.35
 click==6.7                # via pip-tools
 clint==0.5.1              # via twine
 coverage==4.3.4           # via pytest-cov
-docutils==0.13.1
+docutils==0.12
 first==2.0.1              # via pip-tools
 isort==4.2.5              # via pylint
 Jinja2==2.9.5             # via sphinx
