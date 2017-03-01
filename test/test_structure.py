@@ -210,7 +210,7 @@ def test_prefer():
             ]
         ),
         Unavailable,
-        Parametrized(Parametrized(pref.wait, u'600'), []),
+        Parametrized(Parametrized(pref.wait, 600), []),
         Parametrized(
             Parametrized(u'my-pref', None),
             [
@@ -219,10 +219,12 @@ def test_prefer():
             ]
         ),
         Parametrized(Parametrized(pref.respond_async, None), []),
-        Parametrized(Parametrized(pref.wait, u'0'), []),
+        Parametrized(Parametrized(pref.wait, 0), []),
+        Parametrized(Parametrized(pref.return_, Unavailable), []),
     ]
-    assert exch1.request.headers.prefer.wait == u'600'
+    assert exch1.request.headers.prefer.wait == 600
     assert exch1.request.headers.prefer.respond_async
+    assert exch1.request.headers.prefer.return_ is Unavailable
     assert exch1.request.headers.prefer[u'quux'] is None
 
 

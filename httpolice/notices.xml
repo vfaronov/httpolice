@@ -2101,4 +2101,30 @@ One non-obvious thing is how references work
     <ref to="msg.request.headers.prefer"/>
   </error>
 
+  <error id="1287">
+    <title><var ref="msg.method"/> request cannot <h>Prefer</h>: <pref>respond-async</pref></title>
+    <explain>The whole point of a <var ref="msg.method"/> request is to retrieve information from the server. It’s impossible to respond asynchronously to such a request: the response would not contain the requested information.</explain>
+  </error>
+
+  <error id="1288">
+    <title><m>GET</m> request cannot <h>Prefer</h>: <pref>return</pref>=minimal</title>
+    <explain>The whole point of a <m>GET</m> request is to retrieve a representation of the resource (as in “<pref>return</pref>=representation”). There is no “minimal” response that could satisfy this request.</explain>
+  </error>
+
+  <error id="1289">
+    <title><h>Prefer</h>: <pref>return</pref>=minimal contradicts <pref>return</pref>=representation</title>
+    <rfc num="7240" sect="4.2">
+      The "return=minimal" and "return=representation" preferences are
+   mutually exclusive directives.
+    </rfc>
+  </error>
+
+  <error id="1290">
+    <title><h>Prefer</h>: <pref>handling</pref>=strict contradicts <pref>handling</pref>=lenient</title>
+    <rfc num="7240" sect="4.4">
+      The "handling=strict" and "handling=lenient" preferences are mutually
+   exclusive directives.
+    </rfc>
+  </error>
+
 </notices>

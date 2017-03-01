@@ -42,6 +42,6 @@ class KnownDict(object):
                 replace(u'-', u' ').replace(u' ', u'_').replace(u'/', u'_').
                 replace(u'+', u'_').replace(u'.', u'_').
                 lower())
-        if name in [u'continue', u'from']:
+        if name in [u'continue', u'from', u'return']:
             name = name + u'_'
         return name

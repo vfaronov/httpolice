@@ -53,6 +53,8 @@ class HeadersView(object):
                 cls = AltSvcView
             elif key == h.prefer:
                 cls = PreferView
+            elif key == h.preference_applied:
+                cls = PreferenceAppliedView
 
             # For the rest, we only need to know
             # a generic "rule" for combining multiple entries,
@@ -409,3 +411,10 @@ class PreferView(DirectivesView, MultiHeaderView):
     @property
     def without_params(self):
         return [pref for (pref, _) in self]
+
+
+class PreferenceAppliedView(DirectivesView, MultiHeaderView):
+
+    """Wraps a ``Preference-Applied`` header."""
+
+    knowledge_module = httpolice.known.preference

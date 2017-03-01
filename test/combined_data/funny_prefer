@@ -1,4 +1,4 @@
-1000 1285
+1000 1285 1158
 
 ======== BEGIN INBOUND STREAM ========
 PUT /articles/123/ HTTP/1.1
@@ -9,6 +9,7 @@ Content-Length: 16
 Prefer: Handling=lenient ; param1="this is a parameter to 'handling'!" ;param2
 Prefer: BWS-is-not-parsed = because-see-errata
 Prefer: wait="600" , my-pref;;;FOO;;;bar="",  respond-async , wait=0
+Prefer: return=something-else
 
 Hello world!
 

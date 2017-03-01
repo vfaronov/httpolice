@@ -1,10 +1,11 @@
 # -*- coding: utf-8; -*-
 
 from httpolice.citation import RFC
-from httpolice.parse import fill_names, many, maybe, named, pivot, skip
+from httpolice.parse import (auto, fill_names, literal, many, maybe, named,
+                             pivot, skip)
 from httpolice.structure import CaseInsensitive, Parametrized, Preference
 from httpolice.syntax.rfc7230 import OWS, comma_list1, token
-from httpolice.syntax.rfc7231 import parameter
+from httpolice.syntax.rfc7231 import delay_seconds, parameter
 
 
 def _normalize_empty_value(x):
@@ -32,5 +33,9 @@ Prefer = comma_list1(preference)                                        > pivot
 
 Preference_Applied = comma_list1(preference_parameter(head=True))       > pivot
 
+
+return_ = CaseInsensitive << (literal('representation') | 'minimal')    > pivot
+wait = delay_seconds                                                    > auto
+handling = CaseInsensitive << (literal('strict') | 'lenient')           > pivot
 
 fill_names(globals(), RFC(7240))

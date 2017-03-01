@@ -12,8 +12,8 @@ import six
 from httpolice import message
 from httpolice.blackboard import derived_property
 from httpolice.known import (auth, cache, cache_directive, cc, h, header, m,
-                             media_type, method as method_info, product, tc,
-                             upgrade)
+                             media_type, method as method_info, pref, product,
+                             tc, upgrade)
 from httpolice.parse import mark, simple_parse
 from httpolice.structure import (EntityTag, Method, MultiDict, Parametrized,
                                  Versioned, http2, http10, http11, okay)
@@ -398,6 +398,20 @@ def check_request(req):
 
     for dup_pref in duplicates(name for ((name, _), _) in headers.prefer):
         complain(1285, name=dup_pref)
+
+    if headers.prefer.respond_async and method_info.is_safe(method):
+        complain(1287)
+
+    if headers.prefer.return_ == u'minimal' and method == m.GET:
+        complain(1288)
+
+    if (pref.return_, u'minimal') in headers.prefer.without_params and \
+       (pref.return_, u'representation') in headers.prefer.without_params:
+        complain(1289)
+
+    if (pref.handling, u'strict') in headers.prefer.without_params and \
+       (pref.handling, u'lenient') in headers.prefer.without_params:
+        complain(1290)
 
 
 def _check_basic_auth(req, hdr, credentials):

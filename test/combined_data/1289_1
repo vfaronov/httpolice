@@ -1,0 +1,19 @@
+1289 1285
+
+======== BEGIN INBOUND STREAM ========
+PUT /articles/123/ HTTP/1.1
+Host: example.com
+Prefer: Return=Minimal
+User-Agent: demo
+Content-Type: text/plain
+Content-Length: 16
+Prefer: Wait=10, Return=Representation
+
+Hello world!
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 204 No Content
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Preference-Applied: return=minimal, wait=10
+
