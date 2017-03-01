@@ -731,6 +731,15 @@ def check_response_in_context(resp, req):
                      value=(u'' if applied_pref.param is None
                             else u'=%s' % applied_pref.param))
 
+    if resp.headers.preference_applied.is_present and \
+            method_info.is_cacheable(method) and \
+            not (resp.headers.vary == u'*') and \
+            not (resp.headers.vary.is_okay and h.prefer in resp.headers.vary):
+            # We could also look for ``Cache-Control: no-store`` etc.,
+            # but the meaning of ``Vary`` is not limited to caching,
+            # and anyway this is just a mild comment.
+        complain(1291)
+
 
 def _check_basic_challenge(resp, hdr, challenge):
     if isinstance(challenge.param, six.text_type):      # ``token68`` form

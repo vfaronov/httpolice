@@ -9,7 +9,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 
 Unreleased
 ~~~~~~~~~~
-- Checks for the `Prefer`_ mechanism (notices `1285`_ through `1290`_).
+- Checks for the `Prefer`_ mechanism (notices `1285`_ through `1291`_).
 - The XML-related features removed in 0.4.0 have been restored.
 - Check for cacheable 421 (Misdirected Request) responses (notice `1283`_).
 - Check for 202 (Accepted) responses with no body (notice `1284`_).
@@ -18,7 +18,7 @@ Unreleased
 .. _1284: http://pythonhosted.org/HTTPolice/notices.html#1284
 .. _Prefer: https://tools.ietf.org/html/rfc7240
 .. _1285: http://pythonhosted.org/HTTPolice/notices.html#1285
-.. _1290: http://pythonhosted.org/HTTPolice/notices.html#1290
+.. _1291: http://pythonhosted.org/HTTPolice/notices.html#1291
 
 
 0.4.0 - 2017-01-14
