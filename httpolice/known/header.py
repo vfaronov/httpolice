@@ -5,7 +5,7 @@ from httpolice.known.base import KnownDict
 from httpolice.structure import FieldName
 from httpolice.syntax import (internal, rfc5789, rfc5988, rfc6266, rfc6797,
                               rfc7230, rfc7231, rfc7232, rfc7233, rfc7234,
-                              rfc7235, rfc7540, rfc7838)
+                              rfc7235, rfc7240, rfc7540, rfc7838)
 
 
 SINGLE = 1
@@ -602,11 +602,19 @@ known = KnownDict(FieldName, [
   'proactive_conneg': False,
   'rule': MULTI},
  {'_': FieldName(u'Prefer'),
-  '_citations': [RFC(7240)],
-  'iana_status': u'standard'},
+  '_citations': [RFC(7240, section=(2,))],
+  'for_request': True, 'for_response': False,
+  'iana_status': u'standard',
+  'parser': rfc7240.Prefer,
+  'precondition': False, 'proactive_conneg': False,
+  'rule': MULTI},
  {'_': FieldName(u'Preference-Applied'),
-  '_citations': [RFC(7240)],
-  'iana_status': u'standard'},
+  '_citations': [RFC(7240, section=(3,))],
+  'iana_status': u'standard',
+  'for_request': False, 'for_response': True,
+  'parser': rfc7240.Preference_Applied,
+  'precondition': False, 'proactive_conneg': False,
+  'rule': MULTI},
  {'_': FieldName(u'ProfileObject'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Protocol'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Protocol-Info'), '_citations': [RFC(4229)]},

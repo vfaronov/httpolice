@@ -36,9 +36,9 @@ def _check_media_type(complain, mtype):
     return mtype
 
 
-def parameter(exclude=None):
+def parameter(exclude=None, name_cls=CaseInsensitive):
     return (
-        (CaseInsensitive << token__excluding(exclude or [])) *
+        (name_cls << token__excluding(exclude or [])) *
         skip('=') * (token | quoted_string)
     ) > named(u'parameter', RFC(7231), is_pivot=True)
 

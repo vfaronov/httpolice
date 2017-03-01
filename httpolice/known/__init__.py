@@ -13,6 +13,7 @@ from httpolice.known.header import known as h
 from httpolice.known.hsts_directive import known as hsts
 from httpolice.known.media_type import known as media
 from httpolice.known.method import known as m
+from httpolice.known.preference import known as pref
 from httpolice.known.product import known as prod
 from httpolice.known.range_unit import known as unit
 from httpolice.known.relation_type import known as rel

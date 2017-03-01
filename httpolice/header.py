@@ -51,6 +51,8 @@ class HeadersView(object):
                 cls = StrictTransportSecurityView
             elif key == h.alt_svc:
                 cls = AltSvcView
+            elif key == h.prefer:
+                cls = PreferView
 
             # For the rest, we only need to know
             # a generic "rule" for combining multiple entries,
@@ -382,3 +384,28 @@ class AltSvcView(SingleHeaderView):
                 params[i] = (name, value)
 
         return parsed
+
+
+class PreferView(DirectivesView, MultiHeaderView):
+
+    """Wraps a `Prefer` header."""
+
+    knowledge_module = httpolice.known.preference
+
+    # Each preference has two level of wrapping: ``((name, value), params)``.
+    # Params are currently not used for anything, so we peel them off
+    # (but they are still part of ``self.value``).
+
+    def _process_parsed(self, entry, ds):
+        return [Parametrized(self._process_directive(entry, d), params)
+                for (d, params) in ds]
+
+    def __getitem__(self, key):
+        for (preference, value) in self.without_params:
+            if preference == key:
+                return True if value is None else value
+        return None
+
+    @property
+    def without_params(self):
+        return [pref for (pref, _) in self]

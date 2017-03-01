@@ -5,7 +5,7 @@ import os
 
 from httpolice.exchange import Exchange
 from httpolice.inputs.streams import combined_input
-from httpolice.known import altsvc, auth, cache, h, hsts, m
+from httpolice.known import altsvc, auth, cache, h, hsts, m, pref
 from httpolice.request import Request
 from httpolice.response import Response
 from httpolice.structure import (CaseInsensitive, FieldName, HTTPVersion,
@@ -197,6 +197,33 @@ def test_alt_svc():
             MultiDict([(u'foo', u'bar')])
         ),
     ]
+
+
+def test_prefer():
+    [exch1] = load_from_file('funny_prefer')
+    assert exch1.request.headers.prefer.value == [
+        Parametrized(
+            Parametrized(pref.handling, u'lenient'),
+            [
+                Parametrized(u'param1', u"this is a parameter to 'handling'!"),
+                Parametrized(u'param2', None),
+            ]
+        ),
+        Unavailable,
+        Parametrized(Parametrized(pref.wait, u'600'), []),
+        Parametrized(
+            Parametrized(u'my-pref', None),
+            [
+                None, None, Parametrized(u'foo', None),
+                None, None, Parametrized(u'bar', None),
+            ]
+        ),
+        Parametrized(Parametrized(pref.respond_async, None), []),
+        Parametrized(Parametrized(pref.wait, u'0'), []),
+    ]
+    assert exch1.request.headers.prefer.wait == u'600'
+    assert exch1.request.headers.prefer.respond_async
+    assert exch1.request.headers.prefer[u'quux'] is None
 
 
 def test_decode_brotli():

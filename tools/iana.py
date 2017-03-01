@@ -37,8 +37,9 @@ from httpolice.citation import RFC, Citation
 import httpolice.known
 from httpolice.structure import (AltSvcParam, AuthScheme, CacheDirective,
                                  ContentCoding, FieldName, MediaType, Method,
-                                 RangeUnit, RelationType, StatusCode,
-                                 TransferCoding, UpgradeToken, WarnCode)
+                                 Preference, RangeUnit, RelationType,
+                                 StatusCode, TransferCoding, UpgradeToken,
+                                 WarnCode)
 from httpolice.util.text import normalize_whitespace
 
 
@@ -153,6 +154,7 @@ class ParametersRegistry(Registry):     # pylint: disable=abstract-method
         tree = self._get_xml('http-parameters/http-parameters.xml')
         return [
             (ContentCoding, list(self._content_codings(tree))),
+            (Preference, list(self._preferences(tree))),
             (RangeUnit, list(self._range_units(tree))),
             (TransferCoding, list(self._transfer_codings(tree))),
         ]
@@ -165,6 +167,17 @@ class ParametersRegistry(Registry):     # pylint: disable=abstract-method
                 '_': ContentCoding(
                     record.find('iana:name', self.xmlns).text),
                 '_citations': list(self.extract_citations(record)),
+            }
+
+    def _preferences(self, tree):
+        records = tree.findall(
+            '//iana:registry[@id="preferences"]/iana:record', self.xmlns)
+        for record in records:
+            yield {
+                '_': Preference(
+                    record.find('iana:name', self.xmlns).text),
+                '_citations': list(self.extract_citations(
+                    record.find('iana:spec', self.xmlns))),
             }
 
     def _range_units(self, tree):

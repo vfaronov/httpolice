@@ -725,6 +725,12 @@ def check_response_in_context(resp, req):
             and not resp.headers.cache_control.no_store:
         complain(1283)
 
+    for applied_pref in resp.headers.preference_applied:
+        if applied_pref not in req.headers.prefer.without_params:
+            complain(1286, name=applied_pref.item,
+                     value=(u'' if applied_pref.param is None
+                            else u'=%s' % applied_pref.param))
+
 
 def _check_basic_challenge(resp, hdr, challenge):
     if isinstance(challenge.param, six.text_type):      # ``token68`` form

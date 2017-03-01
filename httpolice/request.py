@@ -20,6 +20,7 @@ from httpolice.structure import (EntityTag, Method, MultiDict, Parametrized,
 from httpolice.syntax.common import CTL
 from httpolice.syntax.rfc7230 import (absolute_form, asterisk_form,
                                       authority_form, origin_form)
+from httpolice.util.data import duplicates
 from httpolice.util.text import force_unicode
 
 
@@ -394,6 +395,9 @@ def check_request(req):
             complain(1276, header=hdr, wildcard=wildcard, value=value)
             # No need to report more than one subsumption per header.
             break
+
+    for dup_pref in duplicates(name for ((name, _), _) in headers.prefer):
+        complain(1285, name=dup_pref)
 
 
 def _check_basic_auth(req, hdr, credentials):

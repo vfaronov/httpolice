@@ -2087,4 +2087,18 @@ One non-obvious thing is how references work
     </rfc>
   </comment>
 
+  <comment id="1285">
+    <title>Multiple ‘<var ref="name"/>’ tokens in <h>Prefer</h></title>
+    <rfc num="7240" sect="2">
+      To avoid any possible ambiguity, individual preference tokens SHOULD
+   NOT appear multiple times within a single request.
+    </rfc>
+  </comment>
+
+  <error id="1286">
+    <title><h>Preference-Applied</h>: <var ref="name"/><var ref="value"/> was not requested</title>
+    <explain>“<h>Preference-Applied</h>: <var ref="name"/><var ref="value"/>” means that the server honored the client’s preference <var ref="name"/><var ref="value"/>. But the client did not request <var ref="name"/><var ref="value"/> in its <h>Prefer</h> header.</explain>
+    <ref to="msg.request.headers.prefer"/>
+  </error>
+
 </notices>

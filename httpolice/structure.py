@@ -391,3 +391,10 @@ class AltSvcParam(ProtocolString):
     """An ``Alt-Svc`` parameter name (RFC 7838 Section 3)."""
 
     __slots__ = ()
+
+
+class Preference(CaseInsensitive):
+
+    """An HTTP preference token (RFC 7240 Section 2)."""
+
+    __slots__ = ()
