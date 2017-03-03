@@ -15,8 +15,7 @@ from httpolice.known.status_code import NOT_AT_ALL, NOT_BY_DEFAULT
 from httpolice.parse import simple_parse
 from httpolice.structure import (EntityTag, StatusCode, http2, http10, http11,
                                  okay)
-from httpolice.syntax import rfc6749
-from httpolice.syntax.rfc7230 import asterisk_form
+from httpolice.syntax import rfc6749, rfc7230
 from httpolice.util.data import duplicates
 from httpolice.util.text import (contains_percent_encodes, force_unicode,
                                  is_ascii)
@@ -209,6 +208,11 @@ def check_response_itself(resp):
     status = resp.status
     headers = resp.headers
     body = resp.body
+
+    # Check syntax of reason phrase.
+    if okay(resp.reason):
+        simple_parse(resp.reason, rfc7230.reason_phrase,
+                     complain, 1294, place=u'reason phrase')
 
     if not (100 <= status <= 599):
         complain(1167)
@@ -558,7 +562,7 @@ def check_response_in_context(resp, req):
         elif status.server_error:
             complain(1104)
 
-    if method == m.OPTIONS and req.target_form is asterisk_form and \
+    if method == m.OPTIONS and req.target_form is rfc7230.asterisk_form and \
             status in [st.multiple_choices, st.moved_permanently,
                        st.found, st.temporary_redirect, st.permanent_redirect]:
         complain(1086)

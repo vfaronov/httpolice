@@ -17,8 +17,10 @@ from httpolice.blackboard import Blackboard, derived_property
 from httpolice.codings import decode_brotli, decode_deflate, decode_gzip
 from httpolice.header import HeadersView
 from httpolice.known import cc, h, header, media, media_type, tc, upgrade, warn
+from httpolice.parse import simple_parse
 from httpolice.structure import (FieldName, HeaderEntry, HTTPVersion,
                                  Unavailable, http2, http11, okay)
+from httpolice.syntax import rfc7230
 from httpolice.util.text import force_unicode, format_chars, printable
 
 
@@ -254,6 +256,9 @@ def check_message(msg):
     headers = msg.headers
 
     for hdr in headers:
+        # Check the header name syntax.
+        simple_parse(hdr.name, rfc7230.field_name,
+                     complain, 1293, header=hdr, place=u'field name')
         # Force parsing every header present in the message
         # according to its syntax rules.
         _ = hdr.value

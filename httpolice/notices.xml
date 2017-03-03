@@ -2138,4 +2138,20 @@ One non-obvious thing is how references work
     <ref to="msg.request.headers.prefer"/>
   </comment>
 
+  <error id="1292">
+    <title>Invalid method ‘<var ref="msg.method"/>’</title>
+    <exception/>
+  </error>
+
+  <error id="1293">
+    <title>Invalid field name ‘<var ref="header"/>’</title>
+    <exception/>
+  </error>
+
+  <error id="1294">
+    <title>Bad syntax in reason phrase</title>
+    <exception/>
+    <ref to="msg.status"/>
+  </error>
+
 </notices>

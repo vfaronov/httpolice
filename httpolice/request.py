@@ -18,6 +18,7 @@ from httpolice.parse import mark, simple_parse
 from httpolice.structure import (EntityTag, Method, MultiDict, Parametrized,
                                  Versioned, http2, http10, http11, okay)
 from httpolice.syntax.common import CTL
+from httpolice.syntax import rfc7230
 from httpolice.syntax.rfc7230 import (absolute_form, asterisk_form,
                                       authority_form, origin_form)
 from httpolice.util.data import duplicates
@@ -116,27 +117,20 @@ class Request(message.Message):
 
     @derived_property
     def target_form(self):
-        try:
-            target = self.target.encode('iso-8859-1')
-        except UnicodeError as e:
-            self.complain(1045, error=e)
-            return None
-
         if self.method == m.CONNECT:
-            parser = mark(authority_form)
+            symbol = mark(authority_form)
         elif self.method == m.OPTIONS:
-            parser = (mark(origin_form) | mark(asterisk_form) |
+            symbol = (mark(origin_form) | mark(asterisk_form) |
                       mark(absolute_form))
         else:
-            parser = mark(origin_form) | mark(absolute_form)
-
-        r = simple_parse(target, parser,
+            symbol = mark(origin_form) | mark(absolute_form)
+        r = simple_parse(self.target, symbol,
                          self.complain, 1045, place=u'request target')
         if okay(r):
             (symbol, _) = r
             return symbol
         else:
-            return None
+            return r
 
     @derived_property
     def effective_uri(self):
@@ -224,7 +218,10 @@ def check_request(req):
 
     message.check_message(req)
 
-    _ = req.target_form                 # Force check.
+    # Check the syntax of request method and target.
+    simple_parse(method, rfc7230.method,
+                 complain, 1292, place=u'request method')
+    _ = req.target_form
 
     if body and headers.content_type.is_absent:
         complain(1041)

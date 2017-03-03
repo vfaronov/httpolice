@@ -47,7 +47,7 @@ from bitstring import BitArray, Bits
 import six
 
 from httpolice.structure import Unavailable
-from httpolice.util.text import force_bytes, format_chars
+from httpolice.util.text import format_chars
 
 
 ###############################################################################
@@ -1088,7 +1088,15 @@ def simple_parse(data, symbol, complain, fail_notice_id, annotate_classes=None,
 
     This wraps :class:`Stream` in a simpler interface for the common case.
     """
-    stream = Stream(force_bytes(data))
+    if not isinstance(data, bytes):
+        try:
+            data = data.encode('iso-8859-1')
+        except UnicodeError as e:
+            complain(fail_notice_id, error=e, **extra_context)
+            r = Unavailable
+            return r if annotate_classes is None else (r, None)
+
+    stream = Stream(data)
 
     try:
         r = stream.parse(symbol, to_eof=True,
