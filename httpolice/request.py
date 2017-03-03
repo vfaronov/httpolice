@@ -223,6 +223,9 @@ def check_request(req):
                  complain, 1292, place=u'request method')
     _ = req.target_form
 
+    if method != method.upper() and method.upper() in m:
+        complain(1295, uppercase=Method(method.upper()))
+
     if body and headers.content_type.is_absent:
         complain(1041)
 

@@ -13,6 +13,7 @@ Unreleased
 - The syntax of method and header names and reason phrases is now checked
   for all messages, not only for those parsed from TCP streams
   (notices `1292`_, `1293`_, `1294`_).
+- Check for method names that are not uppercase (notice `1295`_).
 - The XML-related features removed in 0.4.0 have been restored.
 - Check for cacheable 421 (Misdirected Request) responses (notice `1283`_).
 - Check for 202 (Accepted) responses with no body (notice `1284`_).
@@ -25,6 +26,7 @@ Unreleased
 .. _1292: http://pythonhosted.org/HTTPolice/notices.html#1292
 .. _1293: http://pythonhosted.org/HTTPolice/notices.html#1293
 .. _1294: http://pythonhosted.org/HTTPolice/notices.html#1294
+.. _1295: http://pythonhosted.org/HTTPolice/notices.html#1295
 
 
 0.4.0 - 2017-01-14

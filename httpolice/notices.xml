@@ -2154,4 +2154,9 @@ One non-obvious thing is how references work
     <ref to="msg.status"/>
   </error>
 
+  <error id="1295">
+    <title>Method ‘<var ref="msg.method"/>’ was probably intended to be ‘<var ref="uppercase"/>’</title>
+    <rfc num="7231" sect="4.1">The method token is case-sensitive</rfc>
+  </error>
+
 </notices>
