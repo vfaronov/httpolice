@@ -34,5 +34,5 @@ def test_notices_list():
     out = buf.getvalue()
     assert out.count(b'<h3>') == len(httpolice.notice.all_notices)
     assert b'1151' in out
-    assert b'Empty list element in ' in out
+    assert b'Empty list elements in ' in out
     assert b'<var>place</var>' in out

@@ -9,6 +9,9 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 
 Unreleased
 ~~~~~~~~~~
+
+Added
+-----
 - Checks for the `Prefer`_ mechanism (notices `1285`_ through `1291`_).
 - The syntax of method and header names and reason phrases is now checked
   for all messages, not only for those parsed from TCP streams
@@ -27,6 +30,12 @@ Unreleased
 .. _1293: http://pythonhosted.org/HTTPolice/notices.html#1293
 .. _1294: http://pythonhosted.org/HTTPolice/notices.html#1294
 .. _1295: http://pythonhosted.org/HTTPolice/notices.html#1295
+
+Changed
+-------
+- Titles of many notices were changed to make more sense when viewed alone
+  (as in text reports). If you depend on their wording (which you shouldn't),
+  you may need to adjust.
 
 
 0.4.0 - 2017-01-14

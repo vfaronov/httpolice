@@ -177,7 +177,9 @@ def detypographize(s):
     return (s.
             replace(u'“', u'"').replace(u'”', u'"').
             replace(u'‘', u"'").replace(u'’', u"'").
-            replace(u'—', u'--').replace(u'–', u'-').
+            replace(u'—', u'--').                       # em dash
+            replace(u'–', u'-').                        # en dash
+            replace(u'−', u'-').                        # minus sign
             replace(u' ', u' '))                        # no-break space
 
 

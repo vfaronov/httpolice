@@ -26,12 +26,12 @@ One non-obvious thing is how references work
 <notices>
 
   <error id="1000">
-    <title>Malformed <var ref="place"/> header</title>
+    <title>Syntax error in <var ref="place"/> header</title>
     <exception/>
   </error>
 
   <error id="1001">
-    <title>Final <h>Transfer-Encoding</h> is not <tc>chunked</tc></title>
+    <title>Final <h>Transfer-Encoding</h> must be ‘<tc>chunked</tc>’</title>
     <rfc num="7230" sect="3.3.1">
       If any transfer coding
    other than <tc>chunked</tc> is applied to a request payload body, the sender
@@ -41,7 +41,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1002">
-    <title><h>Transfer-Encoding</h> contains <tc>chunked</tc> more than once</title>
+    <title><h>Transfer-Encoding</h> can’t have ‘<tc>chunked</tc>’ twice</title>
     <rfc num="7230" sect="3.3.1">
       A sender MUST
    NOT apply <tc>chunked</tc> more than once to a message body (i.e., chunking an
@@ -55,7 +55,7 @@ One non-obvious thing is how references work
   </debug>
 
   <error id="1004">
-    <title>Incomplete message according to <h>Content-Length</h></title>
+    <title>Message is incomplete according to <h>Content-Length</h></title>
     <explain>This message’s <h>Content-Length</h> header indicates that the body is <var ref="msg.headers.content_length.value"/> bytes long, but there are fewer bytes remaining on the stream <var ref="error.name"/>.</explain>
   </error>
 
@@ -100,7 +100,7 @@ One non-obvious thing is how references work
   </debug>
 
   <error id="1013">
-    <title>Multiple <var ref="header"/> headers</title>
+    <title>Multiple <var ref="header"/> headers are forbidden</title>
     <rfc num="7230" sect="3.2.2">
       A sender MUST NOT generate multiple header fields with the same field
    name in a message unless either the entire field value for that
@@ -111,7 +111,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1014">
-    <title>RWS is not a single space in <var ref="place"/></title>
+    <title>RWS in <var ref="place"/> must be a single space</title>
     <explain>The syntax of <var ref="place"/> includes the rule named RWS. It should be produced as just a single space, but here it was <var ref="num"/> characters. See <rfc num="7230" sect="3.2.3"/>.</explain>
   </comment>
 
@@ -132,7 +132,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1018">
-    <title><h>Transfer-Encoding</h> in a <var ref="msg.status"/> response</title>
+    <title><h>Transfer-Encoding</h> is forbidden in a <var ref="msg.status"/> response</title>
     <rfc num="7230" sect="3.3.1">
       A server MUST NOT send a Transfer-Encoding header field in any
    response with a status code of 1xx (Informational) or 204 (No
@@ -141,7 +141,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1019">
-    <title><h>Transfer-Encoding</h> in a <var ref="msg.status"/> response to <m>CONNECT</m></title>
+    <title><h>Transfer-Encoding</h> is forbidden in a <var ref="msg.status"/> response to <m>CONNECT</m></title>
     <rfc num="7230" sect="3.3.1">
       A server MUST NOT send a Transfer-Encoding header field in
    any 2xx (Successful) response to a CONNECT request
@@ -149,7 +149,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1020">
-    <title><h>Transfer-Encoding</h> together with <h>Content-Length</h></title>
+    <title>Can’t have both <h>Transfer-Encoding</h> and <h>Content-Length</h></title>
     <rfc num="7230" sect="3.3.2">
       A sender MUST NOT send a Content-Length header field in any message
    that contains a Transfer-Encoding header field.
@@ -157,7 +157,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1021">
-    <title><var ref="msg.method"/> request without <h>Content-Length</h></title>
+    <title><var ref="msg.method"/> request should have <h>Content-Length</h></title>
     <rfc num="7230" sect="3.3.2">
       A user agent SHOULD send a Content-Length in a request message when
    no <h>Transfer-Encoding</h> is sent and the request method defines a meaning
@@ -168,7 +168,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1022">
-    <title><var ref="msg.method"/> request with <h>Content-Length</h> but no body</title>
+    <title>Empty <var ref="msg.method"/> request shouldn’t have <h>Content-Length</h></title>
     <rfc num="7230" sect="3.3.2">
       A user agent SHOULD NOT send a
    Content-Length header field when the request message does not contain
@@ -178,7 +178,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1023">
-    <title><h>Content-Length</h> in a <var ref="msg.status"/> response</title>
+    <title><h>Content-Length</h> is forbidden in a <var ref="msg.status"/> response</title>
     <rfc num="7230" sect="3.3.2">
       A server MUST NOT send a Content-Length header field in any response
    with a status code of 1xx (Informational) or 204 (No Content).
@@ -186,7 +186,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1024">
-    <title><h>Content-Length</h> in a <var ref="msg.status"/> response to <m>CONNECT</m></title>
+    <title><h>Content-Length</h> is forbidden in a <var ref="msg.status"/> response to <m>CONNECT</m></title>
     <rfc num="7230" sect="3.3.2">
       A
    server MUST NOT send a Content-Length header field in any 2xx
@@ -202,7 +202,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1026">
-    <title><var ref="entry"/> in a trailer</title>
+    <title><var ref="entry"/> is forbidden in a trailer</title>
     <rfc num="7230" sect="4.1.2">
       A sender MUST NOT generate a trailer that contains a field necessary
    for message framing (e.g., <h ref="no">Transfer-Encoding</h> and <h ref="no">Content-Length</h>),
@@ -220,7 +220,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1028">
-    <title><h>TE</h>: <tc>chunked</tc></title>
+    <title>“<h>TE</h>: <tc>chunked</tc>” is forbidden</title>
     <rfc num="7230" sect="4.3">
       A client MUST NOT send
    the chunked transfer coding name in TE; chunked is always acceptable
@@ -229,7 +229,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1029">
-    <title><h>TE</h> without “<h>Connection</h>: TE”</title>
+    <title><h>TE</h> header requires “<h>Connection</h>: TE”</title>
     <rfc num="7230" sect="4.3">
       Since the TE header field only applies to the immediate connection, a
    sender of TE MUST also send a "TE" connection option within the
@@ -251,7 +251,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1031">
-    <title>No <h>Host</h> header</title>
+    <title>Missing <h>Host</h> header</title>
     <rfc num="7230" sect="5.4">
       A client MUST send a Host header field in all HTTP/1.1 request
    messages.
@@ -259,7 +259,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1032">
-    <title><h>Host</h> is not the first header</title>
+    <title><h>Host</h> should be the first header</title>
     <rfc num="7230" sect="5.4">
       Since the Host field-value is critical information for handling a
    request, a user agent SHOULD generate Host as the first header field
@@ -268,19 +268,20 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1033">
-    <title><var ref="msg.status"/> response to a request with a bad <h ref="no">Host</h> header</title>
+    <title>Request with a bad <h ref="no">Host</h> header must be rejected</title>
     <rfc num="7230" sect="5.4">
       A server MUST respond with a <st>400</st> (Bad Request) status code to any
    HTTP/1.1 request message that lacks a Host header field and to any
    request message that contains more than one Host header field or a
    Host header field with an invalid field-value.
     </rfc>
+    <ref to="msg.status"/>
     <ref to="msg.request.version"/>
     <ref to="msg.request.headers.host"/>
   </error>
 
   <error id="1034">
-    <title><h>Connection</h>: <var ref="header"/></title>
+    <title>“<h>Connection</h>: <var ref="header"/>” is forbidden</title>
     <rfc num="7230" sect="5.4">
       A sender MUST NOT send a connection option corresponding to a header
    field that is intended for all recipients of the payload.  For
@@ -326,7 +327,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1041">
-    <title>Body without <h>Content-Type</h></title>
+    <title>Body should have a <h>Content-Type</h></title>
     <rfc num="7231" sect="3.1.1.5">
       A sender that generates a message containing a payload body SHOULD
    generate a Content-Type header field in that message unless the
@@ -337,7 +338,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1042">
-    <title>More than one ‘<var ref="param"/>’ parameter in <h>Content-Type</h></title>
+    <title>Duplicate ‘<var ref="param"/>’ parameter in <h>Content-Type</h></title>
     <rfc num="6838" sect="4.3">
       It is an error for a specific
    parameter to be specified more than once.
@@ -346,24 +347,24 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1045">
-    <title>Bad request target</title>
+    <title>Syntax error in request target</title>
     <exception/>
     <explain>See also <rfc num="7230" sect="5.3"/>.</explain>
     <ref to="msg.target"/>
   </error>
 
   <error id="1046">
-    <title>Proxied response without <h>Via</h></title>
+    <title>Proxied response needs a <h>Via</h> header</title>
     <explain>According to <rfc num="7230" sect="5.7.1"/>, a proxy must add a <h>Via</h> header to each response that it forwards.</explain>
   </error>
 
   <comment id="1047">
-    <title>Close-delimited response without “<h>Connection</h>: close”</title>
+    <title>Close-delimited response should have “<h>Connection</h>: close”</title>
     <explain>When a response is delimited only by closing the connection, it should have a <h>Connection</h> header with a ‘close’ option. See <rfc num="7230" sect="6.3"/> and <rfc num="7230" sect="6.6"/>.</explain>
   </comment>
 
   <error id="1048">
-    <title><st>101</st> response with no <h>Upgrade</h> header</title>
+    <title><st>101</st> response needs an <h>Upgrade</h> header</title>
     <rfc num="7230" sect="6.7">
       A server that sends a 101 (Switching Protocols) response MUST send an
    <h>Upgrade</h> header field to indicate the new protocol(s) to which the
@@ -383,7 +384,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1050">
-    <title><h>Upgrade</h> header without “<h>Connection</h>: upgrade”</title>
+    <title><h>Upgrade</h> header requires “<h>Connection</h>: upgrade”</title>
     <rfc num="7230" sect="6.7">
       When <h>Upgrade</h> is sent, the sender MUST also send a <h>Connection</h> header
    field (Section 6.1) that contains an "upgrade" connection option, in
@@ -393,7 +394,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1051">
-    <title><st>101</st> response to an HTTP/1.0 request</title>
+    <title><st>101</st> response to an HTTP/1.0 request is forbidden</title>
     <rfc num="7230" sect="6.7">
       A
    server MUST ignore an <h ref="no">Upgrade</h> header field that is received in an
@@ -403,19 +404,19 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1052">
-    <title><var ref="header"/> in a <var ref="msg.status"/> response</title>
+    <title><var ref="header"/> makes no sense in a <var ref="msg.status"/> response</title>
     <explain>The <var ref="header"/> header provides representation metadata, but there can be no representation associated with a <var ref="msg.status"/> response. The header should probably be removed.</explain>
   </error>
 
   <comment id="1053">
-    <title><var ref="header"/> in a request with no body</title>
+    <title><var ref="header"/> makes no sense in an empty request</title>
     <explain>The <var ref="header"/> header provides representation metadata. It would make sense in a request with a body, but this one has no body.</explain>
     <explain>See also <rfc num="7231" sect="3.1"/>.</explain>
     <!-- This is a comment because we do not actually distinguish between "no payload" and "payload of length 0", while RFC 7230 does. It's not unthinkable to include something like a ``Content-Language`` in a POST request with a payload of length 0. -->
   </comment>
 
   <error id="1054">
-    <title><h>Trailer</h> header with no chunked body</title>
+    <title><h>Trailer</h> header makes no sense without a chunked body</title>
     <explain>The <h>Trailer</h> header announces what other headers will be sent in the trailer part of a <tc>chunked</tc> message. It doesn’t make sense here because this message does not use the chunked transfer coding.</explain>
     <explain>See also <rfc num="7230" sect="4.1.2"/>.</explain>
     <ref to="msg.headers.transfer_encoding"/>
@@ -429,7 +430,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1056">
-    <title><m>GET</m> request with a body</title>
+    <title><m>GET</m> request with a body may cause problems</title>
     <rfc num="7231" sect="4.3.1">
       A payload within a GET request message has no defined semantics;
    sending a payload body on a GET request might cause some existing
@@ -439,7 +440,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1057">
-    <title><m>HEAD</m> request with a body</title>
+    <title><m>HEAD</m> request with a body may cause problems</title>
     <rfc num="7231" sect="4.3.2">
       A payload within a HEAD request message has no defined semantics;
    sending a payload body on a HEAD request might cause some existing
@@ -448,7 +449,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1058">
-    <title><var ref="msg.status"/> response to a <m>PUT</m> request with <h ref="no">Content-Range</h></title>
+    <title><m>PUT</m> request with <h ref="no">Content-Range</h> must be rejected</title>
     <rfc num="7231" sect="4.3.4">
       An origin server that allows PUT on a given target resource MUST send
    a <st>400</st> (Bad Request) response to a PUT request that contains a
@@ -456,11 +457,12 @@ One non-obvious thing is how references work
    payload is likely to be partial content that has been mistakenly PUT
    as a full representation.
     </rfc>
+    <ref to="msg.status"/>
     <ref to="msg.request.headers.content_range"/>
   </error>
 
   <comment id="1059">
-    <title><m>DELETE</m> request with a body</title>
+    <title><m>DELETE</m> request with a body may cause problems</title>
     <rfc num="7231" sect="4.3.5">
       A payload within a DELETE request message has no defined semantics;
    sending a payload body on a DELETE request might cause some existing
@@ -475,7 +477,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1061">
-    <title><m>CONNECT</m> request with a body</title>
+    <title><m>CONNECT</m> request with a body may cause problems</title>
     <rfc num="7231" sect="4.3.6">
       A payload within a CONNECT request message has no defined semantics;
    sending a payload body on a CONNECT request might cause some existing
@@ -485,7 +487,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1062">
-    <title><m>OPTIONS</m> request with a body but no <h>Content-Type</h></title>
+    <title><m>OPTIONS</m> request with a body needs <h>Content-Type</h></title>
     <rfc num="7231" sect="4.3.7">
       A client that generates an OPTIONS request containing a payload body
    MUST send a valid <h>Content-Type</h> header field describing the
@@ -494,17 +496,17 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1063">
-    <title>Request with a <var ref="header"/> header</title>
+    <title><var ref="header"/> header is for responses</title>
     <explain>This request has the <var ref="header"/> header, which is only defined for responses.</explain>
   </error>
 
   <error id="1064">
-    <title>Response with a <var ref="header"/> header</title>
+    <title><var ref="header"/> header is for requests</title>
     <explain>This response has the <var ref="header"/> header, which is only defined for requests.</explain>
   </error>
 
   <error id="1066">
-    <title>“<h>Expect</h>: 100-continue” with no body</title>
+    <title>“<h>Expect</h>: 100-continue” is forbidden on empty requests</title>
     <rfc num="7231" sect="5.1.1">
       A client MUST NOT generate a 100-continue expectation in a request
       that does not include a message body.
@@ -513,12 +515,12 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1067">
-    <title><h>Max-Forwards</h> header in a <var ref="msg.method"/> request</title>
+    <title><h>Max-Forwards</h> header is undefined for <var ref="msg.method"/> requests</title>
     <explain>The <h>Max-Forwards</h> header is only defined for <m>OPTIONS</m> and <m>TRACE</m> requests. <rfc num="7231" sect="5.1.2">A recipient MAY ignore a Max-Forwards header field received with any other request methods.</rfc></explain>
   </comment>
 
   <error id="1068">
-    <title><h>Referer</h> with ‘https:’ in an unsecured request</title>
+    <title>Unsecured request must not have a <h>Referer</h> with ‘https:’</title>
     <rfc num="7231" sect="5.5.2">
       A user agent MUST NOT send a Referer header field in an
    unsecured HTTP request if the referring page was received with a
@@ -527,7 +529,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1070">
-    <title>No <h>User-Agent</h> header</title>
+    <title>Missing <h>User-Agent</h> header</title>
     <rfc num="7231" sect="5.5.3">
       A user agent SHOULD send a User-Agent field in each request
    unless specifically configured not to do so.
@@ -535,7 +537,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1071">
-    <title><var ref="msg.status"/> response to an HTTP/1.0 request</title>
+    <title><var ref="msg.status"/> response to an HTTP/1.0 request is forbidden</title>
     <rfc num="7231" sect="6.2">
       Since HTTP/1.0 did not define any 1xx status codes, a
    server MUST NOT send a 1xx response to an HTTP/1.0 client.
@@ -544,7 +546,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1072">
-    <title><st>201</st> response to <var ref="msg.request.method"/></title>
+    <title><st>201</st> response to <var ref="msg.request.method"/> makes no sense</title>
     <explain>The <var ref="msg.request.method"/> method is defined as safe (read-only). But the <st>201</st> status code means that a new resource was created.</explain>
   </error>
 
@@ -554,12 +556,12 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1074">
-    <title><st>202</st> response to <var ref="msg.request.method"/></title>
+    <title><st>202</st> response to <var ref="msg.request.method"/> makes no sense</title>
     <explain>The <var ref="msg.request.method"/> method is defined as safe (read-only). But the <st>202</st> status code means that the server started some kind of processing operation.</explain>
   </error>
 
   <error id="1076">
-    <title><st>205</st> response with a body</title>
+    <title><st>205</st> response must not have a body</title>
     <rfc num="7231" sect="6.3.6">
       Since the 205 status code implies that no additional content will be
    provided, a server MUST NOT generate a payload in a 205 response.
@@ -568,7 +570,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1077">
-    <title><st>300</st> response with no body</title>
+    <title><st>300</st> response should have a body</title>
     <rfc num="7231" sect="6.4.1">
       For request methods other than <m>HEAD</m>, the server SHOULD generate a
    payload in the 300 response containing a list of representation
@@ -578,7 +580,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1078">
-    <title><st>301</st> response with no <h>Location</h> header</title>
+    <title><st>301</st> response should have a <h>Location</h> header</title>
     <rfc num="7231" sect="6.4.2">
       The server SHOULD generate a Location header field in the response
    containing a preferred URI reference for the new permanent URI.
@@ -586,7 +588,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1079">
-    <title><st>302</st> response with no <h>Location</h> header</title>
+    <title><st>302</st> response should have a <h>Location</h> header</title>
     <rfc num="7231" sect="6.4.3">
       The server SHOULD generate a Location header field in the response
    containing a URI reference for the different URI.
@@ -594,7 +596,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1080">
-    <title><st>303</st> response with no <h>Location</h> header</title>
+    <title><st>303</st> response needs a <h>Location</h> header</title>
     <rfc num="7231" sect="6.4.4">
       The 303 (See Other) status code indicates that the server is
    redirecting the user agent to a different resource, as indicated by a
@@ -604,7 +606,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1081">
-    <title><st>303</st> response with no body</title>
+    <title><st>303</st> response should have a body</title>
     <rfc num="7231" sect="6.4.4">
       Except for responses to a <m>HEAD</m> request, the representation of a 303
    response ought to contain a short hypertext note with a hyperlink to
@@ -613,7 +615,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1082">
-    <title>Deprecated status code <st>305</st></title>
+    <title>Status code <st>305</st> is deprecated</title>
     <rfc num="7231" sect="6.4.5">
       The 305 (Use Proxy) status code was defined in a previous version of
    this specification and is now deprecated (Appendix B).
@@ -621,7 +623,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1083">
-    <title>Reserved status code <st>306</st></title>
+    <title>Status code <st>306</st> is reserved</title>
     <rfc num="7231" sect="6.4.6">
       The 306 status code was defined in a previous version of this
    specification, is no longer used, and the code is reserved.
@@ -629,7 +631,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1084">
-    <title><st>307</st> response with no <h>Location</h> header</title>
+    <title><st>307</st> response should have a <h>Location</h> header</title>
     <rfc num="7231" sect="6.4.7">
       The server SHOULD generate a Location header field in the response
    containing a URI reference for the different URI.
@@ -643,14 +645,14 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1086">
-    <title><var ref="msg.status"/> response to a server-wide <m>OPTIONS</m> request</title>
+    <title><var ref="msg.status"/> response to server-wide <m>OPTIONS</m> makes no sense</title>
     <explain>The <var ref="msg.status"/> status code means that the target resource can be found at a different URI. But this was an “ <m>OPTIONS</m> * ” request—it targets the entire server, not any particular resource. So the <var ref="msg.status"/> status code makes no sense here.</explain>
     <explain>Perhaps the <st>303</st> status code would fit better.</explain>
     <ref to="msg.request.target"/>
   </error>
 
   <comment id="1087">
-    <title><var ref="msg.status"/> response with no body</title>
+    <title><var ref="msg.status"/> response should include an explanation</title>
     <rfc num="7231" sect="6.5">
       Except when responding to a <m>HEAD</m> request, the
    server SHOULD send a representation containing an explanation of the
@@ -660,14 +662,14 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1088">
-    <title>Reserved status code <st>402</st></title>
+    <title>Status code <st>402</st> is reserved</title>
     <rfc num="7231" sect="6.5.2">
       The 402 (Payment Required) status code is reserved for future use.
     </rfc>
   </error>
 
   <error id="1089">
-    <title><st>405</st> response with no <h>Allow</h> header</title>
+    <title><st>405</st> response needs an <h>Allow</h> header</title>
     <rfc num="7231" sect="6.5.5">
       The origin server MUST generate an
    <h>Allow</h> header field in a 405 response containing a list of the target
@@ -676,13 +678,13 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1090">
-    <title>Probably wrong use of status code <st>406</st></title>
+    <title><st>406</st> response, but request wasn’t negotiating</title>
     <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers, such as <h ref="no">Accept</h>. But this request doesn’t seem to have such headers.</explain>
     <explain>See also <rfc num="7231" sect="5.3"/>.</explain>
   </error>
 
   <comment id="1092">
-    <title><st>406</st> response with no body</title>
+    <title><st>406</st> response should have a body</title>
     <rfc num="7231" sect="6.5.6">
       The server SHOULD generate a payload containing a list of available
    representation characteristics and corresponding resource identifiers
@@ -700,7 +702,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1094">
-    <title><st>408</st> response without “<h>Connection</h>: close”</title>
+    <title><st>408</st> response should have “<h>Connection</h>: close”</title>
     <rfc num="7231" sect="6.5.7">
       A server SHOULD send the "close" connection option
    (Section 6.1 of [RFC7230]) in the response, since 408 implies that
@@ -710,12 +712,12 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1095">
-    <title><st>409</st> response to a <var ref="msg.request.method"/> request</title>
+    <title><st>409</st> response to <var ref="msg.request.method"/> makes no sense</title>
     <explain>The <st>409</st> status code means that the request conflicted with the current state of the resource. But a <var ref="msg.request.method"/> request is, by definition, safe (read-only): it must not affect the state, so there can be no conflict.</explain>
   </error>
 
   <comment id="1096">
-    <title><st>409</st> response with no body</title>
+    <title><st>409</st> response should include an explanation</title>
     <rfc num="7231" sect="6.5.8">
       The server
    SHOULD generate a payload that includes enough information for a user
@@ -724,13 +726,13 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1097">
-    <title><st>411</st> response to a request with <h ref="no">Content-Length</h></title>
+    <title><st>411</st> response, but request did have <h ref="no">Content-Length</h></title>
     <explain>The <st>411</st> status code means that the server wants to see a <h ref="no">Content-Length</h> header in the request. But this request did, in fact, include a valid Content-Length of <var ref="msg.request.headers.content_length.value"/>.</explain>
     <ref to="msg.request.headers.content_length"/>
   </error>
 
   <error id="1098">
-    <title><st>413</st> response to a request with no body</title>
+    <title><st>413</st> response, but request had no body</title>
     <rfc num="7231" sect="6.5.11">
       The 413 (Payload Too Large) status code indicates that the server is
    refusing to process a request because the request payload is larger
@@ -739,7 +741,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1099">
-    <title><st>415</st> response to a request with no body</title>
+    <title><st>415</st> response, but request had no body</title>
     <rfc num="7231" sect="6.5.13">
       The 415 (Unsupported Media Type) status code indicates that the
    origin server is refusing to service the request because the payload
@@ -748,7 +750,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1100">
-    <title><st>417</st> response to a request with no <h ref="no">Expect</h></title>
+    <title><st>417</st> response, but request had no <h ref="no">Expect</h></title>
     <rfc num="7231" sect="6.5.14">
       The 417 (Expectation Failed) status code indicates that the
    expectation given in the request's <h ref="no">Expect</h> header field
@@ -758,7 +760,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1101">
-    <title><st>426</st> response with no <h>Upgrade</h> header</title>
+    <title><st>426</st> response needs an <h>Upgrade</h> header</title>
     <rfc num="7231" sect="6.5.15">
       The server MUST send an <h>Upgrade</h> header field in a 426
    response to indicate the required protocol(s)
@@ -766,7 +768,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1102">
-    <title>Wrong <st>426</st> response</title>
+    <title><st>426</st> response, but client is ready to upgrade</title>
     <explain>In this response, the server demands that the client upgrade to <var ref="protocol"/>. But the client’s request is already offering that same upgrade in its own <h ref="no">Upgrade</h> header. The server can just send a <st>101</st> response and switch to <var ref="protocol"/>.</explain>
     <explain>See <rfc num="7230" sect="6.7"/>.</explain>
     <ref to="msg.headers.upgrade"/>
@@ -781,7 +783,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1104">
-    <title><var ref="msg.status"/> response with no body</title>
+    <title><var ref="msg.status"/> response should include an explanation</title>
     <rfc num="7231" sect="6.6">
       Except when responding to a <m>HEAD</m> request, the
    server SHOULD send a representation containing an explanation of the
@@ -791,7 +793,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1105">
-    <title><st>505</st> response with the same version as the request</title>
+    <title><st>505</st> response, but request had the same HTTP version</title>
     <explain>The <st>505</st> status code means that the server does not support the HTTP version used in the request—which is <var ref="msg.request.version"/>—but the response itself is <var ref="msg.version"/>, too.</explain>
     <rfc num="7230" sect="2.6">
       A server MUST NOT send
@@ -800,7 +802,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1106">
-    <title><st>505</st> response with no body</title>
+    <title><st>505</st> response should have a body</title>
     <rfc num="7231" sect="6.6.6">
       The server SHOULD
    generate a representation for the 505 response that describes why
@@ -826,12 +828,12 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1110">
-    <title><var ref="msg.status"/> response with no <h>Date</h> header</title>
+    <title>Missing <h>Date</h> header</title>
     <explain>According to <rfc num="7231" sect="7.1.1.2"/>, every <var ref="msg.status"/> response must have a <h>Date</h> header, unless the server has no usable clock.</explain>
   </comment>
 
   <error id="1111">
-    <title><h>Location</h> with a fragment (#) in a <st>201</st> response</title>
+    <title><st>201</st> response can’t have <h>Location</h> with a fragment (#)</title>
     <rfc num="7231" sect="7.1.2">
       There are circumstances in which a fragment identifier in a <h>Location</h>
    value would not be appropriate.  For example, the Location header
@@ -841,17 +843,17 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1112">
-    <title><h>Location</h> header in a <var ref="msg.status"/> response</title>
+    <title><h>Location</h> header is undefined for <var ref="msg.status"/> responses</title>
     <explain><rfc num="7231" sect="7.1.2"/> does not define what it means for a <var ref="msg.status"/> response to have a <h>Location</h> header.</explain>
   </comment>
 
   <comment id="1113">
-    <title><h>Retry-After</h> header in a <var ref="msg.status"/> response</title>
+    <title><h>Retry-After</h> is undefined for <var ref="msg.status"/> responses</title>
     <explain>As far as HTTPolice knows, the <h>Retry-After</h> header is defined for status codes 3xx, <st>413</st>, <st>429</st>, and <st>503</st>, but not for <var ref="msg.status"/>.</explain>
   </comment>
 
   <error id="1114">
-    <title><h>Allow</h> actually includes <var ref="msg.request.method"/></title>
+    <title><st>405</st> response, but <h>Allow</h> includes <var ref="msg.request.method"/></title>
     <explain>The <st>405</st> status code means that the request method (<var ref="msg.request.method"/>) is not allowed for this resource. But the <h>Allow</h> header does include <var ref="msg.request.method"/>.</explain>
   </error>
 
@@ -861,7 +863,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1116">
-    <title><h>Accept-Encoding</h>: <var ref="coding"/> with a quality value</title>
+    <title><h>Accept-Encoding</h>: <var ref="coding"/> must not have a quality value</title>
     <rfc num="7231" sect="5.3.4">
       Most HTTP/1.0 applications do not recognize or obey qvalues
       associated with content-codings.  This means that qvalues might
@@ -870,13 +872,13 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1117">
-    <title><st>406</st> response when unable to satisfy <h ref="no">Accept-Language</h></title>
+    <title><h ref="no">Accept-Language</h> shouldn’t trigger a <st>406</st> response</title>
     <explain>The <st>406</st> status code means that the server cannot satisfy the request’s content negotiation headers. The only such header (known to HTTPolice) in this request is <h ref="no">Accept-Language</h>. However, <rfc num="7231" sect="5.3.5"/> discourages sending a <st>406</st> response in this case: it’s better to send a representation in a different language, because the user may still be able to understand some of it.</explain>
     <ref to="msg.request.headers.accept_language"/>
   </comment>
 
   <error id="1118">
-    <title><h>Last-Modified</h> later than <h>Date</h></title>
+    <title><h>Last-Modified</h> can’t be later than <h>Date</h></title>
     <rfc num="7232" sect="2.2.1">
       An origin server with a clock MUST NOT send a <h>Last-Modified</h> date that
    is later than the server's time of message origination (<h>Date</h>).
@@ -884,7 +886,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1119">
-    <title>Backslash in <var ref="place"/></title>
+    <title>Backslash in <var ref="place"/> may cause problems</title>
     <rfc num="7232" sect="2.3">
       Previously, opaque-tag was defined to be a quoted-string
       ([RFC2616], Section 3.11); thus, some recipients might perform
@@ -894,7 +896,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1120">
-    <title>Weak entity tag in <h>If-Match</h></title>
+    <title>Weak entity tag in <h>If-Match</h> is not supposed to work</title>
     <rfc num="7232" sect="3.1">
       An origin server MUST use the strong comparison function when
    comparing entity-tags for <h>If-Match</h> (Section 2.3.2), since the client
@@ -912,7 +914,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1122">
-    <title><h>If-Modified-Since</h> in a <var ref="msg.method"/> request</title>
+    <title><h>If-Modified-Since</h> in <var ref="msg.method"/> requests is not supposed to work</title>
     <explain>According to <rfc num="7232" sect="3.3"/>, an <h>If-Modified-Since</h> header must be ignored in requests that are neither <m>GET</m> nor <m>HEAD</m>.</explain>
   </error>
 
@@ -924,18 +926,18 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1124">
-    <title><st>304</st> response to a <var ref="msg.request.method"/> request</title>
+    <title><st>304</st> response is undefined for <var ref="msg.request.method"/> requests</title>
     <explain>The <st>304</st> status code is only defined by <rfc num="7232" sect="4.1"/> for responses to <m>GET</m> and <m>HEAD</m>. With other methods, the <st>412</st> status code may be useful.</explain>
   </error>
 
   <error id="1125">
-    <title>Probably wrong use of status code <var ref="msg.status"/></title>
+    <title><var ref="msg.status"/> response, but request has no preconditions</title>
     <explain>The <var ref="msg.status"/> status code is only used when the request includes a precondition, such as <h ref="no">If-Modified-Since</h>. But this request doesn’t seem to have any preconditions.</explain>
     <explain>See <rfc num="7232"/>.</explain>
   </error>
 
   <comment id="1127">
-    <title><var ref="header"/> in a <st>304</st> response</title>
+    <title><st>304</st> response should not have <var ref="header"/></title>
     <rfc num="7232" sect="4.1">
       Since the goal of a 304 response is to minimize information transfer
    when the recipient already has one or more cached representations, a
@@ -947,18 +949,18 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1128">
-    <title><h ref="no">If-Modified-Since</h> was not ignored</title>
+    <title><h ref="no">If-Modified-Since</h> on <var ref="msg.request.method"/> must be ignored</title>
     <explain>The <st>412</st> status code means that the server could not satisfy a precondition included in the request. The only such precondition (known to HTTPolice) in this request is <h ref="no">If-Modified-Since</h>. But <rfc num="7232" sect="3.3"/> says that an <h ref="no">If-Modified-Since</h> header in a <var ref="msg.request.method"/> request must be ignored.</explain>
     <ref to="msg.request.headers.if_modified_since"/>
   </error>
 
   <error id="1129">
-    <title>Wrong <st>412</st> response</title>
+    <title>Preconditions on <var ref="msg.request.method"/> must be ignored</title>
     <explain>The <st>412</st> status code means that the server could not satisfy a precondition included in the request. But, as defined in <rfc num="7232" sect="5"/>, such preconditions must be ignored in a <var ref="msg.request.method"/> request.</explain>
   </error>
 
   <error id="1130">
-    <title><var ref="header"/> in a <var ref="msg.method"/> request</title>
+    <title><var ref="header"/> on <var ref="msg.method"/> makes no sense</title>
     <rfc num="7232" sect="5">
       Likewise, a server
    MUST ignore the conditional request header fields defined by this
@@ -969,7 +971,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1131">
-    <title><var ref="header"/> in a <m>HEAD</m> request</title>
+    <title>Conditional <m>HEAD</m> request is pointless</title>
     <rfc num="7232" sect="5">
       Although conditional request header fields are defined as being
    usable with the <m>HEAD</m> method (to keep HEAD's semantics consistent with
@@ -978,10 +980,11 @@ One non-obvious thing is how references work
    Modified) response and more useful than a <st>412</st> (Precondition Failed)
    response.
     </rfc>
+    <ref to="header"/>
   </comment>
 
   <error id="1132">
-    <title><h>Range</h> header in a <var ref="msg.method"/> request</title>
+    <title><h>Range</h> header on <var ref="msg.method"/> is not supposed to work</title>
     <rfc num="7233" sect="3.1">
       A server
    MUST ignore a <h>Range</h> header field received with a request method other
@@ -998,7 +1001,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1134">
-    <title><h>If-Range</h> without a <h>Range</h> header</title>
+    <title><h>If-Range</h> requires a <h>Range</h> header</title>
     <rfc num="7233" sect="3.2">
       A client MUST NOT generate an <h>If-Range</h> header field in a request that
    does not contain a <h>Range</h> header field.
@@ -1006,7 +1009,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1135">
-    <title>Weak entity tag in <h>If-Range</h></title>
+    <title>Weak entity tags are forbidden in <h>If-Range</h></title>
     <rfc num="7233" sect="3.2">
       A client MUST NOT generate an <h>If-Range</h> header field containing an
    entity-tag that is marked as weak.
@@ -1014,12 +1017,12 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1136">
-    <title><st>206</st> response to a request with no <h ref="no">Range</h> header</title>
+    <title><st>206</st> response, but request had no <h ref="no">Range</h></title>
     <explain>The <st>206</st> status code only makes sense in responses to partial requests—that is, requests with a <h ref="no">Range</h> header. See <rfc num="7233" sect="4.1"/>.</explain>
   </error>
 
   <error id="1137">
-    <title><st>206</st> response to a <var ref="msg.request.method"/> request</title>
+    <title><st>206</st> response to <var ref="msg.request.method"/> is forbidden</title>
     <rfc num="7233" sect="3.1">
       A server
    MUST ignore a <h ref="no">Range</h> header field received with a request method other
@@ -1029,7 +1032,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1138">
-    <title><st>206</st> response without range specifiers</title>
+    <title><st>206</st> response needs range specifiers</title>
     <explain>The <st>206</st> status code means that the response contains one or more parts of the data. When it contains one part, the response must have a <h>Content-Range</h> header. When it contains several parts, the response must have a <h>Content-Type</h> of <media>multipart/byteranges</media>. But this response has neither.</explain>
     <explain>See <rfc num="7233" sect="4.1"/>.</explain>
   </error>
@@ -1071,7 +1074,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1143">
-    <title><h>Content-Range</h> in a <media>multipart/byteranges</media> response</title>
+    <title><h>Content-Range</h> in a <media>multipart/byteranges</media> response is forbidden</title>
     <rfc num="7233" sect="4.1">
       To avoid confusion with single-part responses, a server MUST NOT
    generate a <h>Content-Range</h> header field in the HTTP header section of a
@@ -1082,7 +1085,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1144">
-    <title><media>multipart/byteranges</media> response to a request for a single <h ref="no">Range</h></title>
+    <title><media>multipart/byteranges</media> response can’t be used for a single <h ref="no">Range</h></title>
     <rfc num="7233" sect="4.1">
       A server MUST NOT generate a multipart response to a request for a
    single range, since a client that does not request multiple parts
@@ -1093,14 +1096,14 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1145">
-    <title>Wrong <st>206</st> response</title>
+    <title><st>206</st> response, but <h>ETag</h> doesn’t match <h ref="no">If-Range</h></title>
     <explain>The request’s <h ref="no">If-Range</h> header means that the server is expected to send a <st>206</st> response only if the representation’s <h>ETag</h> matches the one specified in If-Range. In this case, it doesn’t match, so the server is supposed to send a <st>200</st> response with the complete data.</explain>
     <explain>See <rfc num="7233" sect="3.2"/>.</explain>
     <ref to="msg.request.headers.if_range"/>
   </error>
 
   <comment id="1146">
-    <title>Unnecessary <var ref="header"/></title>
+    <title>Unnecessary <var ref="header"/> header</title>
     <rfc num="7233" sect="4.1">
       If a <st ref="no">206</st> is generated in response to a request with an <h ref="no">If-Range</h>
    header field, the sender SHOULD NOT generate other representation
@@ -1112,7 +1115,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1147">
-    <title><h>Content-Range</h> in a <var ref="msg.status"/> response</title>
+    <title><h>Content-Range</h> is undefined for <var ref="msg.status"/> responses</title>
     <explain>The <h>Content-Range</h> header is defined by <rfc num="7233" sect="4.2"/> for responses with status codes <st>206</st> and <st>416</st>, but not <var ref="msg.status"/>.</explain>
   </error>
 
@@ -1127,12 +1130,12 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1149">
-    <title><st>416</st> response to a request with no <h ref="no">Range</h></title>
+    <title><st>416</st> response to request without <h ref="no">Range</h> makes no sense</title>
     <explain>The <st>416</st> status code is defined by <rfc num="7233" sect="4.4"/> only for responses to requests that have a <h ref="no">Range</h> header.</explain>
   </error>
 
   <comment id="1150">
-    <title><st>416</st> response without <h>Content-Range</h></title>
+    <title><st>416</st> response should have <h>Content-Range</h></title>
     <rfc num="7233" sect="4.4">
       When this status
    code is generated in response to a byte-range request, the sender
@@ -1143,7 +1146,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1151">
-    <title>Empty list element in <var ref="place"/></title>
+    <title>Empty list elements in <var ref="place"/> are forbidden</title>
     <rfc num="7230" sect="7">
       In any production that uses the list construct, a sender MUST NOT
    generate empty list elements.
@@ -1151,53 +1154,53 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1152">
-    <title><h>Cache-Control</h>: <var ref="directive"/> in a request</title>
+    <title><h>Cache-Control</h>: <var ref="directive"/> is for responses</title>
     <explain>This request’s <h>Cache-Control</h> header includes the <var ref="directive"/> directive, which is only defined for responses.</explain>
   </error>
 
   <error id="1153">
-    <title><h>Cache-Control</h>: <var ref="directive"/> in a response</title>
+    <title><h>Cache-Control</h>: <var ref="directive"/> is for requests</title>
     <explain>This response’s <h>Cache-Control</h> header includes the <var ref="directive"/> directive, which is only defined for requests.</explain>
   </error>
 
   <comment id="1154">
-    <title><h>Cache-Control</h>: <var ref="directive"/> without quotes</title>
+    <title><h>Cache-Control</h>: <var ref="directive"/> should be quoted</title>
     <explain>The specification for the <var ref="directive"/> directive recommends wrapping its argument in double quotes. But in this message’s <h ref="no">Cache-Control</h> header, it is not quoted.</explain>
   </comment>
 
   <comment id="1155">
-    <title><h>Cache-Control</h>: <var ref="directive"/> with quotes</title>
+    <title><h>Cache-Control</h>: <var ref="directive"/> should not be quoted</title>
     <explain>In this message’s <h ref="no">Cache-Control</h> header, the argument to the <var ref="directive"/> directive is wrapped in double quotes. But the specification recommends writing it as a plain token, without quotes.</explain>
   </comment>
 
   <error id="1156">
-    <title><var ref="entry"/>: <var ref="directive"/> without argument</title>
+    <title><var ref="entry"/>: <var ref="directive"/> needs an argument</title>
     <explain>According to the specification, the <var ref="directive"/> directive must have an argument. But in this message’s <var ref="entry"/> header, it has no argument.</explain>
   </error>
 
   <error id="1157">
-    <title><var ref="entry"/>: <var ref="directive"/> with argument</title>
+    <title><var ref="entry"/>: <var ref="directive"/> can’t have an argument</title>
     <explain>In this message’s <var ref="entry"/> header, the <var ref="directive"/> directive has an argument. But the specification defines no argument for this directive.</explain>
   </error>
 
   <error id="1158">
-    <title>Malformed <var ref="place"/>: <var ref="directive"/></title>
+    <title>Syntax error in <var ref="place"/>: <var ref="directive"/></title>
     <explain>“<var ref="value"/>” is not a correct value for a <var ref="directive"/> directive in <var ref="place"/>.</explain>
     <exception/>
   </error>
 
   <error id="1159">
-    <title><h>Cache-Control</h>: <cache>no-cache</cache> with argument</title>
+    <title><h>Cache-Control</h>: <cache>no-cache</cache> can’t have an argument</title>
     <explain>In this request’s <h>Cache-Control</h> header, the <cache>no-cache</cache> directive has an argument. But the specification for <cache>no-cache</cache> only defines an argument when used in responses.</explain>
   </error>
 
   <comment id="1160">
-    <title><h>Pragma</h>: <var ref="pragma"/></title>
+    <title><h>Pragma</h> other than ‘no-cache’ is deprecated</title>
     <explain>This message’s <h>Pragma</h> header includes ‘<var ref="pragma"/>’, but all pragmas other than ‘no-cache’ are deprecated in <rfc num="7234" sect="5.4"/>.</explain>
   </comment>
 
   <comment id="1161">
-    <title>“<h>Cache-Control</h>: no-cache” without “<h>Pragma</h>: no-cache”</title>
+    <title>“<h>Cache-Control</h>: no-cache” should also have “<h>Pragma</h>: no-cache”</title>
     <rfc num="7234" sect="5.4">
       When sending a no-cache request, a client ought to include both the
    pragma and cache-control directives, unless <h>Cache-Control</h>: <cache>no-cache</cache>
@@ -1207,43 +1210,43 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1162">
-    <title><h>Pragma</h>: no-cache in a response</title>
+    <title><h>Pragma</h>: no-cache is for requests</title>
     <explain>This response contains the ‘no-cache’ pragma directive, which is defined by <rfc num="7234" sect="5.4"/> only for requests.</explain>
     <!-- Not an error because very widespread and benign. -->
   </comment>
 
   <error id="1163">
-    <title>Strange warn code <var ref="code"/></title>
+    <title>Warn code <var ref="code"/> not in range 100—299</title>
     <explain><rfc num="7234" sect="5.5"/> defines two classes of warn codes: 1xx and 2xx. But this message’s <h>Warning</h> header contains a <var ref="code"/> code.</explain>
   </error>
 
   <error id="1164">
-    <title>Warning date does not match the <h>Date</h> header</title>
+    <title><h>Warning</h> date must match the <h>Date</h> header</title>
     <explain>This message’s <h>Warning</h> header contains a warning (code <var ref="code"/>) with a date that does not match the <h>Date</h> header. This means that the warning was mistakenly kept after cache validation. As explained in <rfc num="7234" sect="5.5"/>, such warnings must be removed.</explain>
   </error>
 
   <error id="1165">
-    <title><h>Warning</h>: <var ref="code"/> in a request</title>
+    <title>“<h>Warning</h>: <var ref="code"/>” is for responses</title>
     <explain>This request’s <h>Warning</h> header contains the <var ref="code"/> warn code. But, according to <rfc num="7234" sect="5.5"/>, 1xx warn codes can only be used on responses.</explain>
   </error>
 
   <error id="1166">
-    <title>Response from cache without <h>Age</h></title>
+    <title>Response from cache needs an <h>Age</h> header</title>
     <explain>According to <rfc num="7234" sect="4"/>, a cache must add an <h>Age</h> header to every response that is served without contacting the origin server.</explain>
   </error>
 
   <error id="1167">
-    <title>Bad status code <var ref="msg.status"/></title>
+    <title>Status code <var ref="msg.status"/> not in range 100—599</title>
     <explain>According to <rfc num="7231" sect="6"/>, HTTP status codes can only range from 100 to 599.</explain>
   </error>
 
   <debug id="1168">
-    <title>Response from cache</title>
+    <title><h>Age</h> header implies response from cache</title>
     <explain>This response has an <h>Age</h> header, which implies that it was served from a cache, without contacting the origin server.</explain>
   </debug>
 
   <debug id="1169">
-    <title>Response from cache</title>
+    <title>“<h>Warning</h>: <var ref="code"/>” implies response from cache</title>
     <explain>This response’s <h>Warning</h> header contains the <var ref="code"/> warn code, which implies that it was served from a cache, without contacting the origin server. See <rfc num="7234" sect="5.5"/>.</explain>
   </debug>
 
@@ -1254,17 +1257,17 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1171">
-    <title><var ref="msg.method"/> request with <h>Cache-Control</h>: <var ref="directive"/></title>
+    <title><h>Cache-Control</h>: <var ref="directive"/> has no effect on <var ref="msg.method"/></title>
     <explain>The <var ref="msg.method"/> method is defined as non-cacheable, so the <var ref="directive"/> directive in this request’s <h>Cache-Control</h> header makes no difference.</explain>
   </comment>
 
   <error id="1172">
-    <title>Response from cache to a <var ref="msg.request.method"/> request</title>
+    <title>Response to <var ref="msg.request.method"/> can’t be served from cache</title>
     <explain>The <var ref="msg.request.method"/> method is defined as non-cacheable.</explain>
   </error>
 
   <error id="1173">
-    <title>Response from cache to a request with <h ref="no">Cache-Control</h>: <cache>no-cache</cache></title>
+    <title>Response to “<h ref="no">Cache-Control</h>: <cache>no-cache</cache>” can’t be served from cache</title>
     <rfc num="7234" sect="5.2.1.4">
       The "no-cache" request directive indicates that a cache MUST NOT use
    a stored response to satisfy the request without successful
@@ -1274,7 +1277,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1174">
-    <title>Response from cache to a request with <h ref="no">Pragma</h>: no-cache</title>
+    <title>Response to “<h ref="no">Pragma</h>: no-cache” can’t be served from cache</title>
     <rfc num="7234" sect="5.4">
       When the <h ref="no">Cache-Control</h> header field is not present in a request,
    caches MUST consider the no-cache request pragma-directive as having
@@ -1284,7 +1287,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1175">
-    <title>Response from cache with <h>Cache-Control</h>: <cache>no-cache</cache></title>
+    <title>Response with “<h>Cache-Control</h>: <cache>no-cache</cache>” can’t be served from cache</title>
     <rfc num="7234" sect="5.2.2.2">
       The "no-cache" response directive indicates that the response MUST
    NOT be used to satisfy a subsequent request without successful
@@ -1293,12 +1296,12 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1176">
-    <title>Response from cache with <h>Cache-Control</h>: <cache>no-store</cache></title>
+    <title>Response with “<h>Cache-Control</h>: <cache>no-store</cache>” can’t be served from cache</title>
     <explain>According to <rfc num="7234" sect="3"/>, a cache cannot store a response that includes the <cache>no-store</cache> directive in its <h>Cache-Control</h> header.</explain>
   </error>
 
   <error id="1177">
-    <title>Non-cacheable <var ref="msg.status"/> response served from cache</title>
+    <title><var ref="msg.status"/> response can’t be served from cache by default</title>
     <explain>The <var ref="msg.status"/> status code is not defined as cacheable by default. According to <rfc num="7234" sect="3"/>, such a response can only be cached if it explicitly allows caching, with headers such as <h>Expires</h>. But this response has no such headers, so it is not cacheable.</explain>
   </error>
 
@@ -1308,12 +1311,12 @@ One non-obvious thing is how references work
   </debug>
 
   <debug id="1179">
-    <title>Heuristic freshness</title>
+    <title>“<h>Warning</h>: <warn>113</warn>” implies heuristic freshness</title>
     <explain>The <warn>113</warn> warn code in this response’s <h>Warning</h> header means that the expiration time for this response was chosen heuristically by the cache.</explain>
   </debug>
 
   <comment id="1180">
-    <title>Missing <h>Warning</h>: <warn>113</warn></title>
+    <title>Heuristic freshness should have “<h>Warning</h>: <warn>113</warn>”</title>
     <rfc num="7234" sect="4.2.2">
       When a heuristic is used to calculate freshness lifetime, a cache
    SHOULD generate a <h>Warning</h> header field with a <warn>113</warn> warn-code (see
@@ -1324,7 +1327,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1181">
-    <title>Heuristic freshness when <h>Expires</h> is present</title>
+    <title>Heuristic freshness can’t be used when <h>Expires</h> is present</title>
     <rfc num="7234" sect="4.2.2">
       A cache MUST NOT use heuristics to determine freshness when an
    explicit expiration time is present in the stored response.
@@ -1332,7 +1335,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1182">
-    <title>Heuristic freshness when <cache>max-age</cache> is present</title>
+    <title>Heuristic freshness can’t be used when <cache>max-age</cache> is present</title>
     <rfc num="7234" sect="4.2.2">
       A cache MUST NOT use heuristics to determine freshness when an
    explicit expiration time is present in the stored response.
@@ -1341,22 +1344,22 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1183">
-    <title>Stale response</title>
+    <title>“<h>Warning</h>: <var ref="code"/>” implies response is stale</title>
     <explain>The <var ref="code"/> warn code in this response’s <h>Warning</h> header means that the response is stale, as defined by <rfc num="7234" sect="4.2"/>.</explain>
   </comment>
 
   <comment id="1184">
-    <title>Stale response</title>
+    <title>Response is stale because <h>Age</h> &gt; <cache>max-age</cache></title>
     <explain>This response’s <h>Age</h> is greater than the <cache>max-age</cache> specified in its <h>Cache-Control</h> header. This means that the response is stale, as defined by <rfc num="7234" sect="4.2"/>.</explain>
   </comment>
 
   <comment id="1185">
-    <title>Stale response</title>
+    <title>Response is stale because <h>Age</h> &gt; <h>Expires</h> − <h>Date</h></title>
     <explain>This response’s <h>Age</h> is greater than the difference between its <h>Expires</h> date and its <h>Date</h> header. This means that the response is stale, as defined by <rfc num="7234" sect="4.2"/>.</explain>
   </comment>
 
   <comment id="1186">
-    <title>Stale response without <h ref="no">Warning</h>: <warn>110</warn></title>
+    <title>Stale response should have “<h ref="no">Warning</h>: <warn>110</warn>”</title>
     <rfc num="7234" sect="4.2.4">
       A cache SHOULD generate a Warning header field with the <warn>110</warn> warn-code
    (see Section 5.5.1) in stale responses.
@@ -1364,7 +1367,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1187">
-    <title>Stale response with <h>Cache-Control</h>: <cache>must-revalidate</cache></title>
+    <title>Response with “<h>Cache-Control</h>: <cache>must-revalidate</cache>” can’t be served stale</title>
     <rfc num="7234" sect="5.2.2.1">
       The "must-revalidate" response directive indicates that once it has
    become stale, a cache MUST NOT use the response to satisfy subsequent
@@ -1384,19 +1387,19 @@ One non-obvious thing is how references work
   </comment>
 
   <debug id="1189">
-    <title>Message transformed by a proxy</title>
+    <title>“<h>Warning</h>: <warn>214</warn>” means transformed by proxy</title>
     <explain>The <warn>214</warn> warn code in this message’s <h>Warning</h> header means that it was transformed by a proxy.</explain>
     <explain>See also <rfc num="7230" sect="5.7.2"/>.</explain>
   </debug>
 
   <debug id="1190">
-    <title>Response transformed by a proxy</title>
+    <title>Status <st>203</st> means transformed by proxy</title>
     <explain>The <st>203</st> status code means that this response was transformed by a proxy.</explain>
     <explain>See also <rfc num="7230" sect="5.7.2"/>.</explain>
   </debug>
 
   <error id="1191">
-    <title>Transformed message without <h ref="no">Warning</h>: <warn>214</warn></title>
+    <title>Transformed message needs “<h ref="no">Warning</h>: <warn>214</warn>”</title>
     <rfc num="7230" sect="5.7.2">
       A proxy that transforms a
    payload MUST add a Warning header field with the warn-code of <warn>214</warn>
@@ -1406,7 +1409,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1192">
-    <title>Transformed message with <h>Cache-Control</h>: <cache>no-transform</cache></title>
+    <title>Transformation forbidden by “<h>Cache-Control</h>: <cache>no-transform</cache>”</title>
     <rfc num="7230" sect="5.7.2">
       A proxy MUST NOT transform the payload (Section 3.3 of [RFC7231]) of
    a message that contains a <cache>no-transform</cache> cache-control directive
@@ -1415,12 +1418,12 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1193">
-    <title><h>Cache-Control</h>: <var ref="directive1"/>, <var ref="directive2"/></title>
+    <title><h>Cache-Control</h>: <var ref="directive1"/> contradicts <var ref="directive2"/></title>
     <explain>This message’s <h>Cache-Control</h> header includes both the <var ref="directive1"/> and the <var ref="directive2"/> directives, which contradict each other.</explain>
   </error>
 
   <error id="1194">
-    <title><st>401</st> response without <h>WWW-Authenticate</h></title>
+    <title><st>401</st> response needs a <h>WWW-Authenticate</h> header</title>
     <rfc num="7235" sect="3.1">
       The server generating a 401 response MUST send
    a <h>WWW-Authenticate</h> header field (Section 4.1) containing at least one
@@ -1429,7 +1432,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1195">
-    <title><st>407</st> response without <h>Proxy-Authenticate</h></title>
+    <title><st>407</st> response needs a <h>Proxy-Authenticate</h> header</title>
     <rfc num="7235" sect="3.2">
       The proxy MUST send a
    <h>Proxy-Authenticate</h> header field (Section 4.3) containing a challenge
@@ -1438,7 +1441,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1196">
-    <title>Unquoted ‘realm’ parameter in <var ref="place"/></title>
+    <title>‘realm’ parameter in <var ref="place"/> must be quoted</title>
     <explain>According to <rfc num="7235" sect="2.2"/>, the value of the ‘realm’ parameter must be enclosed in double quotes.</explain>
   </error>
 
@@ -1448,23 +1451,23 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1198">
-    <title>“<h>Connection</h>: close” in a <var ref="msg.status"/> response</title>
+    <title>“<h>Connection</h>: close” makes no sense in <var ref="msg.status"/> response</title>
     <explain>The <var ref="msg.status"/> status code means that this is an interim response, and more responses will follow on the same connection. But the ‘close’ option in this response’s <h>Connection</h> header means that the server will close the connection after sending this response.</explain>
   </error>
 
   <error id="1199">
-    <title>“<h>Connection</h>: close” in a <var ref="msg.status"/> response to <m>CONNECT</m></title>
+    <title>“<h>Connection</h>: close” makes no sense in <var ref="msg.status"/> response to <m>CONNECT</m></title>
     <explain>A <var ref="msg.status"/> response to a <m>CONNECT</m> request means that this connection is becoming a tunnel. But the ‘close’ option in this response’s <h>Connection</h> header means that the server will close the connection after sending this response.</explain>
   </error>
 
   <comment id="1200">
-    <title><st>428</st> response to a request with <var ref="header"/></title>
+    <title><st>428</st> response, but request has a <var ref="header"/> precondition</title>
     <explain>The <st>428</st> status code means that the server refuses to handle an unconditional request. But this request is conditional, because it has the <var ref="header"/> header.</explain>
     <!-- This is not an error because the server might not recognize this particular header. -->
   </comment>
 
   <comment id="1201">
-    <title><st>428</st> response with no body</title>
+    <title><st>428</st> response should include an explanation</title>
     <rfc num="6585" sect="3">
       Responses using this status code SHOULD explain how to resubmit the
    request successfully.
@@ -1472,12 +1475,12 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1202">
-    <title><var ref="msg.status"/> response from cache</title>
+    <title><var ref="msg.status"/> response can’t be served from cache</title>
     <explain>According to the specification, the <var ref="msg.status"/> status code cannot be served from a cache.</explain>
   </error>
 
   <comment id="1203">
-    <title><st>429</st> response with no body</title>
+    <title><st>429</st> response should include an explanation</title>
     <rfc num="6585" sect="4">
       The response representations SHOULD include details explaining the
    condition, and MAY include a <h ref="no">Retry-After</h> header indicating how long
@@ -1486,7 +1489,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1204">
-    <title><st>511</st> response with no body</title>
+    <title><st>511</st> response should have a body</title>
     <rfc num="6585" sect="6">
       The response representation SHOULD contain a link to a resource that
    allows the user to submit credentials (e.g., with an HTML form).
@@ -1494,7 +1497,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1205">
-    <title><st>308</st> response with no <h>Location</h> header</title>
+    <title><st>308</st> response should have a <h>Location</h> header</title>
     <rfc num="7538" sect="3">
       The server SHOULD generate a <h>Location</h> header field ([RFC7231],
    Section 7.1.2) in the response containing a preferred URI reference
@@ -1503,17 +1506,17 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1206">
-    <title><var ref="header"/>: <auth>Basic</auth> with no realm</title>
+    <title><var ref="header"/>: <auth>Basic</auth> must have ‘realm’</title>
     <explain>The Basic authentication scheme requires a ‘realm’ parameter. See <rfc num="7617" sect="2"/>.</explain>
   </error>
 
   <error id="1207">
-    <title><var ref="header"/>: <auth>Basic</auth> with a ‘<var ref="param"/>’ parameter</title>
+    <title><var ref="header"/>: <auth>Basic</auth> can’t have a ‘<var ref="param"/>’ parameter</title>
     <explain>No ‘<var ref="param"/>’ parameter is defined for the Basic authentication scheme. See <rfc num="7617" sect="2"/>.</explain>
   </error>
 
   <error id="1208">
-    <title><var ref="header"/>: <auth>Basic</auth> with a “<var ref="charset"/>” charset</title>
+    <title><var ref="header"/>: <auth>Basic</auth> can’t have a ‘<var ref="charset"/>’ charset</title>
     <explain>According to <rfc num="7617" sect="2.1"/>, the ‘charset’ parameter to the Basic authentication scheme can only have the value “UTF-8”.</explain>
   </error>
 
@@ -1535,7 +1538,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1212">
-    <title>Control character <var ref="char"/> in <var ref="header"/>: <auth>Basic</auth></title>
+    <title><var ref="header"/>: <auth>Basic</auth> can’t contain character <var ref="char"/></title>
     <rfc num="7617" sect="2">
       The user-id and password MUST NOT contain any control characters (see
    "CTL" in Appendix B.1 of [RFC5234]).
@@ -1543,14 +1546,14 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1213">
-    <title><m>PATCH</m> with <h>Content-Type</h>: <var ref="msg.headers.content_type.value"/></title>
+    <title><h>Content-Type</h>: <var ref="msg.headers.content_type.value"/> is not suitable for <m>PATCH</m></title>
     <explain>The <m>PATCH</m> method should only be used with media types that define how to apply the patch. <var ref="msg.headers.content_type.value"/> is not such a media type.</explain>
     <explain>See <rfc num="5789" errata="3169"/>.</explain>
     <explain>For example, <media>application/merge-patch+json</media> would be a suitable patch format for JSON.</explain>
   </comment>
 
   <comment id="1214">
-    <title>Successful application of a <var ref="msg.request.headers.content_type.value"/> patch</title>
+    <title><var ref="msg.request.headers.content_type.value"/> patch should be rejected</title>
     <rfc num="5789" errata="3169">
       If a server receives a <m>PATCH</m>
    request with a media type whose specification does not define
@@ -1563,7 +1566,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1215">
-    <title><st>415</st> response to <m>PATCH</m> without <h>Accept-Patch</h></title>
+    <title><st>415</st> response to <m>PATCH</m> should have <h>Accept-Patch</h></title>
     <rfc num="5789" sect="2.2">
       Such a response SHOULD include an
       <h>Accept-Patch</h> response header as described in Section 3.1 to notify
@@ -1572,28 +1575,28 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1216">
-    <title>“<h>Allow</h>: <m>PATCH</m>” without <h>Accept-Patch</h></title>
+    <title>Should send <h>Accept-Patch</h> with “<h>Allow</h>: <m>PATCH</m>”</title>
     <explain>This <m>OPTIONS</m> response indicates in its <h>Allow</h> header that the <m>PATCH</m> method is supported. According to <rfc num="5789" sect="3.1"/>, in this case the server should also send an <h>Accept-Patch</h> header.</explain>
   </comment>
 
   <error id="1217">
-    <title><h>Accept-Patch</h> without “<h>Allow</h>: <m ref="no">PATCH</m>”</title>
+    <title><h>Accept-Patch</h> implies “<h>Allow</h>: <m ref="no">PATCH</m>”</title>
     <explain>This response’s <h>Accept-Patch</h> header means that this resource supports the <m ref="no">PATCH</m> method, but it’s missing from the <h>Allow</h> header.</explain>
   </error>
 
   <error id="1218">
-    <title>HSTS without <hsts>max-age</hsts></title>
+    <title>HSTS needs a ‘<hsts>max-age</hsts>’ directive</title>
     <explain>According to <rfc num="6797" sect="6.1.1"/>, a <h>Strict-Transport-Security</h> header must have a <hsts>max-age</hsts> directive.</explain>
   </error>
 
   <comment id="1219">
-    <title>HSTS: <hsts>max-age</hsts>=0; <hsts>includeSubDomains</hsts></title>
+    <title>HSTS: <hsts>includeSubDomains</hsts> has no effect with <hsts>max-age</hsts>=0</title>
     <explain>The “<hsts>max-age</hsts>=0” directive in this response’s <h>Strict-Transport-Security</h> header tells the user agent to delete the HSTS policy for the domain. The <hsts>includeSubDomains</hsts> directive makes no difference in this case.</explain>
     <explain>See <rfc num="6797" sect="6.2"/>.</explain>
   </comment>
 
   <error id="1220">
-    <title>Multiple <var ref="directive"/> directives in HSTS</title>
+    <title>Duplicate ‘<var ref="directive"/>’ directive in HSTS</title>
     <rfc num="6797" sect="6.1">
       All directives MUST appear only once in an STS header field.
     </rfc>
@@ -1601,7 +1604,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1221">
-    <title><h>Strict-Transport-Security</h> without TLS</title>
+    <title><h>Strict-Transport-Security</h> can’t be used without TLS</title>
     <rfc num="6797" sect="7.2">
       An HSTS Host MUST NOT include the STS header field in HTTP responses
    conveyed over non-secure transport.
@@ -1625,7 +1628,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1225">
-    <title>Multiple ‘<var ref="name"/>’ parameters in <var ref="place"/></title>
+    <title>Duplicate ‘<var ref="name"/>’ parameter in <var ref="place"/></title>
     <explain>According to <rfc num="5988" sect="5"/>, the ‘<var ref="name"/>’ parameter must not occur more than once in a single link.</explain>
   </error>
 
@@ -1639,20 +1642,20 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1227">
-    <title><h>Accept-Patch</h>: <var ref="patch_type"/></title>
+    <title><var ref="patch_type"/> is not suitable for <h>Accept-Patch</h></title>
     <explain>The <m>PATCH</m> method should only be used with media types that define how to apply the patch. <var ref="patch_type"/> is not such a media type. But this response’s <h>Accept-Patch</h> header invites the client to send patches of type <var ref="patch_type"/>.</explain>
     <explain>See <rfc num="5789" errata="3169"/>.</explain>
     <explain>For example, <media>application/merge-patch+json</media> would be a suitable patch format for JSON.</explain>
   </comment>
 
   <error id="1228">
-    <title><h>Upgrade</h>: h2</title>
+    <title><h>Upgrade</h>: h2 is wrong</title>
     <explain>This message’s <h>Upgrade</h> header includes the token ‘h2’, which normally refers to HTTP/2 over TLS. But HTTP/2 over TLS does not use the <h>Upgrade</h> mechanism, and cleartext HTTP/2 uses the ‘h2c’ token instead, so “Upgrade: h2” is wrong.</explain>
     <explain>See <rfc num="7540" sect="3"/>.</explain>
   </error>
 
   <error id="1230">
-    <title><h>HTTP2-Settings</h> without “<h>Connection</h>: http2-settings”</title>
+    <title><h>HTTP2-Settings</h> needs “<h>Connection</h>: http2-settings”</title>
     <rfc num="7540" sect="3.2.1">
       Since the upgrade is only intended to apply to the immediate
    connection, a client sending the <h>HTTP2-Settings</h> header field MUST
@@ -1662,7 +1665,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1231">
-    <title>“<h>Upgrade</h>: h2c” without <h>HTTP2-Settings</h></title>
+    <title><h>Upgrade</h>: h2c needs <h>HTTP2-Settings</h></title>
     <rfc num="7540" sect="3.2.1">
       A request that upgrades from HTTP/1.1 to HTTP/2 MUST include exactly
    one "HTTP2-Settings" header field.
@@ -1677,7 +1680,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1233">
-    <title>“<h>Upgrade</h>: h2c” on an encrypted connection</title>
+    <title><h>Upgrade</h>: h2c can’t be used on a TLS connection</title>
     <explain>An “<h>Upgrade</h>: h2c” header is used to switch to HTTP/2 from a cleartext HTTP/1.1 connection. But this message was sent on an encrypted (TLS) connection. HTTP/2 over TLS is negotiated by other means.</explain>
     <explain>See <rfc num="7540" sect="3"/>.</explain>
   </error>
@@ -1688,31 +1691,31 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1235">
-    <title><h>Vary</h>: <h ref="no">Host</h></title>
+    <title><h>Vary</h>: <h ref="no">Host</h> is useless</title>
     <explain>There is no need to include <h ref="no">Host</h> in the <h>Vary</h> header, because Host is part of the request URI, and therefore, every HTTP response implicitly varies by Host already. “Vary: Host” can only scare caches away from storing the response.</explain>
     <explain>See <rfc num="7231" sect="7.1.4"/> and <rfc num="7234" sect="2"/>.</explain>
   </comment>
 
   <debug id="1236">
-    <title>Request to a proxy</title>
+    <title>Absolute URI implies request to proxy</title>
     <explain>This request’s target is an absolute URI. According to <rfc num="7230" sect="5.3"/>, HTTP/1.1 clients only use this “absolute form” when connecting to proxies. Therefore, HTTPolice assumes that this request is to a proxy.</explain>
     <ref to="msg.target"/>
     <ref to="msg.version"/>
   </debug>
 
   <error id="1237">
-    <title>Response to a direct request transformed by proxy</title>
+    <title>Response to a direct request can’t be transformed by a proxy</title>
     <explain>It seems like this response was transformed by a proxy, but the request was not directed to a proxy.</explain>
   </error>
 
   <comment id="1238">
-    <title><h>Cache-Control</h>: <var ref="directive1"/>, <var ref="directive2"/></title>
+    <title><h>Cache-Control</h>: <var ref="directive1"/> has no effect with <var ref="directive2"/></title>
     <explain>This response’s <h>Cache-Control</h> header includes both the <var ref="directive1"/> and the <var ref="directive2"/> directives. But <var ref="directive1"/> makes no difference when <var ref="directive2"/> is present.</explain>
     <!-- This used to be part of no. 1193, but strictly speaking ``max-age`` does not contradict ``no-cache``, similarly ``s-maxage`` vs. ``private``, etc. -->
   </comment>
 
   <error id="1239">
-    <title>Body in a response to <m>HEAD</m></title>
+    <title>Response to <m>HEAD</m> can’t have a body</title>
     <rfc num="7231" sect="4.3.2">
       The <m>HEAD</m> method is identical to <m>GET</m> except that the server MUST NOT
    send a message body in the response
@@ -1721,7 +1724,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1240">
-    <title><st>204</st> response with a body</title>
+    <title><st>204</st> response can’t have a body</title>
     <rfc num="7231" sect="6.3.5">
       The 204 (No Content) status code indicates that the server has
    successfully fulfilled the request and that there is no additional
@@ -1738,7 +1741,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1242">
-    <title><st>451</st> response with no body</title>
+    <title><st>451</st> response should include an explanation</title>
     <rfc num="7725" sect="3">
       Responses using this status code SHOULD include an explanation, in
    the response body, of the details of the legal demand: the party
@@ -1748,7 +1751,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1243">
-    <title><st>451</st> response with no <rel>blocked-by</rel> link</title>
+    <title><st>451</st> response should have a <rel>blocked-by</rel> link</title>
     <rfc num="7725" sect="4">
       When an entity blocks access to a resource and returns status 451, it
    SHOULD include a "<h>Link</h>" HTTP header field [RFC5988] whose value is a
@@ -1759,7 +1762,7 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1244">
-    <title><var ref="header"/> header in an HTTP/2 message</title>
+    <title><var ref="header"/> header can’t be used in HTTP/2</title>
     <rfc num="7540" sect="8.1.2.2">
       An endpoint MUST NOT
    generate an HTTP/2 message containing connection-specific header
@@ -1774,7 +1777,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1245">
-    <title><h>Upgrade</h> header in an HTTP/2 message</title>
+    <title><h>Upgrade</h> header can’t be used in HTTP/2</title>
     <rfc num="7540" sect="8.1.2.2">
       HTTP/2 purposefully does not support upgrade to another
       protocol.
@@ -1783,7 +1786,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1246">
-    <title><st>101</st> response over HTTP/2</title>
+    <title><st>101</st> response can’t be used in HTTP/2</title>
     <rfc num="7540" sect="8.1.1">
       HTTP/2 removes support for the <st>101</st> (Switching Protocols)
    informational status code
@@ -1792,7 +1795,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1247">
-    <title><h>Content-Disposition</h>: multiple ‘<var ref="param"/>’ parameters</title>
+    <title>Duplicate ‘<var ref="param"/>’ parameter in <h>Content-Disposition</h></title>
     <rfc num="6266" sect="4.1">
       Content-Disposition header field values with multiple instances of
    the same parameter name are invalid.
@@ -1800,7 +1803,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1248">
-    <title><h>Content-Disposition</h>: percent-encoded filename</title>
+    <title>Percent-encoded filename in <h>Content-Disposition</h> may cause problems</title>
     <rfc num="6266" appendix="D">
       Avoid including the percent character followed by two hexadecimal
       characters (e.g., %A9) in the filename parameter, since some
@@ -1811,7 +1814,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1249">
-    <title><h>Content-Disposition</h>: backslash in filename</title>
+    <title>Backslash in filename in <h>Content-Disposition</h> may cause problems</title>
     <rfc num="6266" appendix="D">
       Avoid including the "\" character in the quoted-string form of the
       filename parameter, as escaping is not implemented by some user
@@ -1821,7 +1824,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1250">
-    <title><h>Content-Disposition</h>: non-ASCII filename</title>
+    <title>Non-ASCII filename in <h>Content-Disposition</h> may cause problems</title>
     <rfc num="6266" appendix="D">
       Avoid using non-ASCII characters in the filename parameter.
       Although most existing implementations will decode them as
@@ -1832,7 +1835,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1251">
-    <title><h>Content-Disposition</h>: ‘filename*’ without ‘filename’</title>
+    <title><h>Content-Disposition</h>: ‘filename*’ should also have ‘filename’ as fallback</title>
     <rfc num="6266" appendix="D">
       When a "filename*" parameter is sent, to also generate a
       "filename" parameter as a fallback for user agents that do not
@@ -1841,7 +1844,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1252">
-    <title><h>Content-Disposition</h>: ‘filename*’ before ‘filename’</title>
+    <title><h>Content-Disposition</h>: ‘filename*’ should come after ‘filename’</title>
     <rfc num="6266" appendix="D">
       When a "filename" parameter is included as a fallback (as per
       above), "filename" should occur first, due to parsing problems in
@@ -1859,13 +1862,13 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1254">
-    <title>Bad encoded value in <var ref="place"/></title>
+    <title>Bad <var ref="charset"/> value in <var ref="place"/></title>
     <explain>This message’s <var ref="place"/> contains a <var ref="charset"/> encoded value in the form defined by <rfc num="5987"/>. But HTTPolice tried to decode it from <var ref="charset"/> and got the following error:</explain>
     <exception/>
   </error>
 
   <comment id="1255">
-    <title><h>Content-Disposition</h>: ‘filename*’ is not UTF-8</title>
+    <title><h>Content-Disposition</h>: filename* should be in UTF-8</title>
     <rfc num="6266" appendix="D">
       Use UTF-8 as the encoding of the "filename*" parameter, when
       present, because at least one existing implementation only
@@ -1885,7 +1888,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1258">
-    <title><h>Alt-Svc</h> header in an HTTP/2 response</title>
+    <title>HTTP/2 should use ALTSVC frame instead of <h>Alt-Svc</h> header</title>
     <explain><rfc num="7838" sect="3"/> recommends using ALTSVC frames instead of the <h>Alt-Svc</h> header on HTTP/2 connections.</explain>
     <ref to="msg.version"/>
   </comment>
@@ -1897,7 +1900,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1260">
-    <title><st>421</st> response with <h>Alt-Svc</h></title>
+    <title><st>421</st> response can’t have <h>Alt-Svc</h></title>
     <rfc num="7838" sect="6">
       An <h>Alt-Svc</h> header field in a <st>421</st> (Misdirected Request) response MUST
    be ignored.
@@ -1905,7 +1908,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1261">
-    <title><h>Authorization</h>: <auth>Bearer</auth> without TLS</title>
+    <title><h>Authorization</h>: <auth>Bearer</auth> requires TLS</title>
     <rfc num="6750" sect="5.3">
       Clients MUST always use TLS [RFC5246]
       (https) or equivalent transport security when making requests with
@@ -1920,7 +1923,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1263">
-    <title><h>WWW-Authenticate</h>: <auth>Bearer</auth> without TLS</title>
+    <title><h>WWW-Authenticate</h>: <auth>Bearer</auth> requires TLS</title>
     <explain>According to <rfc num="6750" sect="5.3"/>, bearer tokens must not be used without TLS. Instead of prompting the client to send a token on an insecure connection, perhaps it would be better to redirect to an ‘https:’ URI first.</explain>
   </error>
 
@@ -1930,7 +1933,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1265">
-    <title><h>WWW-Authenticate</h>: <auth>Bearer</auth> with multiple ‘<var ref="param"/>’ parameters</title>
+    <title>Duplicate ‘<var ref="param"/>’ parameter in “<h>WWW-Authenticate</h>: <auth>Bearer</auth>”</title>
     <explain>According to <rfc num="6750" sect="3"/>, the ‘<var ref="param"/>’ parameter must not appear more than once.</explain>
   </error>
 
@@ -1954,8 +1957,9 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1268">
-    <title><var ref="msg.status"/> response with “error=<var ref="error_code"/>”</title>
+    <title>Response with “error=<var ref="error_code"/>” should be <var ref="expected_status"/></title>
     <explain>According to <rfc num="6750" sect="3.1"/>, when the server’s <auth>Bearer</auth> challenge has “error=<var ref="error_code"/>”, the status code should be <var ref="expected_status"/>.</explain>
+    <ref to="msg.status"/>
     <ref to="msg.headers.www_authenticate"/>
   </comment>
 
@@ -1970,7 +1974,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1270">
-    <title>Access token in URI</title>
+    <title>Access token in URI is insecure</title>
     <explain>The query string of this request’s URI contains an ‘access_token’ parameter. It’s probably a bearer token, as defined in <rfc num="6750"/>.</explain>
     <rfc num="6750" sect="5.3">
       Bearer tokens SHOULD NOT be
@@ -1987,7 +1991,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1271">
-    <title>Access token without TLS</title>
+    <title>Access token may need TLS</title>
     <explain>This request has an ‘access_token’ parameter. It’s probably a bearer token, as defined in <rfc num="6750"/>.</explain>
     <rfc num="6750" sect="5.3">
       Clients MUST always use TLS [RFC5246]
@@ -1999,7 +2003,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1272">
-    <title>Access token in URI without “<h ref="no">Cache-Control</h>: no-store”</title>
+    <title>Access token in URI needs “<h ref="no">Cache-Control</h>: no-store”</title>
     <explain>According to <rfc num="6750" sect="2.3"/>, if an access token is sent in the request URI, then the request should at least have a “<h ref="no">Cache-Control</h>: no-store” header. This reduces the risk of caches saving this token.</explain>
     <ref to="msg.target"/>
   </comment>
@@ -2010,7 +2014,7 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1274">
-    <title>Probably malformed <var ref="header"/> header</title>
+    <title><var ref="header"/> header without credentials</title>
     <explain>An <var ref="header"/> header usually consists of two parts: the name of the authentication scheme, and the actual credentials. But in this request, it only contains the scheme (“<var ref="header.value.item"/>”).</explain>
     <explain>Did you mean something like “<var ref="header"/>: <auth>Bearer</auth> <var ref="header.value.item"/>”?</explain>
     <explain>See also <rfc num="7235" sect="2"/>.</explain>
@@ -2018,7 +2022,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1275">
-    <title>XML with entity declarations</title>
+    <title>Entity declarations in XML may cause problems</title>
     <explain>This message’s XML content includes entity declarations (&lt;!ENTITY&gt;). Many XML applications do not process such declarations because they can lead to denial-of-service attacks.</explain>
     <ref to="msg.displayable_body"/>
   </comment>
@@ -2051,13 +2055,14 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1280">
-    <title><var ref="header"/>: <media>application/json</media> with charset</title>
+    <title>‘charset’ parameter is undefined for <media>application/json</media></title>
     <explain>The <media>application/json</media> media type does not have a ‘charset’ parameter. <rfc num="7159" sect="11">Adding one really has no effect on compliant recipients.</rfc></explain>
+    <ref to="header"/>
     <explain>See also <rfc num="7159" sect="8.1"/>.</explain>
   </comment>
 
   <error id="1281">
-    <title>JSON encoded in <var ref="msg.guessed_charset"/></title>
+    <title>JSON can’t be encoded in <var ref="msg.guessed_charset"/></title>
     <rfc num="7159" sect="8.1">
       JSON text SHALL be encoded in UTF-8, UTF-16, or UTF-32.
     </rfc>
@@ -2071,14 +2076,14 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1283">
-    <title>Cacheable <st>421</st> response</title>
+    <title>Cacheable <st>421</st> response may cause problems</title>
     <explain><st>421</st> responses are defined as cacheable by default. However, because of how an HTTP cache works (<rfc num="7234" sect="2"/>), it is harmful to cache a 421 response, as it would be returned on subsequent requests to the same URI, without even trying to connect to the right server.</explain>
     <explain>To avoid this, a 421 response to <var ref="msg.request.method"/> should be marked as non-cacheable with a header like “<h>Cache-Control</h>: <cache>no-store</cache>”.</explain>
     <explain>See <rfc num="7540" errata="4666"/>.</explain>
   </comment>
 
   <comment id="1284">
-    <title><st>202</st> response with no body</title>
+    <title><st>202</st> response should have a body</title>
     <rfc num="7231" sect="6.3.3">
       The representation sent with this
    response ought to describe the request's current status and point to
@@ -2088,7 +2093,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1285">
-    <title>Multiple ‘<var ref="name"/>’ tokens in <h>Prefer</h></title>
+    <title>Duplicate ‘<var ref="name"/>’ token in <h>Prefer</h></title>
     <rfc num="7240" sect="2">
       To avoid any possible ambiguity, individual preference tokens SHOULD
    NOT appear multiple times within a single request.
@@ -2149,13 +2154,13 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1294">
-    <title>Bad syntax in reason phrase</title>
+    <title>Syntax error in reason phrase</title>
     <exception/>
     <ref to="msg.status"/>
   </error>
 
   <error id="1295">
-    <title>Method ‘<var ref="msg.method"/>’ was probably intended to be ‘<var ref="uppercase"/>’</title>
+    <title>Method ‘<var ref="msg.method"/>’ should probably be ‘<var ref="uppercase"/>’</title>
     <rfc num="7231" sect="4.1">The method token is case-sensitive</rfc>
   </error>
 
