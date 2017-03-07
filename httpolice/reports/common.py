@@ -5,8 +5,9 @@ import six
 
 from httpolice import known, notice
 from httpolice.header import HeaderView
+from httpolice.known import h
 from httpolice.parse import ParseError, Symbol
-from httpolice.structure import HeaderEntry, Parametrized
+from httpolice.structure import FieldName, HeaderEntry, Parametrized
 from httpolice.util.text import format_chars
 
 
@@ -40,7 +41,17 @@ def expand_parametrized(x):
 @expand_piece.register(HeaderEntry)
 @expand_piece.register(HeaderView)
 def expand_header(hdr):
-    return hdr.name
+    return expand_piece(hdr.name)
+
+@expand_piece.register(FieldName)
+def expand_field_name(name):
+    # Canonicalize field names. For example, if the header is called
+    # "cache-control" in the message (as it always is in HTTP/2),
+    # it should be rendered as "Cache-Control" in the report.
+    if name in h:
+        return h[name]['_']
+    else:
+        return name
 
 
 @singledispatch
