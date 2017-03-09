@@ -26,21 +26,31 @@ __ https://en.wikipedia.org/wiki/.har
 
 For example, in Firefox,
 press F12 to open the toolbox, and switch to its Network pane.
-Then, open a simple Web site—let’s try `Mark Nottingham’s page`__.
+Then, open a simple Web site—I’m going to use `h2o.examp1e.net`__ here.
 All HTTP exchanges made by the browser appear in the Network pane.
 Right-click inside that pane and select “Save All As HAR”.
 
-__ https://www.mnot.net/
+__ https://h2o.examp1e.net/
 
 Then feed this HAR file to HTTPolice::
 
-  $ httpolice -i har /path/to/file.har 
-  ------------ request: GET /1441/25776044114_0e5b9879a0_z.jpg
+  $ httpolice -i har /path/to/file.har
+  ------------ request: GET /analytics.js
   ------------ response: 200 OK
-  C 1277 Obsolete 'X-' prefix in X-Photo-Farm
-  C 1277 Obsolete 'X-' prefix in X-Photo-Origin
-  E 1000 Malformed Expires header
-  E 1241 Date + Age is in the future
+  C 1035 Deprecated media type text/javascript
+  D 1168 Age header implies response from cache
+  C 1258 HTTP/2 should use ALTSVC frame instead of Alt-Svc header
+  ------------ request: GET /r/collect?v=1&_v=j49&a=2057119860&t=pageview&_s=1...
+  ------------ response: 200 OK
+  E 1108 Wrong day of week in Expires
+  C 1162 Pragma: no-cache is for requests
+  C 1258 HTTP/2 should use ALTSVC frame instead of Alt-Svc header
+  ------------ request: GET /repos/h2o/h2o?callback=callback
+  ------------ response: 200 OK
+  C 1277 Obsolete 'X-' prefix in X-RateLimit-Limit
+  C 1277 Obsolete 'X-' prefix in X-RateLimit-Remaining
+  C 1277 Obsolete 'X-' prefix in X-RateLimit-Reset
+  C 1277 Obsolete 'X-' prefix in X-Served-By
 
 
 Better reports
