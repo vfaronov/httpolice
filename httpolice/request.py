@@ -229,7 +229,7 @@ def check_request(req):
     if body and headers.content_type.is_absent:
         complain(1041)
 
-    if (method_info.defines_body(method) and
+    if (version in [http10, http11] and method_info.defines_body(method) and
             headers.content_length.is_absent and
             headers.transfer_encoding.is_absent):
         complain(1021)

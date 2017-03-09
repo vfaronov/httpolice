@@ -37,6 +37,12 @@ Changed
   (as in text reports). If you depend on their wording (which you shouldn't),
   you may need to adjust.
 
+Fixed
+-----
+- Notice `1021`_ is no longer reported on HTTP/2 requests.
+
+.. _1021: http://pythonhosted.org/HTTPolice/notices.html#1021
+
 
 0.4.0 - 2017-01-14
 ~~~~~~~~~~~~~~~~~~
