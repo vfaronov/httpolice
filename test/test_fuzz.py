@@ -72,7 +72,8 @@ def make_exchange():
                 random.choice(versions),
                 make_headers(max_num=5),
                 make_body(),
-                make_headers(max_num=2))
+                make_headers(max_num=2),
+                promised=(random.random() < 0.05))
     ])
     resps = [
         Response(random.choice(versions),

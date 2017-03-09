@@ -2164,4 +2164,38 @@ One non-obvious thing is how references work
     <rfc num="7231" sect="4.1">The method token is case-sensitive</rfc>
   </error>
 
+  <error id="1296">
+    <title>Promised <var ref="msg.method"/> request is not cacheable</title>
+    <rfc num="7540">
+      Promised requests MUST be cacheable (see [RFC7231], Section 4.2.3),
+   MUST be safe (see [RFC7231], Section 4.2.1), and MUST NOT include a
+   request body.
+    </rfc>
+  </error>
+
+  <error id="1297">
+    <title>Promised <var ref="msg.method"/> request is unsafe</title>
+    <rfc num="7540">
+      Promised requests MUST be cacheable (see [RFC7231], Section 4.2.3),
+   MUST be safe (see [RFC7231], Section 4.2.1), and MUST NOT include a
+   request body.
+    </rfc>
+  </error>
+
+  <error id="1298">
+    <title>Promised request can’t have a body</title>
+    <rfc num="7540">
+      Promised requests MUST be cacheable (see [RFC7231], Section 4.2.3),
+   MUST be safe (see [RFC7231], Section 4.2.1), and MUST NOT include a
+   request body.
+    </rfc>
+    <ref to="msg.displayable_body"/>
+  </error>
+
+  <error id="1299">
+    <title><var ref="msg.version"/> request can’t be promised</title>
+    <explain>This request is marked as promised (<rfc num="7540" sect="8.2"/>), but <var ref="msg.version"/> does not have a concept of promised requests.</explain>
+    <explain>This is not an error in the request itself, but something along the way to HTTPolice erroneously marked this request as both promised and <var ref="msg.version"/>.</explain>
+  </error>
+
 </notices>

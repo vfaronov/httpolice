@@ -109,6 +109,13 @@ div.message-display {
     margin-top: 2em;
 }
 
+p.promised-note {
+    margin: 0 0 1em 0;
+    padding: 0.3em 0;
+    text-align: center;
+    background-color: paleturquoise;
+}
+
 p.message-remark {
     margin: 0 1em 0.5em 0;
     color: gray;

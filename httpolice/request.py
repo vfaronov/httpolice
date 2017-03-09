@@ -28,7 +28,7 @@ from httpolice.util.text import force_unicode
 class Request(message.Message):
 
     def __init__(self, scheme, method, target, version, header_entries,
-                 body, trailer_entries=None, remark=None):
+                 body, trailer_entries=None, remark=None, promised=None):
         # pylint: disable=redefined-outer-name
         """
         :param scheme:
@@ -105,12 +105,19 @@ class Request(message.Message):
             For example, it can be used to identify the source of the data:
             ``u'from somefile.dat, offset 1337'``.
 
+        :param promised:
+            `True` if this is a promised request `pushed by the server`__,
+            `False` if it isn't, or `None` if unknown.
+
+            __ https://tools.ietf.org/html/rfc7540#section-8.2
+
         """
         super(Request, self).__init__(version, header_entries, body,
                                       trailer_entries, remark)
         self.scheme = force_unicode(scheme) if scheme is not None else None
         self.method = Method(force_unicode(method))
         self.target = force_unicode(target)
+        self.promised = promised
 
     def __repr__(self):
         return '<Request %s>' % self.method
@@ -211,6 +218,7 @@ def check_request(req):
     version = req.version
     headers = req.headers
     body = req.body
+    promised = req.promised
 
     req.silence(notice_id
                 for (notice_id, in_resp) in headers.httpolice_silence
@@ -286,7 +294,11 @@ def check_request(req):
                 complain(1068)
 
     if headers.user_agent.is_absent:
-        complain(1070)
+        # It would perhaps be more correct to write ``if promised == False``,
+        # but then notice 1070 would stop working for existing API users,
+        # who get ``promised=None`` by default.
+        if not promised:
+            complain(1070)
     elif headers.user_agent.is_okay:
         products = [p for p in headers.user_agent if isinstance(p, Versioned)]
         if products and all(product.is_library(p.item) for p in products):
@@ -412,6 +424,16 @@ def check_request(req):
     if (pref.handling, u'strict') in headers.prefer.without_params and \
        (pref.handling, u'lenient') in headers.prefer.without_params:
         complain(1290)
+
+    if promised:
+        if version in [http10, http11]:
+            complain(1299)
+        if method_info.is_cacheable(method) == False:
+            complain(1296)
+        if method_info.is_safe(method) == False:
+            complain(1297)
+        if body:
+            complain(1298)
 
 
 def _check_basic_auth(req, hdr, credentials):

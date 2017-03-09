@@ -40,7 +40,8 @@ def text_report(exchanges, buf):
 
 def _exchange_marker(exchange):
     if exchange.request:
-        marker = u'------------ request: %s %s' % (
+        marker = u'------------ %srequest: %s %s' % (
+            u'promised ' if exchange.request.promised else u'',
             printable(exchange.request.method),
             printable(exchange.request.target))
     elif exchange.responses:

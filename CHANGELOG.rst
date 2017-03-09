@@ -12,6 +12,9 @@ Unreleased
 
 Added
 -----
+- Requests may now be marked as `promised`_ via the `Python API`_, and
+  are then subject to additional checks (notices `1296`_ through `1299`_).
+  This feature is used by `mitmproxy integration`_.
 - Checks for the `Prefer`_ mechanism (notices `1285`_ through `1291`_).
 - The syntax of method and header names and reason phrases is now checked
   for all messages, not only for those parsed from TCP streams
@@ -30,9 +33,16 @@ Added
 .. _1293: http://pythonhosted.org/HTTPolice/notices.html#1293
 .. _1294: http://pythonhosted.org/HTTPolice/notices.html#1294
 .. _1295: http://pythonhosted.org/HTTPolice/notices.html#1295
+.. _1296: http://pythonhosted.org/HTTPolice/notices.html#1296
+.. _1299: http://pythonhosted.org/HTTPolice/notices.html#1299
+.. _promised: https://tools.ietf.org/html/rfc7540#section-8.2
+.. _mitmproxy integration: http://mitmproxy-httpolice.readthedocs.io/
 
 Changed
 -------
+- In `text reports`_, requests can now be identified by the string
+  "------------ promised request" in addition to just "------------ request".
+  If you parse these reports, you may need to adjust.
 - Titles of many notices were changed to make more sense when viewed alone
   (as in text reports). If you depend on their wording (which you shouldn't),
   you may need to adjust.
@@ -182,9 +192,6 @@ Added
 Changed
 -------
 - `mitmproxy integration`_ has been moved into a separate distribution.
-
-.. _mitmproxy integration:
-   http://httpolice.readthedocs.io/en/stable/mitmproxy.html
 
 Fixed
 -----

@@ -103,7 +103,8 @@ def _parse_request_heading(stream, scheme=None):
         return Unavailable
     else:
         req = Request(scheme, method_, target, version_, entries, body=None,
-                      remark=u'from %s, offset %d' % (stream.name, beginning))
+                      remark=u'from %s, offset %d' % (stream.name, beginning),
+                      promised=False)
         stream.dump_complaints(req.complain, place=u'request heading')
         return req
 

@@ -116,6 +116,9 @@ def _render_request(req):
         with H.div(_class=u'message-display'):
             if req.remark:
                 H.p(printable(req.remark), _class=u'message-remark')
+            if req.promised:
+                H.p(u'Promised request pushed by server',
+                    _class=u'promised-note')
             with H.h2(), H.code():      # Request line
                 # We don't insert spaces here because,
                 # without ``__pretty=False``,
