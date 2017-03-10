@@ -113,7 +113,7 @@ known = KnownMethods([
   'idempotent': True,
   'safe': False},
  {'_': Method(u'MKCOL'),
-  '_citations': [RFC(4918, section=(9, 3))],
+  '_citations': [RFC(4918, section=(9, 3)), RFC(5689, section=(3,))],
   'idempotent': True,
   'safe': False},
  {'_': Method(u'MKREDIRECTREF'),

@@ -121,6 +121,7 @@ known = KnownDict(RelationType, [
  {'_': RelationType(u'profile'), '_citations': [RFC(6906)]},
  {'_': RelationType(u'related'), '_citations': [RFC(4287)]},
  {'_': RelationType(u'replies'), '_citations': [RFC(4685)]},
+ {'_': RelationType(u'restconf'), '_citations': [RFC(8040)]},
  {'_': RelationType(u'search'),
   '_citations': [Citation(None,
                           u'http://www.opensearch.org/Specifications/'
