@@ -4,6 +4,7 @@ import pkgutil
 
 import dominate
 import dominate.tags as H
+from dominate.util import text as text_node
 from singledispatch import singledispatch
 import six
 
@@ -93,6 +94,7 @@ def _common_meta(document):
         H.meta(charset=u'utf-8')
         H.meta(name=u'generator', content=u'HTTPolice %s' % version)
         H.style(type=u'text/css').add_raw_string(css_code)
+        H.base(_target=u'blank')
 
 
 def _render_exchanges(exchanges):
@@ -142,7 +144,7 @@ def _render_response(resp):
                            **_for_object(resp.version))
                 with H.span(**_for_object(resp.status)):
                     _render_known(resp.status)
-                    H.span(printable(find_reason_phrase(resp)))
+                    text_node(u' ' + printable(find_reason_phrase(resp)))
             _render_message(resp)       # Headers, body and all that
         _render_complaints(resp)
 
@@ -173,7 +175,7 @@ def _render_header_entries(annotated_entries):
         with H.pre(**_for_object(entry, 'header-entry')), H.code():
             # Dominate defaults to ``__pretty=False`` for ``pre``.
             _render_known(entry.name)
-            H.span(u': ')
+            text_node(u': ')
             _render_annotated(annotated)
 
 
@@ -181,10 +183,9 @@ def _render_annotated(pieces):
     """Render an annotated string as produced by :mod:`httpolice.parse`."""
     for piece in pieces:
         if isinstance(piece, bytes):
-            H.span(printable(piece.decode('iso-8859-1')))
+            text_node(printable(piece.decode('iso-8859-1')))
         else:
-            with H.span(**_for_object(piece)):
-                _render_known(piece)
+            _render_known(piece)
 
 
 def _render_complaints(obj):
@@ -268,17 +269,15 @@ def _magic_references(elem, ctx):
 
 def _render_known(obj):
     """Render an instance of one of the :data:`httpolice.known.classes`."""
-    cls = type(obj).__name__
     text = printable(six.text_type(obj))
     cite = known.citation(obj)
     if cite:
-        elem = H.a(text, _class=cls, href=cite.url, target=u'_blank')
+        with H.a(text, href=cite.url, title=None):
+            title = known.title(obj, with_citation=True)
+            if title:
+                H.attr(title=title)
     else:
-        elem = H.span(text, _class=cls)
-    title = known.title(obj, with_citation=True)
-    if title:
-        with elem:
-            H.attr(title=title)
+        return text_node(text)
 
 
 def _notice_to_html(the_notice, ctx, with_anchor=False):
@@ -301,7 +300,7 @@ def _piece_to_html(piece, ctx):
 
 @_piece_to_html.register(six.text_type)
 def _text_to_html(text, _):
-    H.span(printable(text))
+    text_node(printable(text))
 
 @_piece_to_html.register(list)
 def _list_to_html(xs, ctx):
@@ -336,14 +335,14 @@ def _cite_elem_to_html(elem, ctx):
     _piece_to_html(elem.info, ctx)
     quote = elem.content
     if quote:
-        H.span(u': ')
+        text_node(u': ')
         with H.q():
             _piece_to_html(quote, ctx)
 
 @_piece_to_html.register(Citation)
 def _cite_to_html(cite, _):
     with H.cite():
-        H.a(cite.title, href=cite.url, target=u'_blank')
+        H.a(cite.title, href=cite.url)
 
 @_piece_to_html.register(notice.Ref)
 def _ref_to_html(ref, ctx):

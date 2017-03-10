@@ -20,6 +20,7 @@ Added
 - The XML-related features removed in 0.4.0 have been restored.
 - Check for cacheable 421 (Misdirected Request) responses (notice `1283`_).
 - Check for 202 (Accepted) responses with no body (notice `1284`_).
+- HTML reports have been optimized to load slightly faster in browsers.
 
 .. _1283: http://pythonhosted.org/HTTPolice/notices.html#1283
 .. _1284: http://pythonhosted.org/HTTPolice/notices.html#1284

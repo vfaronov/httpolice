@@ -3,27 +3,31 @@
 
 'use strict';
 
-function collapseAll() {
-    var i, elems = document.querySelectorAll('.notice');
-    for (i = 0; i < elems.length; i += 1) {
-        elems[i].classList.add('collapsed');
+function setupNotices() {
+    var i, button, notice, notices = document.querySelectorAll('.notice');
+
+    for (i = 0; i < notices.length; i += 1) {
+        notice = notices[i];
+
+        // Collapse initially.
+        notice.classList.add('collapsed');
+
+        // Add the "explain" button.
+        button = document.createElement('button');
+        button.setAttribute('type', 'button');
+        button.textContent = 'explain';
+        button.addEventListener('click', onButtonClick);
+        notice.insertBefore(button, notices[i].firstChild);
+
+        // Set up highlights.
+        notice.addEventListener('mouseover', highlightReferences);
+        notice.addEventListener('mouseout', clearHighlights);
     }
 }
 
 function onButtonClick() {
     /* jshint -W040 */
     this.parentElement.classList.toggle('collapsed');
-}
-
-function installButtons() {
-    var i, button, notices = document.querySelectorAll('.notice');
-    for (i = 0; i < notices.length; i += 1) {
-        button = document.createElement('button');
-        button.setAttribute('type', 'button');
-        button.textContent = 'explain';
-        button.addEventListener('click', onButtonClick);
-        notices[i].insertBefore(button, notices[i].firstChild);
-    }
 }
 
 function highlightReferences() {
@@ -59,14 +63,6 @@ function clearHighlights() {
     var i, elems = document.querySelectorAll('.highlight');
     for (i = 0; i < elems.length; i += 1) {
         elems[i].classList.remove('highlight');
-    }
-}
-
-function installHovers() {
-    var i, notices = document.querySelectorAll('.notice');
-    for (i = 0; i < notices.length; i += 1) {
-        notices[i].addEventListener('mouseover', highlightReferences);
-        notices[i].addEventListener('mouseout', clearHighlights);
     }
 }
 
@@ -189,9 +185,7 @@ function installOptions() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    collapseAll();
-    installButtons();
-    installHovers();
+    setupNotices();
     toggleRemarks(false);
     installOptions();
 });
