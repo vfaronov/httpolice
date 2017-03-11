@@ -12,6 +12,9 @@ Unreleased
 
 Added
 -----
+- When `analyzing TCP streams`_, HTTPolice now reorders exchanges
+  based on the Date header. In other words, messages sent at the same time
+  on different connections are now close to each other in the report.
 - Checks for the `Prefer`_ mechanism (notices `1285`_ through `1291`_).
 - The syntax of method and header names and reason phrases is now checked
   for all messages, not only for those parsed from TCP streams
@@ -31,6 +34,8 @@ Added
 .. _1293: http://pythonhosted.org/HTTPolice/notices.html#1293
 .. _1294: http://pythonhosted.org/HTTPolice/notices.html#1294
 .. _1295: http://pythonhosted.org/HTTPolice/notices.html#1295
+.. _analyzing TCP streams:
+   http://httpolice.readthedocs.io/en/stable/streams.html
 
 Changed
 -------

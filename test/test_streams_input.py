@@ -342,3 +342,21 @@ def test_bad_transfer_encoding():
     [exch1] = load_from_file('bad_transfer_encoding')
     assert exch1.request.body is Unavailable
     assert exch1.responses[0].body is Unavailable
+
+
+def test_rearrange():
+    exchanges = load_from_tcpflow('rearrange')
+    assert exchanges[0].request.target == u'/01'
+    assert exchanges[1].request.target == u'/02'
+    assert exchanges[2].request.target == u'/03'
+    assert exchanges[3].request is None
+    assert [complaint.id for complaint in exchanges[3].complaints] == [1009]
+    assert exchanges[4].request is None
+    assert [complaint.id for complaint in exchanges[4].complaints] == [1010]
+    assert exchanges[5].request.target == u'/04'
+    assert exchanges[6].request.target == u'/05'
+    assert exchanges[7].request.target == u'/06'
+    assert exchanges[8].request.target == u'/07'
+    assert exchanges[9].request is None
+    assert [complaint.id for complaint in exchanges[9].complaints] == [1279]
+    assert exchanges[10].request.target == u'/08'

@@ -1,0 +1,14 @@
+GET /01 HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+GET /02 HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+GET /07 HTTP/1.1
+Host: example.com
+Date: Mon, 27 Feb 2017 00:27:57 GMT
+User-Agent: demo
+Comment: wow! this is one of those rare requests that have a Date header
+

@@ -1,0 +1,12 @@
+HTTP/1.1 500 Internal Server Error
+Content-Type: text/plain
+Content-Length: 56
+
+A server error is allowed to not have a Date header.
+
+HTTP/1.1 200 OK
+Date: Mon, 27 Feb 2017 00:28:02 GMT
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!

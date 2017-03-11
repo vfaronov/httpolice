@@ -1,0 +1,22 @@
+HTTP/1.1 200 OK
+Date: Mon, 27 Feb 2017 00:23:07 GMT
+Content-Type: text/plain
+Content-Length: 16
+
+Hello world!
+
+HTTP/1.1 200 OK
+Date: Mon, 27 Feb 2017 00:23:30 GMT
+Content-Type: text/plain
+Content-Length: 16
+
+Hello world!
+
+HTTP/1.1 200 OK
+Date: Mon, 27 Feb 2017 00:28:13 GMT
+Content-Type: text/plain
+Content-Length: 116
+
+This response actually took quite some time to generate
+(compare with the corresponding request's Date header).
+

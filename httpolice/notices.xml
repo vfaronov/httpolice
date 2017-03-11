@@ -2048,10 +2048,11 @@ One non-obvious thing is how references work
 
   <error id="1279">
     <title>Unprocessable streams</title>
-    <explain>HTTPolice has found this pair of stream files:</explain>
-    <explain><var ref="path"/></explain>
-    <explain><var ref="other_path"/></explain>
-    <explain>but cannot detect which of them is the inbound stream and which is the outbound. This can happen if the streams are malformed or not HTTP/1.x. They will not be processed.</explain>
+    <explain>HTTPolice has found the following stream files:</explain>
+    <explain>file 1: <var ref="path1"/></explain>
+    <explain>file 2: <var ref="path2"/></explain>
+    <explain>but cannot detect which of them is the inbound stream and which is the outbound.</explain>
+    <explain>This means that the connection was not HTTP/1.x, or was encrypted, or that the files are somehow malformed. They will not be processed.</explain>
   </error>
 
   <comment id="1280">

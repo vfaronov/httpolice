@@ -1,0 +1,10 @@
+GET /04 HTTP/1.1
+Host: example.org
+User-Agent: demo
+Comment: this one was actually sent much later than connection establishment
+Comment: for some reason
+
+GET /05 HTTP/1.1
+Host: example.org
+User-Agent: demo
+

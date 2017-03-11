@@ -1,0 +1,5 @@
+And now for something completely different!
+
+This is not an HTTP/1.x connection at all, but it still has a timestamp
+in the filename, which allows us to position the 1279 complaint box
+in the right place in the report.

@@ -1,0 +1,19 @@
+HTTP/1.1 200 OK
+Date: Mon, 27 Feb 2017 00:23:10 GMT
+Age: 158
+Content-Type: text/plain
+Content-Length: 203
+
+Date here would suggest that this was sent soon after connection establishment.
+But don't be fooled: it had been sitting cached on the frontend for 158 seconds
+before being sent to this user agent.
+
+HTTP/1.1 404 Not Found
+Date: Sat, 10 Dec 2016 20:19:45 GMT
+Content-Type: text/plain
+Content-Length: 208
+
+Suddenly, a response whose Date is somehow completely off, far in the past.
+Maybe some cache forgot to add an Age header or something.
+But we know it cannot have been sent earlier than the previous one.
+

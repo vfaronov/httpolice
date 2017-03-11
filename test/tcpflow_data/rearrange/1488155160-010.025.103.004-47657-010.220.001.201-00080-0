@@ -1,0 +1,8 @@
+GET /06 HTTP/1.1
+Host: example.net
+User-Agent: demo
+
+GET /08 HTTP/1.1
+Host: example.net
+User-Agent: demo
+
