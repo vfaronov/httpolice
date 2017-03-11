@@ -38,6 +38,7 @@ def html_report(exchanges, buf):
         It must be opened in binary mode (not text).
 
     """
+    trashcan = H.div()
     title = u'HTTPolice report'
     document = dominate.document(title=title)
     _common_meta(document)
@@ -47,7 +48,7 @@ def html_report(exchanges, buf):
         H.attr(_class=u'report')
     with document:
         H.h1(title)
-        _render_exchanges(exchanges)
+        _render_exchanges(exchanges, trashcan)
     buf.write(document.render().encode('utf-8'))
 
 
@@ -97,11 +98,12 @@ def _common_meta(document):
         H.base(_target=u'blank')
 
 
-def _render_exchanges(exchanges):
+def _render_exchanges(exchanges, trashcan):
     # The ``hr`` elements really help readability in w3m.
     H.hr()
     for exch in exchanges:
-        with H.div(_class=u'exchange'):
+        div = H.div(_class=u'exchange')
+        with div:
             if exch.request:
                 _render_request(exch.request)
                 H.hr()
@@ -111,6 +113,17 @@ def _render_exchanges(exchanges):
             if exch.complaints:
                 _render_complaints(exch)
                 H.hr()
+
+        # Some exchanges are "complaint boxes", carrying only a complaint.
+        # If the user silences that complaint, we end up with an empty box.
+        # To avoid adding it to our document, we preemptively add it
+        # to a dummy "trash can" element, per Dominate docs:
+        #
+        #   When the context is closed, any nodes that were not already
+        #   added to something get added to the current context.
+        #
+        if len(div) == 0:
+            trashcan.add(div)
 
 
 def _render_request(req):
