@@ -11,7 +11,7 @@ but on the other hand, you don’t need to change your clients or servers.
 __ https://en.wikipedia.org/wiki/Packet_analyzer
 
 HTTPolice can parse HTTP/1.x streams from the ground up.
-HTTP/2 is not yet supported.
+Parsing HTTP/2 is not yet supported.
 
 
 Using tcpflow
@@ -55,6 +55,17 @@ If there are duplicates, you will get an error.
 
 __ https://github.com/simsong/tcpflow/issues/128
 
+It’s OK if you capture some streams that are not HTTP/1.x.
+HTTPolice will just complain with notices such as `1279`__.
+This means you can run tcpflow without a filter, capturing *all* TCP traffic
+on a given network interface, and then let HTTPolice sort it out
+while :ref:`silencing <silence>` those notices::
+
+  $ sudo tcpflow -T'%t-%A-%a-%B-%b-%#'
+
+  $ httpolice -i tcpflow -o html -s 1279 . >../report.html
+
+__ http://pythonhosted.org/HTTPolice/notices.html#1279
 
 Using tcpick
 ------------
