@@ -49,6 +49,13 @@ Fixed
 
 .. _1021: http://pythonhosted.org/HTTPolice/notices.html#1021
 
+Meanwhile
+---------
+- `mitmproxy integration`_ has new features for interactive use.
+
+.. _mitmproxy integration:
+   http://mitmproxy-httpolice.readthedocs.io/
+
 
 0.4.0 - 2017-01-14
 ~~~~~~~~~~~~~~~~~~
@@ -188,9 +195,6 @@ Added
 Changed
 -------
 - `mitmproxy integration`_ has been moved into a separate distribution.
-
-.. _mitmproxy integration:
-   http://httpolice.readthedocs.io/en/stable/mitmproxy.html
 
 Fixed
 -----

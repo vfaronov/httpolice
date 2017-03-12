@@ -96,29 +96,30 @@ Install it in a Python 3.5+ environment with HTTPolice integration::
 __ https://mitmproxy.org/
 __ http://docs.mitmproxy.org/en/stable/install.html#advanced-installation
 
-Now, we’re going to use mitmproxy’s command-line tool—`mitmdump`__.
-The following command will start mitmdump as an HTTP proxy on port 8080
-with HTTPolice integration::
+We’re going to use mitmproxy’s command-line tool—`mitmdump`__.
+The following command will start mitmdump as a reverse proxy
+in front of your API on port 8080, with HTTPolice integration::
 
-  $ mitmdump -s "`python3 -m mitmproxy_httpolice` -o html report.html"
+  $ mitmdump --reverse https://eve-demo.herokuapp.com \
+  >   -s "`python3 -m mitmproxy_httpolice` -o html -w report.html --tail 5"
 
 __ http://docs.mitmproxy.org/en/latest/mitmdump.html
 
-With mitmdump running, tell curl to use it as a proxy::
+Now tell your client to talk to port 8080 instead of directly to the API::
 
-  $ curl -x localhost:8080 \
-  >   -ksiX POST https://eve-demo.herokuapp.com/people \
+  $ curl -ksiX POST https://localhost:8080/people \
   >   -H 'Content-Type: application/json' \
-  >   -d '{"firstname":"John", "lastname":"Williams"}'
+  >   -d '{"firstname":"Mark", "lastname":"Williams"}'
 
 In the output of mitmdump, you will see that it has intercepted the exchange.
-Now, when you stop mitmdump (Ctrl+C),
-HTTPolice will write an HTML report to ``report.html``.
+Now you can open ``report.html`` and see what HTTPolice thinks of it.
+With the ``--tail 5`` option, ``report.html`` will always contain
+the **last 5 exchanges** seen by mitmproxy (the latest one is at the bottom).
 
 .. note::
 
-   Another such tool is `Fiddler`__. Especially Windows users may prefer it.
-   Use Fiddler’s `HAR 1.2 export`__ to get the data into HTTPolice.
+   If you prefer `Fiddler`__ over mitmproxy, you can use Fiddler’s
+   `HAR 1.2 export`__ to get the data into HTTPolice.
 
    __ http://www.telerik.com/fiddler
    __ http://docs.telerik.com/fiddler/KnowledgeBase/ImportExportFormats
