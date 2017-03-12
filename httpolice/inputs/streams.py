@@ -311,7 +311,7 @@ def _exchange_time(exchange, hint):
     return hint
 
 
-def _sniff_direction(path1, path2):
+def _sniff_direction(path1, path2):                 # pragma: no cover
     if path1 and _sniff_outbound(path1):
         return (path2, path1)
     elif path2 and _sniff_outbound(path2):
