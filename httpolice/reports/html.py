@@ -155,7 +155,10 @@ def _render_response(resp):
                 if resp.version:
                     H.span(printable(resp.version),
                            **_for_object(resp.version))
-                with H.span(**_for_object(resp.status)):
+                # httpolice-devtool (the Chrome extension) relies
+                # on the ``StatusCode`` class. Avoid breaking it, at least
+                # as long as it doesn't inconvenience HTTPolice itself.
+                with H.span(**_for_object(resp.status, u'StatusCode')):
                     _render_known(resp.status)
                     text_node(u' ' + printable(find_reason_phrase(resp)))
             _render_message(resp)       # Headers, body and all that
