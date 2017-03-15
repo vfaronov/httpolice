@@ -7,6 +7,16 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 (which means it is unstable until 1.0).
 
 
+0.5.1 - 2017-03-15
+~~~~~~~~~~~~~~~~~~
+- Fixed compatibility with `httpolice-devtool`_ (when you point it to a local
+  `hpoliced`_ instance).
+
+.. _httpolice-devtool:
+   https://chrome.google.com/webstore/detail/httpolice-devtool/hnlnhebgfcfemjaphgbeokdnfpgbnhgn
+.. _hpoliced: https://pypi.python.org/pypi/hpoliced
+
+
 0.5.0 - 2017-03-12
 ~~~~~~~~~~~~~~~~~~
 
