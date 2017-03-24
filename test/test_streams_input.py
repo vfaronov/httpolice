@@ -139,6 +139,11 @@ def test_chunked_empty():
     assert exch1.request.body == b''
 
 
+def test_unknown_transfer_encoding():
+    [exch1] = load_from_file('1003_1')
+    assert exch1.responses[0].body is Unavailable
+
+
 def test_implicit_response_framing():
     [exch1] = load_from_file('1025_2')
     assert exch1.responses[0].body == b'Hello world!\r\n'
