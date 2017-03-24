@@ -287,9 +287,9 @@ def _decode_transfer_coding(msg, coding):
         except Exception as e:
             msg.complain(1027, coding=coding, error=e)
             msg.body = Unavailable
-    elif okay(coding):
-        msg.complain(1003, coding=coding)
     else:
+        if okay(coding):
+            msg.complain(1003, coding=coding)
         msg.body = Unavailable
 
 

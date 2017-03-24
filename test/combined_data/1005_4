@@ -1,0 +1,21 @@
+1005 1007
+
+# The chunked stream is abruptly cut off before the indicated number of bytes.
+# This used to crash HTTPolice when generating an HTML report.
+
+======== BEGIN INBOUND STREAM ========
+POST / HTTP/1.1
+Host: example.com
+Content-Type: text/plain
+User-Agent: demo
+Transfer-Encoding: chunked
+
+1c
+foo bar foo bar
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!

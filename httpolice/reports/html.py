@@ -95,7 +95,7 @@ def _common_meta(document):
         H.meta(charset=u'utf-8')
         H.meta(name=u'generator', content=u'HTTPolice %s' % version)
         H.style(type=u'text/css').add_raw_string(css_code)
-        H.base(_target=u'blank')
+        H.base(target=u'_blank')
 
 
 def _render_exchanges(exchanges, trashcan):
@@ -288,7 +288,7 @@ def _render_known(obj):
     text = printable(six.text_type(obj))
     cite = known.citation(obj)
     if cite:
-        with H.a(text, href=cite.url, title=None):
+        with H.a(text, href=cite.url):
             title = known.title(obj, with_citation=True)
             if title:
                 H.attr(title=title)

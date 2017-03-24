@@ -652,9 +652,8 @@ class Stream(object):
     def consume_n_bytes(self, n):
         r = self.peek(n)
         if len(r) < n:
-            raise ParseError(name=self.name, point=self.point,
-                             found=u'%d bytes' % len(r),
-                             expected=[(u'%d bytes' % n,)])
+            raise ParseError(self.name, self.point, found=None,
+                             expected=[(u'%d bytes' % n, None)])
         else:
             self.point += n
             return r
@@ -740,8 +739,8 @@ class Stream(object):
 class ParseError(Exception):
 
     def __init__(self, name, point, found, expected):
-        super(ParseError, self).__init__(u'unexpected %r at byte position %r' %
-                                         (found, point))
+        super(ParseError, self).__init__(
+            u'unexpected input at byte position %r' % point)
         self.name = name
         self.point = point
         self.found = found

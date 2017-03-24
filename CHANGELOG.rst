@@ -7,6 +7,17 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 (which means it is unstable until 1.0).
 
 
+0.5.2 - 2017-03-24
+~~~~~~~~~~~~~~~~~~
+- Fixed a few rare crashing bugs found with `american fuzzy lop`_.
+- Fixed a couple cosmetic bugs in HTML reports.
+- When parsing a message with an unknown `transfer coding`_, HTTPolice now
+  correctly skips any checks on its payload body (such as notice `1038`_).
+
+.. _american fuzzy lop: http://lcamtuf.coredump.cx/afl/
+.. _transfer coding: https://tools.ietf.org/html/rfc7230#section-4
+
+
 0.5.1 - 2017-03-15
 ~~~~~~~~~~~~~~~~~~
 - Fixed compatibility with `httpolice-devtool`_ (when you point it to a local
