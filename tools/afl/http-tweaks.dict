@@ -1,0 +1,15 @@
+# This dictionary was created to guide american fuzzy lop towards breaking
+# the *existing* examples in ways that yield interesting output from parsers,
+# as opposed to just patently invalid files. It seems to work as intended,
+# but no bugs have been uncovered so far with these tweaks.
+
+line_terminator="\x0D\x0A"
+header_field_separator=": "
+space=" "
+semicolon=";"
+comma=","
+double_quote="\""
+equals="="
+slash="/"
+asterisk="*"
+zero="0"
