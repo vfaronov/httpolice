@@ -174,7 +174,10 @@ obs_date = (_obsolete_date << rfc850_date |
 def _check_day_of_week(complain, r):
     (claimed_dow, r) = r
     if r is not Unavailable and r.weekday() != claimed_dow:
-        complain(1108, date=r.strftime(u'%Y-%m-%d'),
+        # Don't use `strftime` here because it raises `ValueError`
+        # on years < 1900 in Python 2.7. (Of course, year < 1900
+        # in ``Date`` is pathological, but that's no excuse to crash).
+        complain(1108, date=u'%04d-%02d-%02d' % (r.year, r.month, r.day),
                  claimed=_DAY_NAMES[claimed_dow],
                  actual=_DAY_NAMES[r.weekday()])
     return r
