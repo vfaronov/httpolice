@@ -288,7 +288,7 @@ def _render_known(obj):
     text = printable(six.text_type(obj))
     cite = known.citation(obj)
     if cite:
-        with H.a(text, href=cite.url, title=None):
+        with H.a(text, href=cite.url):
             title = known.title(obj, with_citation=True)
             if title:
                 H.attr(title=title)
