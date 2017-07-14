@@ -5,18 +5,13 @@ HTTPolice is a lint for HTTP requests and responses.
 It checks them for conformance to standards and best practices.
 
 This manual explains all features of HTTPolice in detail.
-If you want a brief introduction, see the :doc:`quickstart`.
+For a brief hands-on introduction, jump to the :doc:`quickstart`.
 
-There is also a `list of all notices`__ that HTTPolice can output.
-
-__ http://pythonhosted.org/HTTPolice/notices.html
-
-For recent changes in HTTPolice, see the `changelog`__.
-
-__ https://github.com/vfaronov/httpolice/blob/master/CHANGELOG.rst
+Contents
+--------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    quickstart
    install
@@ -25,8 +20,11 @@ __ https://github.com/vfaronov/httpolice/blob/master/CHANGELOG.rst
    har
    reports
    api
+   history
 
-Integration packages:
+
+Integration packages
+--------------------
 
 - `mitmproxy integration`__
 - `Django integration`__
@@ -35,3 +33,11 @@ Integration packages:
 __ http://mitmproxy-httpolice.readthedocs.io/
 __ http://django-httpolice.readthedocs.io/
 __ https://chrome.google.com/webstore/detail/httpolice-devtool/hnlnhebgfcfemjaphgbeokdnfpgbnhgn
+
+
+Supplementary materials
+-----------------------
+
+- `List of all notices`__ that HTTPolice can output
+
+__ http://pythonhosted.org/HTTPolice/notices.html

@@ -13,6 +13,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+from collections import OrderedDict
 import sys
 import os
 
@@ -121,15 +122,14 @@ html_theme_options = {
      'github_user': 'vfaronov',
      'github_repo': 'httpolice',
      'github_type': 'star',
-     'fixed_sidebar': 'true',
-     'extra_nav_links': {
-          'mitmproxy integration':
-               'http://mitmproxy-httpolice.readthedocs.io/',
-          'Django integration':
-               'http://django-httpolice.readthedocs.io/',
-          'List of all notices':
-               'http://pythonhosted.org/HTTPolice/notices.html',
-     },
+     'extra_nav_links': OrderedDict([
+          ('mitmproxy integration',
+           'http://mitmproxy-httpolice.readthedocs.io/'),
+          ('Django integration',
+           'http://django-httpolice.readthedocs.io/'),
+          ('List of all notices',
+           'http://pythonhosted.org/HTTPolice/notices.html'),
+     ]),
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
