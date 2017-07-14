@@ -9,6 +9,7 @@ include .coveragerc
 include .isort.cfg
 include pylintrc
 include pytest.ini
+include .eslintrc.js
 
 # Even though Travis only works on a Git repo,
 # this file is important as a reference on the build procedure.

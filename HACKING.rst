@@ -237,7 +237,7 @@ Maintenance
          and changing the version to see if the URL still resolves to 200 (OK).
 
      - Nu Html Checker (in ``tools/vnu.sh``);
-     - JSHint (in ``tools/jshint.sh``).
+     - ESLint (in ``tools/eslint.sh``).
 
   #. Check that everything is OK with the new versions.
      Maybe some Pylint overrides are no longer necessary, etc.
