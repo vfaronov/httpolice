@@ -7,6 +7,11 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 (which means it is unstable until 1.0).
 
 
+Unreleased
+~~~~~~~~~~
+- Notice `1277`_ (obsolete 'X-' prefix) is now reported only once per message.
+
+
 0.5.2 - 2017-03-24
 ~~~~~~~~~~~~~~~~~~
 - Fixed a few rare crashing bugs found with `american fuzzy lop`_.

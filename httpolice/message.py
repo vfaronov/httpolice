@@ -256,6 +256,7 @@ def check_message(msg):
     version = msg.version
     headers = msg.headers
 
+    x_prefixed = []
     for hdr in headers:
         # Check the header name syntax.
         simple_parse(hdr.name, rfc7230.field_name,
@@ -266,7 +267,9 @@ def check_message(msg):
         if header.deprecated(hdr.name):
             complain(1197, header=hdr)
         if hdr.name.startswith(u'X-') and hdr.name not in h:    # not in known
-            complain(1277, header=hdr)
+            x_prefixed.append(hdr)
+    if x_prefixed:
+        complain(1277, headers=x_prefixed)
 
     # Force checking the payload according to various rules.
     _ = msg.decoded_body

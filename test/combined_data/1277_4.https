@@ -1,7 +1,4 @@
-1277 1277 1277 1277 1277
-
-# There was a bug here: 1277 was not reported for ``X-Accepted-Oauth-Scopes``
-# because it compared equal to ``X-Oauth-Scopes``.
+1277
 
 ======== BEGIN INBOUND STREAM ========
 POST /auth/github HTTP/1.1

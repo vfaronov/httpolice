@@ -40,17 +40,14 @@ Then feed this HAR file to HTTPolice::
   C 1035 Deprecated media type text/javascript
   D 1168 Age header implies response from cache
   C 1258 HTTP/2 should use ALTSVC frame instead of Alt-Svc header
-  ------------ request: GET /r/collect?v=1&_v=j49&a=2057119860&t=pageview&_s=1...
+  ------------ request: GET /r/collect?v=1&_v=j56&a=794852962&t=pageview&_s=1&...
   ------------ response: 200 OK
   E 1108 Wrong day of week in Expires
   C 1162 Pragma: no-cache is for requests
   C 1258 HTTP/2 should use ALTSVC frame instead of Alt-Svc header
   ------------ request: GET /repos/h2o/h2o?callback=callback
   ------------ response: 200 OK
-  C 1277 Obsolete 'X-' prefix in X-RateLimit-Limit
-  C 1277 Obsolete 'X-' prefix in X-RateLimit-Remaining
-  C 1277 Obsolete 'X-' prefix in X-RateLimit-Reset
-  C 1277 Obsolete 'X-' prefix in X-Served-By
+  C 1277 Obsolete 'X-' prefix in headers
 
 
 Better reports

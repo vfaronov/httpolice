@@ -208,8 +208,7 @@ class HeaderView(object):
         #
         # Unfortunately, there are places
         # (such as :meth:`httpolice.blackboard.Blackboard.complain`)
-        # where we need header-to-header equality to be less magical
-        # (see ``test/combined_data/1277_4.https``).
+        # where we need header-to-header equality to be less magical.
         # And if we can't do this magic for equality,
         # there's no sense in doing it for other operations.
         # So we just say that comparing headers to headers is `NotImplemented`
