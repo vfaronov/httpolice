@@ -10,7 +10,7 @@
 set -e
 
 RELEASES=https://github.com/validator/validator/releases
-VERSION=17.2.1
+VERSION=17.7.0
 
 JAVA=/usr/lib/jvm/java-8-oracle/bin/java
 test -e "$JAVA" || JAVA=java

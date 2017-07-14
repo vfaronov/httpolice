@@ -4,11 +4,6 @@
 persistent=no
 
 
-[REPORTS]
-
-reports=no
-
-
 [MESSAGES CONTROL]
 
 # - No factoring and code style checks for now. Maybe later.

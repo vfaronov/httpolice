@@ -123,9 +123,9 @@ class HeaderView(object):
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, self.name)
 
-    def _process_parsed(self, entry, value):
+    def _process_parsed(self, entry, parsed):
         # pylint: disable=unused-argument
-        return value
+        return parsed
 
     def _pre_parse(self):
         entries = []
@@ -302,8 +302,8 @@ class DirectivesView(HeaderView):           # pylint: disable=abstract-method
 
     knowledge_module = None
 
-    def _process_parsed(self, entry, ds):
-        return [self._process_directive(entry, d) for d in ds]
+    def _process_parsed(self, entry, parsed):
+        return [self._process_directive(entry, d) for d in parsed]
 
     def _process_directive(self, entry, directive_with_argument):
         directive, argument = directive_with_argument
@@ -397,9 +397,9 @@ class PreferView(DirectivesView, MultiHeaderView):
     # Params are currently not used for anything, so we peel them off
     # (but they are still part of ``self.value``).
 
-    def _process_parsed(self, entry, ds):
+    def _process_parsed(self, entry, parsed):
         return [Parametrized(self._process_directive(entry, d), params)
-                for (d, params) in ds]
+                for (d, params) in parsed]
 
     def __getitem__(self, key):
         for (preference, value) in self.without_params:

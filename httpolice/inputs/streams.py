@@ -132,7 +132,6 @@ def _recombine_streams(streams_info):
         for si in sorted(streams_info, key=lambda si: si.sort_hint))
 
     while streams_map:
-        # pylint: disable=no-member
         (_, stream_info) = streams_map.popitem(last=False)
 
         # Do we have a corresponding stream file in the reverse direction?
