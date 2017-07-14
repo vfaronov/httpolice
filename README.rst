@@ -1,5 +1,19 @@
-HTTPolice is a **lint for HTTP requests and responses**.
-It checks them for conformance to standards and best practices.
+HTTPolice
+=========
+
+.. status:
+.. image:: https://img.shields.io/pypi/v/HTTPolice.svg?color=green
+   :target: https://pypi.python.org/pypi/HTTPolice
+.. image:: https://img.shields.io/pypi/pyversions/HTTPolice.svg?
+   :target: https://pypi.python.org/pypi/HTTPolice
+.. image:: https://readthedocs.org/projects/httpolice/badge/?version=stable
+   :target: http://httpolice.readthedocs.io/
+.. image:: https://travis-ci.org/vfaronov/httpolice.svg?branch=master
+   :target: https://travis-ci.org/vfaronov/httpolice
+
+HTTPolice is a **validator for HTTP requests and responses**. It can spot bad
+header syntax, inappropriate status codes, and other interoperability problems
+in your HTTP server or client.
 
 See `example report`__.
 
@@ -43,5 +57,3 @@ __ https://github.com/vfaronov/httpolice
 `BrowserStack`__ kindly provide a free subscription for testing HTTPolice.
 
 __ https://www.browserstack.com/
-
-Problems, suggestions? Feel free to email the author at vfaronov@gmail.com.

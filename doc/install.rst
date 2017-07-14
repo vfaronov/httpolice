@@ -60,8 +60,8 @@ and to get them, you may need specific versions of Python, lxml and brotlipy.
 __ https://pypi.python.org/pypi/lxml
 __ https://pypi.python.org/pypi/brotlipy
 
-For example, at the time of writing, you can `install Python 3.5`__
-(**not** 3.6) and then simply do::
+For example, at the time of writing, you can `install Python 3.6`__
+and then simply do::
 
   C:\Users\Vasiliy\...\Python35>Scripts\pip install HTTPolice
 
@@ -70,7 +70,7 @@ Check that the installation was successful::
   C:\Users\Vasiliy\...\Python35>Scripts\httpolice --version
   HTTPolice 0.4.0
 
-__ https://www.python.org/downloads/release/python-352/
+__ https://www.python.org/downloads/
 
 However, it’s possible that new versions of lxml and brotlipy
 might not have precompiled binaries for your version of Python,

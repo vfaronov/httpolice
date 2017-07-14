@@ -2,6 +2,7 @@
 
 import io
 import os
+import re
 
 from setuptools import setup
 
@@ -13,11 +14,16 @@ with io.open(os.path.join('httpolice', '__metadata__.py'), 'rb') as f:
 with io.open('README.rst') as f:
     long_description = f.read()
 
+# I prefer not to have shields in my package description. Shields reflect
+# current status; they are good in a README when viewed on Git master,
+# but not in versions published on PyPI.
+long_description = re.sub(r'^\.\. status:.*?\n\n', u'', long_description,
+                          flags=re.DOTALL | re.MULTILINE)
 
 setup(
     name='HTTPolice',
     version=metadata['version'],
-    description='Lint for HTTP',
+    description='Validator for HTTP',
     long_description=long_description,
     url=metadata['homepage'],
     author='Vasiliy Faronov',
@@ -72,5 +78,5 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Quality Assurance',
     ],
-    keywords='HTTP message request response standards RFC lint check',
+    keywords='HTTP message request response standards RFC lint validator',
 )

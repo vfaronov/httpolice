@@ -157,7 +157,7 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-     'description': 'Lint for HTTP',
+     'description': 'Validator for HTTP',
      'github_button': 'true',
      'github_user': 'vfaronov',
      'github_repo': 'httpolice',
