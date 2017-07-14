@@ -12,7 +12,7 @@ chardet==3.0.4            # via requests
 check-manifest==0.35
 click==6.7                # via pip-tools
 coverage==4.4.1           # via pytest-cov
-docutils==0.12
+docutils==0.13.1
 first==2.0.1              # via pip-tools
 idna==2.5                 # via requests
 imagesize==0.7.1          # via sphinx

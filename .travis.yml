@@ -1,10 +1,10 @@
 language: python
+dist: trusty
+sudo: false
 
 addons:
     apt:
         packages:
-            # http://superuser.com/a/1057144/34733
-            - oracle-java8-installer
             - xmlstarlet
 
 python:
