@@ -34,11 +34,11 @@ Prepare examples for AFL::
 
 Run it::
 
-  $ AFL_NO_VAR_CHECK=1 \\
-  >   py-afl-fuzz -m 1000 -t 1000 \\
-  >   -i $fuzz_path/examples/ -o $fuzz_path/results/ -f $fuzz_path/input \\
-  >   -d -x tools/afl/http-tweaks.dict \\
-  >   -- python tools/afl/harness.py -i combined -o html $fuzz_path/input
+  $ AFL_NO_VAR_CHECK=1 \
+      py-afl-fuzz -m 1000 -t 1000 \
+      -i $fuzz_path/examples/ -o $fuzz_path/results/ -f $fuzz_path/input \
+      -d -x tools/afl/http-tweaks.dict \
+      -- python tools/afl/harness.py -i combined -o html $fuzz_path/input
 
 Almost all paths are considered 'variable' by AFL. I'm not sure why.
 Clearing the parser memo (``Stream._cache``) on every run doesn't help,

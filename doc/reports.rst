@@ -87,7 +87,7 @@ If you pass the ``--fail-on`` option, the exit status will be non-zero
 if any notices with the given severity (or higher) have been reported.
 For example::
 
-  $ httpolice -i combined --fail-on=comment test/combined_data/1125_1
+  $ httpolice -i combined --fail-on comment test/combined_data/1125_1
   ------------ request: GET /
   ------------ response: 304 Not Modified
   E 1125 Probably wrong use of status code 304

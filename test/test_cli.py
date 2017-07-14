@@ -43,7 +43,7 @@ def test_fail_on():
     assert stdout == b''
     assert stderr == b''
 
-    (code, stdout, stderr) = run(['-i', 'combined', '--fail-on=comment'],
+    (code, stdout, stderr) = run(['-i', 'combined', '--fail-on', 'comment'],
                                  ['combined_data/simple_ok',
                                   'combined_data/1003_1'])
     assert code == 0
@@ -57,7 +57,7 @@ def test_fail_on():
     assert b'C 1250' in stdout
     assert stderr == b''
 
-    (code, stdout, stderr) = run(['-i', 'combined', '--fail-on=comment'],
+    (code, stdout, stderr) = run(['-i', 'combined', '--fail-on', 'comment'],
                                  ['combined_data/simple_ok',
                                   'combined_data/1172_1'])
     assert code > 0

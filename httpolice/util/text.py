@@ -16,6 +16,7 @@ CHAR_NAMES = {
     b"'": u"single quote (')",
     b',': u'comma (,)',
     b'.': u'period (.)',
+    b':': u'colon (:)',
     b';': u'semicolon (;)',
     b'-': u'dash (-)',
 }
