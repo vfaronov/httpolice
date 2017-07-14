@@ -2,8 +2,8 @@
 .cache
 .coverage
 _build
+_extra
 Django_HTTPolice.egg-info
 HTTPolice.egg-info
-extra_doc
 htmlcov
 mitmproxy_HTTPolice.egg-info

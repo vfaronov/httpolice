@@ -23,6 +23,16 @@ Contents
    history
 
 
+Supplementary documents
+-----------------------
+
+- `List of all notices`__ that HTTPolice can output
+- `Example report`__ produced by HTTPolice
+
+__ notices.html
+__ showcase.html
+
+
 Integration packages
 --------------------
 
@@ -33,11 +43,3 @@ Integration packages
 __ http://mitmproxy-httpolice.readthedocs.io/
 __ http://django-httpolice.readthedocs.io/
 __ https://chrome.google.com/webstore/detail/httpolice-devtool/hnlnhebgfcfemjaphgbeokdnfpgbnhgn
-
-
-Supplementary materials
------------------------
-
-- `List of all notices`__ that HTTPolice can output
-
-__ http://pythonhosted.org/HTTPolice/notices.html

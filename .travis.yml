@@ -36,20 +36,15 @@ script:
     - tools/pylint_all.sh -j 2
     - pytest
 
-    # Build the files to be uploaded to pythonhosted.org.
-    - tools/build_extra_doc.sh
-
-    # Validate HTML-related stuff.
-    # This includes validating an actual HTML report (``showcase.html``).
-    - tools/vnu.sh run extra_doc/_build/*.html
-    - tools/css_validator.sh httpolice/reports/html.css
-    - tools/eslint.sh run httpolice/reports/html.js
-
     # Although the main docs (``doc/``) are processed by Read the Docs,
-    # we still want to check that they are building OK.
-    # But first, make sure that the included API example works.
+    # we want to check that they are building OK, and validate the resulting
+    # HTML report. But first, make sure that the included API example works.
     - python doc/api_example.py && grep -q 1194 report.html
     - sphinx-build -W doc/ doc/_build/
+    - tools/vnu.sh run doc/_build/showcase.html
+    - tools/vnu.sh run doc/_build/notices.html
+    - tools/css_validator.sh httpolice/reports/html.css
+    - tools/eslint.sh run httpolice/reports/html.js
 
     # Check the assorted reStructuredText documents at the top of the repo.
     - tools/check_rst.sh
@@ -57,11 +52,6 @@ script:
     # Check that the source distribution includes everything it should,
     # and nothing it shouldn't (including all the files we just built).
     - check-manifest
-
-before_deploy:
-    # If we're going to upload a development release,
-    # we need to revert back to the "stable" version of extra docs.
-    - tools/extra_doc_hack.sh
 
 deploy:
     on:
@@ -74,6 +64,4 @@ deploy:
     password:
         secure: Ym1VrWn+vEEumSVT3rIXk5qz/EtEYht/9KnQwi9zW2kkJ40DRcITq19AxAhCcKeW+wut/Q9gk5dmAKVbudIJCvd7r1pG+XOQuvoJS7xpua7+uunDs56vZwhcNrQumzluoBxSYDpTUjc0xey2vcWacjQViqTLYMFu97sfFTmfQuvRD6/7u83ZsyU7ixweTm+XpCpL72MfJMZo/pFEL+d4fg8stXyboPWzMA9tKh2uk4i7TD1iWcPDfisKDwhqz6F/SN66P7ylmz69h/plwPCncUCXUR6ovbWDYqyE845Awrwd+VylGkrmTMC2FQb14TR2LQStYr0XwcM0aftQDJkoYscnmf01OCreZrs5hwbY8xrF7Jill47ueDrGXtH6FwgcZBgTscdoR+F92IINOZcuKzrOToGZPZsi7la3hrdltCSMbV9npO4M5z7By8IrUSV/DsnupF/+RsTNA1I65IEyhlC0V1xv0cQUi+/DNe6UDebHXRR6qNt1oXgDDogK60s5x28srPKBW9JRmXM7M61II2di19WV83dvwtsiqGZ/WUDVtO1mzMcnSnuep4KLhP21FhtKRIj/g6YMwiYVqGVBsluJecV/tmHVUtSXjE/L9myowq1mFVmew3lc6p2n9OjVfbn2PplnwbKm781/9YX30r7aR9NPNquBB1RVhlIn4qE=
     distributions: "sdist bdist_wheel"
-    # Also upload files to pythonhosted.org.
-    skip_cleanup: true
-    docs_dir: extra_doc/_build
+    skip_upload_docs: true

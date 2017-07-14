@@ -14,6 +14,8 @@
 # serve to show the default.
 
 from collections import OrderedDict
+import io
+import shutil
 import sys
 import os
 
@@ -21,6 +23,45 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
+
+# -- Preparation ----------------------------------------------------------
+
+import httpolice
+import httpolice.inputs
+import httpolice.reports.html
+
+# XXX: POSSIBLY KIND OF A HACK
+
+# We have two special documentation pages:
+# ``notices.html`` with the list of all notices, and
+# ``showcase.html`` with an example HTML report.
+
+# They used to be on pythonhosted.org (PyPI's built-in documentation hosting),
+# but it's deprecated, works terribly, and (unlike RTD) is not versioned.
+# So instead we now add these pages into our main docs using Sphinx's
+# ``html_extra_path`` feature (see below).
+
+# But for that to work, we need to actually build those pages first, and put
+# them into the ``html_extra_path``. I can't think of a more appropriate place
+# to trigger their build than right here. After all, Sphinx's docs do say that
+# ``conf.py`` "can execute arbitrarily complex code", so maybe it's OK.
+
+# See also: https://stackoverflow.com/q/38547509/200445
+
+if os.path.exists('_extra'):
+    shutil.rmtree('_extra')
+os.mkdir('_extra')
+
+with io.open('_extra/notices.html', 'wb') as notices_file:
+    httpolice.reports.html.list_notices(notices_file)
+
+with io.open('_extra/showcase.html', 'wb') as showcase_file:
+    exchanges = list(httpolice.inputs.combined_input(
+        ['../test/combined_data/showcase.https']))
+    for exch in exchanges:
+        httpolice.check_exchange(exch)
+    httpolice.html_report(exchanges, showcase_file)
+
 
 # -- General configuration ------------------------------------------------
 
@@ -57,7 +98,6 @@ author = 'Vasiliy Faronov'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-import httpolice
 release = httpolice.__version__
 version = '.'.join(release.split('.')[:2])
 
@@ -123,12 +163,12 @@ html_theme_options = {
      'github_repo': 'httpolice',
      'github_type': 'star',
      'extra_nav_links': OrderedDict([
+          ('List of all notices', 'notices.html'),
+          ('Example report', 'showcase.html'),
           ('mitmproxy integration',
            'http://mitmproxy-httpolice.readthedocs.io/'),
           ('Django integration',
            'http://django-httpolice.readthedocs.io/'),
-          ('List of all notices',
-           'http://pythonhosted.org/HTTPolice/notices.html'),
      ]),
 }
 
@@ -159,7 +199,7 @@ html_static_path = []
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
 # directly to the root of the documentation.
-#html_extra_path = []
+html_extra_path = ['_extra']
 
 # If not None, a 'Last updated on:' timestamp is inserted at every page
 # bottom, using the given strftime format.

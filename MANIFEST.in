@@ -18,6 +18,7 @@ include .travis.yml
 graft test
 graft doc
 prune doc/_build
+prune doc/_extra
 graft tools
 
 global-exclude *.pyc

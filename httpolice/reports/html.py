@@ -9,7 +9,7 @@ from singledispatch import singledispatch
 import six
 
 from httpolice import known, message, notice, structure
-from httpolice.__metadata__ import version
+from httpolice.__metadata__ import homepage, version
 from httpolice.citation import Citation
 from httpolice.header import HeaderView
 from httpolice.reports.common import (expand_error, expand_piece,
@@ -81,6 +81,12 @@ def list_notices(buf):
         H.attr(_class=u'notices-list')
     with document:
         H.h1(title)
+        H.p(u'This is the list of all notices produced by ',
+            H.a(u'HTTPolice', href=homepage, target='_self'),
+            u' version ', version, u'.')
+        H.p(u'See also the ',
+            H.a(u'HTTPolice manual', href=u'http://httpolice.readthedocs.io/',
+                target='_self'), u'.')
         placeholder = Placeholder()
         for id_ in sorted(notice.all_notices.keys()):
             _notice_to_html(notice.all_notices[id_], placeholder,
