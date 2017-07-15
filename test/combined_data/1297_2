@@ -1,0 +1,17 @@
+# Notice 1297 should only look at one header entry at a time.
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Forwarded: for=127.0.0.1
+Forwarded: proto=https
+Forwarded: by=unknown
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!

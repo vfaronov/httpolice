@@ -4,7 +4,17 @@ History of changes
 
 Unreleased
 ~~~~~~~~~~
+Changed
+-------
 - Notice `1277`_ (obsolete 'X-' prefix) is now reported only once per message.
+
+Added
+-----
+- Checks for the `Forwarded`_ header (notices `1296`_, `1297`_).
+
+.. _Forwarded: https://tools.ietf.org/html/rfc7239
+.. _1296: http://pythonhosted.org/HTTPolice/notices.html#1296
+.. _1297: http://pythonhosted.org/HTTPolice/notices.html#1297
 
 
 0.5.2 - 2017-03-24

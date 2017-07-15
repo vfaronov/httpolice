@@ -1,0 +1,16 @@
+1000 1000
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Forwarded: for=123.45.67.89; proto=https
+Forwarded: for=fe80::6eb6:566f:a443:ae95
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+
+Hello world!

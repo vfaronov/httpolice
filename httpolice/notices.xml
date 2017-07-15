@@ -2167,4 +2167,17 @@ One non-obvious thing is how references work
     <rfc num="7231" sect="4.1">The method token is case-sensitive</rfc>
   </error>
 
+  <error id="1296">
+    <title>Duplicate ‘<var ref="param"/>’ parameter in <var ref="entry"/></title>
+    <rfc num="7239" sect="4">
+      Each parameter MUST NOT occur more than once per field-value.
+    </rfc>
+  </error>
+
+  <comment id="1297">
+    <title>Possibly bad syntax in <var ref="entry"/></title>
+    <explain>The <h ref="no">Forwarded</h> header here contains <var ref="n_elements"/> elements, describing <var ref="n_elements"/> proxy hops, with only one parameter for each proxy — yet all parameters have different names.</explain>
+    <explain>If this was intended to be <var ref="n_elements"/> parameters for a single proxy hop, then the pairs must be separated with semicolons, not commas.</explain>
+  </comment>
+
 </notices>

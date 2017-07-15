@@ -55,6 +55,8 @@ class HeadersView(object):
                 cls = PreferView
             elif key == h.preference_applied:
                 cls = PreferenceAppliedView
+            elif key == h.forwarded:
+                cls = ForwardedView
 
             # For the rest, we only need to know
             # a generic "rule" for combining multiple entries,
@@ -118,7 +120,7 @@ class HeaderView(object):
     def __init__(self, message, name):
         self.message = message
         self.name = name
-        self._entries = self._value = None
+        self._entries = self._value = self._value_breakdown = None
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, self.name)
@@ -162,6 +164,13 @@ class HeaderView(object):
         if self._entries is None:   # pragma: no cover
             self._parse()
         return self._entries
+
+    @property
+    def value_breakdown(self):
+        """List of (parsed) values for every entry of this header."""
+        if self._entries is None:   # pragma: no cover
+            self._parse()
+        return self._value_breakdown
 
     @property
     def value(self):
@@ -259,6 +268,7 @@ class UnknownHeaderView(HeaderView):
         entries, values = self._pre_parse()
         self._value = b','.join(values) if values else None
         self._entries = entries
+        self._value_breakdown = values
 
 
 class SingleHeaderView(HeaderView):
@@ -271,9 +281,11 @@ class SingleHeaderView(HeaderView):
             if len(entries) > 1:
                 self.message.complain(1013, header=self.name, entries=entries)
             self._value = values[-1]
+            self._value_breakdown = [values[-1]]
             self._entries = [entries[-1]]
         else:
             self._value = None
+            self._value_breakdown = []
             self._entries = []
 
 
@@ -289,6 +301,7 @@ class MultiHeaderView(HeaderView):
                 self._value.append(Unavailable)
             else:
                 self._value.extend(sub_values)
+        self._value_breakdown = values
         self._entries = entries
 
     def __iter__(self):
@@ -417,3 +430,18 @@ class PreferenceAppliedView(DirectivesView, MultiHeaderView):
     """Wraps a ``Preference-Applied`` header."""
 
     knowledge_module = httpolice.known.preference
+
+
+class ForwardedView(DirectivesView, MultiHeaderView):
+
+    """Wraps a ``Forwarded`` header."""
+
+    knowledge_module = httpolice.known.forwarded_param
+
+    def _process_parsed(self, entry, parsed):
+        # Work at the second level of nesting (forwarded-pairs,
+        # not forwarded-elements).
+        return [super(ForwardedView, self)._process_parsed(entry, pairs)
+                for pairs in parsed]
+
+    __getattr__ = None

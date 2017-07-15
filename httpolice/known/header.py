@@ -5,7 +5,7 @@ from httpolice.known.base import KnownDict
 from httpolice.structure import FieldName
 from httpolice.syntax import (internal, rfc5789, rfc5988, rfc6266, rfc6797,
                               rfc7230, rfc7231, rfc7232, rfc7233, rfc7234,
-                              rfc7235, rfc7240, rfc7540, rfc7838)
+                              rfc7235, rfc7239, rfc7240, rfc7540, rfc7838)
 
 
 SINGLE = 1
@@ -406,8 +406,14 @@ known = KnownDict(FieldName, [
   'rule': SINGLE},
  {'_': FieldName(u'Ext'), '_citations': [RFC(4229)]},
  {'_': FieldName(u'Forwarded'),
-  '_citations': [RFC(7239)],
-  'iana_status': u'standard'},
+  '_citations': [RFC(7239, section=(4,))],
+  'bad_for_connection': True,
+  'for_request': True, 'for_response': False,
+  'iana_status': u'standard',
+  'parser': rfc7239.Forwarded,
+  'precondition': False,
+  'proactive_conneg': False,
+  'rule': MULTI},
  {'_': FieldName(u'From'),
   '_citations': [RFC(7231, section=(5, 5, 1))],
   'for_request': True,

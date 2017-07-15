@@ -9,6 +9,7 @@ from httpolice.known.auth_scheme import known as auth
 from httpolice.known.base import KnownDict
 from httpolice.known.cache_directive import known as cache
 from httpolice.known.content_coding import known as cc
+from httpolice.known.forwarded_param import known as forwarded
 from httpolice.known.header import known as h
 from httpolice.known.hsts_directive import known as hsts
 from httpolice.known.media_type import known as media

@@ -398,3 +398,10 @@ class Preference(CaseInsensitive):
     """An HTTP preference token (RFC 7240 Section 2)."""
 
     __slots__ = ()
+
+
+class ForwardedParam(CaseInsensitive):
+
+    """A parameter for the Forwarded header (RFC 7239)."""
+
+    __slots__ = ()
