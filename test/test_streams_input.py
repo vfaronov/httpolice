@@ -112,7 +112,7 @@ def test_unparseable():
 
 
 def test_unparseable_body():
-    [exch1, exch2] = load_from_file('1000_1')
+    [exch1, exch2] = load_from_file('1000_01')
 
     assert exch1.request.method == m.GET
     assert exch1.request.body == b''
