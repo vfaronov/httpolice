@@ -38,7 +38,14 @@ def html_report(exchanges, buf):
         It must be opened in binary mode (not text).
 
     """
-    trashcan = H.div()
+    # We don't want to hold the entire report in memory before printing it,
+    # because that would mean unbounded memory growth with more input.
+    # But Dominate obviously doesn't have a streaming mode, so we do this
+    # manually. We create our document, but instead of the actual exchanges,
+    # we insert a magic string that allows us to split it into a prologue
+    # and an epilogue.
+    magic = u'---- CUT HERE ----'
+
     title = u'HTTPolice report'
     document = dominate.document(title=title)
     _common_meta(document)
@@ -48,8 +55,15 @@ def html_report(exchanges, buf):
         H.attr(_class=u'report')
     with document:
         H.h1(title)
-        _render_exchanges(exchanges, trashcan)
-    buf.write(document.render().encode('utf-8'))
+        H.hr()
+        text_node(magic)
+
+    (prologue, epilogue) = document.render().split(magic)
+
+    buf.write(prologue.encode('utf-8'))
+    for div in _generate_exchange_divs(exchanges):
+        buf.write(div.render().encode('utf-8'))
+    buf.write(epilogue.encode('utf-8'))
 
 
 class Placeholder(object):
@@ -104,14 +118,13 @@ def _common_meta(document):
         H.base(target=u'_blank')
 
 
-def _render_exchanges(exchanges, trashcan):
-    # The ``hr`` elements really help readability in w3m.
-    H.hr()
+def _generate_exchange_divs(exchanges):
     for exch in exchanges:
         div = H.div(_class=u'exchange')
         with div:
             if exch.request:
                 _render_request(exch.request)
+                # The ``hr`` elements really help readability in w3m.
                 H.hr()
             for resp in exch.responses:
                 _render_response(resp)
@@ -122,14 +135,8 @@ def _render_exchanges(exchanges, trashcan):
 
         # Some exchanges are "complaint boxes", carrying only a complaint.
         # If the user silences that complaint, we end up with an empty box.
-        # To avoid adding it to our document, we preemptively add it
-        # to a dummy "trash can" element, per Dominate docs:
-        #
-        #   When the context is closed, any nodes that were not already
-        #   added to something get added to the current context.
-        #
-        if len(div) == 0:
-            trashcan.add(div)
+        if len(div) != 0:
+            yield div
 
 
 def _render_request(req):

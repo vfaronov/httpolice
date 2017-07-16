@@ -12,6 +12,7 @@ Changed
 Added
 -----
 - HTTPolice can now use much less memory when parsing long TCP streams.
+- Similarly, large HTML reports need much less memory to produce.
 - Checks for the `Forwarded`_ header (notices `1296`_, `1297`_).
 
 .. _Forwarded: https://tools.ietf.org/html/rfc7239
