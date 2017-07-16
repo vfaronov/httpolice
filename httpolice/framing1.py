@@ -252,7 +252,7 @@ def parse_header_fields(stream):
             while stream.peek() in [b' ', b'\t']:
                 stream.complain(1016)
                 vs.append(b' ' + stream.readline(decode=False).lstrip(b' \t'))
-        name = FieldName(name.decode())
+        name = FieldName(name.decode('iso-8859-1'))
         value = b''.join(vs).strip(b' \t')
         entries.append(HeaderEntry(name, value))
     return entries
