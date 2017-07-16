@@ -14,6 +14,7 @@ Added
 - HTTPolice can now use much less memory when parsing long TCP streams.
 - Similarly, large HTML reports need much less memory to produce.
 - Checks for the `Forwarded`_ header (notices `1296`_, `1297`_).
+- Minor speedup in case when request URLs often repeat.
 
 .. _Forwarded: https://tools.ietf.org/html/rfc7239
 .. _chunk extensions: https://tools.ietf.org/html/rfc7230#section-4.1.1

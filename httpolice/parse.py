@@ -134,9 +134,7 @@ def parse(data, symbol, complain=None, fail_notice_id=None,
 
 _memo = OrderedDict()
 
-# This value was obtained by running on a large tcpflow input and increasing
-# until it stopped getting faster.
-MEMO_LIMIT = 200
+MEMO_LIMIT = 500
 
 
 def _splice_annotations(data, annotations):

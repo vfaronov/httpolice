@@ -25,6 +25,11 @@ from httpolice.util.data import duplicates
 from httpolice.util.text import force_unicode
 
 
+normal_target = mark(origin_form) | mark(absolute_form)
+options_target = mark(origin_form) | mark(asterisk_form) | mark(absolute_form)
+connect_target = mark(authority_form)
+
+
 class Request(message.Message):
 
     def __init__(self, scheme, method, target, version, header_entries,
@@ -118,12 +123,11 @@ class Request(message.Message):
     @derived_property
     def target_form(self):
         if self.method == m.CONNECT:
-            symbol = mark(authority_form)
+            symbol = connect_target
         elif self.method == m.OPTIONS:
-            symbol = (mark(origin_form) | mark(asterisk_form) |
-                      mark(absolute_form))
+            symbol = options_target
         else:
-            symbol = mark(origin_form) | mark(absolute_form)
+            symbol = normal_target
         r = parse(self.target, symbol, self.complain, 1045,
                   place=u'request target')
         if okay(r):
