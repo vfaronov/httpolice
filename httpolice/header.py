@@ -22,7 +22,7 @@ import sys
 from httpolice import known
 from httpolice.known import alt_svc_param, cache_directive, h, header
 import httpolice.known.hsts_directive
-from httpolice.parse import simple_parse
+from httpolice.parse import parse
 from httpolice.structure import Parametrized, Unavailable, okay
 from httpolice.syntax.rfc7230 import quoted_string, token
 
@@ -142,7 +142,7 @@ class HeaderView(object):
             if parser is None:
                 parsed = entry.value
             else:
-                (parsed, annotations) = simple_parse(
+                (parsed, annotations) = parse(
                     entry.value, parser,
                     self.message.complain, 1000, place=entry,
                     annotate_classes=known.classes)
@@ -330,10 +330,9 @@ class DirectivesView(HeaderView):           # pylint: disable=abstract-method
                 self.message.complain(1157, entry=entry, directive=directive)
                 argument = None
             elif parser is not None:
-                argument = simple_parse(argument, parser,
-                                        self.message.complain, 1158,
-                                        place=entry,
-                                        directive=directive, value=argument)
+                argument = parse(argument, parser,
+                                 self.message.complain, 1158, place=entry,
+                                 directive=directive, value=argument)
         return Parametrized(directive, argument)
 
     def __getattr__(self, key):
@@ -392,9 +391,8 @@ class AltSvcView(SingleHeaderView):
                 (name, value) = params[i]
                 parser = alt_svc_param.parser_for(name)
                 if parser is not None:
-                    value = simple_parse(value, parser,
-                                         self.message.complain, 1259,
-                                         place=entry, param=name, value=value)
+                    value = parse(value, parser, self.message.complain, 1259,
+                                  place=entry, param=name, value=value)
                 params[i] = (name, value)
 
         return parsed

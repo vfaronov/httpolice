@@ -1,9 +1,9 @@
-1008 1009
+1009
 
-# Here, the server decided to respond to a HEAD request with a full body.
+# There's only a CR after the headers block, no LF.
 
 ======== BEGIN INBOUND STREAM ========
-HEAD / HTTP/1.1
+GET / HTTP/1.1
 Host: example.com
 User-Agent: demo
 
@@ -12,5 +12,4 @@ HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 14
-
-Hello world!
+Hello world!

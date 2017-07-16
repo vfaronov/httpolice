@@ -14,11 +14,11 @@ from httpolice.blackboard import derived_property
 from httpolice.known import (auth, cache, cache_directive, cc, h, header, m,
                              media_type, method as method_info, pref, product,
                              tc, upgrade)
-from httpolice.parse import mark, simple_parse
+from httpolice.parse import mark, parse
 from httpolice.structure import (EntityTag, Method, MultiDict, Parametrized,
                                  Versioned, http2, http10, http11, okay)
-from httpolice.syntax.common import CTL
 from httpolice.syntax import rfc7230
+from httpolice.syntax.common import CTL
 from httpolice.syntax.rfc7230 import (absolute_form, asterisk_form,
                                       authority_form, origin_form)
 from httpolice.util.data import duplicates
@@ -124,8 +124,8 @@ class Request(message.Message):
                       mark(absolute_form))
         else:
             symbol = mark(origin_form) | mark(absolute_form)
-        r = simple_parse(self.target, symbol,
-                         self.complain, 1045, place=u'request target')
+        r = parse(self.target, symbol, self.complain, 1045,
+                  place=u'request target')
         if okay(r):
             (symbol, _) = r
             return symbol
@@ -219,8 +219,7 @@ def check_request(req):
     message.check_message(req)
 
     # Check the syntax of request method and target.
-    simple_parse(method, rfc7230.method,
-                 complain, 1292, place=u'request method')
+    parse(method, rfc7230.method, complain, 1292, place=u'request method')
     _ = req.target_form
 
     if method != method.upper() and method.upper() in m:

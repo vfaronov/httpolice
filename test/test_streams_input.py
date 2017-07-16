@@ -74,12 +74,8 @@ def test_complex_connection():
                            '[<Response 100>, <Response 123>, <Response 201>])')
 
     assert exch2.request.method == m.HEAD
-    # According to my reading of the spec (which may be wrong),
-    # every ``obs-fold`` becomes one space,
-    # and these spaces are *not* stripped
-    # from either end of the resulting ``field-value``.
-    assert exch2.request.header_entries[2] == (u'Quux', b' demo  (demo) ')
-    assert exch2.request.header_entries[3] == (u'Foo', b'  bar')
+    assert exch2.request.header_entries[2] == (u'Quux', b'demo  (demo)')
+    assert exch2.request.header_entries[3] == (u'Foo', b'bar')
     assert exch2.request.header_entries[4] == (h.accept_encoding, b'')
     assert len(exch2.responses) == 1
     assert exch2.responses[0].status == st.ok
@@ -356,12 +352,10 @@ def test_rearrange():
     assert exchanges[2].request.target == u'/03'
     assert exchanges[3].request is None
     assert [complaint.id for complaint in exchanges[3].complaints] == [1009]
-    assert exchanges[4].request is None
-    assert [complaint.id for complaint in exchanges[4].complaints] == [1010]
-    assert exchanges[5].request.target == u'/04'
-    assert exchanges[6].request.target == u'/05'
-    assert exchanges[7].request.target == u'/06'
-    assert exchanges[8].request.target == u'/07'
-    assert exchanges[9].request is None
-    assert [complaint.id for complaint in exchanges[9].complaints] == [1279]
-    assert exchanges[10].request.target == u'/08'
+    assert exchanges[4].request.target == u'/04'
+    assert exchanges[5].request.target == u'/05'
+    assert exchanges[6].request.target == u'/06'
+    assert exchanges[7].request.target == u'/07'
+    assert exchanges[8].request is None
+    assert [complaint.id for complaint in exchanges[8].complaints] == [1279]
+    assert exchanges[9].request.target == u'/08'

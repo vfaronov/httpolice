@@ -12,7 +12,7 @@ from httpolice.known import (auth, cache, cache_directive, h, header, hsts, m,
                              media, media_type, method as method_info, rel, st,
                              status_code, tc, unit, upgrade, warn)
 from httpolice.known.status_code import NOT_AT_ALL, NOT_BY_DEFAULT
-from httpolice.parse import simple_parse
+from httpolice.parse import parse
 from httpolice.structure import (EntityTag, StatusCode, http2, http10, http11,
                                  okay)
 from httpolice.syntax import rfc6749, rfc7230
@@ -211,8 +211,8 @@ def check_response_itself(resp):
 
     # Check syntax of reason phrase.
     if okay(resp.reason):
-        simple_parse(resp.reason, rfc7230.reason_phrase,
-                     complain, 1294, place=u'reason phrase')
+        parse(resp.reason, rfc7230.reason_phrase, complain, 1294,
+              place=u'reason phrase')
 
     if not (100 <= status <= 599):
         complain(1167)
@@ -805,8 +805,8 @@ def _check_bearer_challenge(resp, hdr, challenge):
     for param in [u'scope', u'error', u'error_description', u'error_uri']:
         if param in params:
             parser = getattr(rfc6749, param)
-            simple_parse(params[param], parser,
-                         resp.complain, 1266, param=param, value=params[param])
+            parse(params[param], parser, resp.complain, 1266,
+                  param=param, value=params[param])
 
     if resp.status == st.unauthorized and u'error' not in params and \
             req and req.headers.authorization.is_okay and \

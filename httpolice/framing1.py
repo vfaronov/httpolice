@@ -2,16 +2,31 @@
 
 """Parse HTTP/1.x message framing according to RFC 7230."""
 
+import re
+
+from httpolice.citation import RFC
 from httpolice.codings import decode_deflate, decode_gzip
 from httpolice.exchange import Exchange, complaint_box
 from httpolice.known import m, st, tc
-from httpolice.parse import ParseError, maybe, skip
+from httpolice.parse import ParseError, Symbol
 from httpolice.request import Request
 from httpolice.response import Response
 from httpolice.structure import (FieldName, HeaderEntry, HTTPVersion, Method,
                                  StatusCode, Unavailable, okay)
-from httpolice.syntax import rfc7230
-from httpolice.syntax.common import CRLF, LF, SP
+
+
+# Create empty symbols just for referring to them in parse errors.
+
+HTTP_message = Symbol(u'HTTP-message', RFC(7230, section=(3,)))
+request_line = Symbol(u'request-line', RFC(7230, section=(3, 1, 1)))
+status_line = Symbol(u'status-line', RFC(7230, section=(3, 1, 2)))
+header_field = Symbol(u'header-field', RFC(7230, section=(3, 2)))
+chunked_body = Symbol(u'chunked-body', RFC(7230, section=(4, 1)))
+chunk = Symbol(u'chunk', RFC(7230, section=(4, 1)))
+chunk_size = Symbol(u'chunk-size', RFC(7230, section=(4, 1)))
+
+
+HTTP_VERSION = re.compile(u'^HTTP/[0-9]\\.[0-9]$')
 
 
 def parse_streams(inbound, outbound, scheme=None):
@@ -35,11 +50,11 @@ def parse_streams(inbound, outbound, scheme=None):
         containing neither request nor responses,
         but only a notice that indicates some general problem with the streams.
     """
-    while inbound and inbound.sane:
+    while inbound and inbound.good:
         (req, req_box) = _parse_request(inbound, scheme)
         (resps, resp_box) = ([], None)
         if req:
-            if outbound and outbound.sane:
+            if outbound and outbound.good:
                 (resps, resp_box) = _parse_responses(outbound, req)
                 if resps:
                     if resps[-1].status == st.switching_protocols:
@@ -54,15 +69,14 @@ def parse_streams(inbound, outbound, scheme=None):
 
     if inbound and not inbound.eof:
         # Some data remains on the inbound stream, but we can't parse it.
-        yield complaint_box(1007, stream=inbound,
-                            nbytes=len(inbound.consume_rest()))
+        yield complaint_box(1007, stream=inbound, offset=inbound.tell())
 
-    if outbound and outbound.sane:
+    if outbound and outbound.good:
         if inbound:
             # We had some requests, but we ran out of them.
             # We'll still try to parse the remaining responses on their own.
             yield complaint_box(1008, stream=outbound)
-        while outbound.sane:
+        while outbound.good:
             (resps, resp_box) = _parse_responses(outbound, None)
             if resps:
                 yield Exchange(None, resps)
@@ -71,41 +85,36 @@ def parse_streams(inbound, outbound, scheme=None):
 
     if outbound and not outbound.eof:
         # Some data remains on the outbound stream, but we can't parse it.
-        yield complaint_box(1010, stream=outbound,
-                            nbytes=len(outbound.consume_rest()))
+        yield complaint_box(1010, stream=outbound, offset=outbound.tell())
 
 
 def _parse_request(stream, scheme=None):
-    req = _parse_request_heading(stream, scheme)
-    if req is Unavailable:
-        box = Exchange(None, [])
-        stream.dump_complaints(box.complain, place=u'request heading')
-        return (None, box)
+    try:
+        req = _parse_request_heading(stream, scheme)
+    except ParseError as e:
+        return (None, complaint_box(1006, error=e))
     else:
         _parse_request_body(req, stream)
         return (req, None)
 
 
 def _parse_request_heading(stream, scheme=None):
-    beginning = stream.point
-    try:
-        with stream:
-            method_ = Method(stream.consume_regex(rfc7230.method))
-            stream.consume_regex(SP)
-            target = stream.consume_regex(b'[^\\s]+', u'request target')
-            stream.consume_regex(SP)
-            version_ = HTTPVersion(stream.consume_regex(rfc7230.HTTP_version))
-            _parse_line_ending(stream)
-            entries = parse_header_fields(stream)
-    except ParseError as e:
-        stream.sane = False
-        stream.complain(1006, error=e)
-        return Unavailable
-    else:
-        req = Request(scheme, method_, target, version_, entries, body=None,
-                      remark=u'from %s, offset %d' % (stream.name, beginning))
-        stream.dump_complaints(req.complain, place=u'request heading')
-        return req
+    beginning = stream.tell()
+    with stream.parsing(request_line):
+        line = stream.readline()
+        pieces = line.split(u' ')
+        if len(pieces) != 3 or not HTTP_VERSION.match(pieces[2]):
+            raise stream.error(beginning)
+    method_ = Method(pieces[0])
+    target = pieces[1]
+    version_ = HTTPVersion(pieces[2])
+    entries = parse_header_fields(stream)
+    with stream.parsing(HTTP_message):
+        stream.readlineend()
+    req = Request(scheme, method_, target, version_, entries, body=None,
+                  remark=u'from %s, offset %d' % (stream.name, beginning))
+    stream.dump_complaints(req.complain, place=u'request heading')
+    return req
 
 
 def _parse_request_body(req, stream):
@@ -129,11 +138,10 @@ def _parse_request_body(req, stream):
             stream.sane = False
         else:
             try:
-                req.body = stream.consume_n_bytes(n)
+                req.body = stream.read(n)
             except ParseError as exc:
                 req.body = Unavailable
                 req.complain(1004, error=exc)
-                stream.sane = False
 
     else:
         req.body = b''
@@ -141,14 +149,13 @@ def _parse_request_body(req, stream):
 
 def _parse_responses(stream, req):
     resps = []
-    while stream.sane:
+    while stream.good:
         # Parse all responses corresponding to one request.
         # RFC 7230 section 3.3.
-        resp = _parse_response_heading(req, stream)
-        if resp is Unavailable:
-            box = Exchange(None, [])
-            stream.dump_complaints(box.complain, place=u'response heading')
-            return (resps, box)
+        try:
+            resp = _parse_response_heading(req, stream)
+        except ParseError as e:
+            return (resps, complaint_box(1009, error=e))
         else:
             resps.append(resp)
             _parse_response_body(resp, stream)
@@ -160,27 +167,25 @@ def _parse_responses(stream, req):
 
 
 def _parse_response_heading(req, stream):
-    beginning = stream.point
-    try:
-        with stream:
-            version_ = HTTPVersion(stream.consume_regex(rfc7230.HTTP_version))
-            stream.consume_regex(SP)
-            status = StatusCode(stream.consume_regex(rfc7230.status_code))
-            stream.consume_regex(SP)
-            reason = stream.consume_regex(rfc7230.reason_phrase)
-            _parse_line_ending(stream)
-            entries = parse_header_fields(stream)
-    except ParseError as e:
-        stream.complain(1009, error=e)
-        stream.sane = False
-        return Unavailable
-    else:
-        resp = Response(
-            version_, status, reason, entries, body=None,
-            remark=u'from %s, offset %d' % (stream.name, beginning))
-        resp.request = req
-        stream.dump_complaints(resp.complain, place=u'response heading')
-        return resp
+    beginning = stream.tell()
+    with stream.parsing(status_line):
+        line = stream.readline()
+        pieces = line.split(u' ', 2)
+        if len(pieces) != 3 or \
+                not HTTP_VERSION.match(pieces[0]) or not pieces[1].isdigit():
+            raise stream.error(beginning)
+    version_ = HTTPVersion(pieces[0])
+    status = StatusCode(pieces[1])
+    reason = pieces[2]
+    entries = parse_header_fields(stream)
+    with stream.parsing(HTTP_message):
+        stream.readlineend()
+    resp = Response(
+        version_, status, reason, entries, body=None,
+        remark=u'from %s, offset %d' % (stream.name, beginning))
+    resp.request = req
+    stream.dump_complaints(resp.complain, place=u'response heading')
+    return resp
 
 
 def _parse_response_body(resp, stream):
@@ -208,7 +213,7 @@ def _parse_response_body(resp, stream):
             codings.pop()
             _parse_chunked(resp, stream)
         else:
-            resp.body = stream.consume_rest()
+            resp.body = stream.read()
         while codings and okay(resp.body):
             _decode_transfer_coding(resp, codings.pop())
 
@@ -219,22 +224,13 @@ def _parse_response_body(resp, stream):
             stream.sane = False
         else:
             try:
-                resp.body = stream.consume_n_bytes(n)
+                resp.body = stream.read(n)
             except ParseError as exc:
                 resp.body = Unavailable
                 resp.complain(1004, error=exc)
-                stream.sane = False
 
     else:
-        resp.body = stream.consume_rest()
-
-
-def _parse_line_ending(stream):
-    r = stream.maybe_consume_regex(CRLF)
-    if r is None:
-        r = stream.consume_regex(LF, u'line ending')
-        stream.complain(1224)
-    return r
+        resp.body = stream.read()
 
 
 def parse_header_fields(stream):
@@ -245,28 +241,20 @@ def parse_header_fields(stream):
     :raises: :class:`ParseError`
     """
     entries = []
-    while True:
-        name = stream.maybe_consume_regex(rfc7230.field_name)
-        if name is None:
-            break
-        stream.consume_regex(b':')
-        stream.consume_regex(rfc7230.OWS)
-        vs = []
-        while True:
-            v = stream.maybe_consume_regex(rfc7230.field_content)
-            if v is None:
-                if stream.maybe_consume_regex(rfc7230.obs_fold):
-                    stream.complain(1016)
-                    vs.append(b' ')
-                else:
-                    break
-            else:
-                vs.append(v.encode('iso-8859-1'))       # back to bytes
-        value = b''.join(vs)
-        stream.consume_regex(rfc7230.OWS)
-        _parse_line_ending(stream)
-        entries.append(HeaderEntry(FieldName(name), value))
-    _parse_line_ending(stream)
+    while stream.peek() not in [b'\r', b'\n', b'']:
+        with stream.parsing(header_field):
+            pos = stream.tell()
+            line = stream.readline(decode=False)
+            (name, colon, v) = line.partition(b':')
+            if not colon:
+                raise stream.error(pos)
+            vs = [v]
+            while stream.peek() in [b' ', b'\t']:
+                stream.complain(1016)
+                vs.append(b' ' + stream.readline(decode=False).lstrip(b' \t'))
+        name = FieldName(name.decode())
+        value = b''.join(vs).strip(b' \t')
+        entries.append(HeaderEntry(name, value))
     return entries
 
 
@@ -294,27 +282,33 @@ def _decode_transfer_coding(msg, coding):
 
 
 def _parse_chunk(stream):
-    size = stream.parse(rfc7230.chunk_size * skip(maybe(rfc7230.chunk_ext)))
-    _parse_line_ending(stream)
-    if size == 0:
-        return b''
-    else:
-        data = stream.consume_n_bytes(size)
-        _parse_line_ending(stream)
-        return data
+    with stream.parsing(chunk):
+        pos = stream.tell()
+        (size_s, _, _) = stream.readline().partition(u';')
+        with stream.parsing(chunk_size):
+            try:
+                size = int(size_s.rstrip(u' \t'), 16)     # RFC errata ID: 4667
+            except ValueError:
+                raise stream.error(pos)
+        if size == 0:
+            return b''
+        else:
+            data = stream.read(size)
+            stream.readlineend()
+            return data
 
 
 def _parse_chunked(msg, stream):
     data = []
     try:
-        with stream:
-            chunk = _parse_chunk(stream)
-            while chunk:
-                data.append(chunk)
-                chunk = _parse_chunk(stream)
-            trailer = parse_header_fields(stream)
+        chunk_data = _parse_chunk(stream)
+        while chunk_data:
+            data.append(chunk_data)
+            chunk_data = _parse_chunk(stream)
+        trailer = parse_header_fields(stream)
+        with stream.parsing(chunked_body):
+            stream.readlineend()
     except ParseError as e:
-        stream.sane = False
         msg.complain(1005, error=e)
         msg.body = Unavailable
     else:

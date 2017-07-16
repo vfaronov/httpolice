@@ -1,4 +1,4 @@
-1005 1007
+1005
 
 # The chunked stream is abruptly cut off before the indicated number of bytes.
 # This used to crash HTTPolice when generating an HTML report.

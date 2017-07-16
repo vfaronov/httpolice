@@ -2,7 +2,9 @@
 
 """A library of parser combinators based on the Earley algorithm.
 
-Examples of usage can be found in :mod:`httpolice.syntax`.
+See :mod:`httpolice.syntax` for examples of how to construct a grammar
+with these combinators, and :mod:`httpolice.header` for examples of how
+to use the resulting grammar.
 
 Why do we use Earley instead of a more mainstream approach like LR(1)?
 Because Earley can deal with any (context-free) grammar.
@@ -12,12 +14,11 @@ They just work. And we get detailed error messages for free.
 
 However, Earley is not very fast (at least this implementation).
 We use it for headers, which have complex grammars but are easy to memoize.
-For HTTP/1.x message framing, we just use regexes,
-which are derived automatically from the same code (:meth:`Symbol.as_regex`).
+For HTTP/1.x message framing, we use much simpler line-oriented rules
+hardcoded in :mod:`httpolice.framing1`.
 
-A parser's input is a stream of bytes, represented by :class:`Stream`.
-The output is whatever is returned by the semantic actions
-(the ``<<`` operator, :meth:`Symbol.__rlshift__`).
+A parser's input is a bytestring, and the output is whatever is returned
+by the semantic actions (the ``<<`` operator, :meth:`Symbol.__rlshift__`).
 Before applying semantic actions,
 bytes are automatically decoded from ISO-8859-1--the historic encoding of HTTP.
 
@@ -41,13 +42,139 @@ ensures this automatically for most classes.
 
 from collections import OrderedDict
 import operator
-import re
 
 from bitstring import BitArray, Bits
 import six
+from six.moves import range
 
 from httpolice.structure import Unavailable
 from httpolice.util.text import format_chars
+
+
+###############################################################################
+# The main interface to parsing.
+
+def parse(data, symbol, complain=None, fail_notice_id=None,
+          annotate_classes=None, **extra_context):
+    """(Try to) parse a string as a grammar symbol.
+
+    Uses memoization internally, so parsing the same strings many times isn't
+    expensive.
+
+    :param data:
+        The bytestring or Unicode string to parse. Unicode will be encoded
+        to ISO-8859-1 first; encoding failure is treated as a parse failure.
+    :param symbol:
+        The :class:`Symbol` to parse as.
+    :param complain:
+        If not `None`, this function will be called with any complaints
+        produced while parsing (only if parsing was successful), like
+        `Blackboard.complain`.
+    :param fail_notice_id:
+        If not `None`, failure to parse will be reported as this notice ID
+        instead of raising `ParseError`. The complaint will have an ``error``
+        key with the `ParseError` as value.
+    :param annotate_classes:
+        If not `None`, these classes will be annotated in the input `data`.
+
+    Any `extra_context` will be passed to `complain` with every complaint.
+
+    :return:
+        If `annotate_classes` is `None`, then the result of parsing
+        (`Unavailable` if parse failed). Otherwise, a pair: the same result +
+        the annotated input string as a list of bytestrings and instances
+        of `annotate_classes`.
+
+    :raises:
+        If `fail_notice_id` is `None`, raises :exc:`ParseError` on parse
+        failure, or :exc:`UnicodeError` if `data` cannot be encoded to bytes.
+
+    """
+    annotate_classes = tuple(annotate_classes or ())        # for `isinstance`
+
+    if not isinstance(data, bytes):
+        try:
+            data = data.encode('iso-8859-1')
+        except UnicodeError as e:
+            if fail_notice_id is None:      # pragma: no cover
+                raise
+            complain(fail_notice_id, error=e, **extra_context)
+            r = Unavailable
+            return (r, None) if annotate_classes else r
+
+    # Check if we have already memoized this.
+    key = (data, symbol, annotate_classes)
+    parse_result = _memo.pop(key, None)
+    if parse_result is not None:
+        _memo[key] = parse_result       # Reinsertion maintains LRU order.
+    else:
+        try:
+            parse_result = _inner_parse(data, symbol.as_nonterminal(),
+                                        annotate_classes)
+        except ParseError as e:
+            if fail_notice_id is None:
+                raise
+            complaint = (fail_notice_id, {'error': e})
+            parse_result = (Unavailable, [complaint], [])
+        else:
+            _memo[key] = parse_result
+            while len(_memo) > MEMO_LIMIT:
+                _memo.popitem()
+
+    (r, complaints, annotations) = parse_result
+    if complain is not None:
+        for (notice_id, context) in complaints:
+            context = dict(extra_context, **context)
+            complain(notice_id, **context)
+    if annotate_classes:
+        return (r, _splice_annotations(data, annotations))
+    else:
+        return r
+
+
+_memo = OrderedDict()
+
+# This value was obtained by running on a large tcpflow input and increasing
+# until it stopped getting faster.
+MEMO_LIMIT = 200
+
+
+def _splice_annotations(data, annotations):
+    r = []
+    i = 0
+    for (start, end, obj) in annotations:
+        if start >= i:
+            r.append(data[i:start])
+            r.append(obj)
+            i = end
+    r.append(data[i:])
+    return [chunk for chunk in r if chunk != b'']
+
+
+class ParseError(Exception):
+
+    def __init__(self, name, position, expected, found=None):
+        """
+        :param name: Name of the input stream (file) with the error, or `None`.
+        :param position: Byte offset at which the error was encountered.
+        :param expected:
+            List of ``(description, symbols)``, where `description` is
+            a free-form description of what could satisfy parse at that
+            `position` in the input, and `symbols` is an iterable
+            of :class:`Symbol` as part of which this `description` would be
+            expected. `description` may be `None` if an entire symbol was
+            expected at that `position` and no further detail is available.
+        :param found:
+            A bytestring of length 1 or 0 (for EOF) that was found
+            at `position`, or `None` if irrelevant.
+
+        """
+        super(ParseError, self).__init__(
+            u'unexpected input at byte position %r' % position)
+        self.name = name
+        self.position = position
+        self.expected = expected
+        self.found = found
 
 
 ###############################################################################
@@ -64,8 +191,6 @@ class Symbol(object):
         self.citation = citation
         self.is_pivot = is_pivot
         self._is_ephemeral = is_ephemeral
-        self._regex = None
-        self._compiled_regex = None
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__,
@@ -94,19 +219,6 @@ class Symbol(object):
             return (self.name is None)
         else:
             return self._is_ephemeral
-
-    def as_compiled_regex(self):
-        if self._compiled_regex is None:
-            self._compiled_regex = re.compile(self.as_regex())
-        return self._compiled_regex
-
-    def as_regex(self):
-        if self._regex is None:
-            self._regex = self.build_regex()
-        return self._regex
-
-    def build_regex(self):
-        raise NotImplementedError
 
     def group(self):
         raise NotImplementedError
@@ -179,9 +291,6 @@ class Terminal(Symbol):
     def group(self):
         return self
 
-    def build_regex(self):
-        return b'[' + b''.join(re.escape(char) for char in self.chars()) + b']'
-
     def as_rule(self):
         return Rule((self,))
 
@@ -225,10 +334,6 @@ class Nonterminal(Symbol):
     @property
     def rules(self):
         raise NotImplementedError
-
-    def build_regex(self):
-        return b'(' + b'|'.join(b''.join(sym.as_regex() for sym in rule.symbols)
-                                for rule in self.rules) + b')'
 
     def as_rule(self):
         if self.is_ephemeral and len(self.rules) == 1:
@@ -309,12 +414,6 @@ class RepeatedNonterminal(Nonterminal):
                 r = r | _begin_list << self.inner
             self._rules = r.rules
         return self._rules
-
-    def build_regex(self):
-        if self.max_count is None:
-            return self.inner.as_regex() + b'*'
-        else:       # pragma: no cover
-            return self.inner.as_regex() + (b'{0,%d}' % self.max_count)
 
 
 class Rule(object):
@@ -577,177 +676,6 @@ def can_complain(func):
 
 
 ###############################################################################
-# The input stream and parse error abstractions.
-
-class Stream(object):
-
-    # pylint: disable=attribute-defined-outside-init
-
-    """Wraps a string of bytes that are the input to parsers.
-
-    This class is directly used in :mod:`httpolice.framing1`,
-    and it encapsulates some state that is passed around there,
-    including complaints that are later "dumped" into the parsed message.
-    In most other cases, you probably want :func:`simple_parse` instead.
-    """
-
-    _cache = OrderedDict()
-
-    # Obtained by running under ``/usr/bin/time -v`` on a large tcpflow input
-    # and increasing until the results stopped improving.
-    _cache_size = 200
-
-    def __init__(self, data, name=None):
-        self.data = data
-        self.name = name
-        self._sane = True
-        self._set_state((0, [], []))
-        self._stack = []
-
-    def _get_state(self):
-        return (self.point, self.complaints[:], self.annotations[:])
-
-    def _set_state(self, state):
-        (self.point, self.complaints, self.annotations) = state
-
-    def _is_empty_state(self):
-        return self.point == 0 and not self.complaints and not self.annotations
-
-    def __enter__(self):
-        self._stack.append(self._get_state())
-        return self
-
-    def __exit__(self, exc_type, _1, _2):
-        state = self._stack.pop()
-        if exc_type is not None:
-            self._set_state(state)
-        return False
-
-    def peek(self, n):
-        return self.data[self.point:(self.point + n)]
-
-    def __getitem__(self, i):
-        if 0 <= i < len(self.data) - self.point:
-            return self.data[(self.point + i):(self.point + i + 1)]
-        elif i == len(self.data) - self.point:
-            return b''
-        else:   # pragma: no cover
-            raise IndexError(i)
-
-    @property
-    def eof(self):
-        return self.point == len(self.data)
-
-    @property
-    def sane(self):
-        return self._sane and not self.eof
-
-    @sane.setter
-    def sane(self, value):
-        self._sane = value
-
-    def skip(self, n):
-        self.point = min(self.point + n, len(self.data))
-
-    def consume_n_bytes(self, n):
-        r = self.peek(n)
-        if len(r) < n:
-            raise ParseError(self.name, self.point, found=None,
-                             expected=[(u'%d bytes' % n, None)])
-        else:
-            self.point += n
-            return r
-
-    def consume_rest(self):
-        r = self.data[self.point:]
-        self.point = len(self.data)
-        return r
-
-    def consume_regex(self, target, name=None):
-        if isinstance(target, Symbol):
-            regex = target.as_compiled_regex()
-        else:
-            regex = re.compile(target)
-        match = regex.match(self.data, self.point)
-        if match is None:
-            raise ParseError(
-                self.name, self.point, found=None,
-                expected=[(target if name is None else name, None)])
-        else:
-            r = match.group(0)
-            self.skip(len(r))
-            return r.decode('iso-8859-1')
-
-    def maybe_consume_regex(self, target):
-        try:
-            return self.consume_regex(target)
-        except ParseError:
-            return None
-
-    def parse(self, target, to_eof=False, annotate_classes=None):
-        annotate_classes = tuple(annotate_classes or ())
-        key = None
-        if self._is_empty_state() and to_eof:
-            # Memoization is really only useful
-            # when we're parsing something small in its entirety,
-            # like a header value.
-            # The above ``if`` means that the cache won't get in our way
-            # when we're parsing something big in chunks,
-            # like HTTP/1.x framing.
-            key = (self.data, target, annotate_classes)
-            item = self._cache.pop(key, None)
-            if item is not None:
-                (r, state) = item
-                self._set_state(state)
-                self._cache[key] = item
-                return r
-
-        r = parse(self, target.as_nonterminal(), to_eof, annotate_classes)
-        if key is not None:
-            self._cache[key] = (r, self._get_state())
-            while len(self._cache) > self._cache_size:
-                self._cache.popitem()
-        return r
-
-    def complain(self, notice_id, **context):
-        self.complaints.append((notice_id, context))
-
-    def add_complaints(self, complaints):
-        self.complaints.extend(complaints)
-
-    def dump_complaints(self, complain_func, **extra_context):
-        for (notice_id, context) in self.complaints:
-            context = dict(extra_context, **context)
-            complain_func(notice_id, **context)
-        self.complaints = []
-
-    def add_annotations(self, annotations):
-        self.annotations.extend(annotations)
-
-    def collect_annotations(self):
-        r = []
-        i = 0
-        for (start, end, obj) in self.annotations:
-            if start >= i:
-                r.append(self.data[i:start])
-                r.append(obj)
-                i = end
-        r.append(self.data[i:])
-        return [chunk for chunk in r if chunk != b'']
-
-
-class ParseError(Exception):
-
-    def __init__(self, name, point, found, expected):
-        super(ParseError, self).__init__(
-            u'unexpected input at byte position %r' % point)
-        self.name = name
-        self.point = point
-        self.found = found
-        self.expected = expected
-
-
-###############################################################################
 # The actual Earley parsing algorithms.
 # These are written in a sort of low-level, non-idiomatic Python
 # to make them less terribly inefficient.
@@ -777,7 +705,8 @@ def _add_item(items, items_idx, items_set, symbol, rule, pos, start):
             (symbol, rule, pos, start))
 
 
-def parse(stream, target_symbol, to_eof=False, annotate_classes=()):
+def _inner_parse(data, target_symbol, annotate_classes):
+    length = len(data)
     (items, items_idx, items_set) = ([], {}, set())
 
     # Seed the initial items inventory with rules for `target_symbol`.
@@ -786,10 +715,8 @@ def parse(stream, target_symbol, to_eof=False, annotate_classes=()):
         _add_item(items, items_idx, items_set, target_symbol, rule, 0, 0)
 
     # Outer loop: over `data`.
-    i = 0                  # Relative position in the stream.
-    last_good_i = None     # `i` of the last complete parse of `target_symbol`.
-    while True:
-        token = stream[i]
+    for i in range(length + 1):
+        token = data[i : i + 1]
 
         # Initialize the items inventory for the next `i`,
         # because we will be adding to it on successful scans.
@@ -808,10 +735,6 @@ def parse(stream, target_symbol, to_eof=False, annotate_classes=()):
             next_symbol = rule.xsymbols[pos]
 
             if next_symbol is None:
-                # This is a completed item.
-                if symbol is target_symbol:
-                    # Remember as a valid parse.
-                    last_good_i = i
                 # Earley completion:
                 # copy items from this rule's start `i` to the current `i`,
                 # advancing their rules by 1 position.
@@ -847,32 +770,26 @@ def parse(stream, target_symbol, to_eof=False, annotate_classes=()):
             if j == len(items):
                 break
 
-        if not token:        # End of stream.
-            break
-        i += 1
-
-    if (last_good_i is not None) and (last_good_i == i or not to_eof):
-        results = _find_results(stream, target_symbol, chart, last_good_i,
+    # pylint: disable=undefined-loop-variable
+    if i == length:             # Successfully parsed up to the end of stream.
+        results = _find_results(data, target_symbol, chart, i,
                                 [], annotate_classes)
         for start_i, _, result, complaints, annotations in results:
             # There may be multiple valid parses in case of ambiguities,
             # but in practice we just want
             # the first parse that stretches to the beginning of the input.
             if start_i == 0:
-                stream.skip(last_good_i)
-                stream.add_complaints(complaints)
-                stream.add_annotations(annotations)
-                return result
+                return (result, complaints, annotations)
 
-    raise _build_parse_error(stream, target_symbol, chart)
+    raise _build_parse_error(data, target_symbol, chart)
 
 
-def _find_results(stream, symbol, chart, end_i,
+def _find_results(data, symbol, chart, end_i,
                   outer_parents, annotate_classes):
     # The trivial base case is to find the parse result of a terminal.
     if isinstance(symbol, Terminal):
         if end_i > 0:
-            token = stream[end_i - 1]
+            token = data[end_i - 1 : end_i]
             if symbol.match(token):
                 token = token.decode('iso-8859-1')
                 yield end_i - 1, None, token, [], []
@@ -976,7 +893,7 @@ def _find_results(stream, symbol, chart, end_i,
                         inner_symbol = rule.symbols[-len(frames) - 1]
                     # Recursively get an iterator
                     # over possible results for this symbol.
-                    rs = _find_results(stream, inner_symbol, chart, i, parents,
+                    rs = _find_results(data, inner_symbol, chart, i, parents,
                                        annotate_classes)
 
                 # Get the next result for this symbol.
@@ -1038,13 +955,13 @@ def _find_results(stream, symbol, chart, end_i,
                                    complaints, annotations))
 
 
-def _build_parse_error(stream, target_symbol, chart):
+def _build_parse_error(data, target_symbol, chart):
     # Find the last `i` that had some Earley items --
     # that is, the last `i` where we could still make sense of the input data.
     i, items = [(i, items)
                 for (i, (items, _, _)) in enumerate(chart)
                 if len(items) > 0][-1]
-    found = stream[i]
+    found = data[i : i + 1]
 
     # What terminal symbols did we expect at that `i`?
     expected = OrderedDict()
@@ -1061,8 +978,8 @@ def _build_parse_error(stream, target_symbol, chart):
             # so if the input data just stopped there, that would work, too,
             expected[u'end of data'] = None
 
-    return ParseError(stream.name, stream.point + i,
-                      found, list(expected.items()))
+    return ParseError(name=None, position=i,
+                      expected=list(expected.items()), found=found)
 
 
 def _find_pivots(chart, symbol, start, stack=None):
@@ -1076,37 +993,3 @@ def _find_pivots(chart, symbol, start, stack=None):
             if (parent, parent_start) not in stack:
                 for p in _find_pivots(chart, parent, parent_start, stack):
                     yield p
-
-
-###############################################################################
-# Miscellaneous helpers.
-
-def simple_parse(data, symbol, complain, fail_notice_id, annotate_classes=None,
-                 **extra_context):
-    """(Try to) parse an entire string as a single grammar symbol.
-
-    This wraps :class:`Stream` in a simpler interface for the common case.
-    """
-    if not isinstance(data, bytes):
-        try:
-            data = data.encode('iso-8859-1')
-        except UnicodeError as e:
-            complain(fail_notice_id, error=e, **extra_context)
-            r = Unavailable
-            return r if annotate_classes is None else (r, None)
-
-    stream = Stream(data)
-
-    try:
-        r = stream.parse(symbol, to_eof=True,
-                         annotate_classes=annotate_classes)
-    except ParseError as e:
-        complain(fail_notice_id, error=e, **extra_context)
-        r = Unavailable
-    else:
-        stream.dump_complaints(complain, **extra_context)
-
-    if annotate_classes is None:
-        return r
-    else:
-        return (r, stream.collect_annotations())

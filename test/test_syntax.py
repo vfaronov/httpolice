@@ -5,7 +5,8 @@ from datetime import datetime
 import pytest
 
 from httpolice.known import cc, media, rel, tc, unit
-from httpolice.parse import (ParseError, Stream, empty, literal, many, named,
+import httpolice.parse
+from httpolice.parse import (ParseError, empty, literal, many, named,
                              recursive, skip, string, subst)
 from httpolice.structure import (ContentRange, ExtValue, LanguageTag,
                                  MultiDict, Parametrized, RangeSpecifier,
@@ -15,7 +16,7 @@ from httpolice.syntax import (rfc3986, rfc5988, rfc6266, rfc7230, rfc7231,
 
 
 def parse(parser, text):
-    return Stream(text).parse(parser, to_eof=True)
+    return httpolice.parse.parse(text, parser)
 
 def no_parse(parser, text):
     with pytest.raises(ParseError):

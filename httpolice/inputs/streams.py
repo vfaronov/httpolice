@@ -12,7 +12,7 @@ import six
 from httpolice.exchange import complaint_box
 from httpolice.framing1 import parse_streams
 from httpolice.inputs.common import InputError, decode_path
-from httpolice.parse import Stream
+from httpolice.stream import Stream
 
 
 def streams_input(paths):
@@ -206,14 +206,29 @@ def _path_pairs_input(path_pairs, sniff_direction=False,
 
 
 def _parse_paths(inbound_path, outbound_path, scheme=u'http'):
-    inbound = outbound = None
-    if inbound_path is not None:
-        with io.open(inbound_path, 'rb') as f:
-            inbound = Stream(f.read(), name=decode_path(inbound_path))
-    if outbound_path is not None:
-        with io.open(outbound_path, 'rb') as f:
-            outbound = Stream(f.read(), name=decode_path(outbound_path))
-    return parse_streams(inbound, outbound, scheme)
+    inbound_file = outbound_file = None
+
+    try:
+        if inbound_path:
+            inbound_file = io.open(inbound_path, 'rb')
+            inbound = Stream(inbound_file, name=decode_path(inbound_path))
+        else:
+            inbound = None
+
+        if outbound_path:
+            outbound_file = io.open(outbound_path, 'rb')
+            outbound = Stream(outbound_file, name=decode_path(outbound_path))
+        else:
+            outbound = None
+
+        for exch in parse_streams(inbound, outbound, scheme):
+            yield exch
+
+    finally:
+        if inbound_file is not None:
+            inbound_file.close()
+        if outbound_file is not None:
+            outbound_file.close()
 
 
 def _rearrange_by_time(sequences):
@@ -270,8 +285,6 @@ def _rearrange_by_time(sequences):
         (time, exchange) = position[i]
         if exchange is None:
             # Start iterating over this sequence.
-            # Currently (with eager parsing) this means that the stream files
-            # for this sequence will be read into memory.
             exchange = next(sequences[i][0])
             new_time = _exchange_time(exchange, time)
             if time is None or new_time > time:
@@ -370,7 +383,9 @@ def parse_combined(path):
         raise InputError('%s: bad combined file: no outbound marker' % path)
     (inbound_data, outbound_data) = parts2
 
-    inbound = Stream(inbound_data, name=decode_path(path) + u' (inbound)')
-    outbound = Stream(outbound_data, name=decode_path(path) + u' (outbound)')
+    inbound = Stream(io.BufferedReader(io.BytesIO(inbound_data)),
+                     name=decode_path(path) + u' (inbound)')
+    outbound = Stream(io.BufferedReader(io.BytesIO(outbound_data)),
+                      name=decode_path(path) + u' (outbound)')
 
     return (inbound, outbound, scheme, preamble)

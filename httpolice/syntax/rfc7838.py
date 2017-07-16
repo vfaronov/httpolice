@@ -10,7 +10,7 @@ import six
 
 from httpolice.citation import RFC
 from httpolice.parse import (can_complain, fill_names, literal, many,
-                             maybe_str, pivot, simple_parse, skip, subst)
+                             maybe_str, parse, pivot, skip, subst)
 from httpolice.structure import AltSvcParam, MultiDict, Parametrized
 from httpolice.syntax.rfc7230 import (OWS, comma_list1, port, quoted_string,
                                       tchar, token, uri_host)
@@ -44,9 +44,8 @@ protocol_id = _check_protocol_id << token                               > pivot
 
 @can_complain
 def _check_alt_authority(complain, value):
-    return simple_parse(value,
-                        maybe_str(uri_host) + ':' + port,
-                        complain, 1257, authority=value)
+    return parse(value, maybe_str(uri_host) + ':' + port, complain, 1257,
+                 authority=value)
 
 alt_authority = _check_alt_authority << quoted_string                   > pivot
 

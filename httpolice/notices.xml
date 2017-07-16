@@ -71,7 +71,7 @@ One non-obvious thing is how references work
 
   <debug id="1007">
     <title>Stop parsing request stream</title>
-    <explain>Due to previous notices, the remaining <var ref="nbytes"/> bytes on the request stream <var ref="stream.name"/> cannot be parsed.</explain>
+    <explain>Due to previous notices, the data beginning at byte <var ref="offset"/> on the request stream <var ref="stream.name"/> will not be parsed.</explain>
   </debug>
 
   <error id="1008">
@@ -86,7 +86,7 @@ One non-obvious thing is how references work
 
   <debug id="1010">
     <title>Stop parsing response stream</title>
-    <explain>Due to previous notices, the remaining <var ref="nbytes"/> bytes on the response stream <var ref="stream.name"/> cannot be parsed.</explain>
+    <explain>Due to previous notices, the data beginning at byte <var ref="offset"/> on the response stream <var ref="stream.name"/> will not be parsed.</explain>
   </debug>
 
   <debug id="1011">

@@ -41,10 +41,10 @@ Run it::
       -- python tools/afl/harness.py -i combined -o html $fuzz_path/input
 
 Almost all paths are considered 'variable' by AFL. I'm not sure why.
-Clearing the parser memo (``Stream._cache``) on every run doesn't help,
-but maybe it's the memoization in grammar symbols. Anyway, this variability
-doesn't seem to be a problem, and setting ``AFL_NO_VAR_CHECK=1`` greatly
-reduces the time spent on calibration.
+Clearing the parser memo on every run doesn't help, but maybe it's
+the memoization in grammar symbols. Anyway, this variability doesn't seem to be
+a problem, and setting ``AFL_NO_VAR_CHECK=1`` greatly reduces the time spent
+on calibration.
 
 Remove the ``-d`` option if you have patience.
 

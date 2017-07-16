@@ -12,9 +12,10 @@ from httpolice.exchange import Exchange
 from httpolice.helpers import pop_pseudo_headers
 from httpolice.inputs.common import InputError, decode_path
 from httpolice.known import h, m, media, st
-from httpolice.parse import ParseError, Stream
+from httpolice.parse import ParseError
 from httpolice.request import Request
 from httpolice.response import Response
+from httpolice.stream import Stream
 from httpolice.structure import (FieldName, StatusCode, Unavailable, http2,
                                  http11)
 
@@ -116,8 +117,8 @@ def _process_request(data, creator, path):
             # Yes, Firefox actually outputs this stuff. Go figure.
             (wtf, actual_text) = text.rsplit(u'\r\n', 1)
             try:
-                stream = Stream((wtf + u'\r\n').encode('iso-8859-1'))
-                more_entries = framing1.parse_header_fields(stream)
+                buf = io.BufferedReader(io.BytesIO(wtf.encode('iso-8859-1')))
+                more_entries = framing1.parse_header_fields(Stream(buf))
             except (UnicodeError, ParseError):      # pragma: no cover
                 pass
             else:

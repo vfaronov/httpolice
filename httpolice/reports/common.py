@@ -61,22 +61,21 @@ def expand_error(error):
 @expand_error.register(ParseError)
 def expand_parse_error(error):
     paras = [[error.name]] if error.name else []
-    paras.append([u'Parse error at offset %d.' % error.point])
+    paras.append([u'Parse error at offset %d.' % error.position])
     if error.found == b'':
         paras.append([u'Found end of data.'])
     elif error.found is not None:
         paras.append([u'Found: %s' % format_chars([error.found])])
 
-    for i, (option, as_part_of) in enumerate(error.expected):
-        if i == 0:
-            paras.append([u'Expected:'])
-            para = [option]
-        else:
-            para = [u'or ', option]
-        if as_part_of:
-            para.append(u' as part of ')
-            for j, parent in enumerate(as_part_of):
-                para.extend([u' or ', parent] if j > 0 else [parent])
+    paras.append([u'Expected:'])
+    for i, (option, symbols) in enumerate(error.expected):
+        para = []
+        if option:
+            para.extend([option] if i == 0 else [u'or ', option])
+            if symbols:
+                para.append(u', as part of ')
+        for j, symbol in enumerate(symbols or []):
+            para.extend([symbol] if j == 0 else [u' or ', symbol])
         paras.append(para)
 
     return paras

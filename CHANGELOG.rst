@@ -7,12 +7,15 @@ Unreleased
 Changed
 -------
 - Notice `1277`_ (obsolete 'X-' prefix) is now reported only once per message.
+- The syntax of `chunk extensions`_ is no longer checked.
 
 Added
 -----
+- HTTPolice can now use much less memory when parsing long TCP streams.
 - Checks for the `Forwarded`_ header (notices `1296`_, `1297`_).
 
 .. _Forwarded: https://tools.ietf.org/html/rfc7239
+.. _chunk extensions: https://tools.ietf.org/html/rfc7230#section-4.1.1
 .. _1296: http://pythonhosted.org/HTTPolice/notices.html#1296
 .. _1297: http://pythonhosted.org/HTTPolice/notices.html#1297
 

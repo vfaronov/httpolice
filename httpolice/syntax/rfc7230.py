@@ -6,11 +6,9 @@ from httpolice.parse import (auto, can_complain, fill_names, group, literal,
                              pivot, recursive, skip, string, string1,
                              string_excluding, string_times, subst)
 from httpolice.structure import (CaseInsensitive, ConnectionOption, FieldName,
-                                 HTTPVersion, Method, MultiDict, Parametrized,
-                                 StatusCode, TransferCoding, UpgradeToken,
-                                 Versioned)
-from httpolice.syntax.common import (ALPHA, CRLF, DIGIT, DQUOTE, HEXDIG, HTAB,
-                                     SP, VCHAR)
+                                 Method, MultiDict, Parametrized,
+                                 TransferCoding, UpgradeToken, Versioned)
+from httpolice.syntax.common import ALPHA, DIGIT, DQUOTE, HTAB, SP, VCHAR
 from httpolice.syntax.rfc3986 import (absolute_URI, authority,
                                       host as uri_host, port, query,
                                       relative_part, segment)
@@ -108,22 +106,9 @@ request_target = (origin_form |
                   authority_form |
                   asterisk_form)                                        > pivot
 
-HTTP_name = octet(0x48) + octet(0x54) + octet(0x54) + octet(0x50)       > auto
-HTTP_version = HTTPVersion << HTTP_name + '/' + DIGIT + '.' + DIGIT     > pivot
-
-status_code = StatusCode << string_times(3, 3, DIGIT)                   > pivot
 reason_phrase = string(HTAB | SP | VCHAR | obs_text)                    > pivot
 
 field_name = FieldName << token                                         > pivot
-field_vchar = VCHAR | obs_text                                          > auto
-
-obs_fold = CRLF + string1(SP | HTAB)                                    > auto
-
-# The original RFC 7230 ``field-content`` is wrong (see RFC Errata ID: 4189).
-# This version seems to capture the intended behavior.
-field_content = (field_vchar +
-                 maybe_str(string(SP | HTAB | field_vchar) +
-                           field_vchar))                                > auto
 
 def transfer_parameter(no_q=False):
     return (
@@ -160,14 +145,6 @@ t_codings = (CaseInsensitive << literal('trailers') |
 TE = comma_list(t_codings)                                              > pivot
 
 Trailer = comma_list1(field_name)                                       > pivot
-
-chunk_size = (lambda s: int(s, 16)) << string1(HEXDIG)                  > pivot
-chunk_ext_name = token                                                  > auto
-chunk_ext_val = token | quoted_string                                   > auto
-
-# As updated by RFC 7230 errata ID: 4667.
-chunk_ext = many(skip(BWS * ';' * BWS) * chunk_ext_name *
-                 maybe(skip(BWS * '=' * BWS) * chunk_ext_val))          > pivot
 
 Host = uri_host + maybe_str(':' + port)                                 > pivot
 
