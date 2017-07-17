@@ -27,6 +27,7 @@ chunk_size = Symbol(u'chunk-size', RFC(7230, section=(4, 1)))
 
 
 HTTP_VERSION = re.compile(u'^HTTP/[0-9]\\.[0-9]$')
+STATUS_CODE = re.compile(u'^[0-9]{3}$')
 
 
 def parse_streams(inbound, outbound, scheme=None):
@@ -172,7 +173,8 @@ def _parse_response_heading(req, stream):
         line = stream.readline()
         pieces = line.split(u' ', 2)
         if len(pieces) != 3 or \
-                not HTTP_VERSION.match(pieces[0]) or not pieces[1].isdigit():
+                not HTTP_VERSION.match(pieces[0]) or \
+                not STATUS_CODE.match(pieces[1]):
             raise stream.error(beginning)
     version_ = HTTPVersion(pieces[0])
     status = StatusCode(pieces[1])
