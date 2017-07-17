@@ -15,6 +15,8 @@ class Stream(object):
     as similarly-named methods of file objects.
     """
 
+    max_line_length = 16 * 1024
+
     def __init__(self, file_, name=None):
         self.file = file_
         self.name = name
@@ -62,10 +64,15 @@ class Stream(object):
 
     def readline(self, decode=True):
         pos = self.tell()
-        r = self.file.readline()
+        r = self.file.readline(self.max_line_length)
         if self.peek() == b'':
             self.eof = True
         if not r.endswith(b'\n'):
+            if len(r) >= self.max_line_length:
+                raise self.error(
+                    pos,
+                    expected=u'no more than %d bytes before end of line' %
+                    self.max_line_length)
             raise self.error(pos, expected=u'data terminated by end of line')
 
         if len(r) >= 2 and r[-2:-1] == b'\r':

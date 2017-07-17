@@ -30,6 +30,9 @@ HTTP_VERSION = re.compile(u'^HTTP/[0-9]\\.[0-9]$')
 STATUS_CODE = re.compile(u'^[0-9]{3}$')
 
 
+MAX_BODY_SIZE = 1024 * 1024 * 1024
+
+
 def parse_streams(inbound, outbound, scheme=None):
     """Parse one or two HTTP/1.x streams.
 
@@ -118,6 +121,25 @@ def _parse_request_heading(stream, scheme=None):
     return req
 
 
+def _process_content_length(msg, stream):
+    n = msg.headers.content_length.value
+    if n is Unavailable:
+        msg.body = Unavailable
+        stream.sane = False
+    else:
+        if n > MAX_BODY_SIZE:
+            msg.body = Unavailable
+            stream.sane = False
+            msg.complain(1298, place=msg.headers.content_length, size=n,
+                         max_size=MAX_BODY_SIZE)
+        else:
+            try:
+                msg.body = stream.read(n)
+            except ParseError as exc:
+                msg.body = Unavailable
+                msg.complain(1004, error=exc)
+
+
 def _parse_request_body(req, stream):
     # RFC 7230 section 3.3.3.
 
@@ -133,16 +155,7 @@ def _parse_request_body(req, stream):
             _decode_transfer_coding(req, codings.pop())
 
     elif req.headers.content_length:
-        n = req.headers.content_length.value
-        if n is Unavailable:
-            req.body = Unavailable
-            stream.sane = False
-        else:
-            try:
-                req.body = stream.read(n)
-            except ParseError as exc:
-                req.body = Unavailable
-                req.complain(1004, error=exc)
+        _process_content_length(req, stream)
 
     else:
         req.body = b''
@@ -220,16 +233,7 @@ def _parse_response_body(resp, stream):
             _decode_transfer_coding(resp, codings.pop())
 
     elif resp.headers.content_length.is_present:
-        n = resp.headers.content_length.value
-        if n is Unavailable:
-            resp.body = Unavailable
-            stream.sane = False
-        else:
-            try:
-                resp.body = stream.read(n)
-            except ParseError as exc:
-                resp.body = Unavailable
-                resp.complain(1004, error=exc)
+        _process_content_length(resp, stream)
 
     else:
         resp.body = stream.read()
@@ -283,7 +287,17 @@ def _decode_transfer_coding(msg, coding):
         msg.body = Unavailable
 
 
-def _parse_chunk(stream):
+class BodyTooLongError(Exception):
+
+    def __init__(self, size, max_size):
+        super(BodyTooLongError, self).__init__(u'body longer than %d bytes' %
+                                               max_size)
+        self.size = size
+        self.max_size = max_size
+
+
+def _parse_chunk(stream, data):
+    current_size = sum(len(c) for c in data)
     with stream.parsing(chunk):
         pos = stream.tell()
         (size_s, _, _) = stream.readline().partition(u';')
@@ -293,28 +307,33 @@ def _parse_chunk(stream):
             except ValueError:
                 raise stream.error(pos)
         if size == 0:
-            return b''
+            return False
+        elif size + current_size > MAX_BODY_SIZE:
+            stream.sane = False
+            raise BodyTooLongError(size + current_size, MAX_BODY_SIZE)
         else:
-            data = stream.read(size)
+            data.append(stream.read(size))
             stream.readlineend()
-            return data
+            return True
 
 
 def _parse_chunked(msg, stream):
     data = []
+    place = u'chunked framing'
     try:
-        chunk_data = _parse_chunk(stream)
-        while chunk_data:
-            data.append(chunk_data)
-            chunk_data = _parse_chunk(stream)
+        while _parse_chunk(stream, data):
+            pass
         trailer = parse_header_fields(stream)
         with stream.parsing(chunked_body):
             stream.readlineend()
     except ParseError as e:
         msg.complain(1005, error=e)
         msg.body = Unavailable
+    except BodyTooLongError as e:
+        msg.complain(1298, place=place, size=e.size, max_size=e.max_size)
+        msg.body = Unavailable
     else:
-        stream.dump_complaints(msg.complain, place=u'chunked framing')
+        stream.dump_complaints(msg.complain, place=place)
         msg.body = b''.join(data)
         msg.trailer_entries = trailer
         if trailer:

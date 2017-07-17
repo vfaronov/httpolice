@@ -1,0 +1,23 @@
+1298 1298 1007 1010
+
+======== BEGIN INBOUND STREAM ========
+PUT /articles/123/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: text/plain
+Content-Length: 8429245833248012
+
+Hello world!
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 201 Created
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Transfer-Encoding: chunked
+
+3e
+A new article has been created with the following content:
+
+
+1df25abb9d7d0c
+Hello world!

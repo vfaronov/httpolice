@@ -359,3 +359,16 @@ def test_rearrange():
     assert exchanges[8].request is None
     assert [complaint.id for complaint in exchanges[8].complaints] == [1279]
     assert exchanges[9].request.target == u'/08'
+
+
+def test_super_long_headers(tmpdir):
+    req_path = tmpdir.join('request.dat')
+    with req_path.open('wb') as req_file:
+        req_file.write(b'GET / HTTP/1.1\r\n'
+                       b'Host: example.com\r\n'
+                       b'User-Agent: test\r\n'
+                       b'Accept-Language: ' + (b'en, ' * 4096) + b'\r\n'
+                       b'\r\n')
+    exchanges = load(req_stream_input, [str(req_path)])
+    assert exchanges[0].request is None
+    assert [complaint.id for complaint in exchanges[0].complaints] == [1006]

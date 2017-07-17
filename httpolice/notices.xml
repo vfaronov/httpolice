@@ -2180,4 +2180,9 @@ One non-obvious thing is how references work
     <explain>If this was intended to be <var ref="n_elements"/> parameters for a single proxy hop, then the pairs must be separated with semicolons, not commas.</explain>
   </comment>
 
+  <debug id="1298">
+    <title>Body is too long to be checked</title>
+    <explain>This message’s <var ref="place"/> indicates that the body is at least <var ref="size"/> bytes long. HTTPolice does not attempt to process bodies longer than <var ref="max_size"/> bytes. The rest of the stream will not be processed either.</explain>
+  </debug>
+
 </notices>
