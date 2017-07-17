@@ -1,8 +1,10 @@
 # -*- coding: utf-8; -*-
 
 from datetime import datetime
+import io
 import os
 
+from httpolice import check_exchange, text_report
 from httpolice.exchange import Exchange
 from httpolice.inputs.streams import combined_input
 from httpolice.known import altsvc, auth, cache, h, hsts, m, prefer
@@ -100,18 +102,18 @@ def test_cache_control():
     assert headers.cache_control.value == [
         Parametrized(cache.max_age, 3600),
         Parametrized(cache.max_stale, 60),
-        Unavailable,
+        Unavailable(b'"foo bar"'),
         Parametrized(u'qux', u'xyzzy 123'),
         Parametrized(cache.no_transform, None),
         Parametrized(u'abcde', None),
-        Parametrized(cache.min_fresh, Unavailable),
-        Parametrized(cache.no_store, None),
+        Parametrized(cache.min_fresh, Unavailable(u'')),
+        Parametrized(cache.no_store, Unavailable(u'yes')),
     ]
 
     assert headers.pragma.value == [u'no-cache',
                                     (u'foo', None),
                                     (u'bar', u'baz'), (u'qux', u'xyzzy'),
-                                    Unavailable]
+                                    Unavailable(b'no-cache=krekfewhrfk')]
 
     assert cache.max_age in headers.cache_control
     assert headers.cache_control.max_age == 3600
@@ -129,10 +131,10 @@ def test_cache_control():
     assert headers.cache_control.no_cache is None
 
     assert cache.min_fresh in headers.cache_control
-    assert headers.cache_control.min_fresh is Unavailable
+    assert headers.cache_control.min_fresh == Unavailable(u'')
 
     assert cache.no_store in headers.cache_control
-    assert headers.cache_control.no_store is True
+    assert headers.cache_control.no_store
 
     assert cache.only_if_cached not in headers.cache_control
 
@@ -144,7 +146,7 @@ def test_warning():
         WarningValue(123, u'-', u'something', None),
         WarningValue(234, u'[::0]:8080', u'something else',
                      datetime(2016, 1, 28, 8, 22, 4)),
-        Unavailable,
+        Unavailable(b'345 - forgot to quote this one'),
         WarningValue(456, u'baz', u'qux', None),
         WarningValue(567, u'-', u'xyzzy', None),
     ]
@@ -161,7 +163,7 @@ def test_www_authenticate():
         Parametrized(u'Foo', MultiDict()),
         Parametrized(u'Bar', u'jgfCGSU8u=='),
         Parametrized(u'Baz', MultiDict()),
-        Unavailable,
+        Unavailable(b'Wrong=bad, Better'),
         Parametrized(u'Scheme1',
                      MultiDict([(u'foo', u'bar'), (u'baz', u'qux')])),
         Parametrized(u'Scheme2', MultiDict()),
@@ -177,12 +179,12 @@ def test_hsts():
     sts = exch1.responses[0].headers.strict_transport_security
     assert sts.value == [
         Parametrized(hsts.max_age, 15768000),
-        Parametrized(hsts.includesubdomains, None),
-        Parametrized(hsts.max_age, Unavailable),
+        Parametrized(hsts.includesubdomains, Unavailable(u'xyzzy')),
+        Parametrized(hsts.max_age, Unavailable(u'')),
         Parametrized(u'fooBar', None),
     ]
     assert sts.max_age == 15768000
-    assert sts.includesubdomains == True
+    assert sts.includesubdomains
 
 
 def test_alt_svc():
@@ -209,7 +211,7 @@ def test_prefer():
                 Parametrized(u'param2', None),
             ]
         ),
-        Unavailable,
+        Unavailable(b'BWS-is-not-parsed = because-see-errata'),
         Parametrized(Parametrized(prefer.wait, 600), []),
         Parametrized(
             Parametrized(u'my-pref', None),
@@ -220,12 +222,22 @@ def test_prefer():
         ),
         Parametrized(Parametrized(prefer.respond_async, None), []),
         Parametrized(Parametrized(prefer.wait, 0), []),
-        Parametrized(Parametrized(prefer.return_, Unavailable), []),
+        Parametrized(Parametrized(prefer.return_,
+                                  Unavailable(b'something-else')),
+                     []),
     ]
     assert exch1.request.headers.prefer.wait == 600
     assert exch1.request.headers.prefer.respond_async
-    assert exch1.request.headers.prefer.return_ is Unavailable
+    assert isinstance(exch1.request.headers.prefer.return_, Unavailable)
     assert exch1.request.headers.prefer[u'quux'] is None
+    assert isinstance(
+        exch1.responses[0].headers.preference_applied.respond_async,
+        Unavailable)
+    check_exchange(exch1)
+    buf = io.BytesIO()
+    text_report([exch1], buf)
+    assert b'Preference-Applied: respond-async=true was not requested' \
+        in buf.getvalue()           # not "respond-async=Unavailable"
 
 
 def test_decode_brotli():

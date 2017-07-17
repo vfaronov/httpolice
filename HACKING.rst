@@ -64,14 +64,13 @@ otherwise it's easy to introduce bugs.
 
 ``None`` and ``Unavailable``
 ----------------------------
-Many things in the domain model can have the special values
-``None`` and/or ``httpolice.structure.Unavailable``
-in addition to the normal range of their types.
-Usually:
+Many things in the domain model can be ``None`` or instances
+of ``httpolice.structure.Unavailable`` in addition to the normal range
+of their types. Typically:
 
 - ``None`` means "we have no information about this thing";
 - ``Unavailable`` means "we know that this thing is present
-  (not missing), but we don't know its value".
+  (not missing), but we don't know its exact value in this context".
 
 For example:
 
@@ -80,7 +79,7 @@ For example:
   - a non-empty bytestring;
   - an empty bytestring, meaning that the body was absent or empty
     (RFC 7230 distinguishes between absent and empty, but we don't);
-  - ``Unavailable``, meaning that the body was present but unknown
+  - ``Unavailable()``, meaning that the body was present but unknown
     (for instance, HAR files never contain the raw payload body,
     only the ``Message.decoded_body``);
   - ``None``, meaning that we have no idea if there was or wasn't a body.

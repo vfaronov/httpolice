@@ -347,8 +347,8 @@ def test_http_date():
         datetime(1994, 11, 6, 8, 49, 37)
     assert parse(p, b'Sun Nov 16 08:49:37 1994') == \
         datetime(1994, 11, 16, 8, 49, 37)
-    assert parse(p, b'Sun Nov 36 08:49:37 1994') is Unavailable
-    assert parse(p, b'Sun Nov 16 28:49:37 1994') is Unavailable
+    assert isinstance(parse(p, b'Sun Nov 36 08:49:37 1994'), Unavailable)
+    assert isinstance(parse(p, b'Sun Nov 16 28:49:37 1994'), Unavailable)
     no_parse(p, b'Foo, 13 Jan 2016 24:09:06 GMT')
 
 

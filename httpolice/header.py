@@ -145,7 +145,7 @@ class HeaderView(object):
                     entry.value, syntax,
                     self.message.complain, 1000, place=entry,
                     annotate_classes=known.classes)
-                if parsed is not Unavailable:
+                if not isinstance(parsed, Unavailable):
                     parsed = self._process_parsed(entry, parsed)
                     self.message.annotations[(from_trailer, i)] = annotations
             values.append(parsed)
@@ -296,8 +296,8 @@ class MultiHeaderView(HeaderView):
         entries, values = self._pre_parse()
         self._value = []
         for sub_values in values:
-            if sub_values is Unavailable:
-                self._value.append(Unavailable)
+            if isinstance(sub_values, Unavailable):
+                self._value.append(sub_values)
             else:
                 self._value.extend(sub_values)
         self._value_breakdown = values
@@ -323,11 +323,11 @@ class DirectivesView(HeaderView):           # pylint: disable=abstract-method
         if argument is None:
             if self.knowledge.argument_required(directive):
                 self.message.complain(1156, entry=entry, directive=directive)
-                argument = Unavailable
+                argument = Unavailable(u'')
         else:
             if self.knowledge.no_argument(directive):
                 self.message.complain(1157, entry=entry, directive=directive)
-                argument = None
+                argument = Unavailable(argument)
             elif syntax is not None:
                 argument = parse(argument, syntax,
                                  self.message.complain, 1158, place=entry,

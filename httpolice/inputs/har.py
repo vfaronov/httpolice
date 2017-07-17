@@ -101,7 +101,7 @@ def _process_request(data, creator, path):
         # A message body was present, but we cannot recover it,
         # because message body is the body *with* ``Content-Encoding``,
         # and HAR does not include that.
-        body = Unavailable
+        body = Unavailable()
     else:
         # Unknown. Maybe there was a body, maybe there wasn't.
         body = None
@@ -173,7 +173,7 @@ def _process_response(data, req, creator, path):
             status == st.not_modified:
         body = b''
     elif data['bodySize'] > 0 or data['content']['size'] > 0:
-        body = Unavailable
+        body = Unavailable()
     else:
         body = None
 

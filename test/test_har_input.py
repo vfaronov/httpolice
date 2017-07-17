@@ -19,15 +19,15 @@ def test_http2bin_chrome():
     assert exchanges[0].request.version is None
     assert u'http2bin_chrome.har' in exchanges[0].responses[0].remark
     assert exchanges[0].responses[0].version is None
-    assert exchanges[0].responses[0].body is Unavailable
+    assert isinstance(exchanges[0].responses[0].body, Unavailable)
 
     assert exchanges[1].request.target == u'https://http2bin.org/encoding/utf8'
     assert not exchanges[1].responses[0].reason
 
     assert exchanges[4].responses[0].body == b''
 
-    assert exchanges[10].request.body is Unavailable
-    assert exchanges[10].request.decoded_body is Unavailable
+    assert isinstance(exchanges[10].request.body, Unavailable)
+    assert isinstance(exchanges[10].request.decoded_body, Unavailable)
     assert exchanges[10].request.unicode_body == (u'custname=qwedqwed&'
                                                   u'custtel=dqwedwe&'
                                                   u'custemail=&'
@@ -41,8 +41,8 @@ def test_http2bin_firefox():
 
     assert exchanges[0].request.version == http2
     assert exchanges[0].request.headers.connection.is_absent
-    assert exchanges[0].responses[0].body is Unavailable
-    assert exchanges[0].responses[0].decoded_body is Unavailable
+    assert isinstance(exchanges[0].responses[0].body, Unavailable)
+    assert isinstance(exchanges[0].responses[0].decoded_body, Unavailable)
     assert exchanges[0].responses[0].unicode_body[:5] == u'{\n  "'
     assert exchanges[0].responses[0].json_data['url'] == \
         u'https://http2bin.org/get'
@@ -51,11 +51,11 @@ def test_http2bin_firefox():
     assert exchanges[5].responses[0].decoded_body == b''
     assert exchanges[5].responses[0].unicode_body == u''
 
-    assert exchanges[7].responses[0].body is Unavailable
+    assert isinstance(exchanges[7].responses[0].body, Unavailable)
     assert len(exchanges[7].responses[0].decoded_body) == 1024
 
-    assert exchanges[10].request.body is Unavailable
-    assert exchanges[10].request.decoded_body is Unavailable
+    assert isinstance(exchanges[10].request.body, Unavailable)
+    assert isinstance(exchanges[10].request.decoded_body, Unavailable)
     assert exchanges[10].request.unicode_body == (u'custname=ferferf&'
                                                   u'custtel=rfwrefwerf&'
                                                   u'custemail=&'
@@ -83,11 +83,11 @@ def test_xhr_chrome():
     assert exchanges[0].request.target == u'/put'
     assert exchanges[0].request.version == http11
     assert exchanges[0].responses[0].version == http11
-    assert exchanges[0].request.body is Unavailable
-    assert exchanges[0].request.decoded_body is Unavailable
+    assert isinstance(exchanges[0].request.body, Unavailable)
+    assert isinstance(exchanges[0].request.decoded_body, Unavailable)
     assert exchanges[0].request.unicode_body == u'wrfqerfqerferg45rfrqerf'
-    assert exchanges[0].responses[0].body is Unavailable
-    assert exchanges[0].responses[0].decoded_body is Unavailable
+    assert isinstance(exchanges[0].responses[0].body, Unavailable)
+    assert isinstance(exchanges[0].responses[0].decoded_body, Unavailable)
     assert exchanges[0].responses[0].unicode_body[:5] == u'{\n  "'
     assert exchanges[0].responses[0].json_data['data'] == \
         u'wrfqerfqerferg45rfrqerf'
@@ -106,7 +106,7 @@ def test_httpbin_edge():
     assert exchanges[0].request.target == u'/get'
     assert exchanges[0].request.version is None
     assert exchanges[0].responses[0].version is None
-    assert exchanges[0].responses[0].body is Unavailable
+    assert isinstance(exchanges[0].responses[0].body, Unavailable)
     assert exchanges[0].responses[0].json_data['url'] == \
         u'http://httpbin.org/get'
 
@@ -133,8 +133,8 @@ def test_firefox_multiple_set_cookie():
 
 def test_firefox_gif():
     exchanges = load_from_file('firefox_gif.har')
-    assert exchanges[0].responses[0].body is Unavailable
-    assert exchanges[0].responses[0].decoded_body is Unavailable
+    assert isinstance(exchanges[0].responses[0].body, Unavailable)
+    assert isinstance(exchanges[0].responses[0].decoded_body, Unavailable)
 
 
 def test_fiddler_connect():

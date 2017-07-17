@@ -90,7 +90,7 @@ def derived_property(getter):
     If we have the `body`, we can derive the `decoded_body` and memoize it.
 
     On the other hand, in HAR files, we never know the raw `body`
-    (so it is always set to `Unavailable`),
+    (so it is always set to ``Unavailable()``),
     but sometimes we do know the `decoded_body`,
     so the HAR input module may assign directly to `decoded_body`.
     """

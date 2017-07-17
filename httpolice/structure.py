@@ -13,30 +13,50 @@ from httpolice.util.text import force_bytes, force_unicode
 # Commonly useful structures
 
 
-class _Unavailable(object):
+@six.python_2_unicode_compatible
+class Unavailable(object):
+
+    """A wrapper for a value that has no useful representation in context.
+
+    This is used to represent failures to decode or parse a string. In this
+    case, the underlying string (byte- or Unicode) is to be passed to
+    the constructor.
+
+    This is also used to represent values that are known to be present but
+    whose value could not be obtained, and there is no underlying string that
+    is available. In this case, nothing should be passed to the constructor.
 
     """
-    A placeholder for something that we know is present (**not** missing),
-    but we don't know its exact value.
-    Used as the singleton :data:`Unavailable`, like `None`.
-    """
 
-    __slots__ = ()
+    __slots__ = ['inner']
+
+    def __init__(self, inner=None):
+        self.inner = inner
 
     def __repr__(self):
-        return 'Unavailable'
+        return 'Unavailable(%r)' % self.inner
+
+    def __str__(self):                                  # pragma: no cover
+        if self.inner is None:
+            return u'(?)'
+        else:
+            return force_unicode(self.inner)
 
     def __eq__(self, other):
-        return False
+        # It's questionable whether an `Unavailable` should ever compare equal
+        # to another `Unavailable`, seeing as they might be failures in
+        # different contexts (e.g. trying to parse the same string as two
+        # different grammar symbols). But in practice, this behavior is useful.
+        # See ``test/combined_data/1286_2`` for an example.
+        return isinstance(other, Unavailable) and \
+            self.inner is not None and self.inner == other.inner
 
-    def __hash__(self):     # pragma: no cover
-        return 1
-
-Unavailable = _Unavailable()
+    def __hash__(self):
+        return hash(self.inner)
 
 
 def okay(x):
-    return (x is not None) and (x is not Unavailable)
+    return (x is not None) and not isinstance(x, Unavailable)
 
 
 class Parametrized(namedtuple('Parametrized', ('item', 'param'))):

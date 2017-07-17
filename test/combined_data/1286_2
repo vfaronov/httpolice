@@ -1,0 +1,21 @@
+1158 1158
+
+# Even though ``return=intermediate`` is invalid from our point of view
+# (because we parse it according to the ABNF given in RFC 7240 Section 4.2),
+# it is correctly echoed by the server and shouldn't trigger no. 1286.
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Prefer: return=intermediate
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+Preference-Applied: return=intermediate
+Vary: prefer
+
+Hello world!

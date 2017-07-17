@@ -9,7 +9,7 @@ from httpolice.parse import (auto, can_complain, fill_names, literal, many,
                              string1, string_times, subst)
 from httpolice.structure import (CaseInsensitive, Charset, ContentCoding,
                                  MediaType, MultiDict, Parametrized,
-                                 ProductName, Unavailable, Versioned)
+                                 ProductName, Unavailable, Versioned, okay)
 from httpolice.syntax.common import DIGIT, SP
 from httpolice.syntax.rfc3986 import URI_reference, absolute_URI
 from httpolice.syntax.rfc4647 import language_range
@@ -19,10 +19,12 @@ from httpolice.syntax.rfc7230 import (OWS, RWS, comma_list, comma_list1,
                                       quoted_string, token, token__excluding)
 
 
-# The standard library's `calendar.day_name` is locale-dependent,
+# The standard library's day and month names are locale-dependent,
 # which brings in Unicode problems.
 _DAY_NAMES = [u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday',
               u'Saturady', u'Sunday']
+_MONTH_NAMES = [u'Jan', u'Feb', u'Mar', u'Apr', u'May', u'Jun', u'Jul', u'Aug',
+                u'Sep', u'Oct', u'Nov', u'Dec']
 
 
 _BAD_MEDIA_TYPES = {
@@ -72,8 +74,9 @@ def _to_date(complain, d, m, y):
     try:
         return date(y, m, d)
     except ValueError:
-        complain(1222, date=u'%d-%02d-%02d' % (y, m, d))
-        return Unavailable
+        date_s = u'%d %s %d' % (d, _MONTH_NAMES[m - 1], y)
+        complain(1222, date=date_s)
+        return Unavailable(date_s)
 
 day = int << string_times(2, 2, DIGIT)                                  > pivot
 month = (subst(1) << octet(0x4A) * octet(0x61) * octet(0x6E)  |
@@ -100,8 +103,9 @@ def _to_time(complain, h, m, s):
         # I can ignore this for now.
         return time(h, m, s)
     except ValueError:
-        complain(1223, time=u'%02d:%02d:%02d' % (h, m, s))
-        return Unavailable
+        time_s = u'%02d:%02d:%02d' % (h, m, s)
+        complain(1223, time=time_s)
+        return Unavailable(time_s)
 
 hour = int << string_times(2, 2, DIGIT)                                 > pivot
 minute = int << string_times(2, 2, DIGIT)                               > pivot
@@ -112,8 +116,8 @@ time_of_day = _to_time << (hour * skip(':') *
                            second)                                      > pivot
 
 def _to_datetime(dow, d, t):
-    if d is Unavailable or t is Unavailable:
-        return (dow, Unavailable)
+    if not okay(d) or not okay(t):
+        return (dow, Unavailable(u'%s %s' % (d, t)))
     else:
         return (dow, datetime(d.year, d.month, d.day,
                               t.hour, t.minute, t.second))
@@ -174,7 +178,7 @@ obs_date = (_obsolete_date << rfc850_date |
 @can_complain
 def _check_day_of_week(complain, r):
     (claimed_dow, r) = r
-    if r is not Unavailable and r.weekday() != claimed_dow:
+    if okay(r) and r.weekday() != claimed_dow:
         # Don't use `strftime` here because it raises `ValueError`
         # on years < 1900 in Python 2.7. (Of course, year < 1900
         # in ``Date`` is pathological, but that's no excuse to crash).

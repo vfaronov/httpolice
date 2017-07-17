@@ -123,12 +123,12 @@ def _parse_request_heading(stream, scheme=None):
 
 def _process_content_length(msg, stream):
     n = msg.headers.content_length.value
-    if n is Unavailable:
-        msg.body = Unavailable
+    if not okay(n):
+        msg.body = Unavailable()
         stream.sane = False
     else:
         if n > MAX_BODY_SIZE:
-            msg.body = Unavailable
+            msg.body = Unavailable()
             stream.sane = False
             msg.complain(1298, place=msg.headers.content_length, size=n,
                          max_size=MAX_BODY_SIZE)
@@ -136,7 +136,7 @@ def _process_content_length(msg, stream):
             try:
                 msg.body = stream.read(n)
             except ParseError as exc:
-                msg.body = Unavailable
+                msg.body = Unavailable()
                 msg.complain(1004, error=exc)
 
 
@@ -148,10 +148,10 @@ def _parse_request_body(req, stream):
         if codings.pop() == tc.chunked:
             _parse_chunked(req, stream)
         else:
-            req.body = Unavailable
+            req.body = Unavailable()
             req.complain(1001)
             stream.sane = False
-        while codings and (req.body is not Unavailable):
+        while codings and okay(req.body):
             _decode_transfer_coding(req, codings.pop())
 
     elif req.headers.content_length:
@@ -268,23 +268,23 @@ def _decode_transfer_coding(msg, coding):
     if coding == tc.chunked:
         # The outermost chunked has already been peeled off at this point.
         msg.complain(1002)
-        msg.body = Unavailable
+        msg.body = Unavailable(msg.body)
     elif coding == tc.gzip or coding == tc.x_gzip:
         try:
             msg.body = decode_gzip(msg.body)
         except Exception as e:
             msg.complain(1027, coding=coding, error=e)
-            msg.body = Unavailable
+            msg.body = Unavailable(msg.body)
     elif coding == tc.deflate:
         try:
             msg.body = decode_deflate(msg.body)
         except Exception as e:
             msg.complain(1027, coding=coding, error=e)
-            msg.body = Unavailable
+            msg.body = Unavailable(msg.body)
     else:
         if okay(coding):
             msg.complain(1003, coding=coding)
-        msg.body = Unavailable
+        msg.body = Unavailable(msg.body)
 
 
 class BodyTooLongError(Exception):
@@ -328,10 +328,10 @@ def _parse_chunked(msg, stream):
             stream.readlineend()
     except ParseError as e:
         msg.complain(1005, error=e)
-        msg.body = Unavailable
+        msg.body = Unavailable()
     except BodyTooLongError as e:
         msg.complain(1298, place=place, size=e.size, max_size=e.max_size)
-        msg.body = Unavailable
+        msg.body = Unavailable()
     else:
         stream.dump_complaints(msg.complain, place=place)
         msg.body = b''.join(data)

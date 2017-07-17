@@ -99,7 +99,7 @@ def parse(data, symbol, complain=None, fail_notice_id=None,
             if fail_notice_id is None:      # pragma: no cover
                 raise
             complain(fail_notice_id, error=e, **extra_context)
-            r = Unavailable
+            r = Unavailable(data)
             return (r, None) if annotate_classes else r
 
     # Check if we have already memoized this.
@@ -115,7 +115,7 @@ def parse(data, symbol, complain=None, fail_notice_id=None,
             if fail_notice_id is None:
                 raise
             complaint = (fail_notice_id, {'error': e})
-            parse_result = (Unavailable, [complaint], [])
+            parse_result = (Unavailable(data), [complaint], [])
         else:
             _memo[key] = parse_result
             while len(_memo) > MEMO_LIMIT:

@@ -186,7 +186,7 @@ def _render_message(msg):
         with H.div(**_for_object(msg.displayable_body, u'body-display')):
             if body is None:
                 H.h3(u'Body is unknown')
-            elif body is Unavailable:
+            elif isinstance(body, Unavailable):
                 H.h3(u'Body is present, but not available for inspection')
             else:
                 if transforms:

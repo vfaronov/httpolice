@@ -115,8 +115,14 @@ def test_unparseable_body():
     assert len(exch1.responses) == 1
     assert exch1.responses[0].status == st.ok
     assert not exch1.responses[0].headers.content_length.is_okay
-    assert exch1.responses[0].headers.content_length.value is Unavailable
-    assert exch1.responses[0].body is Unavailable
+    assert exch1.responses[0].headers.content_length.value == \
+        Unavailable(b'<ERROR>')
+    # Headers that failed to parse never compare equal or unequal to anything.
+    assert not exch1.responses[0].headers.content_length == \
+        Unavailable(b'<ERROR>')
+    assert not exch1.responses[0].headers.content_length != \
+        Unavailable(b'<ERROR>')
+    assert isinstance(exch1.responses[0].body, Unavailable)
 
     # The other one is just a box for no. 1010.
     assert exch2.request is None
@@ -137,7 +143,7 @@ def test_chunked_empty():
 
 def test_unknown_transfer_encoding():
     [exch1] = load_from_file('1003_1')
-    assert exch1.responses[0].body is Unavailable
+    assert isinstance(exch1.responses[0].body, Unavailable)
 
 
 def test_implicit_response_framing():
@@ -336,13 +342,13 @@ def test_resp_stream():
 
 def test_bad_content_encoding():
     [exch1] = load_from_file('bad_content_encoding')
-    assert exch1.responses[0].decoded_body is Unavailable
+    assert exch1.responses[0].decoded_body == Unavailable(b'Hello world!\r\n')
 
 
 def test_bad_transfer_encoding():
     [exch1] = load_from_file('bad_transfer_encoding')
-    assert exch1.request.body is Unavailable
-    assert exch1.responses[0].body is Unavailable
+    assert isinstance(exch1.request.body, Unavailable)
+    assert isinstance(exch1.responses[0].body, Unavailable)
 
 
 def test_rearrange():

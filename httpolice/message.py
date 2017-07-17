@@ -85,12 +85,12 @@ class Message(Blackboard):
                     r = decoder(r)
                 except Exception as e:
                     self.complain(1037, coding=coding, error=e)
-                    r = Unavailable
+                    r = Unavailable(r)
             elif okay(coding):
                 self.complain(1036, coding=coding)
-                r = Unavailable
+                r = Unavailable(r)
             else:
-                r = Unavailable
+                r = Unavailable(r)
         return r
 
     @derived_property
@@ -117,7 +117,7 @@ class Message(Blackboard):
         if not okay(self.decoded_body):
             return self.decoded_body
         if self.guessed_charset is None:
-            return Unavailable
+            return Unavailable(self.decoded_body)
         # pylint: disable=no-member
         return self.decoded_body.decode(self.guessed_charset)
 
@@ -134,7 +134,7 @@ class Message(Blackboard):
                 r = json.loads(self.unicode_body)
             except ValueError as e:
                 self.complain(1038, error=e)
-                r = Unavailable
+                r = Unavailable(self.unicode_body)
             else:
                 if self.guessed_charset not in ['ascii', 'utf-8', 'utf-16',
                                                 'utf-16-le', 'utf-16-be',
@@ -156,11 +156,11 @@ class Message(Blackboard):
                 return defusedxml.ElementTree.fromstring(self.decoded_body)
             except defusedxml.EntitiesForbidden:
                 self.complain(1275)
-                return Unavailable
+                return Unavailable(self.decoded_body)
             # http://bugs.python.org/issue29896
             except (xml.etree.ElementTree.ParseError, UnicodeError) as e:
                 self.complain(1039, error=e)
-                return Unavailable
+                return Unavailable(self.decoded_body)
         else:
             return None
 
@@ -181,7 +181,10 @@ class Message(Blackboard):
                     self.complain(1139)
                 elif isinstance(d, email.errors.StartBoundaryNotFoundDefect):
                     self.complain(1140)
-            return parsed if parsed.is_multipart() else Unavailable
+            if parsed.is_multipart():
+                return parsed
+            else:
+                return Unavailable(self.decoded_body)
         else:
             return None
 
@@ -194,7 +197,7 @@ class Message(Blackboard):
                 if not URL_ENCODED_GOOD_BYTES[byte]:
                     char = six.int2byte(byte)
                     self.complain(1040, char=format_chars([char]))
-                    return Unavailable
+                    return Unavailable(self.decoded_body)
             # pylint: disable=no-member
             return parse_qs(self.decoded_body.decode('ascii'))
         else:
