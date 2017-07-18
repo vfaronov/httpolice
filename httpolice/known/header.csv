@@ -9,6 +9,7 @@ Accept-Encoding,,RFC 7694 defines it for responses.,,7231,5.3.4,,,,rfc7231,Accep
 Accept-Features,,,,4229,,,,,,,,,,,,,,,
 Accept-Language,,,,7231,5.3.5,,,,rfc7231,Accept_Language,,,True,False,standard,False,True,,multi
 Accept-Patch,,,,5789,3.1,,,,rfc5789,Accept_Patch,,,False,True,,,,,multi
+Accept-Post,,,,,,,https://www.w3.org/TR/ldp/,,,,,,,,standard,,,,
 Accept-Ranges,,,,7233,2.3,,,,rfc7233,Accept_Ranges,,,False,True,standard,,,,single
 Access-Control,,,,,,,http://www.w3.org/2006/appformats/,W3C Web Application Formats Working Group,,,,,,,deprecated,,,,
 Access-Control-Allow-Credentials,,,citation,,,,https://www.w3.org/TR/cors/#access-control-allow-credentials-response-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,

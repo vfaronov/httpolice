@@ -1,4 +1,5 @@
 key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title
+aes128gcm,,,,8188,,,,
 br,,,,7932,,,,
 compress,,,,7230,4.2.1,,,
 deflate,,,,7230,4.2.2,,,

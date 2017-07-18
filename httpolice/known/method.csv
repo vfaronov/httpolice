@@ -11,7 +11,7 @@ GET,,,,7231,4.3.1,,,,True,False,True,True
 HEAD,,,,7231,4.3.2,,,,True,False,True,True
 LABEL,,,,3253,8.2,,,,,,True,False
 LINK,,,,2068,19.6.1.2,,,,,,True,False
-LOCK,,,,4918,9.1,,,,,,False,False
+LOCK,,,,4918,9.10,,,,,,False,False
 MERGE,,,,3253,11.2,,,,,,True,False
 MKACTIVITY,,,,3253,13.5,,,,,,True,False
 MKCALENDAR,,,,4791,5.3.1,,,,,,True,False
