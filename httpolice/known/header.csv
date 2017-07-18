@@ -10,7 +10,7 @@ Accept-Features,,,,4229,,,,,,,,,,,,,,,
 Accept-Language,,,,7231,5.3.5,,,,rfc7231,Accept_Language,,,True,False,standard,False,True,,multi
 Accept-Patch,,,,5789,3.1,,,,rfc5789,Accept_Patch,,,False,True,,,,,multi
 Accept-Post,,,,,,,https://www.w3.org/TR/ldp/,,,,,,,,standard,,,,
-Accept-Ranges,,,,7233,2.3,,,,rfc7233,Accept_Ranges,,,False,True,standard,,,,single
+Accept-Ranges,,,,7233,2.3,,,,rfc7233,Accept_Ranges,,,False,True,standard,,,,multi
 Access-Control,,,,,,,http://www.w3.org/2006/appformats/,W3C Web Application Formats Working Group,,,,,,,deprecated,,,,
 Access-Control-Allow-Credentials,,,citation,,,,https://www.w3.org/TR/cors/#access-control-allow-credentials-response-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,
 Access-Control-Allow-Headers,,,citation,,,,https://www.w3.org/TR/cors/#access-control-allow-headers-response-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,
@@ -21,7 +21,7 @@ Access-Control-Request-Headers,,,citation,,,,https://www.w3.org/TR/cors/#access-
 Access-Control-Request-Method,,,citation,,,,https://www.w3.org/TR/cors/#access-control-request-method-request-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,
 Age,,,,7234,5.1,,,,rfc7234,Age,True,True,False,True,standard,,,,single
 Allow,,,,7231,7.4.1,,,,rfc7231,Allow,,,False,True,standard,,,,multi
-Alt-Svc,,,,7838,3,,,,rfc7838,Alt_Svc,,,False,True,standard,,,,single
+Alt-Svc,,,,7838,3,,,,rfc7838,Alt_Svc,,,False,True,standard,,,,multi
 Alt-Used,,,,7838,5,,,,rfc7838,Alt_Used,,True,True,False,standard,False,False,,single
 Alternates,,,,4229,,,,,,,,,,,,,,,
 Apply-To-Redirect-Ref,,,,4437,,,,,,,,,,,,,,,
@@ -79,9 +79,9 @@ Hobareg,,,,7486,6.1.1,,,,,,,,,,experimental,,,,
 Host,,,,7230,5.4,,,,rfc7230,Host,,True,True,False,standard,False,False,,single
 IM,,,,4229,,,,,,,,,,,,,,,
 If,,,,4918,10.4,,,,,,,True,,,standard,True,,,
-If-Match,,,,7232,3.1,,,,rfc7232,If_Match,,True,True,False,standard,True,False,,single
+If-Match,,,,7232,3.1,,,,rfc7232,If_Match,,True,True,False,standard,True,False,,multi
 If-Modified-Since,,,,7232,3.3,,,,rfc7232,If_Modified_Since,,True,True,False,standard,True,False,,single
-If-None-Match,,,,7232,3.2,,,,rfc7232,If_None_Match,,True,True,False,standard,True,False,,single
+If-None-Match,,,,7232,3.2,,,,rfc7232,If_None_Match,,True,True,False,standard,True,False,,multi
 If-Range,,,,7233,3.2,,,,rfc7233,If_Range,,True,True,False,standard,False,False,,single
 If-Schedule-Tag-Match,,,,6638,8.3,,,,,,,True,,,standard,True,,,
 If-Unmodified-Since,,,,7232,3.4,,,,rfc7232,If_Unmodified_Since,,True,True,False,standard,True,False,,single
@@ -176,7 +176,7 @@ Upgrade,,,,7230,6.7,,,,rfc7230,Upgrade,,,True,True,standard,False,False,,multi
 Urgency,,,,8030,5.3,,,,,,,,,,standard,,,,
 User-Agent,,,,7231,5.5.3,,,,rfc7231,User_Agent,,,True,False,standard,False,False,,single
 Variant-Vary,,,,4229,,,,,,,,,,,,,,,
-Vary,,,,7231,7.1.4,,,,rfc7231,Vary,True,True,False,True,standard,,,,single
+Vary,,,,7231,7.1.4,,,,rfc7231,Vary,True,True,False,True,standard,,,,multi
 Version,,,,4229,,,,,,,,,,,,,,,
 Via,,,,7230,5.7.1,,,,rfc7230,Via,True,,True,True,standard,False,False,,multi
 WWW-Authenticate,,,,7235,4.1,,,,rfc7235,WWW_Authenticate,True,,False,True,standard,,,,multi

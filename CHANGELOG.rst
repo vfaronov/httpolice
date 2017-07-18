@@ -21,6 +21,8 @@ Added
 
 Fixed
 -----
+- Notice `1013`_ is no longer wrongly reported for some headers
+  such as ``Vary``.
 - Fixed a crash on some pathological values of ``charset`` in ``Content-Type``.
 
 .. _Forwarded: https://tools.ietf.org/html/rfc7239
@@ -29,6 +31,7 @@ Fixed
 .. _1298: http://pythonhosted.org/HTTPolice/notices.html#1298
 .. _1296: http://pythonhosted.org/HTTPolice/notices.html#1296
 .. _1297: http://pythonhosted.org/HTTPolice/notices.html#1297
+.. _1013: http://pythonhosted.org/HTTPolice/notices.html#1013
 
 
 0.5.2 - 2017-03-24

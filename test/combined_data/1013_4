@@ -1,0 +1,19 @@
+1235
+
+# The presence of no. 1235 here means that we correctly recognize the multiple
+# values.
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Vary: accept-encoding
+Content-Type: text/plain
+Content-Length: 14
+Vary: host
+
+Hello world!

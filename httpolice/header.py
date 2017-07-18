@@ -285,12 +285,24 @@ class MultiHeaderView(HeaderView):
 
     def _parse(self):
         entries, values = self._pre_parse()
-        self._value = []
-        for sub_values in values:
-            if isinstance(sub_values, Unavailable):
-                self._value.append(sub_values)
+        # Some headers, such as ``Vary``, permit both a comma-separated list
+        # (which can be spread over multiple entries) as well as a singular
+        # value (which cannot be combined with any other).
+        singular = [v for v in values
+                    if not isinstance(v, (list, Unavailable))]
+        if singular:
+            if len(singular) == len(entries) == 1:
+                self._value = singular[0]
             else:
-                self._value.extend(sub_values)
+                self._value = [Unavailable()]
+                self.message.complain(1013, header=self, entries=entries)
+        else:
+            self._value = []
+            for v in values:
+                if isinstance(v, Unavailable):
+                    self._value.append(v)
+                else:
+                    self._value.extend(v)
         self._entries = entries
 
     def __iter__(self):

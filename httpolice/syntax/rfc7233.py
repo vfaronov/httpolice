@@ -3,7 +3,8 @@
 from httpolice.citation import RFC
 from httpolice.parse import (auto, can_complain, fill_names, literal, maybe,
                              pivot, skip, string, string1, subst)
-from httpolice.structure import ContentRange, RangeSpecifier, RangeUnit
+from httpolice.structure import (CaseInsensitive, ContentRange, RangeSpecifier,
+                                 RangeUnit)
 from httpolice.syntax.common import CHAR, DIGIT, SP, VCHAR
 from httpolice.syntax.rfc7230 import comma_list1, token__excluding
 from httpolice.syntax.rfc7231 import HTTP_date
@@ -13,9 +14,8 @@ from httpolice.syntax.rfc7232 import entity_tag
 bytes_unit = RangeUnit << literal('bytes')                              > auto
 other_range_unit = RangeUnit << token__excluding(['bytes'])             > auto
 range_unit = bytes_unit | other_range_unit                              > pivot
-acceptable_ranges = (
-    subst([]) << literal('none') |
-    comma_list1(range_unit))                                            > pivot
+acceptable_ranges = (CaseInsensitive << literal('none') |
+                     comma_list1(range_unit))                           > pivot
 Accept_Ranges = acceptable_ranges                                       > pivot
 
 @can_complain

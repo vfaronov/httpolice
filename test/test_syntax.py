@@ -354,8 +354,8 @@ def test_http_date():
 
 def test_acceptable_ranges():
     p = rfc7233.acceptable_ranges
-    assert parse(p, b'none') == []
-    assert parse(p, b'NONE') == []
+    assert parse(p, b'none') == u'none'
+    assert parse(p, b'NONE') == u'none'
     assert parse(p, b'none,') == [u'none']
     assert parse(p, b', ,Bytes, Pages') == [unit.bytes, u'pages']
 

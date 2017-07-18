@@ -243,3 +243,13 @@ def test_prefer():
 def test_decode_brotli():
     [exch1] = load_from_file('content_encoding_br')
     assert exch1.responses[0].decoded_body.startswith(b'Lorem ipsum dolor')
+
+
+def test_singular_vs_plural():
+    [exch] = load_from_file('1013_5')
+    assert exch.request.headers.if_none_match == u'*'
+    assert exch.responses[0].headers.alt_svc == u'clear'
+    assert all(isinstance(v, Unavailable)
+               for v in exch.responses[0].headers.accept_ranges)
+    assert all(isinstance(v, Unavailable)
+               for v in exch.responses[0].headers.vary)
