@@ -278,7 +278,7 @@ class SingleHeaderView(HeaderView):
         entries, values = self._pre_parse()
         if entries:
             if len(entries) > 1:
-                self.message.complain(1013, header=self.name, entries=entries)
+                self.message.complain(1013, header=self, entries=entries)
             self._value = values[-1]
             self._value_breakdown = [values[-1]]
             self._entries = [entries[-1]]
