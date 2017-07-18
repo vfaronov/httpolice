@@ -51,6 +51,7 @@ class Registry(object):
     key_order = []
     xmlns = {'iana': 'http://www.iana.org/assignments'}
     relative_url = None
+    registry_id = None
     cls = None
 
     def __init__(self, base_url='http://www.iana.org/assignments/'):
@@ -59,7 +60,11 @@ class Registry(object):
     def get_all(self):
         tree = self._get_xml(self.relative_url)
         entries = []
-        for record in tree.findall('//iana:record', self.xmlns):
+        if self.registry_id:
+            xpath = '//iana:registry[@id="%s"]/iana:record' % self.registry_id
+        else:
+            xpath = '//iana:record'
+        for record in tree.findall(xpath, self.xmlns):
             entry = self._from_record(record)
             if entry:
                 entries.append(entry)
@@ -280,6 +285,7 @@ class AuthSchemeRegistry(Registry):
 
     cls = AuthScheme
     relative_url = 'http-authschemes/http-authschemes.xml'
+    registry_id = 'authschemes'
 
     def _from_record(self, record):
         return {
