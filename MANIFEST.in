@@ -4,6 +4,7 @@ include README.rst
 include LICENSE.txt
 include CHANGELOG.rst
 include HACKING.rst
+include httpolice/known/README.rst
 
 include .coveragerc
 include .isort.cfg
