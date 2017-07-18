@@ -1,0 +1,9 @@
+key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title
+Basic,,,,7617,,,,
+Bearer,,,,6750,,,,
+Digest,,,,7616,,,,
+HOBA,,,,7486,3,,,
+Negotiate,,,,4559,3,,,
+OAuth,,,,5849,3.5.1,,,
+SCRAM-SHA-1,,,,7804,,,,
+SCRAM-SHA-256,,,,7804,,,,

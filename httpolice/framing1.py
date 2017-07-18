@@ -17,13 +17,13 @@ from httpolice.structure import (FieldName, HeaderEntry, HTTPVersion, Method,
 
 # Create empty symbols just for referring to them in parse errors.
 
-HTTP_message = Symbol(u'HTTP-message', RFC(7230, section=(3,)))
-request_line = Symbol(u'request-line', RFC(7230, section=(3, 1, 1)))
-status_line = Symbol(u'status-line', RFC(7230, section=(3, 1, 2)))
-header_field = Symbol(u'header-field', RFC(7230, section=(3, 2)))
-chunked_body = Symbol(u'chunked-body', RFC(7230, section=(4, 1)))
-chunk = Symbol(u'chunk', RFC(7230, section=(4, 1)))
-chunk_size = Symbol(u'chunk-size', RFC(7230, section=(4, 1)))
+HTTP_message = Symbol(u'HTTP-message', RFC(7230, section=u'3'))
+request_line = Symbol(u'request-line', RFC(7230, section=u'3.1.1'))
+status_line = Symbol(u'status-line', RFC(7230, section=u'3.1.2'))
+header_field = Symbol(u'header-field', RFC(7230, section=u'3.2'))
+chunked_body = Symbol(u'chunked-body', RFC(7230, section=u'4.1'))
+chunk = Symbol(u'chunk', RFC(7230, section=u'4.1'))
+chunk_size = Symbol(u'chunk-size', RFC(7230, section=u'4.1'))
 
 
 HTTP_VERSION = re.compile(u'^HTTP/[0-9]\\.[0-9]$')

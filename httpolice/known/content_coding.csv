@@ -1,0 +1,10 @@
+key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title
+br,,,,7932,,,,
+compress,,,,7230,4.2.1,,,
+deflate,,,,7230,4.2.2,,,
+exi,,,,,,,http://www.w3.org/TR/exi/,W3C Recommendation: Efficient XML Interchange (EXI) Format
+gzip,,,,7230,4.2.3,,,
+identity,,,,7231,5.3.4,,,
+pack200-gzip,,,,,,,http://www.jcp.org/en/jsr/detail?id=200,JSR 200: Network Transfer Format for Java
+x-compress,,,,7230,4.2.1,,,
+x-gzip,,,,7230,4.2.3,,,

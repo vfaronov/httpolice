@@ -9,11 +9,9 @@ import string
 
 import six
 
-from httpolice import message
+from httpolice import known, message
 from httpolice.blackboard import derived_property
-from httpolice.known import (auth, cache, cache_directive, cc, h, header, m,
-                             media_type, method as method_info, pref, product,
-                             tc, upgrade)
+from httpolice.known import auth, cache, cc, h, m, prefer, tc, upgrade
 from httpolice.parse import mark, parse
 from httpolice.structure import (EntityTag, Method, MultiDict, Parametrized,
                                  Versioned, http2, http10, http11, okay)
@@ -226,18 +224,18 @@ def check_request(req):
     parse(method, rfc7230.method, complain, 1292, place=u'request method')
     _ = req.target_form
 
-    if method != method.upper() and method.upper() in m:
+    if method != method.upper() and method.upper() in known.method:
         complain(1295, uppercase=Method(method.upper()))
 
     if body and headers.content_type.is_absent:
         complain(1041)
 
-    if (version in [http10, http11] and method_info.defines_body(method) and
+    if (version in [http10, http11] and known.method.defines_body(method) and
             headers.content_length.is_absent and
             headers.transfer_encoding.is_absent):
         complain(1021)
 
-    if (method_info.defines_body(method) == False) and (body == b'') and \
+    if (known.method.defines_body(method) == False) and (body == b'') and \
             headers.content_length.is_present:
         complain(1022)
 
@@ -257,9 +255,9 @@ def check_request(req):
         complain(1032)
 
     for hdr in headers:
-        if header.is_for_request(hdr.name) == False:
+        if known.header.is_for_request(hdr.name) == False:
             complain(1063, header=hdr)
-        elif header.is_representation_metadata(hdr.name) and \
+        elif known.header.is_representation_metadata(hdr.name) and \
                 req.has_body == False:
             complain(1053, header=hdr)
 
@@ -292,7 +290,8 @@ def check_request(req):
         complain(1070)
     elif headers.user_agent.is_okay:
         products = [p for p in headers.user_agent if isinstance(p, Versioned)]
-        if products and all(product.is_library(p.item) for p in products):
+        if products and all(known.product.is_library(p.item)
+                            for p in products):
             complain(1093, library=products[0])
 
     for x in headers.accept_encoding:
@@ -305,7 +304,7 @@ def check_request(req):
 
     if method == m.HEAD:
         for hdr in headers:
-            if header.is_precondition(hdr.name):
+            if known.header.is_precondition(hdr.name):
                 complain(1131, header=hdr)
 
     if method in [m.CONNECT, m.OPTIONS, m.TRACE]:
@@ -327,7 +326,7 @@ def check_request(req):
         complain(1135)
 
     for direct in headers.cache_control:
-        if cache_directive.is_for_request(direct.item) == False:
+        if known.cache_directive.is_for_request(direct.item) == False:
             complain(1152, directive=direct.item)
         if direct == cache.no_cache and direct.param is not None:
             complain(1159, directive=direct.item)
@@ -339,7 +338,7 @@ def check_request(req):
         if 100 <= warning.code <= 199:
             complain(1165, code=warning.code)
 
-    if method_info.is_cacheable(method) == False:
+    if known.method.is_cacheable(method) == False:
         for direct in headers.cache_control:
             if direct.item in [cache.max_age, cache.max_stale, cache.min_fresh,
                                cache.no_cache, cache.no_store,
@@ -364,7 +363,7 @@ def check_request(req):
                 complain(1274, header=hdr)
 
     if method == m.PATCH and headers.content_type.is_okay:
-        if media_type.is_patch(headers.content_type.item) == False:
+        if known.media_type.is_patch(headers.content_type.item) == False:
             complain(1213)
 
     for protocol in headers.upgrade:
@@ -402,18 +401,18 @@ def check_request(req):
     for dup_pref in duplicates(name for ((name, _), _) in headers.prefer):
         complain(1285, name=dup_pref)
 
-    if headers.prefer.respond_async and method_info.is_safe(method):
+    if headers.prefer.respond_async and known.method.is_safe(method):
         complain(1287)
 
     if headers.prefer.return_ == u'minimal' and method == m.GET:
         complain(1288)
 
-    if (pref.return_, u'minimal') in headers.prefer.without_params and \
-       (pref.return_, u'representation') in headers.prefer.without_params:
+    if (prefer.return_, u'minimal') in headers.prefer.without_params and \
+       (prefer.return_, u'representation') in headers.prefer.without_params:
         complain(1289)
 
-    if (pref.handling, u'strict') in headers.prefer.without_params and \
-       (pref.handling, u'lenient') in headers.prefer.without_params:
+    if (prefer.handling, u'strict') in headers.prefer.without_params and \
+       (prefer.handling, u'lenient') in headers.prefer.without_params:
         complain(1290)
 
     for (entry, elements) in zip(headers.forwarded.entries,

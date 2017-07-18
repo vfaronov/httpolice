@@ -3,6 +3,7 @@
 from datetime import date, datetime, time
 
 from httpolice.citation import RFC
+from httpolice.known import media
 from httpolice.parse import (auto, can_complain, fill_names, literal, many,
                              maybe, maybe_str, named, octet, pivot, skip,
                              string1, string_times, subst)
@@ -25,8 +26,8 @@ _DAY_NAMES = [u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday',
 
 
 _BAD_MEDIA_TYPES = {
-    MediaType(u'plain/text'): MediaType(u'text/plain'),
-    MediaType(u'text/json'): MediaType(u'application/json'),
+    MediaType(u'plain/text'): media.text_plain,
+    MediaType(u'text/json'): media.application_json,
 }
 
 @can_complain

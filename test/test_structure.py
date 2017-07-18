@@ -5,7 +5,7 @@ import os
 
 from httpolice.exchange import Exchange
 from httpolice.inputs.streams import combined_input
-from httpolice.known import altsvc, auth, cache, h, hsts, m, pref
+from httpolice.known import altsvc, auth, cache, h, hsts, m, prefer
 from httpolice.request import Request
 from httpolice.response import Response
 from httpolice.structure import (CaseInsensitive, FieldName, HTTPVersion,
@@ -203,14 +203,14 @@ def test_prefer():
     [exch1] = load_from_file('funny_prefer')
     assert exch1.request.headers.prefer.value == [
         Parametrized(
-            Parametrized(pref.handling, u'lenient'),
+            Parametrized(prefer.handling, u'lenient'),
             [
                 Parametrized(u'param1', u"this is a parameter to 'handling'!"),
                 Parametrized(u'param2', None),
             ]
         ),
         Unavailable,
-        Parametrized(Parametrized(pref.wait, 600), []),
+        Parametrized(Parametrized(prefer.wait, 600), []),
         Parametrized(
             Parametrized(u'my-pref', None),
             [
@@ -218,9 +218,9 @@ def test_prefer():
                 None, None, Parametrized(u'bar', None),
             ]
         ),
-        Parametrized(Parametrized(pref.respond_async, None), []),
-        Parametrized(Parametrized(pref.wait, 0), []),
-        Parametrized(Parametrized(pref.return_, Unavailable), []),
+        Parametrized(Parametrized(prefer.respond_async, None), []),
+        Parametrized(Parametrized(prefer.wait, 0), []),
+        Parametrized(Parametrized(prefer.return_, Unavailable), []),
     ]
     assert exch1.request.headers.prefer.wait == 600
     assert exch1.request.headers.prefer.respond_async

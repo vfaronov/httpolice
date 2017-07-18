@@ -6,12 +6,10 @@ from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 import six
 
-from httpolice import message
+from httpolice import known, message
 from httpolice.blackboard import derived_property
-from httpolice.known import (auth, cache, cache_directive, h, header, hsts, m,
-                             media, media_type, method as method_info, rel, st,
-                             status_code, tc, unit, upgrade, warn)
-from httpolice.known.status_code import NOT_AT_ALL, NOT_BY_DEFAULT
+from httpolice.known import (Cacheable, auth, cache, h, hsts, m, media, rel,
+                             st, tc, unit, upgrade, warn)
 from httpolice.parse import parse
 from httpolice.structure import (EntityTag, StatusCode, http2, http10, http11,
                                  okay)
@@ -227,9 +225,9 @@ def check_response_itself(resp):
             complain(1023)
 
     for hdr in headers:
-        if header.is_for_response(hdr.name) == False:
+        if known.header.is_for_response(hdr.name) == False:
             complain(1064, header=hdr)
-        elif header.is_representation_metadata(hdr.name) and \
+        elif known.header.is_representation_metadata(hdr.name) and \
                 status.informational:
             complain(1052, header=hdr)
 
@@ -299,7 +297,7 @@ def check_response_itself(resp):
             # and this is widely seen in practice.
             if hdr.name in [h.etag, h.last_modified]:
                 continue
-            elif header.is_representation_metadata(hdr.name):
+            elif known.header.is_representation_metadata(hdr.name):
                 complain(1127, header=hdr)
 
     if headers.content_range.is_present and \
@@ -315,7 +313,7 @@ def check_response_itself(resp):
             complain(1138)
 
     for direct in headers.cache_control:
-        if cache_directive.is_for_response(direct.item) == False:
+        if known.cache_directive.is_for_response(direct.item) == False:
             complain(1153, directive=direct.item)
 
     if u'no-cache' in headers.pragma:
@@ -329,9 +327,9 @@ def check_response_itself(resp):
         if headers.cache_control.no_store:
             complain(1176)
 
-        if status_code.is_cacheable(status) == NOT_AT_ALL:
+        if known.status_code.is_cacheable(status) is Cacheable.not_at_all:
             complain(1202)
-        elif status_code.is_cacheable(status) == NOT_BY_DEFAULT:
+        if known.status_code.is_cacheable(status) is Cacheable.not_by_default:
             if headers.expires.is_absent and headers.cache_control.is_absent:
                 complain(1177)
 
@@ -400,7 +398,7 @@ def check_response_itself(resp):
             complain(1220, directive=dupe)
 
     for patch_type in headers.accept_patch:
-        if media_type.is_patch(patch_type.item) == False:
+        if known.media_type.is_patch(patch_type.item) == False:
             complain(1227, patch_type=patch_type.item)
 
     if resp.transformed_by_proxy and headers.via.is_absent:
@@ -524,7 +522,7 @@ def check_response_in_context(resp, req):
             status.successful:
         complain(1058)
 
-    if method_info.is_safe(method):
+    if known.method.is_safe(method):
         if status == st.created:
             complain(1072)
         if status == st.accepted:
@@ -568,14 +566,14 @@ def check_response_in_context(resp, req):
         complain(1086)
 
     if status == st.not_acceptable:
-        if not req.headers.clearly(header.is_proactive_conneg):
+        if not req.headers.clearly(known.header.is_proactive_conneg):
             complain(1090)
             # We used to report a separate comment notice (no. 1091)
             # in case the request had some headers we didn't know.
             # But it's unlikely that anyone would use custom conneg headers,
             # and it seems more helpful to report an error in this case
             # (after all, it can be silenced).
-        elif req.headers.clearly(header.is_proactive_conneg) == \
+        elif req.headers.clearly(known.header.is_proactive_conneg) == \
                 set([h.accept_language]):
             complain(1117)
 
@@ -635,18 +633,18 @@ def check_response_in_context(resp, req):
     if status in [st.not_modified, st.precondition_failed]:
         if method not in [m.GET, m.HEAD] and status == st.not_modified:
             complain(1124)
-        elif not req.headers.clearly(header.is_precondition):
+        elif not req.headers.clearly(known.header.is_precondition):
             complain(1125)
             # We used to report a separate comment notice (no. 1126)
             # in case the request had some headers we didn't know.
             # But it's unlikely that anyone would use custom preconditions,
             # and it seems more helpful to report an error in this case
             # (after all, it can be silenced).
-        elif req.headers.clearly(header.is_precondition) == \
+        elif req.headers.clearly(known.header.is_precondition) == \
                 set([h.if_modified_since]):
             if method not in [m.GET, m.HEAD]:
                 complain(1128)
-        elif req.headers.clearly(header.is_precondition).issubset(
+        elif req.headers.clearly(known.header.is_precondition).issubset(
                 set([h.if_match, h.if_none_match,
                      h.if_modified_since, h.if_unmodified_since, h.if_range])):
             if method in [m.CONNECT, m.OPTIONS, m.TRACE]:
@@ -671,7 +669,7 @@ def check_response_in_context(resp, req):
 
         if req.headers.if_range.is_present:
             for hdr in resp.headers:
-                if header.is_representation_metadata(hdr.name) and \
+                if known.header.is_representation_metadata(hdr.name) and \
                         hdr.name not in [h.etag, h.content_location]:
                     complain(1146, header=hdr)
 
@@ -684,7 +682,7 @@ def check_response_in_context(resp, req):
             complain(1150)
 
     if resp.from_cache:
-        if method_info.is_cacheable(method) == False:
+        if known.method.is_cacheable(method) == False:
             complain(1172)
         if resp.headers.age > req.headers.cache_control.max_age:
             complain(1170)
@@ -705,13 +703,14 @@ def check_response_in_context(resp, req):
 
     if status == st.precondition_required:
         for hdr in req.headers:
-            if header.is_precondition(hdr.name):
+            if known.header.is_precondition(hdr.name):
                 complain(1200, header=hdr)
                 break
 
     if method == m.PATCH:
         if status.successful and req.headers.content_type.is_okay and \
-                media_type.is_patch(req.headers.content_type.item) == False:
+                known.media_type.is_patch(req.headers.content_type.item) == \
+                    False:
             complain(1214)
         if status == st.unsupported_media_type and \
                 resp.headers.accept_patch.is_absent:
@@ -725,8 +724,9 @@ def check_response_in_context(resp, req):
             req.is_tls == False:
         complain(1221)
 
-    if status == st.misdirected_request and method_info.is_cacheable(method) \
-            and not resp.headers.cache_control.no_store:
+    if status == st.misdirected_request and \
+            known.method.is_cacheable(method) and \
+            not resp.headers.cache_control.no_store:
         complain(1283)
 
     for applied_pref in resp.headers.preference_applied:
@@ -736,7 +736,7 @@ def check_response_in_context(resp, req):
                             else u'=%s' % applied_pref.param))
 
     if resp.headers.preference_applied.is_present and \
-            method_info.is_cacheable(method) and \
+            known.method.is_cacheable(method) and \
             not (resp.headers.vary == u'*') and \
             not (resp.headers.vary.is_okay and h.prefer in resp.headers.vary):
             # We could also look for ``Cache-Control: no-store`` etc.,
@@ -804,8 +804,8 @@ def _check_bearer_challenge(resp, hdr, challenge):
 
     for param in [u'scope', u'error', u'error_description', u'error_uri']:
         if param in params:
-            parser = getattr(rfc6749, param)
-            parse(params[param], parser, resp.complain, 1266,
+            syntax = getattr(rfc6749, param)
+            parse(params[param], syntax, resp.complain, 1266,
                   param=param, value=params[param])
 
     if resp.status == st.unauthorized and u'error' not in params and \

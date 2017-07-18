@@ -1,0 +1,215 @@
+key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title,syntax_module,syntax_symbol,bad_for_connection,bad_for_trailer,for_request,for_response,iana_status,precondition,proactive_conneg,representation_metadata,rule
+A-IM,,,,4229,,,,,,,,,,,,,,,
+ALPN,,,,7639,2,,,,,,,,,,standard,,,,
+Accept,,,,7231,5.3.2,,,,rfc7231,Accept,,,True,False,standard,False,True,,multi
+Accept-Additions,,,,4229,,,,,,,,,,,,,,,
+Accept-Charset,,,,7231,5.3.3,,,,rfc7231,Accept_Charset,,,True,False,standard,False,True,,multi
+Accept-Datetime,,,,7089,,,,,,,,,,,informational,,,,
+Accept-Encoding,,RFC 7694 defines it for responses.,,7231,5.3.4,,,,rfc7231,Accept_Encoding,,,True,True,standard,False,True,,multi
+Accept-Features,,,,4229,,,,,,,,,,,,,,,
+Accept-Language,,,,7231,5.3.5,,,,rfc7231,Accept_Language,,,True,False,standard,False,True,,multi
+Accept-Patch,,,,5789,3.1,,,,rfc5789,Accept_Patch,,,False,True,,,,,multi
+Accept-Ranges,,,,7233,2.3,,,,rfc7233,Accept_Ranges,,,False,True,standard,,,,single
+Access-Control,,,,,,,http://www.w3.org/2006/appformats/,W3C Web Application Formats Working Group,,,,,,,deprecated,,,,
+Access-Control-Allow-Credentials,,,citation,,,,https://www.w3.org/TR/cors/#access-control-allow-credentials-response-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,
+Access-Control-Allow-Headers,,,citation,,,,https://www.w3.org/TR/cors/#access-control-allow-headers-response-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,
+Access-Control-Allow-Methods,,,citation,,,,https://www.w3.org/TR/cors/#access-control-allow-methods-response-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,
+Access-Control-Allow-Origin,,,citation,,,,https://www.w3.org/TR/cors/#access-control-allow-origin-response-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,
+Access-Control-Max-Age,,,citation,,,,https://www.w3.org/TR/cors/#access-control-max-age-response-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,
+Access-Control-Request-Headers,,,citation,,,,https://www.w3.org/TR/cors/#access-control-request-headers-request-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,
+Access-Control-Request-Method,,,citation,,,,https://www.w3.org/TR/cors/#access-control-request-method-request-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,
+Age,,,,7234,5.1,,,,rfc7234,Age,True,True,False,True,standard,,,,single
+Allow,,,,7231,7.4.1,,,,rfc7231,Allow,,,False,True,standard,,,,multi
+Alt-Svc,,,,7838,3,,,,rfc7838,Alt_Svc,,,False,True,standard,,,,single
+Alt-Used,,,,7838,5,,,,rfc7838,Alt_Used,,True,True,False,standard,False,False,,single
+Alternates,,,,4229,,,,,,,,,,,,,,,
+Apply-To-Redirect-Ref,,,,4437,,,,,,,,,,,,,,,
+Authentication-Control,,,,8053,4,,,,,,,,,,experimental,,,,
+Authentication-Info,,,,7615,3,,,,,,,,,,standard,,,,
+Authorization,,,,7235,4.2,,,,rfc7235,Authorization,True,True,True,False,standard,False,False,,single
+C-Ext,,,,4229,,,,,,,,,,,,,,,
+C-Man,,,,4229,,,,,,,,,,,,,,,
+C-Opt,,,,4229,,,,,,,,,,,,,,,
+C-PEP,,,,4229,,,,,,,,,,,,,,,
+C-PEP-Info,,,,4229,,,,,,,,,,,,,,,
+Cache-Control,,,,7234,5.2,,,,rfc7234,Cache_Control,True,True,True,True,standard,False,False,,multi
+CalDAV-Timezones,,,,7809,7.1,,,,,,,,,,standard,,,,
+Close,,,,7230,8.1,,,,,,,,,,reserved,,,,
+Compliance,,,,4229,,,,,,,,,,,,,,,
+Connection,,,,7230,6.1,,,,rfc7230,Connection,,,True,True,standard,False,False,,multi
+Content-Base,,,,2068,,,,,,,,,,,obsoleted,,,,
+Content-Disposition,,,,6266,4,,,,rfc6266,content_disposition,,,False,True,standard,,,True,single
+Content-Encoding,,,,7231,3.1.2.2,,,,rfc7231,Content_Encoding,True,True,,,standard,False,False,True,multi
+Content-ID,,,,4229,,,,,,,,,,,,,,,
+Content-Language,,,,7231,3.1.3.2,,,,rfc7231,Content_Language,True,,,,standard,False,False,True,multi
+Content-Length,,,,7230,3.3.2,,,,rfc7230,Content_Length,,True,True,True,standard,False,False,,single
+Content-Location,,,,7231,3.1.4.2,,,,rfc7231,Content_Location,,,,,standard,False,False,True,single
+Content-MD5,,,,4229,,,,,,,,,,,,,,,
+Content-Range,,,,7233,4.2,,,,rfc7233,Content_Range,True,True,False,True,standard,,,,single
+Content-Script-Type,,,,4229,,,,,,,,,,,,,,,
+Content-Style-Type,,,,4229,,,,,,,,,,,,,,,
+Content-Transfer-Encoding,,,,4229,,,,,,,,,,,,,,,
+Content-Type,,,,7231,3.1.1.5,,,,rfc7231,Content_Type,,True,,,standard,False,False,True,single
+Content-Version,,,,4229,,,,,,,,,,,,,,,
+Cookie,,,,6265,,,,,,,,,,,standard,False,False,,
+Cookie2,,,,2965,,,,,,,,,,,obsoleted,,,,
+Cost,,,,4229,,,,,,,,,,,,,,,
+DASL,,,,5323,,,,,,,,,,,standard,,,,
+DAV,,,,4918,,,,,,,,,,,standard,,,,
+Date,,,,7231,7.1.1.2,,,,rfc7231,Date,,True,True,True,standard,False,False,,single
+Default-Style,,,,4229,,,,,,,,,,,,,,,
+Delta-Base,,,,4229,,,,,,,,,,,,,,,
+Depth,,,,4918,,,,,,,,,,,standard,,,,
+Derived-From,,,,4229,,,,,,,,,,,,,,,
+Destination,,,,4918,,,,,,,,,,,standard,,,,
+Differential-ID,,,,4229,,,,,,,,,,,,,,,
+Digest,,,,4229,,,,,,,,,,,,,,,
+EDIINT-Features,,,,6017,,,,,,,,,,,,,,,
+ETag,,,,7232,2.3,,,,rfc7232,ETag,True,,False,True,standard,,,True,single
+Expect,,,,7231,5.1.1,,,,rfc7231,Expect,,True,True,False,standard,False,False,,single
+Expires,,,,7234,5.3,,,,rfc7234,Expires,True,True,False,True,standard,,,,single
+Ext,,,,4229,,,,,,,,,,,,,,,
+Forwarded,,,,7239,4,,,,rfc7239,Forwarded,True,,True,False,standard,False,False,,multi
+From,,,,7231,5.5.1,,,,,,,,True,False,standard,False,False,,single
+GetProfile,,,,4229,,,,,,,,,,,,,,,
+HTTP2-Settings,,,,7540,3.2.1,,,,rfc7540,HTTP2_Settings,,,True,False,standard,False,False,,single
+HTTPolice-Silence,,,,,,,,,internal,HTTPolice_Silence,,,True,True,,False,False,,multi
+Hobareg,,,,7486,6.1.1,,,,,,,,,,experimental,,,,
+Host,,,,7230,5.4,,,,rfc7230,Host,,True,True,False,standard,False,False,,single
+IM,,,,4229,,,,,,,,,,,,,,,
+If,,,,4918,10.4,,,,,,,True,,,standard,True,,,
+If-Match,,,,7232,3.1,,,,rfc7232,If_Match,,True,True,False,standard,True,False,,single
+If-Modified-Since,,,,7232,3.3,,,,rfc7232,If_Modified_Since,,True,True,False,standard,True,False,,single
+If-None-Match,,,,7232,3.2,,,,rfc7232,If_None_Match,,True,True,False,standard,True,False,,single
+If-Range,,,,7233,3.2,,,,rfc7233,If_Range,,True,True,False,standard,False,False,,single
+If-Schedule-Tag-Match,,,,6638,8.3,,,,,,,True,,,standard,True,,,
+If-Unmodified-Since,,,,7232,3.4,,,,rfc7232,If_Unmodified_Since,,True,True,False,standard,True,False,,single
+Keep-Alive,,,,4229,,,,,,,,,,,,,,,
+Label,,,,4229,,,,,,,,,,,,,,,
+Last-Modified,,,,7232,2.2,,,,rfc7232,Last_Modified,True,,False,True,standard,,,True,single
+Link,,"Not sure if this makes any sense on requests.
+With the `anchor` parameter, perhaps.
+Leaving undefined for now.",,5988,5,,,,rfc5988,Link,,,,True,,False,False,,multi
+Location,,,,7231,7.1.2,,,,rfc7231,Location,,True,False,True,standard,,,,single
+Lock-Token,,,,4918,,,,,,,,,,,standard,,,,
+MIME-Version,,,,7231,,A.1,,,,,,,,,standard,False,False,,
+Man,,,,4229,,,,,,,,,,,,,,,
+Max-Forwards,,,,7231,5.1.2,,,,rfc7231,Max_Forwards,,True,True,False,standard,False,False,,single
+Memento-Datetime,,,,7089,,,,,,,,,,,informational,,,,
+Message-ID,,,,4229,,,,,,,,,,,,,,,
+Meter,,,,4229,,,,,,,,,,,,,,,
+Method-Check,,,,,,,http://www.w3.org/2006/appformats/,W3C Web Application Formats Working Group,,,,,,,deprecated,,,,
+Method-Check-Expires,,,,,,,http://www.w3.org/2006/appformats/,W3C Web Application Formats Working Group,,,,,,,deprecated,,,,
+Negotiate,,,,4229,,,,,,,,,,,,,,,
+Non-Compliance,,,,4229,,,,,,,,,,,,,,,
+Opt,,,,4229,,,,,,,,,,,,,,,
+Optional,,,,4229,,,,,,,,,,,,,,,
+Optional-WWW-Authenticate,,,,8053,3,,,,,,,,,,experimental,,,,
+Ordering-Type,,,,4229,,,,,,,,,,,standard,,,,
+Origin,,,,6454,,,,,,,,,,,standard,False,False,,
+Overwrite,,,,4918,,,,,,,,,,,standard,True,,,
+P3P,,,,4229,,,,,,,,,,,,,,,
+PEP,,,,4229,,,,,,,,,,,,,,,
+PICS-Label,,,,4229,,,,,,,,,,,,,,,
+Pep-Info,,,,4229,,,,,,,,,,,,,,,
+Position,,,,4229,,,,,,,,,,,standard,,,,
+Pragma,,,,7234,5.4,,,,rfc7234,Pragma,,True,True,True,standard,False,False,,multi
+Prefer,,,,7240,2,,,,rfc7240,Prefer,,,True,False,standard,False,False,,multi
+Preference-Applied,,,,7240,3,,,,rfc7240,Preference_Applied,,,False,True,standard,False,False,,multi
+ProfileObject,,,,4229,,,,,,,,,,,,,,,
+Protocol,,,,4229,,,,,,,,,,,,,,,
+Protocol-Info,,,,4229,,,,,,,,,,,,,,,
+Protocol-Query,,,,4229,,,,,,,,,,,,,,,
+Protocol-Request,,,,4229,,,,,,,,,,,,,,,
+Proxy-Authenticate,,,,7235,4.3,,,,rfc7235,Proxy_Authenticate,,,False,True,standard,,,,multi
+Proxy-Authentication-Info,,,,7615,4,,,,,,,,,,standard,,,,
+Proxy-Authorization,,,,7235,4.4,,,,rfc7235,Proxy_Authorization,,True,True,False,standard,False,False,,single
+Proxy-Features,,,,4229,,,,,,,,,,,,,,,
+Proxy-Instruction,,,,4229,,,,,,,,,,,,,,,
+Public,,,,4229,,,,,,,,,,,,,,,
+Public-Key-Pins,,,,7469,,,,,,,,,,,standard,,,,
+Public-Key-Pins-Report-Only,,,,7469,,,,,,,,,,,standard,,,,
+Range,,,,7233,3.1,,,,rfc7233,Range,,True,True,False,standard,False,False,,single
+Redirect-Ref,,,,4437,,,,,,,,,,,,,,,
+Referer,,,,7231,5.5.2,,,,rfc7231,Referer,,,True,False,standard,False,False,,single
+Referer-Root,,,,,,,http://www.w3.org/2006/appformats/,W3C Web Application Formats Working Group,,,,,,,deprecated,,,,
+Resolution-Hint,,,,4229,,,,,,,,,,,,,,,
+Resolver-Location,,,,4229,,,,,,,,,,,,,,,
+Retry-After,,,,7231,7.1.3,,,,rfc7231,Retry_After,,True,False,True,standard,,,,single
+SLUG,,,,5023,,,,,,,,,,,standard,,,,
+Safe,,,,4229,,,,,,,,,,,,,,,
+Schedule-Reply,,,,6638,,,,,,,,,,,standard,,,,
+Schedule-Tag,,,,6638,,,,,,,,,,,standard,,,,
+Sec-WebSocket-Accept,,,,6455,,,,,,,,,,,standard,,,,
+Sec-WebSocket-Extensions,,,,6455,,,,,,,,,,,standard,,,,
+Sec-WebSocket-Key,,,,6455,,,,,,,,,,,standard,,,,
+Sec-WebSocket-Protocol,,,,6455,,,,,,,,,,,standard,,,,
+Sec-WebSocket-Version,,,,6455,,,,,,,,,,,standard,,,,
+Security-Scheme,,,,4229,,,,,,,,,,,,,,,
+Server,,,,7231,7.4.2,,,,rfc7231,Server,,,False,True,standard,,,,single
+Set-Cookie,,,,6265,,,,,,,,,,,standard,,,,set_cookie
+Set-Cookie2,,,,2965,,,,,,,,,,,obsoleted,,,,
+SetProfile,,,,4229,,,,,,,,,,,,,,,
+SoapAction,,,,4229,,,,,,,,,,,,,,,
+Status-URI,,,,4229,,,,,,,,,,,,,,,
+Strict-Transport-Security,,,,6797,6.1,,,,rfc6797,Strict_Transport_Security,,,False,True,standard,,,,single
+SubOK,,,,4229,,,,,,,,,,,,,,,
+Subst,,,,4229,,,,,,,,,,,,,,,
+Surrogate-Capability,,,,4229,,,,,,,,,,,,,,,
+Surrogate-Control,,,,4229,,,,,,,,,,,,,,,
+TCN,,,,4229,,,,,,,,,,,,,,,
+TE,,,,7230,4.3,,,,rfc7230,TE,,True,True,False,standard,False,False,,multi
+TTL,,,,8030,5.2,,,,,,,,,,standard,,,,
+Timeout,,,,4918,,,,,,,,,,,standard,,,,
+Title,,,,4229,,,,,,,,,,,,,,,
+Topic,,,,8030,5.4,,,,,,,,,,standard,,,,
+Trailer,,,,7230,4.4,,,,rfc7230,Trailer,,True,,,standard,False,False,,multi
+Transfer-Encoding,,,,7230,3.3.1,,,,rfc7230,Transfer_Encoding,,True,True,True,standard,False,False,,multi
+UA-Color,,,,4229,,,,,,,,,,,,,,,
+UA-Media,,,,4229,,,,,,,,,,,,,,,
+UA-Pixels,,,,4229,,,,,,,,,,,,,,,
+UA-Resolution,,,,4229,,,,,,,,,,,,,,,
+UA-Windowpixels,,,,4229,,,,,,,,,,,,,,,
+URI,,,,4229,,,,,,,,,,,,,,,
+Upgrade,,,,7230,6.7,,,,rfc7230,Upgrade,,,True,True,standard,False,False,,multi
+Urgency,,,,8030,5.3,,,,,,,,,,standard,,,,
+User-Agent,,,,7231,5.5.3,,,,rfc7231,User_Agent,,,True,False,standard,False,False,,single
+Variant-Vary,,,,4229,,,,,,,,,,,,,,,
+Vary,,,,7231,7.1.4,,,,rfc7231,Vary,True,True,False,True,standard,,,,single
+Version,,,,4229,,,,,,,,,,,,,,,
+Via,,,,7230,5.7.1,,,,rfc7230,Via,True,,True,True,standard,False,False,,multi
+WWW-Authenticate,,,,7235,4.1,,,,rfc7235,WWW_Authenticate,True,,False,True,standard,,,,multi
+Want-Digest,,,,4229,,,,,,,,,,,,,,,
+Warning,,,,7234,5.5,,,,rfc7234,Warning_,True,True,True,True,standard,False,False,,multi
+X-ATT-DeviceId,,"Any common ""X-"" prefixed headers should be included here,
+even if there are no citations for them.
+This is necessary for notice 1277 to work properly.
+Many of these are taken from Wikipedia:
+https://en.wikipedia.org/wiki/List_of_HTTP_header_fields",,,,,,,,,,,,,,,,,
+X-Aspnet-Version,,,,,,,,,,,,,,,,,,,
+X-CSRF-Token,,,,,,,,,,,,,,,,,,,
+X-CSRFToken,,,,,,,,,,,,,,,,,,,
+X-Content-Duration,,,,,,,,,,,,,,,,,,,
+X-Content-Security-Policy,,,,,,,,,,,,,,,,,,,
+X-Content-Type-Options,,,,,,,,,,,,,,,,,,,
+X-Device-Accept,,,,,,,http://www.w3.org/2005/MWI/BPWG/,W3C Mobile Web Best Practices Working Group,,,,,,,,,,,
+X-Device-Accept-Charset,,,,,,,http://www.w3.org/2005/MWI/BPWG/,W3C Mobile Web Best Practices Working Group,,,,,,,,,,,
+X-Device-Accept-Encoding,,,,,,,http://www.w3.org/2005/MWI/BPWG/,W3C Mobile Web Best Practices Working Group,,,,,,,,,,,
+X-Device-Accept-Language,,,,,,,http://www.w3.org/2005/MWI/BPWG/,W3C Mobile Web Best Practices Working Group,,,,,,,,,,,
+X-Device-User-Agent,,,,,,,http://www.w3.org/2005/MWI/BPWG/,W3C Mobile Web Best Practices Working Group,,,,,,,,,,,
+X-Firefox-SPDY,,,,,,,,,,,,,,,,,,,
+X-Forwarded-For,,,,,,,,,,,,,,,,,,,
+X-Forwarded-Host,,,,,,,,,,,,,,,,,,,
+X-Forwarded-Proto,,,,,,,,,,,,,,,,,,,
+X-Frame-Options,,,,7034,,,,,,,,,,,informational,,,,
+X-GitHub-Request-ID,,,,,,,,,,,,,,,,,,,
+X-HTTP-Method-Override,,,,,,,,,,,,,,,,,,,
+X-Powered-By,,,,,,,,,,,,,,,,,,,
+X-Requested-With,,,,,,,,,,,,,,,,,,,
+X-UA-Compatible,,,,,,,,,,,,,,,,,,,
+X-UIDH,,,,,,,,,,,,,,,,,,,
+X-Varnish,,,,,,,,,,,,,,,,,,,
+X-Wap-Profile,,,,,,,,,,,,,,,,,,,
+X-WebKit-CSP,,,,,,,,,,,,,,,,,,,
+X-XSRF-Token,,,,,,,,,,,,,,,,,,,
+X-XSS-Protection,,,,,,,,,,,,,,,,,,,

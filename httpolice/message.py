@@ -13,10 +13,11 @@ import defusedxml
 import defusedxml.ElementTree
 import six
 
+from httpolice import known
 from httpolice.blackboard import Blackboard, derived_property
 from httpolice.codings import decode_brotli, decode_deflate, decode_gzip
 from httpolice.header import HeadersView
-from httpolice.known import cc, h, header, media, media_type, tc, upgrade, warn
+from httpolice.known import cc, h, media, tc, upgrade, warn
 from httpolice.parse import parse
 from httpolice.structure import (FieldName, HeaderEntry, HTTPVersion,
                                  Unavailable, http2, http11, okay)
@@ -127,7 +128,7 @@ class Message(Blackboard):
     @derived_property
     def json_data(self):
         if self.headers.content_type.is_okay and \
-                media_type.is_json(self.headers.content_type.item) and \
+                known.media_type.is_json(self.headers.content_type.item) and \
                 okay(self.unicode_body) and self.content_is_full:
             try:
                 r = json.loads(self.unicode_body)
@@ -147,7 +148,7 @@ class Message(Blackboard):
     @derived_property
     def xml_data(self):
         if self.headers.content_type.is_okay and \
-                media_type.is_xml(self.headers.content_type.item) and \
+                known.media_type.is_xml(self.headers.content_type.item) and \
                 okay(self.decoded_body) and self.content_is_full:
             try:
                 # It's not inconceivable that a message might contain
@@ -166,7 +167,8 @@ class Message(Blackboard):
     @derived_property
     def multipart_data(self):
         ctype = self.headers.content_type
-        if ctype.is_okay and media_type.is_multipart(ctype.value.item) and \
+        if ctype.is_okay and \
+                known.media_type.is_multipart(ctype.value.item) and \
                 okay(self.decoded_body) and self.content_is_full:
             # All multipart media types obey the same general syntax
             # specified in RFC 2046 Section 5.1,
@@ -264,9 +266,9 @@ def check_message(msg):
         # Force parsing every header present in the message
         # according to its syntax rules.
         _ = hdr.value
-        if header.deprecated(hdr.name):
+        if known.header.is_deprecated(hdr.name):
             complain(1197, header=hdr)
-        if hdr.name.startswith(u'X-') and hdr.name not in h:    # not in known
+        if hdr.name.startswith(u'X-') and hdr.name not in known.header:
             x_prefixed.append(hdr)
     if x_prefixed:
         complain(1277, headers=x_prefixed)
@@ -293,11 +295,11 @@ def check_message(msg):
         complain(1020)
 
     for opt in headers.connection:
-        if header.is_bad_for_connection(FieldName(opt)):
+        if known.header.is_bad_for_connection(FieldName(opt)):
             complain(1034, header=headers[FieldName(opt)])
 
     if headers.content_type.is_okay:
-        if media_type.deprecated(headers.content_type.item):
+        if known.media_type.is_deprecated(headers.content_type.item):
             complain(1035)
         for dupe in headers.content_type.param.duplicates():
             complain(1042, param=dupe)

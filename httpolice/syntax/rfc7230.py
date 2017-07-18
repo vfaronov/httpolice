@@ -84,14 +84,14 @@ def comma_list(element):
         (subst([None, None]) << literal(',') |
          (lambda x: [x]) << group(element)) +
         many(skip(OWS * ',') * maybe(skip(OWS) * element))
-    ) > named(u'#rule', RFC(7230, section=(7,)))
+    ) > named(u'#rule', RFC(7230, section=u'7'))
 
 def comma_list1(element):
     return _collect_elements << (
         many(subst(None) << ',' * OWS) +
         ((lambda x: [x]) << group(element)) +
         many(skip(OWS * ',') * maybe(skip(OWS) * element))
-    ) > named(u'1#rule', RFC(7230, section=(7,)))
+    ) > named(u'1#rule', RFC(7230, section=u'7'))
 
 method = Method << token                                                > pivot
 

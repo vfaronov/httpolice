@@ -57,6 +57,7 @@ setup(
     ],
     package_data={
         'httpolice': ['notices.xml'],
+        'httpolice.known': ['*.csv'],
         'httpolice.reports': ['html.css', 'html.js'],
     },
     entry_points={

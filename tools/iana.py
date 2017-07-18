@@ -8,33 +8,32 @@ Simply run::
   $ tools/iana.py
 
 and it will fetch the protocol elements registered with IANA,
-compare them with those in :mod:`httpolice.known`, and report differences.
+compare them with those in :mod:`httpolice.known`, and dump updates
+back into CSV files. Then just use your favorite ``git difftool -d``
+to check that the updates make sense, and ``git commit`` them.
 
-Items missing from HTTPolice are printed in a format
-that can be copy-pasted right into the appropriate module
-(run under Python 2, so that strings get the ``u`` prefix for consistency).
+Doesn't work under Python 2 because trying to marry CSV, Unicode, and newlines
+across Python 2 and 3 is too much for me.
 
-If certain items should not be synced, add a ``_no_sync`` key to them.
+This only updates existing entries and adds new ones. Entries that are present
+in HTTPolice but not registered with IANA are not touched (there are too many
+``X-`` headers that we need to know).
 
-Items that are present in HTTPolice but not registered with IANA
-are **not** reported (there are too many ``X-`` headers that we need to know).
+You can prevent updating certain entries by filling out their ``no_sync`` field
+with a comma-separated list of "processed" fields to skip, such as
+``citation,title``, or an asterisk ``*`` to entirely skip the entry.
 
-Exits with a non-zero status if any differences have been found.
 """
 
-from __future__ import print_function
-
-import pprint
 import re
 from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 from six.moves.urllib.request import Request  # pylint: disable=import-error
 from six.moves.urllib.request import urlopen  # pylint: disable=import-error
-import sys
 
 import lxml.etree
 
+from httpolice import known
 from httpolice.citation import RFC, Citation
-import httpolice.known
 from httpolice.structure import (AltSvcParam, AuthScheme, CacheDirective,
                                  ContentCoding, FieldName, ForwardedParam,
                                  MediaType, Method, Preference, RangeUnit,
@@ -76,7 +75,7 @@ class Registry(object):
     def _from_record(self, record):
         raise NotImplementedError()
 
-    def extract_citations(self, record):
+    def extract_citation(self, record):
         for xref in record.findall('iana:xref', self.xmlns):
             if xref.get('type') == 'rfc':
                 match = re.search(
@@ -85,15 +84,16 @@ class Registry(object):
                 if match:
                     num = int(match.group(1))
                     kw = match.group(2).lower()
-                    sect = RFC.parse_sect(match.group(3))
-                    yield RFC(num, **{kw: sect})
+                    sect = match.group(3)
+                    return RFC(num, **{kw: sect})
                 else:
                     num = int(xref.get('data')[3:])
-                    yield RFC(num)
+                    return RFC(num)
             elif xref.get('type') == 'uri':
                 title = normalize_whitespace(xref.text) if xref.text else None
                 url = xref.get('data')
-                yield Citation(title, url)
+                return Citation(title, url)
+        return None
 
 
 class HeaderRegistry(Registry):
@@ -105,8 +105,8 @@ class HeaderRegistry(Registry):
         if record.find('iana:protocol', self.xmlns).text != 'http':
             return None
         entry = {
-            '_': FieldName(record.find('iana:value', self.xmlns).text),
-            '_citations': list(self.extract_citations(record)),
+            'key': FieldName(record.find('iana:value', self.xmlns).text),
+            'citation': self.extract_citation(record),
         }
         status = record.find('iana:status', self.xmlns)
         if (status is not None) and status.text:
@@ -121,8 +121,8 @@ class MethodRegistry(Registry):
 
     def _from_record(self, record):
         return {
-            '_': Method(record.find('iana:value', self.xmlns).text),
-            '_citations': list(self.extract_citations(record)),
+            'key': Method(record.find('iana:value', self.xmlns).text),
+            'citation': self.extract_citation(record),
             'safe': yes_no(record.find('iana:safe', self.xmlns).text),
             'idempotent':
                 yes_no(record.find('iana:idempotent', self.xmlns).text),
@@ -142,9 +142,9 @@ class StatusCodeRegistry(Registry):
         if description.lower() == 'unassigned':
             return None
         return {
-            '_': StatusCode(value),
-            '_citations': list(self.extract_citations(record)),
-            '_title': description,
+            'key': StatusCode(value),
+            'citation': self.extract_citation(record),
+            'title': description,
         }
 
 
@@ -165,9 +165,9 @@ class ParametersRegistry(Registry):     # pylint: disable=abstract-method
             '//iana:registry[@id="content-coding"]/iana:record', self.xmlns)
         for record in records:
             yield {
-                '_': ContentCoding(
+                'key': ContentCoding(
                     record.find('iana:name', self.xmlns).text),
-                '_citations': list(self.extract_citations(record)),
+                'citation': self.extract_citation(record),
             }
 
     def _forwarded_parameters(self, tree):
@@ -175,9 +175,9 @@ class ParametersRegistry(Registry):     # pylint: disable=abstract-method
             '//iana:registry[@id="forwarded"]/iana:record', self.xmlns)
         for record in records:
             yield {
-                '_': ForwardedParam(
+                'key': ForwardedParam(
                     record.find('iana:name', self.xmlns).text),
-                '_citations': list(self.extract_citations(record)),
+                'citation': self.extract_citation(record),
                 'description':
                     record.find('iana:description', self.xmlns).text,
             }
@@ -187,10 +187,10 @@ class ParametersRegistry(Registry):     # pylint: disable=abstract-method
             '//iana:registry[@id="preferences"]/iana:record', self.xmlns)
         for record in records:
             yield {
-                '_': Preference(
+                'key': Preference(
                     record.find('iana:name', self.xmlns).text),
-                '_citations': list(self.extract_citations(
-                    record.find('iana:spec', self.xmlns))),
+                'citation': self.extract_citation(
+                    record.find('iana:spec', self.xmlns)),
             }
 
     def _range_units(self, tree):
@@ -198,9 +198,9 @@ class ParametersRegistry(Registry):     # pylint: disable=abstract-method
             '//iana:registry[@id="range-units"]/iana:record', self.xmlns)
         for record in records:
             yield {
-                '_': RangeUnit(
+                'key': RangeUnit(
                     record.find('iana:name', self.xmlns).text),
-                '_citations': list(self.extract_citations(record)),
+                'citation': self.extract_citation(record),
             }
 
     def _transfer_codings(self, tree):
@@ -208,9 +208,9 @@ class ParametersRegistry(Registry):     # pylint: disable=abstract-method
             '//iana:registry[@id="transfer-coding"]/iana:record', self.xmlns)
         for record in records:
             yield {
-                '_': TransferCoding(
+                'key': TransferCoding(
                     record.find('iana:name', self.xmlns).text),
-                '_citations': list(self.extract_citations(record)),
+                'citation': self.extract_citation(record),
             }
 
 
@@ -232,8 +232,8 @@ class MediaTypeRegistry(Registry):
                 return None
         else:
             entry = {}
-        entry['_'] = MediaType(u'%s/%s' % (toplevel, subtype))
-        entry['_citations'] = list(self.extract_citations(record))
+        entry['key'] = MediaType(u'%s/%s' % (toplevel, subtype))
+        entry['citation'] = self.extract_citation(record)
         return entry
 
 
@@ -244,9 +244,9 @@ class UpgradeTokenRegistry(Registry):
 
     def _from_record(self, record):
         return {
-            '_': UpgradeToken(record.find('iana:value', self.xmlns).text),
-            '_citations': list(self.extract_citations(record)),
-            '_title':
+            'key': UpgradeToken(record.find('iana:value', self.xmlns).text),
+            'citation': self.extract_citation(record),
+            'title':
                 record.find('iana:description', self.xmlns).text,
         }
 
@@ -258,9 +258,8 @@ class CacheDirectiveRegistry(Registry):
 
     def _from_record(self, record):
         return {
-            '_': CacheDirective(
-                    record.find('iana:value', self.xmlns).text),
-            '_citations': list(self.extract_citations(record)),
+            'key': CacheDirective(record.find('iana:value', self.xmlns).text),
+            'citation': self.extract_citation(record),
         }
 
 
@@ -271,9 +270,9 @@ class WarnCodeRegistry(Registry):
 
     def _from_record(self, record):
         return {
-            '_': WarnCode(record.find('iana:value', self.xmlns).text),
-            '_citations': list(self.extract_citations(record)),
-            '_title': record.find('iana:description', self.xmlns).text,
+            'key': WarnCode(record.find('iana:value', self.xmlns).text),
+            'citation': self.extract_citation(record),
+            'title': record.find('iana:description', self.xmlns).text,
         }
 
 
@@ -284,8 +283,8 @@ class AuthSchemeRegistry(Registry):
 
     def _from_record(self, record):
         return {
-            '_': AuthScheme(record.find('iana:value', self.xmlns).text),
-            '_citations': list(self.extract_citations(record)),
+            'key': AuthScheme(record.find('iana:value', self.xmlns).text),
+            'citation': self.extract_citation(record),
         }
 
 
@@ -296,9 +295,9 @@ class RelationTypeRegistry(Registry):
 
     def _from_record(self, record):
         return {
-            '_': RelationType(record.find('iana:value', self.xmlns).text),
-            '_citations': list(
-                self.extract_citations(record.find('iana:spec', self.xmlns))),
+            'key': RelationType(record.find('iana:value', self.xmlns).text),
+            'citation': 
+                self.extract_citation(record.find('iana:spec', self.xmlns)),
         }
 
 
@@ -309,59 +308,36 @@ class AltSvcParamRegistry(Registry):
 
     def _from_record(self, record):
         return {
-            '_': AltSvcParam(record.find('iana:value', self.xmlns).text),
-            '_citations': list(self.extract_citations(record)),
+            'key': AltSvcParam(record.find('iana:value', self.xmlns).text),
+            'citation': self.extract_citation(record),
         }
 
 
-def make_diff(here, there):
-    missing = []
-    mismatch = []
-    for key, entry in there.items():
-        if key in here:
-            no_sync = here[key].pop('_no_sync', [])
-            entry_diff = {k: {'here': here[key].get(k), 'there': v}
-                          for k, v in entry.items()
-                          if not _info_match(k, here[key].get(k), v) and
-                             no_sync != True and k not in no_sync}
-            if entry_diff:
-                entry_diff['_'] = key
-                mismatch.append(entry_diff)
-        elif entry['_citations']:
-            # We don't have much use for entries without citations.
-            missing.append(entry)
-    return missing, mismatch
+def dump_updates(knowledge, their_entries):
+    entries = {key: knowledge.get(key).copy() for key in knowledge}
 
+    for their in their_entries:
+        key = their['key']
+        entry = entries.setdefault(key, {})
+        no_sync = entry.get('no_sync', '').split(',')
+        entry.update({
+            k: v for (k, v) in their.items()
+            if v is not None and k not in no_sync and '*' not in no_sync
+            and not (k == 'citation' and k in entry and entry[k].subset_of(v))
+        })
+        if not entry.get('citation') and key not in knowledge:
+            # This entry was newly fetched from IANA, but has no citations
+            # (e.g. there are many such media types). These are mostly useless.
+            del entries[key]
 
-def _info_match(key, here, there):
-    if key == '_citations':
-        # We consider the citation lists matching if
-        # for every citation listed at IANA
-        # we have the same citation or a more specific one.
-        here = here or []
-        for there_cit in there:
-            if not any(here_cit.subset_of(there_cit) for here_cit in here):
-                return False
-        return True
-    else:
-        return here == there
+    knowledge.dump(entry for (_, entry) in sorted(entries.items()))
 
 
 def main():
-    exit_status = 0
     for reg in Registry.__subclasses__():
         for cls, entries in reg().get_all():
-            (here, _) = httpolice.known.classes[cls]
-            there = {entry['_']: entry for entry in entries}
-            missing, mismatch = make_diff(here, there)
-            for title, updates in [('missing', missing),
-                                   ('mismatch', mismatch)]:
-                if updates:
-                    print('======== %s %s ========\n' % (cls.__name__, title))
-                    pprint.pprint(updates)
-                    print('\n')
-                    exit_status = 1
-    sys.exit(exit_status)
+            (knowledge, _) = known.classes[cls]
+            dump_updates(knowledge, entries)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,8 @@
+key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title
+chunked,,,,7230,4.1,,,
+compress,,,,7230,4.2.1,,,
+deflate,,,,7230,4.2.2,,,
+gzip,,,,7230,4.2.3,,,
+identity,,RFC errata ID: 408,*,,,,,
+x-compress,,,,7230,4.2.1,,,
+x-gzip,,,,7230,4.2.2,,,

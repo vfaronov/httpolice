@@ -1,0 +1,5 @@
+key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title,syntax_module,syntax_symbol,argument
+handling,,,,7240,4.4,,,,rfc7240,handling,required
+respond-async,,,,7240,4.1,,,,,,no
+return,,,,7240,4.2,,,,rfc7240,return_,required
+wait,,,,7240,4.3,,,,rfc7240,wait,required

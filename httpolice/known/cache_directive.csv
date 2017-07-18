@@ -1,0 +1,15 @@
+key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title,syntax_module,syntax_symbol,argument,argument_form,for_request,for_response
+max-age,,,citation,7234,5.2,,,,rfc7234,delta_seconds,required,token,True,True
+max-stale,,,,7234,5.2.1.2,,,,rfc7234,delta_seconds,optional,token,True,False
+min-fresh,,,,7234,5.2.1.3,,,,rfc7234,delta_seconds,required,token,True,False
+must-revalidate,,,,7234,5.2.2.1,,,,,,no,,False,True
+no-cache,,,citation,7234,5.2,,,,rfc7234,no_cache,optional,quoted_string,True,True
+no-store,,,citation,7234,5.2,,,,,,no,,True,True
+no-transform,,,citation,7234,5.2,,,,,,no,,True,True
+only-if-cached,,,,7234,5.2.1.7,,,,,,no,,True,False
+private,,,,7234,5.2.2.6,,,,rfc7234,private,optional,quoted_string,False,True
+proxy-revalidate,,,,7234,5.2.2.7,,,,,,no,,False,True
+public,,,,7234,5.2.2.5,,,,,,no,,False,True
+s-maxage,,,,7234,5.2.2.9,,,,rfc7234,delta_seconds,required,token,False,True
+stale-if-error,,,,5861,4,,,,rfc7234,delta_seconds,required,,True,True
+stale-while-revalidate,,,,5861,3,,,,rfc7234,delta_seconds,required,,False,True

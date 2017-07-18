@@ -19,8 +19,7 @@ import string
 import pytest
 import six
 
-from httpolice import Exchange, Request, Response, check_exchange
-from httpolice.known import h, header, m
+from httpolice import Exchange, Request, Response, check_exchange, known
 from httpolice.reports import html_report, text_report
 from httpolice.structure import http2, http10, http11
 
@@ -29,8 +28,9 @@ N_TESTS = 100
 
 schemes = [u'http', u'https', u'foobar', None]
 versions = [http10, http11, http2, u'HTTP/3.0', None]
-methods = sorted(m)
-header_names = sorted(hdr for hdr in h if header.parser_for(hdr) is not None)
+methods = sorted(known.method)
+header_names = sorted(hdr for hdr in known.header
+                      if known.header.syntax_for(hdr) is not None)
 
 def make_request_target():
     fuzzer = random.choice([make_token, make_garbage])

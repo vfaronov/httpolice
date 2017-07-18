@@ -147,13 +147,9 @@ class CiteRFC(Cite):
 
     @property
     def info(self):
-        num = int(self.get('num'))
-        sect = citation.RFC.parse_sect(self.get('sect')) \
-            if self.get('sect') else None
-        appendix = citation.RFC.parse_sect(self.get('appendix')) \
-            if self.get('appendix') else None
-        errata = int(self.get('errata')) if self.get('errata') else None
-        return citation.RFC(num, sect, appendix, errata)
+        return citation.RFC(self.get('num'),
+                            self.get('sect'), self.get('appendix'),
+                            self.get('errata'))
 
 
 class Known(Content):

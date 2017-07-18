@@ -94,6 +94,24 @@ For example:
   (this is why you see comparisons to ``False`` all over the place).
 
 
+Known
+-----
+The ``httpolice.known`` package manages tabular data associated with various
+protocol elements, such as which RFC defines which header.
+
+The data is stored as CSV within the package. From time to time, it is manually
+synchronized with IANA registries using the ``tools/iana.py`` script, which
+takes care not to touch our private fields. See ``httpolice/known/README.rst``
+for more.
+
+Then, the various objects and functions in ``httpolice.known`` allow querying
+this data. For this purpose, the module is imported as ``from httpolice import
+known``, so you get things like ``known.header.is_deprecated(...)``.
+
+As a bonus, ``httpolice.known`` exposes nice attribute-style accessors for all
+the various protocol element names, like ``m.GET`` and ``h.last_modified``.
+
+
 Code coverage
 -------------
 The delivery pipeline (Travis CI) requires "100%" statement coverage in tests.
@@ -122,8 +140,8 @@ and you want HTTPolice to understand it.
    into a new module ``httpolice.syntax.rfc9999``,
    using the parser combinators from ``httpolice.parse``.
    Consult other modules in ``httpolice.syntax`` to get the hang of it.
-#. Add information about ``Foo-Bar`` into ``httpolice.known.header``.
-   Consult the comments in that module regarding the fields you can fill in.
+#. Fill out the entry for ``Foo-Bar`` in ``httpolice/known/header.csv``.
+   Consult ``README.rst`` there.
 #. Some complex headers may need special-casing in ``httpolice.header``.
    See ``CacheControlView`` for an example.
 
@@ -168,11 +186,11 @@ Releasing a new version
 #. Make sure that you're on master, it's clean and synced with GitHub,
    and that Travis is green.
 
-#. Sync with IANA registries by running (under Python 2)::
+#. Sync with IANA registries, for example::
 
      $ tools/iana.py
-
-   and propagating any changes to ``httpolice.known``.
+     $ git difftool -d     # review for surprises
+     $ git commit -am 'Sync with IANA registries'
 
 #. If necessary, update the version number in ``httpolice/__metadata__.py``
    (e.g. 0.12.0.dev4 → 0.12.0).

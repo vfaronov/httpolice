@@ -1,0 +1,3 @@
+key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title,syntax_module,syntax_symbol,argument
+includeSubDomains,,,,6797,6.1.2,,,,,,no
+max-age,,,,6797,6.1.1,,,,rfc6797,max_age_value,required

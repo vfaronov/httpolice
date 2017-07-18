@@ -20,8 +20,7 @@ import operator
 import sys
 
 from httpolice import known
-from httpolice.known import alt_svc_param, cache_directive, h, header
-import httpolice.known.hsts_directive
+from httpolice.known import HeaderRule, h
 from httpolice.parse import parse
 from httpolice.structure import Parametrized, Unavailable, okay
 from httpolice.syntax.rfc7230 import quoted_string, token
@@ -35,12 +34,12 @@ class HeadersView(object):
         self._message = message
         self._cache = {}
 
-    def __getattr__(self, key):
-        return self[getattr(h, key)]
+    def __getattr__(self, name):
+        return self[getattr(h, name)]
 
     def __getitem__(self, key):
         if key not in self._cache:
-            rule = header.rule_for(key)
+            rule = known.header.rule_for(key)
 
             # Some headers have more internal structure
             # than can be handled by a simple context-free parser,
@@ -61,9 +60,9 @@ class HeadersView(object):
             # For the rest, we only need to know
             # a generic "rule" for combining multiple entries,
             # and a parser to parse the value.
-            elif rule == header.SINGLE:
+            elif rule is HeaderRule.single:
                 cls = SingleHeaderView
-            elif rule == header.MULTI:
+            elif rule is HeaderRule.multi:
                 cls = MultiHeaderView
             else:
                 cls = UnknownHeaderView
@@ -133,17 +132,17 @@ class HeaderView(object):
         entries = []
         values = []
         items = self.message.headers.enumerate(self.name)
-        parser = header.parser_for(self.name)
+        syntax = known.header.syntax_for(self.name)
         for from_trailer, i, entry in items:
-            if from_trailer and header.is_bad_for_trailer(self.name):
+            if from_trailer and known.header.is_bad_for_trailer(self.name):
                 self.message.complain(1026, entry=entry)
                 continue
             entries.append(entry)
-            if parser is None:
+            if syntax is None:
                 parsed = entry.value
             else:
                 (parsed, annotations) = parse(
-                    entry.value, parser,
+                    entry.value, syntax,
                     self.message.complain, 1000, place=entry,
                     annotate_classes=known.classes)
                 if parsed is not Unavailable:
@@ -313,30 +312,30 @@ class DirectivesView(HeaderView):           # pylint: disable=abstract-method
 
     """Wraps a header whose parsed value is a list of directives."""
 
-    knowledge_module = None
+    knowledge = None
 
     def _process_parsed(self, entry, parsed):
         return [self._process_directive(entry, d) for d in parsed]
 
     def _process_directive(self, entry, directive_with_argument):
         directive, argument = directive_with_argument
-        parser = self.knowledge_module.parser_for(directive)
+        syntax = self.knowledge.syntax_for(directive)
         if argument is None:
-            if self.knowledge_module.argument_required(directive):
+            if self.knowledge.argument_required(directive):
                 self.message.complain(1156, entry=entry, directive=directive)
                 argument = Unavailable
         else:
-            if self.knowledge_module.no_argument(directive):
+            if self.knowledge.no_argument(directive):
                 self.message.complain(1157, entry=entry, directive=directive)
                 argument = None
-            elif parser is not None:
-                argument = parse(argument, parser,
+            elif syntax is not None:
+                argument = parse(argument, syntax,
                                  self.message.complain, 1158, place=entry,
                                  directive=directive, value=argument)
         return Parametrized(directive, argument)
 
-    def __getattr__(self, key):
-        return self[getattr(self.knowledge_module.known, key)]
+    def __getattr__(self, name):
+        return self[getattr(self.knowledge.accessor, name)]
 
     def __getitem__(self, key):
         for directive, argument in self:
@@ -349,18 +348,18 @@ class CacheControlView(DirectivesView, MultiHeaderView):
 
     """Wraps a ``Cache-Control`` header."""
 
-    knowledge_module = cache_directive
+    knowledge = known.cache_directive
 
     def _process_directive(self, entry, directive_with_argument):
         (directive, argument) = directive_with_argument
         if argument is not None:
             (symbol, argument) = argument
 
-            if cache_directive.quoted_string_preferred(directive) and \
+            if known.cache_directive.quoted_string_preferred(directive) and \
                     symbol is not quoted_string:
                 self.message.complain(1154, directive=directive)
 
-            if cache_directive.token_preferred(directive) and \
+            if known.cache_directive.token_preferred(directive) and \
                     symbol is not token:
                 self.message.complain(1155, directive=directive)
 
@@ -372,7 +371,7 @@ class StrictTransportSecurityView(DirectivesView, SingleHeaderView):
 
     """Wraps a ``Strict-Transport-Security`` header."""
 
-    knowledge_module = httpolice.known.hsts_directive
+    knowledge = known.hsts_directive
 
 
 class AltSvcView(SingleHeaderView):
@@ -389,9 +388,9 @@ class AltSvcView(SingleHeaderView):
             params = alternative.param.sequence
             for i in range(len(params)):
                 (name, value) = params[i]
-                parser = alt_svc_param.parser_for(name)
-                if parser is not None:
-                    value = parse(value, parser, self.message.complain, 1259,
+                syntax = known.alt_svc_param.syntax_for(name)
+                if syntax is not None:
+                    value = parse(value, syntax, self.message.complain, 1259,
                                   place=entry, param=name, value=value)
                 params[i] = (name, value)
 
@@ -402,7 +401,7 @@ class PreferView(DirectivesView, MultiHeaderView):
 
     """Wraps a `Prefer` header."""
 
-    knowledge_module = httpolice.known.preference
+    knowledge = known.preference
 
     # Each preference has two level of wrapping: ``((name, value), params)``.
     # Params are currently not used for anything, so we peel them off
@@ -427,14 +426,14 @@ class PreferenceAppliedView(DirectivesView, MultiHeaderView):
 
     """Wraps a ``Preference-Applied`` header."""
 
-    knowledge_module = httpolice.known.preference
+    knowledge = known.preference
 
 
 class ForwardedView(DirectivesView, MultiHeaderView):
 
     """Wraps a ``Forwarded`` header."""
 
-    knowledge_module = httpolice.known.forwarded_param
+    knowledge = known.forwarded_param
 
     def _process_parsed(self, entry, parsed):
         # Work at the second level of nesting (forwarded-pairs,

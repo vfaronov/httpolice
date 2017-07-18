@@ -6,9 +6,9 @@ from httpolice.parse import (fill_names, literal, mark, maybe, maybe_str,
 from httpolice.structure import (CacheDirective, CaseInsensitive, Parametrized,
                                  WarnCode, WarningValue)
 from httpolice.syntax.common import DIGIT, DQUOTE, SP
-from httpolice.syntax.rfc7230 import (comma_list1, port, pseudonym,
-                                      quoted_string, token, token__excluding,
-                                      uri_host)
+from httpolice.syntax.rfc7230 import (comma_list, comma_list1, field_name,
+                                      port, pseudonym, quoted_string, token,
+                                      token__excluding, uri_host)
 from httpolice.syntax.rfc7231 import HTTP_date
 
 
@@ -19,6 +19,10 @@ cache_directive = Parametrized << (
     (CacheDirective << token) *
     maybe(skip('=') * (mark(token) | mark(quoted_string))))             > pivot
 Cache_Control = comma_list1(cache_directive)                            > pivot
+
+# RFC 7234 does not, strictly speaking, define these productions:
+no_cache = comma_list(field_name)                                       > pivot
+private = comma_list(field_name)                                        > pivot
 
 Expires = HTTP_date                                                     > pivot
 

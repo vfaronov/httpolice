@@ -1,0 +1,65 @@
+key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title,cacheable
+100,Continue,,,7231,6.2.1,,,,not_by_default
+101,Switching Protocols,,,7231,6.2.2,,,,not_by_default
+102,Processing,,,2518,,,,,
+200,OK,,,7231,6.3.1,,,,by_default
+201,Created,,,7231,6.3.2,,,,not_by_default
+202,Accepted,,,7231,6.3.3,,,,not_by_default
+203,Non-Authoritative Information,,,7231,6.3.4,,,,by_default
+204,No Content,,,7231,6.3.5,,,,by_default
+205,Reset Content,,,7231,6.3.6,,,,not_by_default
+206,Partial Content,,,7233,4.1,,,,by_default
+207,Multi-Status,,,4918,,,,,
+208,Already Reported,,,5842,,,,,
+226,IM Used,,,3229,,,,,
+300,Multiple Choices,,,7231,6.4.1,,,,by_default
+301,Moved Permanently,,,7231,6.4.2,,,,by_default
+302,Found,,,7231,6.4.3,,,,not_by_default
+303,See Other,,,7231,6.4.4,,,,not_by_default
+304,Not Modified,"The cacheability story here is complicated by the fact that
+a cache can generate a 304 response out of a stored 200 response
+(as in RFC 7234 section 4.3.2). It's not clear to me whether
+an `Age` header would make sense on such a response,
+so let's not check it for now.",,7232,4.1,,,,
+305,Use Proxy,,,7231,6.4.5,,,,
+306,(Unused),,,7231,6.4.6,,,,
+307,Temporary Redirect,,,7231,6.4.7,,,,not_by_default
+308,Permanent Redirect,,,7538,3,,,,by_default
+400,Bad Request,,,7231,6.5.1,,,,not_by_default
+401,Unauthorized,,,7235,3.1,,,,not_by_default
+402,Payment Required,,,7231,6.5.2,,,,
+403,Forbidden,,,7231,6.5.3,,,,not_by_default
+404,Not Found,,,7231,6.5.4,,,,by_default
+405,Method Not Allowed,,,7231,6.5.5,,,,by_default
+406,Not Acceptable,,,7231,6.5.6,,,,not_by_default
+407,Proxy Authentication Required,,,7235,3.2,,,,not_by_default
+408,Request Timeout,,,7231,6.5.7,,,,not_by_default
+409,Conflict,,,7231,6.5.8,,,,not_by_default
+410,Gone,,,7231,6.5.9,,,,by_default
+411,Length Required,,,7231,6.5.10,,,,not_by_default
+412,Precondition Failed,,,7232,4.2,,,,not_by_default
+413,Payload Too Large,,,7231,6.5.11,,,,not_by_default
+414,URI Too Long,,,7231,6.5.12,,,,by_default
+415,Unsupported Media Type,,,7231,6.5.13,,,,not_by_default
+416,Range Not Satisfiable,,,7233,4.4,,,,not_by_default
+417,Expectation Failed,,,7231,6.5.14,,,,not_by_default
+421,Misdirected Request,,,7540,9.1.2,,,,by_default
+422,Unprocessable Entity,,,4918,11.2,,,,not_by_default
+423,Locked,,,4918,11.3,,,,not_by_default
+424,Failed Dependency,,,4918,11.4,,,,not_by_default
+426,Upgrade Required,,,7231,6.5.15,,,,not_by_default
+428,Precondition Required,,,6585,3,,,,not_at_all
+429,Too Many Requests,,,6585,4,,,,not_at_all
+431,Request Header Fields Too Large,,,6585,5,,,,not_at_all
+451,Unavailable For Legal Reasons,,,7725,3,,,,by_default
+500,Internal Server Error,,,7231,6.6.1,,,,not_by_default
+501,Not Implemented,,,7231,6.6.2,,,,by_default
+502,Bad Gateway,,,7231,6.6.3,,,,not_by_default
+503,Service Unavailable,,,7231,6.6.4,,,,not_by_default
+504,Gateway Timeout,,,7231,6.6.5,,,,not_by_default
+505,HTTP Version Not Supported,,,7231,6.6.6,,,,not_by_default
+506,Variant Also Negotiates,,,2295,,,,,
+507,Insufficient Storage,,,4918,11.5,,,,not_by_default
+508,Loop Detected,,,5842,,,,,
+510,Not Extended,,,2774,,,,,
+511,Network Authentication Required,,,6585,6,,,,not_at_all

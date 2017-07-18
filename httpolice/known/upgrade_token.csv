@@ -1,0 +1,5 @@
+key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title
+HTTP,Hypertext Transfer Protocol,,,7230,2.6,,,
+TLS,Transport Layer Security,,,2817,,,,
+WebSocket,The Web Socket Protocol,,,6455,,,,
+h2c,Hypertext Transfer Protocol version 2 (HTTP/2),,,7540,3.2,,,
