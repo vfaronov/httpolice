@@ -24,6 +24,7 @@ from httpolice.known import HeaderRule, h
 from httpolice.parse import parse
 from httpolice.structure import Parametrized, Unavailable, okay
 from httpolice.syntax.rfc7230 import quoted_string, token
+from httpolice.util.data import duplicates
 
 
 class HeadersView(object):
@@ -119,7 +120,7 @@ class HeaderView(object):
     def __init__(self, message, name):
         self.message = message
         self.name = name
-        self._entries = self._value = self._value_breakdown = None
+        self._entries = self._value = None
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, self.name)
@@ -163,13 +164,6 @@ class HeaderView(object):
         if self._entries is None:   # pragma: no cover
             self._parse()
         return self._entries
-
-    @property
-    def value_breakdown(self):
-        """List of (parsed) values for every entry of this header."""
-        if self._entries is None:   # pragma: no cover
-            self._parse()
-        return self._value_breakdown
 
     @property
     def value(self):
@@ -267,7 +261,6 @@ class UnknownHeaderView(HeaderView):
         entries, values = self._pre_parse()
         self._value = b','.join(values) if values else None
         self._entries = entries
-        self._value_breakdown = values
 
 
 class SingleHeaderView(HeaderView):
@@ -280,11 +273,9 @@ class SingleHeaderView(HeaderView):
             if len(entries) > 1:
                 self.message.complain(1013, header=self, entries=entries)
             self._value = values[-1]
-            self._value_breakdown = [values[-1]]
             self._entries = [entries[-1]]
         else:
             self._value = None
-            self._value_breakdown = []
             self._entries = []
 
 
@@ -300,7 +291,6 @@ class MultiHeaderView(HeaderView):
                 self._value.append(sub_values)
             else:
                 self._value.extend(sub_values)
-        self._value_breakdown = values
         self._entries = entries
 
     def __iter__(self):
@@ -438,7 +428,21 @@ class ForwardedView(DirectivesView, MultiHeaderView):
     def _process_parsed(self, entry, parsed):
         # Work at the second level of nesting (forwarded-pairs,
         # not forwarded-elements).
-        return [super(ForwardedView, self)._process_parsed(entry, pairs)
-                for pairs in parsed]
+        elements = [super(ForwardedView, self)._process_parsed(entry, elem)
+                    for elem in parsed]
+
+        # ``Forwarded`` is probably more likely than other headers to appear
+        # multiple times in a message (as appended by intermediaries), so
+        # it's more important to report these notices on a specific entry
+        # rather than on the entire `ForwardedView` in `check_request`.
+        for elem in elements:
+            for duped in duplicates(param for (param, _value) in elem):
+                self.message.complain(1296, entry=entry, param=duped)
+        if len(elements) > 1 and all(len(elem) == 1 for elem in elements):
+            if not duplicates(param for [(param, _value)] in elements):
+                self.message.complain(1297, entry=entry,
+                                      n_elements=len(elements))
+
+        return elements
 
     __getattr__ = None

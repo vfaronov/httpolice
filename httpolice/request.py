@@ -415,17 +415,6 @@ def check_request(req):
        (prefer.handling, u'lenient') in headers.prefer.without_params:
         complain(1290)
 
-    for (entry, elements) in zip(headers.forwarded.entries,
-                                 headers.forwarded.value_breakdown):
-        if not okay(elements):
-            continue
-        for elem in elements:
-            for duped in duplicates(param for (param, _) in elem):
-                complain(1296, entry=entry, param=duped)
-        if len(elements) > 1 and all(len(elem) == 1 for elem in elements):
-            if not duplicates(param for [(param, _)] in elements):
-                complain(1297, entry=entry, n_elements=len(elements))
-
 
 def _check_basic_auth(req, hdr, credentials):
     if isinstance(credentials, six.text_type):   # ``token68`` form
