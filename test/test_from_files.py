@@ -11,6 +11,7 @@ In HAR files, the expected notices are specified in the ``_expected`` key.
 import io
 import json
 import os
+import re
 
 import pytest
 import six
@@ -55,4 +56,9 @@ def test_from_file(input_from_file):    # pylint: disable=redefined-outer-name
                     if not ln.startswith(u'----'))
     assert expected == actual
 
-    html_report(exchanges, six.BytesIO())     # Just check that it doesn't fail
+    buf = six.BytesIO()
+    html_report(exchanges, buf)
+    # Check that the report does not contain strings that look like default
+    # Python object reprs, meaning that we failed to render something.
+    # This pops up from time to time.
+    assert not re.search(b'&lt;[^>]+ at 0x[0-9a-fA-F]+&gt;', buf.getvalue())
