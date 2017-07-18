@@ -101,7 +101,7 @@ class Message(Blackboard):
 
         try:
             codec = codecs.lookup(charset)
-        except LookupError:
+        except (LookupError, UnicodeError):
             return None
         charset = codec.name
 

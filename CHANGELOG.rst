@@ -19,6 +19,10 @@ Added
 - Checks for the `Forwarded`_ header (notices `1296`_, `1297`_).
 - Minor speedup in case when request URLs often repeat.
 
+Fixed
+-----
+- Fixed a crash on some pathological values of ``charset`` in ``Content-Type``.
+
 .. _Forwarded: https://tools.ietf.org/html/rfc7239
 .. _chunk extensions: https://tools.ietf.org/html/rfc7230#section-4.1.1
 .. _1009: http://pythonhosted.org/HTTPolice/notices.html#1009
