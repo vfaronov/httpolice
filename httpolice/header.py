@@ -206,7 +206,7 @@ class HeaderView(object):
     def _compare(self, other, op):
         # It would be nice to be able to compare headers by values, as in::
         #
-        #   response.headers.etag == request.headers.if_match
+        #   resp.headers.last_modified == req.headers.if_modified_since
         #
         # Unfortunately, there are places
         # (such as :meth:`httpolice.blackboard.Blackboard.complain`)
@@ -218,7 +218,7 @@ class HeaderView(object):
         #
         # Now, the following form still works::
         #
-        #   response.headers.etag == request.headers.if_match.value
+        #   resp.headers.last_modified == req.headers.if_modified_since.value
         #
         # so we don't lose all that much.
 

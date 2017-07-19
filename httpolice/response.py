@@ -617,7 +617,7 @@ def check_response_in_context(resp, req):
             complain(1115)
 
     if method in [m.GET, m.HEAD] and status.successful:
-        if req.headers.if_none_match.is_okay and resp.headers.etag.is_okay:
+        if resp.headers.etag.is_okay:
             if req.headers.if_none_match == u'*':
                 # In this case we could ignore the presence of ``ETag``,
                 # but then we would need a separate notice
@@ -737,8 +737,7 @@ def check_response_in_context(resp, req):
 
     if resp.headers.preference_applied.is_present and \
             known.method.is_cacheable(method) and \
-            not (resp.headers.vary == u'*') and \
-            not (resp.headers.vary.is_okay and h.prefer in resp.headers.vary):
+            resp.headers.vary != u'*' and h.prefer not in resp.headers.vary:
             # We could also look for ``Cache-Control: no-store`` etc.,
             # but the meaning of ``Vary`` is not limited to caching,
             # and anyway this is just a mild comment.

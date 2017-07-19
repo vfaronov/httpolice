@@ -298,9 +298,8 @@ def check_request(req):
         if x.item in [cc.x_gzip, cc.x_compress] and x.param is not None:
             complain(1116, coding=x.item)
 
-    if headers.if_match.is_okay and headers.if_match != u'*':
-        if any(tag.weak for tag in headers.if_match):
-            complain(1120)
+    if headers.if_match != u'*' and any(tag.weak for tag in headers.if_match):
+        complain(1120)
 
     if method == m.HEAD:
         for hdr in headers:
