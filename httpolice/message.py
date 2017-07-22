@@ -72,6 +72,7 @@ class Message(Blackboard):
 
     @derived_property
     def decoded_body(self):
+        """The payload body with Content-Encoding removed."""
         r = self.body
         codings = self.headers.content_encoding.value[:]
         while codings and okay(r) and r:
@@ -116,13 +117,14 @@ class Message(Blackboard):
     def unicode_body(self):
         if not okay(self.decoded_body):
             return self.decoded_body
-        if self.guessed_charset is None:
+        if not okay(self.guessed_charset):
             return Unavailable(self.decoded_body)
         # pylint: disable=no-member
         return self.decoded_body.decode(self.guessed_charset)
 
     @derived_property
     def content_is_full(self):
+        """Does this message carry a complete instance of its Content-Type?"""
         return True
 
     @derived_property
@@ -139,7 +141,7 @@ class Message(Blackboard):
                 if self.guessed_charset not in ['ascii', 'utf-8', 'utf-16',
                                                 'utf-16-le', 'utf-16-be',
                                                 'utf-32', 'utf-32-le',
-                                                'utf-32-be']:
+                                                'utf-32-be', None]:
                     self.complain(1281)
             return r
         else:
@@ -205,6 +207,11 @@ class Message(Blackboard):
 
     @derived_property
     def displayable_body(self):
+        """
+        The payload body in a form that is appropriate for display in a message
+        preview, along with a list of phrases explaining which transformations
+        have been applied to arrive at that form.
+        """
         removing_te = [u'removing Transfer-Encoding'] \
             if self.headers.transfer_encoding else []
         removing_ce = [u'removing Content-Encoding'] \

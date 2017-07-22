@@ -7,22 +7,22 @@ Unreleased
 Changed
 -------
 - Notice `1277`_ (obsolete 'X-' prefix) is now reported only once per message.
-- HTTPolice no longer attempts to process very long header lines (currently
-  16K; they will fail with notice `1006`_/`1009`_) and message bodies
-  (currently 1G; notice `1298`_).
+- When parsing TCP streams, HTTPolice no longer attempts to process very long
+  header lines (currently 16K; they will fail with notice `1006`_/`1009`_)	
+  and message bodies (currently 1G; notice `1298`_).
 - The syntax of `chunk extensions`_ is no longer checked.
 
 Added
 -----
-- HTTPolice can now use much less memory when parsing long TCP streams.
-- Similarly, large HTML reports need much less memory to produce.
 - Checks for the `Forwarded`_ header (notices `1296`_, `1297`_).
-- Minor speedup in case when request URLs often repeat.
 
 Fixed
 -----
+- HTTPolice can now use much less memory when parsing long TCP streams.
+- Similarly, large HTML reports need much less memory to produce.
 - Notice `1013`_ is no longer wrongly reported for some headers
   such as ``Vary``.
+- Minor speedup in case when request URLs often repeat.
 - Fixed a crash on some pathological values of ``charset`` in ``Content-Type``.
 
 .. _Forwarded: https://tools.ietf.org/html/rfc7239

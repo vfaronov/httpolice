@@ -40,10 +40,10 @@ def parse_streams(inbound, outbound, scheme=None):
     is unreliable, because response framing depends on the request.
 
     :param inbound:
-        The inbound (request) stream as a :class:`~httpolice.parse.Stream`,
+        The inbound (request) stream as a :class:`~httpolice.stream.Stream`,
         or `None`.
     :param outbound:
-        The outbound (response) stream as a :class:`~httpolice.parse.Stream`,
+        The outbound (response) stream as a :class:`~httpolice.stream.Stream`,
         or `None`.
     :param scheme:
         The scheme of the request URI, as a Unicode string,
@@ -242,7 +242,7 @@ def _parse_response_body(resp, stream):
 def parse_header_fields(stream):
     """Parse a block of HTTP/1.x header fields.
 
-    :param stream: The :class:`~httpolice.parse.Stream` from which to parse.
+    :param stream: The :class:`~httpolice.stream.Stream` from which to parse.
     :return: A list of :class:`HeaderEntry`.
     :raises: :class:`ParseError`
     """

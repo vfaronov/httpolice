@@ -1,9 +1,9 @@
 HTTPolice user manual
 =====================
 
-`HTTPolice`__ is a validator for HTTP requests and responses. It can spot bad
-header syntax, inappropriate status codes, and other interoperability problems
-in your HTTP server or client.
+`HTTPolice`__ is a validator or “linter” for HTTP requests and responses.
+It can spot bad header syntax, inappropriate status codes, and other potential
+problems in your HTTP server or client.
 
 __ https://github.com/vfaronov/httpolice
 

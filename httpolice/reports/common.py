@@ -69,7 +69,7 @@ def expand_parse_error(error):
         if option:
             para.extend([option] if i == 0 else [u'or ', option])
             if symbols:
-                para.append(u', as part of ')
+                para.append(u' as part of ')
         for j, symbol in enumerate(symbols or []):
             para.extend([symbol] if j == 0 else [u' or ', symbol])
         paras.append(para)

@@ -32,7 +32,7 @@ Also, the input string can be annotated with parsed objects.
 For example, in an HTML report,
 the ``text/xml`` in ``Accept: text/xml;q=0.9`` becomes a hyperlink to RFC,
 because it is parsed into a :class:`~httpolice.structure.MediaType` object.
-The list of classes to annotate must be passed to :meth:`Stream.parse`.
+The list of classes to annotate must be passed to :func:`parse`.
 Also, the object (in this case, ``MediaType(u'text/xml')``)
 must be the end result of a distinct :class:`Nonterminal`,
 **not** buried inside some :class:`Rule`.

@@ -1242,7 +1242,10 @@ One non-obvious thing is how references work
 
   <debug id="1168">
     <title><h>Age</h> header implies response from cache</title>
-    <explain>This response has an <h>Age</h> header, which implies that it was served from a cache, without contacting the origin server.</explain>
+    <rfc num="7234" sect="5.1">
+      The presence of an <h>Age</h> header field implies that the response was not
+   generated or validated by the origin server for this request.
+    </rfc>
   </debug>
 
   <debug id="1169">
@@ -2016,7 +2019,7 @@ One non-obvious thing is how references work
   <error id="1274">
     <title><var ref="header"/> header without credentials</title>
     <explain>An <var ref="header"/> header usually consists of two parts: the name of the authentication scheme, and the actual credentials. But in this request, it only contains the scheme (“<var ref="header.value.item"/>”).</explain>
-    <explain>Did you mean something like “<var ref="header"/>: <auth>Bearer</auth> <var ref="header.value.item"/>”?</explain>
+    <explain>Was something like “<var ref="header"/>: <auth>Bearer</auth> <var ref="header.value.item"/>” intended?</explain>
     <explain>See also <rfc num="7235" sect="2"/>.</explain>
     <!-- This is an error, not a comment, because it's hard to imagine a conformant use of ``credentials`` consisting only of the ``auth-scheme`` (in particular, none of the schemes registered with IANA allow this), whereas forgetting the ``auth-scheme`` is a common mistake. -->
   </error>
@@ -2031,7 +2034,7 @@ One non-obvious thing is how references work
     <title><var ref="header"/>: <var ref="wildcard"/> is as good as <var ref="value"/></title>
     <explain>The <var ref="header"/> header is not an ordered list. Whether <var ref="wildcard"/> comes before or after <var ref="value"/>, does not affect its priority. Only explicit quality values (q=) count.</explain>
     <explain>In other words, this request says that any <var ref="wildcard"/> is as acceptable as <var ref="value"/>.</explain>
-    <explain>If you want to make <var ref="wildcard"/> a fallback, you should add a lower quality value to it, for example: <var ref="wildcard"/>;q=0.1</explain>
+    <explain>To make <var ref="wildcard"/> a fallback, it should have a lower quality value, for example: <var ref="wildcard"/>;q=0.1</explain>
     <explain>See <rfc num="7231" sect="5.3.1"/>.</explain>
   </error>
 
@@ -2117,6 +2120,7 @@ One non-obvious thing is how references work
   <error id="1288">
     <title><m>GET</m> request cannot <h>Prefer</h>: <prefer>return</prefer>=minimal</title>
     <explain>The whole point of a <m>GET</m> request is to retrieve a representation of the resource (as in “<prefer>return</prefer>=representation”). There is no “minimal” response that could satisfy this request.</explain>
+    <explain>Instead, the <h>Accept</h> header could be used to select the desired kind of representation.</explain>
   </error>
 
   <error id="1289">
