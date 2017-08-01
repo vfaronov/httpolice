@@ -28,7 +28,7 @@ class Unavailable(object):
 
     """
 
-    __slots__ = ['inner']
+    __slots__ = ('inner',)
 
     def __init__(self, inner=None):
         self.inner = inner

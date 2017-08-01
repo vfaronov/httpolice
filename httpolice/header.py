@@ -321,12 +321,12 @@ class DirectivesView(HeaderView):           # pylint: disable=abstract-method
 
     def _process_directive(self, entry, directive_with_argument):
         directive, argument = directive_with_argument
-        syntax = self.knowledge.syntax_for(directive)
         if argument is None:
             if self.knowledge.argument_required(directive):
                 self.message.complain(1156, entry=entry, directive=directive)
                 argument = Unavailable(u'')
         else:
+            syntax = self.knowledge.syntax_for(directive)
             if self.knowledge.no_argument(directive):
                 self.message.complain(1157, entry=entry, directive=directive)
                 argument = Unavailable(argument)

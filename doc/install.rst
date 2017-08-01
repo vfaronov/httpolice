@@ -15,7 +15,7 @@ you may need to install it `manually`__ or `from your OS distribution`__.
 You may also need development files and tools to compile dependencies.
 
 __ https://pip.pypa.io/en/stable/installing/
-__ https://packaging.python.org/en/latest/install_requirements_linux/
+__ https://packaging.python.org/guides/installing-using-linux-tools/
 
 `PyPy`__ (the 2.7 variant) is also supported,
 but you may experience problems with older PyPy versions (5.3.1 should be OK).
@@ -63,12 +63,12 @@ __ https://pypi.python.org/pypi/brotlipy
 For example, at the time of writing, you can `install Python 3.6`__
 and then simply do::
 
-  C:\Users\Vasiliy\...\Python35>Scripts\pip install HTTPolice
+  C:\Users\Vasiliy\...\Python36>Scripts\pip install HTTPolice
 
 Check that the installation was successful::
 
-  C:\Users\Vasiliy\...\Python35>Scripts\httpolice --version
-  HTTPolice 0.4.0
+  C:\Users\Vasiliy\...\Python36>Scripts\httpolice --version
+  HTTPolice 0.6.0
 
 __ https://www.python.org/downloads/
 
@@ -79,7 +79,7 @@ to find a version that has suitable binaries (look for ``*-win32.whl``),
 and install those specific versions **before** installing HTTPolice.
 For example::
 
-  C:\Users\Vasiliy\...\Python35>Scripts\pip install lxml==3.7.2
-  C:\Users\Vasiliy\...\Python35>Scripts\pip install brotlipy==0.6.0
+  C:\Users\Vasiliy\...\Python36>Scripts\pip install lxml==3.8.0
+  C:\Users\Vasiliy\...\Python36>Scripts\pip install brotlipy==0.7.0
 
 __ https://pypi.python.org/pypi

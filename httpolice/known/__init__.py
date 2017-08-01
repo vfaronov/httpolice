@@ -391,10 +391,10 @@ warn = warn_code.accessor
 
 
 def _collect():
-    gs = globals()
-    return {gs[name].knowledge.cls: (gs[name].knowledge, name)
-            for name in gs
-            if isinstance(gs[name], KnowledgeAccessor)}
+    globals_ = globals()
+    return {globals_[name].knowledge.cls: (globals_[name].knowledge, name)
+            for name in globals_
+            if isinstance(globals_[name], KnowledgeAccessor)}
 
 classes = _collect()    # dict containing items like: ``Method: (method, 'm')``
 

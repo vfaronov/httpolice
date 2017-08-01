@@ -42,9 +42,9 @@ def html_report(exchanges, buf):
     # because that would mean unbounded memory growth with more input.
     # But Dominate obviously doesn't have a streaming mode, so we do this
     # manually. We create our document, but instead of the actual exchanges,
-    # we insert a magic string that allows us to split it into a prologue
+    # we insert a separator string that allows us to split it into a prologue
     # and an epilogue.
-    magic = u'---- CUT HERE ----'
+    separator = u'---- CUT HERE ----'
 
     title = u'HTTPolice report'
     document = dominate.document(title=title)
@@ -56,9 +56,9 @@ def html_report(exchanges, buf):
     with document:
         H.h1(title)
         H.hr()
-        text_node(magic)
+        text_node(separator)
 
-    (prologue, epilogue) = document.render().split(magic)
+    (prologue, epilogue) = document.render().split(separator)
 
     buf.write(prologue.encode('utf-8'))
     for div in _generate_exchange_divs(exchanges):
@@ -230,7 +230,7 @@ def _render_complaints(obj):
 # These references directly correspond to Python object references.
 # However, we do not include the raw ``id()`` of objects in the report files,
 # but instead "anonymize" them.
-# See http://security.stackexchange.com/q/121238/108469
+# See https://security.stackexchange.com/q/121238/108469
 
 _seen_ids = {}
 

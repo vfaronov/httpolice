@@ -2,50 +2,50 @@
 
 """A library of parser combinators based on the Earley algorithm.
 
-See :mod:`httpolice.syntax` for examples of how to construct a grammar
-with these combinators, and :mod:`httpolice.header` for examples of how
-to use the resulting grammar.
+This is used mainly for parsing header values (see :mod:`httpolice.header`).
+The grammar defined with these combinators is in :mod:`httpolice.syntax`.
 
-Why do we use Earley instead of a more mainstream approach like LR(1)?
-Because Earley can deal with any (context-free) grammar.
-So we can use the rules almost exactly as defined in the RFCs.
-We don't need to transform them, add lookaheads etc.
-They just work. And we get detailed error messages for free.
+We use Earley -- instead of more mainstream approaches like LR(1) -- because
+Earley can deal with any (context-free) grammar. So we can use the rules almost
+exactly as defined in the RFCs. We don't need to transform them, add lookaheads
+and such; they just work. And we get precise, detailed error messages.
 
-However, Earley is not very fast (at least this implementation).
-We use it for headers, which have complex grammars but are easy to memoize.
-For HTTP/1.x message framing, we use much simpler line-oriented rules
-hardcoded in :mod:`httpolice.framing1`.
+The grammar given in the RFCs has octets as terminal symbols, and we follow it.
+This means we have to run Earley on individual bytes rather than higher-level
+tokens, which makes it slow. To compensate, we memoize, which is easy to do
+for things like headers. For HTTP/1.x message framing, however, we don't even
+bother with Earley: instead we use simple line-oriented rules hardcoded
+in :mod:`httpolice.framing1`.
 
-A parser's input is a bytestring, and the output is whatever is returned
-by the semantic actions (the ``<<`` operator, :meth:`Symbol.__rlshift__`).
-Before applying semantic actions,
-bytes are automatically decoded from ISO-8859-1--the historic encoding of HTTP.
+Parsed bytestrings are automatically decoded from ISO-8859-1 -- the historic
+encoding of HTTP. After that, the grammar's semantic actions are applied
+(as specified with the ``<<`` operator, :meth:`Symbol.__rlshift__`).
+The semantic actions convert parsed strings into objects that are more
+suitable for further work -- mainly classes from :mod:`httpolice.structure`.
 
-If a semantic action is marked with the :func:`can_complain` decorator,
-then it can also produce complaints (notices).
-For example, this is how notice 1015 is implemented.
-Only the parser sees the ``BWS``,
-but its complaint is propagated up to the message where the ``BWS`` was found.
+A semantic action can also produce complaints (notices), if it is decorated
+with :func:`can_complain`. For example, this is how no. 1015 is implemented:
+only the parser sees the ``BWS``, but its complaint is propagated up to
+the message where the ``BWS`` was found.
 
-Also, the input string can be annotated with parsed objects.
-For example, in an HTML report,
-the ``text/xml`` in ``Accept: text/xml;q=0.9`` becomes a hyperlink to RFC,
-because it is parsed into a :class:`~httpolice.structure.MediaType` object.
-The list of classes to annotate must be passed to :func:`parse`.
-Also, the object (in this case, ``MediaType(u'text/xml')``)
-must be the end result of a distinct :class:`Nonterminal`,
-**not** buried inside some :class:`Rule`.
-The ``<<`` operator (:meth:`Symbol.__rlshift__`)
-ensures this automatically for most classes.
+Another side result of parsing is the input string *annotated* with instances
+of parsed objects. For example, in ``Accept: text/xml;q=1.0``, the ``text/xml``
+is parsed into a :class:`~httpolice.structure.MediaType` object. Thus,
+the annotated string is::
+
+    [MediaType(u'text/xml'), b';q=1.0']
+
+This annotated representation is then used in :mod:`httpolice.reports.html`
+to render ``text/xml`` as a link to the RFC, using :mod:`httpolice.known`.
+
 """
 
 from collections import OrderedDict
 import operator
+from six.moves import range
 
 from bitstring import BitArray, Bits
 import six
-from six.moves import range
 
 from httpolice.structure import Unavailable
 from httpolice.util.text import format_chars
@@ -185,6 +185,22 @@ class Symbol(object):
 
     def __init__(self, name=None, citation=None, is_pivot=False,
                  is_ephemeral=None):
+        """
+        :param name:
+            The name of this symbol in the grammar, normally as specified
+            in `citation`.
+        :param citation:
+            The :class:`~httpolice.citation.Citation` for the document that
+            defines this symbol.
+        :param is_pivot:
+            `True` if this symbol is a meaningful enough block of the grammar
+            to be shown to the user as part of a :exc:`ParseError` explanation
+            (see :func:`_build_parse_error`).
+        :param is_ephemeral:
+            Whether this symbol is ephemeral. If `None`, this is determined
+            heuristically. See :meth:`is_ephemeral`.
+
+        """
         self.name = name
         self.citation = citation
         self.is_pivot = is_pivot
@@ -197,12 +213,14 @@ class Symbol(object):
     def __gt__(self, seal):
         """``sym >seal`` seals the `sym` symbol, then applies `seal` to it.
 
-        After a symbol is sealed, it is treated as a unit,
-        never inlined into other symbols' rules.
-        If every "top-level" symbol is sealed,
-        the actual grammar is structured exactly as seen in the code.
+        This causes the symbol to be treated as a unit, with a specific name
+        and (usually) citation. It will then never be inlined into other
+        symbol's rules. This leads to an almost exact correspondence between
+        the layout of `Symbol` objects and the actual grammar given in RFCs.
         This is also necessary for error reporting.
+
         See also :func:`fill_names`.
+
         """
         if self.name is None:
             sealed = self
@@ -213,6 +231,19 @@ class Symbol(object):
 
     @property
     def is_ephemeral(self):
+        """Is it OK to inline this symbol into others (if possible)?
+
+        Ephemeral symbols are a side effect of constructing a grammar using our
+        combinators. For example, when we write::
+
+            foo = bar | baz | qux           > auto
+
+        we want `foo` to consist of three rules. But naturally Python
+        interprets this as ``(bar | baz) | qux``, where ``bar | baz`` is
+        an ephemeral symbol -- it needs to be "dissolved" in the rules
+        for `foo`.
+
+        """
         if self._is_ephemeral is None:
             return (self.name is None)
         else:
@@ -255,6 +286,11 @@ class Symbol(object):
         """``func << sym`` wraps the result of parsing `sym` with `func`."""
         if isinstance(func, type) and not (func is int or func is float or
                                            func is six.text_type):
+            # If a string is wrapped in a class, this often means that we want
+            # to annotate this string. But for that to work, the string must be
+            # the result of parsing an entire grammar symbol (that's how
+            # `_find_results` works). So we need to prevent this symbol from
+            # being inlined into others.
             is_ephemeral = False
         else:
             is_ephemeral = None
@@ -274,10 +310,10 @@ class Symbol(object):
 
 class Terminal(Symbol):
 
-    """A terminal symbol of the grammar."""
+    """A terminal symbol of the grammar, matching some set of octets."""
 
     def __init__(self, name=None, citation=None, bits=None):
-        super(Terminal, self).__init__(name, citation, is_pivot=False)
+        super(Terminal, self).__init__(name, citation)
         self.bits = bits if bits is not None else Bits(256)
 
     def chars(self):
@@ -362,9 +398,7 @@ class SimpleNonterminal(Nonterminal):
                  is_ephemeral=None, rules=None):
         super(SimpleNonterminal, self).__init__(name, citation, is_pivot,
                                                 is_ephemeral)
-        if rules is None:
-            rules = []
-        self._rules = rules
+        self._rules = rules or []
 
     @property
     def rules(self):
@@ -379,7 +413,7 @@ class SimpleNonterminal(Nonterminal):
     def set_rules_from(self, other):
         self._rules = other.rules
 
-    rec = property(None, set_rules_from)
+    rec = property(None, set_rules_from)        # used for recursive rules
 
 
 class RepeatedNonterminal(Nonterminal):
@@ -469,6 +503,14 @@ class Rule(object):
         return Rule(self.symbols, wrapper_action)
 
 
+class _Skip(object):
+
+    def __repr__(self):
+        return '_SKIP'
+
+_SKIP = _Skip()
+
+
 empty = SimpleNonterminal(name=u'empty', rules=[Rule(())], is_ephemeral=True)
 
 
@@ -502,13 +544,6 @@ def as_symbol(x):
 
 recursive = SimpleNonterminal
 
-
-class _Skip(object):
-
-    def __repr__(self):
-        return '_SKIP'
-
-_SKIP = _Skip()
 
 def skip(x):
     return _skip_args << as_symbol(x)
@@ -570,24 +605,23 @@ def string1(inner):
 def string_excluding(terminal, excluding):
     """
     ``string_excluding(t, ['foo', 'bar'])`` is the same as ``string(t)``,
-    except it **never parses** the input strings
-    "foo" and "bar" (case-insensitive).
+    except it **never parses** the input strings "foo" and "bar"
+    (case-insensitive).
 
-    This is used where the grammar special-cases certain strings.
-    For example, consider the ``link-param`` rule from RFC 5988.
-    Strictly speaking, that rule matches the string::
+    This is used where the grammar special-cases certain strings. For example,
+    consider RFC 5988. Strictly speaking, the string::
 
       hreflang="Hello world!"
 
-    because the ``link-extension`` rule matches it.
-    But the spec obviously intends that
-    an "hreflang" parameter must only have a language tag as a value,
-    as it is special-cased in the definition of ``link-param``.
-    Therefore, in our code for ``link-extension``,
-    we exclude "hreflang" and other special cases
-    from the allowed values of ``parmname``.
+    matches the ``link-param`` rule, because it matches ``link-extension``.
+    But the spec obviously intends that an "hreflang" parameter must only have
+    a language tag as a value, as it is special-cased in the definition
+    of ``link-param``. Therefore, in our code for ``link-extension``, we
+    exclude "hreflang" and other special cases from the allowed values
+    of ``parmname``.
 
     This only works when the excluded strings are relatively few and short.
+
     """
     initials = set(s[0:1].lower() for s in excluding if s)
 
@@ -597,7 +631,7 @@ def string_excluding(terminal, excluding):
 
     r = free + string(terminal)
     for c in initials:
-        continuations = [s[1:] for s in excluding if s and s[0:1].lower() == c]
+        continuations = [s[1:] for s in excluding if s[0:1].lower() == c]
         r = r | literal(c) + string_excluding(terminal, continuations)
     if '' not in excluding:
         r = r | subst(u'') << empty
@@ -623,13 +657,13 @@ def fill_names(scope, citation):
 
     When we write::
 
-      foobar = literal(b'foo') | literal(b'bar')
+      foobar = literal('foo') | literal('bar')
 
-    there is no way for `foobar` to know its own name
-    (which is ``foobar``, important for error reporting),
-    unless we post-process it with this function.
-    It takes names from `scope` and writes them back into the symbols.
-    This only happens for symbols sealed with :func:`auto` or :func:`pivot`.
+    there is no way for `foobar` to know its own name (which is ``foobar``,
+    important for error reporting), unless we post-process it with this
+    function. It takes names from `scope` and writes them back into
+    the symbols. This only happens for symbols sealed with :func:`auto`
+    or :func:`pivot`.
     """
     for name, x in scope.items():
         if isinstance(x, Symbol) and x.name is _AUTO:

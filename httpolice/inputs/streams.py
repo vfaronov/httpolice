@@ -206,21 +206,15 @@ def _path_pairs_input(path_pairs, sniff_direction=False,
 
 
 def _parse_paths(inbound_path, outbound_path, scheme=u'http'):
-    inbound_file = outbound_file = None
+    inbound_file = inbound = outbound_file = outbound = None
 
     try:
         if inbound_path:
             inbound_file = io.open(inbound_path, 'rb')
             inbound = Stream(inbound_file, name=decode_path(inbound_path))
-        else:
-            inbound = None
-
         if outbound_path:
             outbound_file = io.open(outbound_path, 'rb')
             outbound = Stream(outbound_file, name=decode_path(outbound_path))
-        else:
-            outbound = None
-
         for exch in parse_streams(inbound, outbound, scheme):
             yield exch
 

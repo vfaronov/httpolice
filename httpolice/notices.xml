@@ -111,7 +111,7 @@ One non-obvious thing is how references work
   </error>
 
   <comment id="1014">
-    <title>RWS in <var ref="place"/> must be a single space</title>
+    <title>RWS in <var ref="place"/> should be a single space</title>
     <explain>The syntax of <var ref="place"/> includes the rule named RWS. It should be produced as just a single space, but here it was <var ref="num"/> characters. See <rfc num="7230" sect="3.2.3"/>.</explain>
   </comment>
 
@@ -292,7 +292,7 @@ One non-obvious thing is how references work
 
   <comment id="1035">
     <title>Deprecated media type <var ref="msg.headers.content_type.value"/></title>
-    <explain>According to <h>Content-Type</h>, this message’s body is of type <var ref="msg.headers.content_type.value"/>, which is listed as “deprecated” or “obsoleted” in the <cite title="IANA media types registry" url="http://www.iana.org/assignments/media-types/media-types.xml"/>.</explain>
+    <explain>According to <h>Content-Type</h>, this message’s body is of type <var ref="msg.headers.content_type.value"/>, which is listed as “deprecated” or “obsoleted” in the <cite title="IANA media types registry" url="https://www.iana.org/assignments/media-types/media-types.xml"/>.</explain>
   </comment>
 
   <debug id="1036">
@@ -1450,7 +1450,7 @@ One non-obvious thing is how references work
 
   <comment id="1197">
     <title>Deprecated header <var ref="header"/></title>
-    <explain>This message has the <var ref="header"/> header, which is listed as “obsoleted” or “deprecated” in the <cite title="IANA message headers registry" url="http://www.iana.org/assignments/message-headers/message-headers.xhtml"/>.</explain>
+    <explain>This message has the <var ref="header"/> header, which is listed as “obsoleted” or “deprecated” in the <cite title="IANA message headers registry" url="https://www.iana.org/assignments/message-headers/message-headers.xhtml"/>.</explain>
   </comment>
 
   <error id="1198">
@@ -2041,7 +2041,7 @@ One non-obvious thing is how references work
   <comment id="1277">
     <title>Obsolete ‘X-’ prefix in headers</title>
     <explain>Adding an ‘X-’ prefix to “experimental” headers is an old practice that is now considered obsolete. See <rfc num="6648" sect="3"/>.</explain>
-    <explain>For custom headers that may be generally useful, it’s best to drop the ‘X-’ prefix (but check the <cite title="IANA message headers registry" url="http://www.iana.org/assignments/message-headers/message-headers.xhtml"/> to avoid collisions with existing names).</explain>
+    <explain>For custom headers that may be generally useful, it’s best to drop the ‘X-’ prefix (but check the <cite title="IANA message headers registry" url="https://www.iana.org/assignments/message-headers/message-headers.xhtml"/> to avoid collisions with existing names).</explain>
     <explain>For private headers not intended to be used by others, ‘X-’ can be replaced with something like the organization’s name.</explain>
     <ref to="headers"/>
   </comment>

@@ -36,7 +36,7 @@ and one of three *severities*:
   Something is clearly wrong.
   For example, a `“MUST” requirement`__ of a standard is clearly violated.
 
-  __ http://tools.ietf.org/html/rfc2119
+  __ https://tools.ietf.org/html/rfc2119
 
   Please note that **not all errors may be actual problems**.
   Sometimes there is a good reason to violate a standard.
@@ -48,7 +48,7 @@ and one of three *severities*:
   Something is *possibly* wrong or sub-optimal, but HTTPolice isn’t sure.
   For example, a `“SHOULD” requirement`__ of a standard is clearly violated.
 
-  __ http://tools.ietf.org/html/rfc2119
+  __ https://tools.ietf.org/html/rfc2119
 
 *debug*
   This just explains why HTTPolice did (or did not do) something.
@@ -67,8 +67,8 @@ You can *silence* notices that you don’t want to see.
 They will disappear from reports and from the :doc:`api`.
 
 Please note that some notice IDs can stand for a range of problems.
-For example, most errors in header syntax are reported as notice 1000,
-so if you silence it, you **lose a big chunk** of HTTPolice’s functionality.
+For example, most errors in header syntax are reported as notices 1000 or 1158,
+so if you silence them, you may lose a big chunk of HTTPolice’s functionality.
 
 Silencing globally
 ~~~~~~~~~~~~~~~~~~

@@ -26,7 +26,7 @@ from httpolice.util.text import force_unicode, format_chars, printable
 
 
 # This list is taken from the HTML specification --
-# http://www.w3.org/TR/html/forms.html#url-encoded-form-data --
+# https://www.w3.org/TR/html/sec-forms.html#urlencoded-form-data --
 # as the exhaustive list of bytes that can be output
 # by a "conformant" URL encoder.
 

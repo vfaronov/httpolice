@@ -4,6 +4,7 @@ History of changes
 
 Unreleased
 ~~~~~~~~~~
+
 Changed
 -------
 - Notice `1277`_ (obsolete 'X-' prefix) is now reported only once per message.
@@ -21,8 +22,8 @@ Fixed
 - Fixed a few bugs and design problems that caused HTTPolice to use more time
   and memory than necessary in various cases (sometimes much more).
 - Notice `1013`_ is no longer wrongly reported for some headers
-  such as ``Vary``.
-- Fixed a crash on some pathological values of ``charset`` in ``Content-Type``.
+  such as Vary.
+- Fixed a crash on some pathological values of 'charset' in Content-Type.
 
 .. _Forwarded: https://tools.ietf.org/html/rfc7239
 .. _chunk extensions: https://tools.ietf.org/html/rfc7230#section-4.1.1
@@ -229,7 +230,7 @@ Added
 - `Stale controls`_ are now recognized.
 - Checks for status code `451 (Unavailable For Legal Reasons)`_.
 
-.. _Django integration: http://httpolice.readthedocs.io/en/stable/django.html
+.. _Django integration: http://django-httpolice.readthedocs.io/
 .. _silenced: http://httpolice.readthedocs.io/en/stable/concepts.html#silence
 .. _bearer tokens: http://tools.ietf.org/html/rfc6750
 .. _Content-Disposition: http://tools.ietf.org/html/rfc6266
