@@ -51,9 +51,11 @@ Syntax-related fields
 --------------
 
 ``rule``
-    Usually, if the header is defined as a comma-separated list, set this
-    to ``multi`` to indicate that it can appear multiple times in a single
-    message (see RFC 7230 Section 3.2.2); otherwise, set to ``single``.
+    Defines how to combine and represent the parsed values of this header.
+    For typical headers, set this to ``multi`` if the header is defined
+    as a comma-separated list, otherwise to ``single``. For headers that need
+    custom processing, set this to ``special`` and add an appropriate
+    ``HeadersView.special_case`` in ``httpolice.header``.
 
 ``for_request``, ``for_response``
     Whether this header can appear in requests and responses, respectively.

@@ -31,6 +31,14 @@ class HeadersView(object):
 
     """Wraps all headers of a single message, exposing them as attributes."""
 
+    special_cases = {}
+
+    @classmethod
+    def special_case(cls, view_cls):
+        assert view_cls.name not in cls.special_cases
+        cls.special_cases[view_cls.name] = view_cls
+        return view_cls
+        
     def __init__(self, message):
         self._message = message
         self._cache = {}
@@ -42,31 +50,21 @@ class HeadersView(object):
         if key not in self._cache:
             rule = known.header.rule_for(key)
 
-            # Some headers have more internal structure
-            # than can be handled by a simple context-free parser,
-            # so they need special-casing.
-            if key == h.cache_control:
-                cls = CacheControlView
-            elif key == h.strict_transport_security:
-                cls = StrictTransportSecurityView
-            elif key == h.alt_svc:
-                cls = AltSvcView
-            elif key == h.prefer:
-                cls = PreferView
-            elif key == h.preference_applied:
-                cls = PreferenceAppliedView
-            elif key == h.forwarded:
-                cls = ForwardedView
-
-            # For the rest, we only need to know
-            # a generic "rule" for combining multiple entries,
-            # and a parser to parse the value.
-            elif rule is HeaderRule.single:
-                cls = SingleHeaderView
-            elif rule is HeaderRule.multi:
-                cls = MultiHeaderView
+            # Some headers have more internal structure than can be handled
+            # by a simple context-free parser, so they need special-casing.
+            # For the rest, we only need to know a generic "rule" for combining
+            # multiple entries (and a parser to parse the value).
+            if key in self.special_cases:
+                assert rule is HeaderRule.special
+                cls = self.special_cases[key]
             else:
-                cls = UnknownHeaderView
+                assert rule is not HeaderRule.special
+                if rule is HeaderRule.single:
+                    cls = SingleHeaderView
+                elif rule is HeaderRule.multi:
+                    cls = MultiHeaderView
+                else:
+                    cls = UnknownHeaderView
 
             self._cache[key] = cls(self._message, key)
 
@@ -346,10 +344,10 @@ class DirectivesView(HeaderView):           # pylint: disable=abstract-method
         return None
 
 
+@HeadersView.special_case
 class CacheControlView(DirectivesView, MultiHeaderView):
 
-    """Wraps a ``Cache-Control`` header."""
-
+    name = h.cache_control
     knowledge = known.cache_directive
 
     def _process_directive(self, entry, directive_with_argument):
@@ -369,16 +367,17 @@ class CacheControlView(DirectivesView, MultiHeaderView):
             _process_directive(entry, (directive, argument))
 
 
+@HeadersView.special_case
 class StrictTransportSecurityView(DirectivesView, SingleHeaderView):
 
-    """Wraps a ``Strict-Transport-Security`` header."""
-
+    name = h.strict_transport_security
     knowledge = known.hsts_directive
 
 
-class AltSvcView(SingleHeaderView):
+@HeadersView.special_case
+class AltSvcView(MultiHeaderView):
 
-    """Wraps an ``Alt-Svc`` header with its various parameters."""
+    name = h.alt_svc
 
     def _process_parsed(self, entry, parsed):
         if parsed == u'clear':
@@ -399,10 +398,10 @@ class AltSvcView(SingleHeaderView):
         return parsed
 
 
+@HeadersView.special_case
 class PreferView(DirectivesView, MultiHeaderView):
 
-    """Wraps a `Prefer` header."""
-
+    name = h.prefer
     knowledge = known.preference
 
     # Each preference has two level of wrapping: ``((name, value), params)``.
@@ -424,17 +423,17 @@ class PreferView(DirectivesView, MultiHeaderView):
         return [pref for (pref, _) in self]
 
 
+@HeadersView.special_case
 class PreferenceAppliedView(DirectivesView, MultiHeaderView):
 
-    """Wraps a ``Preference-Applied`` header."""
-
+    name = h.preference_applied
     knowledge = known.preference
 
 
+@HeadersView.special_case
 class ForwardedView(DirectivesView, MultiHeaderView):
 
-    """Wraps a ``Forwarded`` header."""
-
+    name = h.forwarded
     knowledge = known.forwarded_param
 
     def _process_parsed(self, entry, parsed):

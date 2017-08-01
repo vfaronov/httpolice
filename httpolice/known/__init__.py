@@ -204,7 +204,7 @@ class DirectiveKnowledge(SyntaxKnowledge):
 class HeaderRule(Enum):
     single = 1
     multi = 2
-    set_cookie = 3
+    special = 3
 
 class HeaderKnowledge(SyntaxKnowledge):
 

@@ -21,7 +21,7 @@ Access-Control-Request-Headers,,,citation,,,,https://www.w3.org/TR/cors/#access-
 Access-Control-Request-Method,,,citation,,,,https://www.w3.org/TR/cors/#access-control-request-method-request-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,
 Age,,,,7234,5.1,,,,rfc7234,Age,True,True,False,True,standard,,,,single
 Allow,,,,7231,7.4.1,,,,rfc7231,Allow,,,False,True,standard,,,,multi
-Alt-Svc,,,,7838,3,,,,rfc7838,Alt_Svc,,,False,True,standard,,,,multi
+Alt-Svc,,,,7838,3,,,,rfc7838,Alt_Svc,,,False,True,standard,,,,special
 Alt-Used,,,,7838,5,,,,rfc7838,Alt_Used,,True,True,False,standard,False,False,,single
 Alternates,,,,4229,,,,,,,,,,,,,,,
 Apply-To-Redirect-Ref,,,,4437,,,,,,,,,,,,,,,
@@ -33,7 +33,7 @@ C-Man,,,,4229,,,,,,,,,,,,,,,
 C-Opt,,,,4229,,,,,,,,,,,,,,,
 C-PEP,,,,4229,,,,,,,,,,,,,,,
 C-PEP-Info,,,,4229,,,,,,,,,,,,,,,
-Cache-Control,,,,7234,5.2,,,,rfc7234,Cache_Control,True,True,True,True,standard,False,False,,multi
+Cache-Control,,,,7234,5.2,,,,rfc7234,Cache_Control,True,True,True,True,standard,False,False,,special
 CalDAV-Timezones,,,,7809,7.1,,,,,,,,,,standard,,,,
 Close,,,,7230,8.1,,,,,,,,,,reserved,,,,
 Compliance,,,,4229,,,,,,,,,,,,,,,
@@ -70,7 +70,7 @@ ETag,,,,7232,2.3,,,,rfc7232,ETag,True,,False,True,standard,,,True,single
 Expect,,,,7231,5.1.1,,,,rfc7231,Expect,,True,True,False,standard,False,False,,single
 Expires,,,,7234,5.3,,,,rfc7234,Expires,True,True,False,True,standard,,,,single
 Ext,,,,4229,,,,,,,,,,,,,,,
-Forwarded,,,,7239,4,,,,rfc7239,Forwarded,True,,True,False,standard,False,False,,multi
+Forwarded,,,,7239,4,,,,rfc7239,Forwarded,True,,True,False,standard,False,False,,special
 From,,,,7231,5.5.1,,,,,,,,True,False,standard,False,False,,single
 GetProfile,,,,4229,,,,,,,,,,,,,,,
 HTTP2-Settings,,,,7540,3.2.1,,,,rfc7540,HTTP2_Settings,,,True,False,standard,False,False,,single
@@ -115,8 +115,8 @@ PICS-Label,,,,4229,,,,,,,,,,,,,,,
 Pep-Info,,,,4229,,,,,,,,,,,,,,,
 Position,,,,4229,,,,,,,,,,,standard,,,,
 Pragma,,,,7234,5.4,,,,rfc7234,Pragma,,True,True,True,standard,False,False,,multi
-Prefer,,,,7240,2,,,,rfc7240,Prefer,,,True,False,standard,False,False,,multi
-Preference-Applied,,,,7240,3,,,,rfc7240,Preference_Applied,,,False,True,standard,False,False,,multi
+Prefer,,,,7240,2,,,,rfc7240,Prefer,,,True,False,standard,False,False,,special
+Preference-Applied,,,,7240,3,,,,rfc7240,Preference_Applied,,,False,True,standard,False,False,,special
 ProfileObject,,,,4229,,,,,,,,,,,,,,,
 Protocol,,,,4229,,,,,,,,,,,,,,,
 Protocol-Info,,,,4229,,,,,,,,,,,,,,,
@@ -148,12 +148,12 @@ Sec-WebSocket-Protocol,,,,6455,,,,,,,,,,,standard,,,,
 Sec-WebSocket-Version,,,,6455,,,,,,,,,,,standard,,,,
 Security-Scheme,,,,4229,,,,,,,,,,,,,,,
 Server,,,,7231,7.4.2,,,,rfc7231,Server,,,False,True,standard,,,,single
-Set-Cookie,,,,6265,,,,,,,,,,,standard,,,,set_cookie
+Set-Cookie,,,,6265,,,,,,,,,,,standard,,,,
 Set-Cookie2,,,,2965,,,,,,,,,,,obsoleted,,,,
 SetProfile,,,,4229,,,,,,,,,,,,,,,
 SoapAction,,,,4229,,,,,,,,,,,,,,,
 Status-URI,,,,4229,,,,,,,,,,,,,,,
-Strict-Transport-Security,,,,6797,6.1,,,,rfc6797,Strict_Transport_Security,,,False,True,standard,,,,single
+Strict-Transport-Security,,,,6797,6.1,,,,rfc6797,Strict_Transport_Security,,,False,True,standard,,,,special
 SubOK,,,,4229,,,,,,,,,,,,,,,
 Subst,,,,4229,,,,,,,,,,,,,,,
 Surrogate-Capability,,,,4229,,,,,,,,,,,,,,,
