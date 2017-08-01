@@ -91,7 +91,7 @@ Install it in a Python 3.5+ environment with HTTPolice integration::
 (see also the instructions for `installing mitmproxy from source`__).
 
 __ https://mitmproxy.org/
-__ http://docs.mitmproxy.org/en/stable/install.html#advanced-installation
+__ http://docs.mitmproxy.org/page/install.html#advanced-installation
 
 We’re going to use mitmproxy’s command-line tool—`mitmdump`__.
 The following command will start mitmdump as a reverse proxy
@@ -100,7 +100,7 @@ in front of your API on port 8080, with HTTPolice integration::
   $ mitmdump --reverse https://eve-demo.herokuapp.com \
   >   -s "`python3 -m mitmproxy_httpolice` -o html -w report.html --tail 5"
 
-__ http://docs.mitmproxy.org/en/latest/mitmdump.html
+__ http://docs.mitmproxy.org/page/mitmdump.html
 
 Now tell your client to talk to port 8080 instead of directly to the API::
 

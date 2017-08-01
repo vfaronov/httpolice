@@ -17,7 +17,7 @@ problems in your HTTP server or client.
 
 See `example report`__.
 
-__ http://pythonhosted.org/HTTPolice/showcase.html
+__ http://httpolice.readthedocs.io/page/showcase.html
 
 As a command-line tool, it can read `HAR files`__ or raw HTTP/1.x TCP streams.
 It can integrate with `mitmproxy`__ for TLS-encrypted and HTTP/2 traffic.
@@ -32,13 +32,13 @@ __ https://chrome.google.com/webstore/detail/httpolice-devtool/hnlnhebgfcfemjaph
 
 Start with the `quickstart`__.
 
-__ http://httpolice.readthedocs.io/en/stable/quickstart.html
+__ http://httpolice.readthedocs.io/page/quickstart.html
 
 A full `user manual`__ is available.
 Also, a `list of all problems`__ HTTPolice can detect.
 
-__ http://httpolice.readthedocs.io/en/stable/
-__ http://pythonhosted.org/HTTPolice/notices.html
+__ http://httpolice.readthedocs.io/
+__ http://httpolice.readthedocs.io/page/notices.html
 
 HTTPolice was partly inspired by `REDbot`__, another QA tool for the Web.
 But the approach is different: instead of actively testing your server,

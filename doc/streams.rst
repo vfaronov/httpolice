@@ -65,7 +65,7 @@ while :ref:`silencing <silence>` those notices::
 
   $ httpolice -i tcpflow -o html -s 1279 . >../report.html
 
-__ http://pythonhosted.org/HTTPolice/notices.html#1279
+__ http://httpolice.readthedocs.io/page/notices.html#1279
 
 Using tcpick
 ------------
@@ -76,7 +76,7 @@ sometimes it produces files that are clearly invalid HTTP streams
 (HTTPolice will fail to parse them with notices like `1009`__).
 
 __ http://tcpick.sourceforge.net/
-__ http://pythonhosted.org/HTTPolice/notices.html#1009
+__ http://httpolice.readthedocs.io/page/notices.html#1009
 
 Anyway, using it is very similar to using tcpflow::
 

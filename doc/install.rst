@@ -7,14 +7,14 @@ HTTPolice is a Python package that requires Python 2.7 or 3.4+.
 It can be installed like all other Python packages:
 with `pip`__ from `PyPI`__.
 
-__ https://pip.pypa.io/en/stable/
+__ https://pip.pypa.io/
 __ https://pypi.python.org/pypi/HTTPolice
 
 If you’re not familiar with pip,
 you may need to install it `manually`__ or `from your OS distribution`__.
 You may also need development files and tools to compile dependencies.
 
-__ https://pip.pypa.io/en/stable/installing/
+__ https://pip.pypa.io/page/installing/
 __ https://packaging.python.org/guides/installing-using-linux-tools/
 
 `PyPy`__ (the 2.7 variant) is also supported,
