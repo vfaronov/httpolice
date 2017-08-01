@@ -308,31 +308,39 @@ class MultiHeaderView(HeaderView):
         return iter(v for v in self.value if okay(v))
 
 
-class DirectivesView(HeaderView):           # pylint: disable=abstract-method
+class ArgumentsView(HeaderView):           # pylint: disable=abstract-method
 
-    """Wraps a header whose parsed value is a list of directives."""
+    """
+    For a header whose parsed value contains some sort of ``name[=argument]``
+    pairs, and the argument needs to be parsed depending on the name.
+    """
 
     knowledge = None
 
     def _process_parsed(self, entry, parsed):
-        return [self._process_directive(entry, d) for d in parsed]
+        return [self._process_pair(entry, d) for d in parsed]
 
-    def _process_directive(self, entry, directive_with_argument):
-        directive, argument = directive_with_argument
+    def _process_pair(self, entry, pair):
+        name, argument = pair
         if argument is None:
-            if self.knowledge.argument_required(directive):
-                self.message.complain(1156, entry=entry, directive=directive)
+            if self.knowledge.argument_required(name):
+                self.message.complain(1156, entry=entry, name=name)
                 argument = Unavailable(u'')
         else:
-            syntax = self.knowledge.syntax_for(directive)
-            if self.knowledge.no_argument(directive):
-                self.message.complain(1157, entry=entry, directive=directive)
+            syntax = self.knowledge.syntax_for(name)
+            if self.knowledge.no_argument(name):
+                self.message.complain(1157, entry=entry, name=name)
                 argument = Unavailable(argument)
             elif syntax is not None:
                 argument = parse(argument, syntax,
                                  self.message.complain, 1158, place=entry,
-                                 directive=directive, value=argument)
-        return Parametrized(directive, argument)
+                                 name=name, value=argument)
+        return Parametrized(name, argument)
+
+
+class DirectivesView(ArgumentsView):        # pylint: disable=abstract-method
+
+    """For a header whose value is a list of ``directive[=argument]`` pairs."""
 
     def __getattr__(self, name):
         return self[getattr(self.knowledge.accessor, name)]
@@ -350,8 +358,8 @@ class CacheControlView(DirectivesView, MultiHeaderView):
     name = h.cache_control
     knowledge = known.cache_directive
 
-    def _process_directive(self, entry, directive_with_argument):
-        (directive, argument) = directive_with_argument
+    def _process_pair(self, entry, pair):
+        (directive, argument) = pair
         if argument is not None:
             (symbol, argument) = argument
 
@@ -364,7 +372,7 @@ class CacheControlView(DirectivesView, MultiHeaderView):
                 self.message.complain(1155, directive=directive)
 
         return super(CacheControlView, self). \
-            _process_directive(entry, (directive, argument))
+            _process_pair(entry, (directive, argument))
 
 
 @HeadersView.special_case
@@ -375,7 +383,7 @@ class StrictTransportSecurityView(DirectivesView, SingleHeaderView):
 
 
 @HeadersView.special_case
-class AltSvcView(DirectivesView, MultiHeaderView):
+class AltSvcView(ArgumentsView, MultiHeaderView):
 
     name = h.alt_svc
     knowledge = known.alt_svc_param
@@ -403,8 +411,8 @@ class PreferView(DirectivesView, MultiHeaderView):
     # (but they are still part of ``self.value``).
 
     def _process_parsed(self, entry, parsed):
-        return [Parametrized(self._process_directive(entry, d), params)
-                for (d, params) in parsed]
+        return [Parametrized(self._process_pair(entry, pair), params)
+                for (pair, params) in parsed]
 
     def __getitem__(self, key):
         for (preference, value) in self.without_params:
@@ -425,7 +433,7 @@ class PreferenceAppliedView(DirectivesView, MultiHeaderView):
 
 
 @HeadersView.special_case
-class ForwardedView(DirectivesView, MultiHeaderView):
+class ForwardedView(ArgumentsView, MultiHeaderView):
 
     name = h.forwarded
     knowledge = known.forwarded_param
@@ -449,5 +457,3 @@ class ForwardedView(DirectivesView, MultiHeaderView):
                                       n_elements=len(elements))
 
         return elements
-
-    __getattr__ = None

@@ -1174,18 +1174,18 @@ One non-obvious thing is how references work
   </comment>
 
   <error id="1156">
-    <title><var ref="entry"/>: <var ref="directive"/> needs an argument</title>
-    <explain>According to the specification, the <var ref="directive"/> directive must have an argument. But in this message’s <var ref="entry"/> header, it has no argument.</explain>
+    <title><var ref="entry"/>: <var ref="name"/> needs an argument</title>
+    <explain>According to the specification, ‘<var ref="name"/>’ in <var ref="entry"/> must have an argument. But in this message, it doesn’t.</explain>
   </error>
 
   <error id="1157">
-    <title><var ref="entry"/>: <var ref="directive"/> can’t have an argument</title>
-    <explain>In this message’s <var ref="entry"/> header, the <var ref="directive"/> directive has an argument. But the specification defines no argument for this directive.</explain>
+    <title><var ref="entry"/>: <var ref="name"/> can’t have an argument</title>
+    <explain>In this message’s <var ref="entry"/> header, ‘<var ref="name"/>’ has an argument. But the specification defines no argument for ‘<var ref="name"/>’.</explain>
   </error>
 
   <error id="1158">
-    <title>Syntax error in <var ref="place"/>: <var ref="directive"/></title>
-    <explain>“<var ref="value"/>” is not a correct value for a <var ref="directive"/> directive in <var ref="place"/>.</explain>
+    <title>Syntax error in <var ref="place"/>: <var ref="name"/></title>
+    <explain>“<var ref="value"/>” is not a correct value for ‘<var ref="name"/>’ in <var ref="place"/>.</explain>
     <exception/>
   </error>
 

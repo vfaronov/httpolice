@@ -188,9 +188,9 @@ class Argument(Enum):
     optional = 1
     required = 2
 
-class DirectiveKnowledge(SyntaxKnowledge):
+class ArgumentKnowledge(SyntaxKnowledge):
 
-    """Knowledge about directives that can have arguments with some syntax."""
+    """Knowledge about things that can have arguments with some syntax."""
 
     argument = Argument
 
@@ -281,7 +281,7 @@ class ArgumentForm(Enum):
     token = 1
     quoted_string = 2
 
-class CacheDirectiveKnowledge(DirectiveKnowledge):
+class CacheDirectiveKnowledge(ArgumentKnowledge):
 
     argument_form = ArgumentForm
 
@@ -302,22 +302,8 @@ cache_directive = CacheDirectiveKnowledge(structure.CacheDirective,
 cache = cache_directive.accessor
 
 
-class ForwardedParamKnowledge(DirectiveKnowledge):
-
-    def process(self, raw):
-        # All forwarded parameters require an argument.
-        processed = super(ForwardedParamKnowledge, self).process(raw)
-        processed['argument'] = Argument.required
-        return processed
-
-    def unprocess(self, processed, orig_raw):               # pragma: no cover
-        processed = processed.copy()
-        del processed['argument']
-        return super(ForwardedParamKnowledge, self).unprocess(processed,
-                                                              orig_raw)
-
-forwarded_param = ForwardedParamKnowledge(structure.ForwardedParam,
-                                          'forwarded_param')
+forwarded_param = ArgumentKnowledge(structure.ForwardedParam,
+                                    'forwarded_param')
 forwarded = forwarded_param.accessor
 
 
@@ -350,7 +336,7 @@ class ProductKnowledge(Knowledge):
 product = ProductKnowledge(structure.ProductName, 'product')
 
 
-alt_svc_param = DirectiveKnowledge(structure.AltSvcParam, 'alt_svc_param')
+alt_svc_param = ArgumentKnowledge(structure.AltSvcParam, 'alt_svc_param')
 altsvc = alt_svc_param.accessor
 
 
@@ -362,11 +348,11 @@ content_coding = Knowledge(structure.ContentCoding, 'content_coding')
 cc = content_coding.accessor
 
 
-hsts_directive = DirectiveKnowledge(structure.HSTSDirective, 'hsts_directive')
+hsts_directive = ArgumentKnowledge(structure.HSTSDirective, 'hsts_directive')
 hsts = hsts_directive.accessor
 
 
-preference = DirectiveKnowledge(structure.Preference, 'preference')
+preference = ArgumentKnowledge(structure.Preference, 'preference')
 prefer = preference.accessor
 
 

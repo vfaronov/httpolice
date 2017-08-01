@@ -1,5 +1,5 @@
-key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title,syntax_module,syntax_symbol,description
-by,,,,7239,5.1,,,,rfc7239,node,IP-address of incoming interface of a proxy
-for,,,,7239,5.2,,,,rfc7239,node,IP-address of client making a request through a proxy
-host,,,,7239,5.3,,,,rfc7230,Host,Host header field of the incoming request
-proto,,,,7239,5.4,,,,rfc3986,scheme,Application protocol used for incoming request
+key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title,syntax_module,syntax_symbol,argument,description
+by,,,,7239,5.1,,,,rfc7239,node,required,IP-address of incoming interface of a proxy
+for,,,,7239,5.2,,,,rfc7239,node,required,IP-address of client making a request through a proxy
+host,,,,7239,5.3,,,,rfc7230,Host,required,Host header field of the incoming request
+proto,,,,7239,5.4,,,,rfc3986,scheme,required,Application protocol used for incoming request

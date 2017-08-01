@@ -44,7 +44,7 @@ Syntax-related fields
     to get the ``httpolice.parse.Symbol`` that can parse this syntax.
 
 ``argument``
-    Whether a directive can or must have an argument.
+    Whether the directive/parameter can or must have an argument.
 
 
 ``header.csv``
