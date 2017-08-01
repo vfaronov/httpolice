@@ -18,11 +18,10 @@ Added
 
 Fixed
 -----
-- HTTPolice can now use much less memory when parsing long TCP streams.
-- Similarly, large HTML reports need much less memory to produce.
+- Fixed a few bugs and design problems that caused HTTPolice to use more time
+  and memory than necessary in various cases (sometimes much more).
 - Notice `1013`_ is no longer wrongly reported for some headers
   such as ``Vary``.
-- Minor speedup in case when request URLs often repeat.
 - Fixed a crash on some pathological values of ``charset`` in ``Content-Type``.
 
 .. _Forwarded: https://tools.ietf.org/html/rfc7239

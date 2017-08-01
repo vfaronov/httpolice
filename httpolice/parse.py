@@ -119,7 +119,7 @@ def parse(data, symbol, complain=None, fail_notice_id=None,
         else:
             _memo[key] = parse_result
             while len(_memo) > MEMO_LIMIT:
-                _memo.popitem()
+                _memo.popitem(last=False)
 
     (r, complaints, annotations) = parse_result
     if complain is not None:
