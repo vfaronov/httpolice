@@ -11,6 +11,8 @@ Changed
 - When parsing TCP streams, HTTPolice no longer attempts to process very long
   header lines (currently 16K; they will fail with notice `1006`_/`1009`_)	
   and message bodies (currently 1G; notice `1298`_).
+- Notice 1259 (malformed parameter in Alt-Svc) has been removed: the same
+  problem is now reported as notice `1158`_.
 - The syntax of `chunk extensions`_ is no longer checked.
 
 Added
@@ -29,6 +31,7 @@ Fixed
 .. _chunk extensions: https://tools.ietf.org/html/rfc7230#section-4.1.1
 .. _1009: http://pythonhosted.org/HTTPolice/notices.html#1009
 .. _1298: http://pythonhosted.org/HTTPolice/notices.html#1298
+.. _1158: http://pythonhosted.org/HTTPolice/notices.html#1158
 .. _1296: http://pythonhosted.org/HTTPolice/notices.html#1296
 .. _1297: http://pythonhosted.org/HTTPolice/notices.html#1297
 .. _1013: http://pythonhosted.org/HTTPolice/notices.html#1013

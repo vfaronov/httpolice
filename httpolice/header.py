@@ -375,9 +375,10 @@ class StrictTransportSecurityView(DirectivesView, SingleHeaderView):
 
 
 @HeadersView.special_case
-class AltSvcView(MultiHeaderView):
+class AltSvcView(DirectivesView, MultiHeaderView):
 
     name = h.alt_svc
+    knowledge = known.alt_svc_param
 
     def _process_parsed(self, entry, parsed):
         if parsed == u'clear':
@@ -386,15 +387,8 @@ class AltSvcView(MultiHeaderView):
         # Parse every parameter's value according to its defined parser.
         parsed = copy.deepcopy(parsed)
         for alternative in parsed:
-            params = alternative.param.sequence
-            for i in range(len(params)):
-                (name, value) = params[i]
-                syntax = known.alt_svc_param.syntax_for(name)
-                if syntax is not None:
-                    value = parse(value, syntax, self.message.complain, 1259,
-                                  place=entry, param=name, value=value)
-                params[i] = (name, value)
-
+            alternative.param.sequence[:] = super(AltSvcView, self). \
+                _process_parsed(entry, alternative.param.sequence)
         return parsed
 
 

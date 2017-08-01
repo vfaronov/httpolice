@@ -350,7 +350,7 @@ class ProductKnowledge(Knowledge):
 product = ProductKnowledge(structure.ProductName, 'product')
 
 
-alt_svc_param = SyntaxKnowledge(structure.AltSvcParam, 'alt_svc_param')
+alt_svc_param = DirectiveKnowledge(structure.AltSvcParam, 'alt_svc_param')
 altsvc = alt_svc_param.accessor
 
 

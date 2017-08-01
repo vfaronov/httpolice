@@ -1896,12 +1896,6 @@ One non-obvious thing is how references work
     <ref to="msg.version"/>
   </comment>
 
-  <error id="1259">
-    <title>Malformed <var ref="param"/> parameter in <var ref="place"/></title>
-    <explain>“<var ref="value"/>” is not a correct value for a <var ref="param"/> parameter in <var ref="place"/>.</explain>
-    <exception/>
-  </error>
-
   <error id="1260">
     <title><st>421</st> response can’t have <h>Alt-Svc</h></title>
     <rfc num="7838" sect="6">
