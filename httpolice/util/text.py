@@ -3,6 +3,7 @@
 import io
 import re
 import string
+import sys
 
 import six
 
@@ -20,6 +21,9 @@ CHAR_NAMES = {
     b';': u'semicolon (;)',
     b'-': u'dash (-)',
 }
+
+
+fs_encoding = sys.getfilesystemencoding()
 
 
 def nicely_join(strings):
@@ -104,18 +108,18 @@ def format_chars(chars):
     return u' or '.join(piece for piece in pieces if piece)
 
 
-def force_unicode(x):
+def force_unicode(x, encoding='iso-8859-1'):
     if isinstance(x, bytes):
-        return x.decode('iso-8859-1')
+        return x.decode(encoding)
     else:
         return six.text_type(x)
 
 
-def force_bytes(x):
+def force_bytes(x, encoding='iso-8859-1'):
     if isinstance(x, bytes):
         return x
     else:
-        return x.encode('iso-8859-1', 'replace')
+        return x.encode(encoding, 'replace')
 
 
 def stdio_as_bytes(f):
@@ -230,7 +234,7 @@ class MockStdio(object):
         self.buffer = io.BytesIO()
 
     def write(self, s):
-        self.buffer.write(s.encode('utf-8'))
+        self.buffer.write(force_bytes(s, 'utf-8'))
 
 
 def contains_percent_encodes(s):
@@ -241,3 +245,7 @@ def contains_percent_encodes(s):
     False
     """
     return bool(re.search(u'%[0-9A-Fa-f]{2}', s))
+
+
+def decode_path(path):
+    return force_unicode(path, fs_encoding)

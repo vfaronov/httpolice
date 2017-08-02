@@ -20,12 +20,13 @@ from httpolice.exchange import check_exchange
 from httpolice.inputs.har import har_input
 from httpolice.inputs.streams import combined_input, parse_combined
 from httpolice.reports import html_report, text_report
+from httpolice.util.text import decode_path
 
 
-base_path = os.path.dirname(__file__)
+base_path = os.path.dirname(decode_path(__file__))
 
 relative_paths = [os.path.join(section, fn)
-                  for section in ['combined_data', 'har_data']
+                  for section in [u'combined_data', u'har_data']
                   for fn in os.listdir(os.path.join(base_path, section))]
 
 

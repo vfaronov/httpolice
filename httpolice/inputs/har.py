@@ -10,7 +10,7 @@ import six
 from httpolice import framing1
 from httpolice.exchange import Exchange
 from httpolice.helpers import pop_pseudo_headers
-from httpolice.inputs.common import InputError, decode_path
+from httpolice.inputs.common import InputError
 from httpolice.known import h, m, media, st
 from httpolice.parse import ParseError
 from httpolice.request import Request
@@ -18,6 +18,7 @@ from httpolice.response import Response
 from httpolice.stream import Stream
 from httpolice.structure import (FieldName, StatusCode, Unavailable, http2,
                                  http11)
+from httpolice.util.text import decode_path
 
 
 FIDDLER = [u'Fiddler']
@@ -31,21 +32,21 @@ FIREFOX = [u'Firefox', u'Iceweasel']
 def har_input(paths):
     for path in paths:
         # According to the spec, HAR files are UTF-8 with an optional BOM.
+        path = decode_path(path)
         with io.open(path, 'rt', encoding='utf-8-sig') as f:
             try:
                 data = json.load(f)
             except ValueError as exc:
                 six.raise_from(
-                    InputError('%s: bad HAR file: %s' % (path, exc)),
+                    InputError(u'%s: bad HAR file: %s' % (path, exc)),
                     exc)
-            decoded_path = decode_path(path)
             try:
                 creator = data['log']['creator']['name']
                 for entry in data['log']['entries']:
-                    yield _process_entry(entry, creator, decoded_path)
+                    yield _process_entry(entry, creator, path)
             except (TypeError, KeyError) as exc:
                 six.raise_from(
-                    InputError('%s: cannot understand HAR file: %r' %
+                    InputError(u'%s: cannot understand HAR file: %r' %
                                (path, exc)),
                     exc)
 

@@ -23,6 +23,7 @@ Fixed
 -----
 - Fixed a few bugs and design problems that caused HTTPolice to use more time
   and memory than necessary in various cases (sometimes much more).
+- Fixed some Unicode errors under Python 2.
 - Notice `1013`_ is no longer wrongly reported for some headers
   such as Vary.
 - Fixed a crash on some pathological values of 'charset' in Content-Type.

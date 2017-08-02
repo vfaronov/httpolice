@@ -65,7 +65,7 @@ def run_cli(args, stdout, stderr):
     except (EnvironmentError, inputs.InputError) as exc:
         if args.full_traceback:
             traceback.print_exc(file=stderr)
-        stderr.write('httpolice: %s\n' % exc)
+        stderr.write(u'httpolice: %s\n' % exc)
         return 1
 
     if args.fail_on is not None:

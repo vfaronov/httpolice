@@ -11,13 +11,14 @@ import six
 
 from httpolice.exchange import complaint_box
 from httpolice.framing1 import parse_streams
-from httpolice.inputs.common import InputError, decode_path
+from httpolice.inputs.common import InputError
 from httpolice.stream import Stream
+from httpolice.util.text import decode_path
 
 
 def streams_input(paths):
     if len(paths) % 2 != 0:
-        raise InputError('even number of input streams required')
+        raise InputError(u'even number of input streams required')
     pairs = [(paths[i], paths[i + 1], None) for i in range(0, len(paths), 2)]
     return _path_pairs_input(pairs, sniff_direction=False)
 
@@ -39,14 +40,15 @@ def tcpick_input(dir_paths):
         # Extract `_StreamInfo` from tcpick filenames so they can be
         # recombined into pairs. This relies on the counter produced by
         # tcpick's ``-F2`` option.
+        dir_path = decode_path(dir_path)
         streams_info = []
         for name in os.listdir(dir_path):
             path = os.path.join(dir_path, name)
             match = re.match(
                 r'^tcpick_(\d+)_([^_]+)_([^_]+)_[^.]+.(serv|clnt)\.dat$', name)
             if not match:
-                raise InputError('wrong tcpick filename %s '
-                                 '(did you use the -F2 option?)' % name)
+                raise InputError(u'wrong tcpick filename %s '
+                                 u'(did you use the -F2 option?)' % name)
             (counter, src, dest, direction) = match.groups()
             counter = int(counter)
             if direction == 'serv':
@@ -69,6 +71,7 @@ def tcpflow_input(dir_paths):
         # source port, destination address, destination port", keeping track
         # of its uniqueness within a given directory.
         # See https://github.com/simsong/tcpflow/issues/128 .
+        dir_path = decode_path(dir_path)
         streams_info = []
         seen = {}
         for name in os.listdir(dir_path):
@@ -77,13 +80,13 @@ def tcpflow_input(dir_paths):
             path = os.path.join(dir_path, name)
             match = re.match(r'^(\d+)-([^-]+-\d+)-([^-]+-\d+)-\d+$', name)
             if not match:
-                raise InputError('wrong tcpflow filename %s '
-                                 '(did you use the right -T option?)' % name)
+                raise InputError(u'wrong tcpflow filename %s '
+                                 u'(did you use the right -T option?)' % name)
             (timestamp, src, dest) = match.groups()
             timestamp = int(timestamp)
             if (src, dest) in seen:
-                raise InputError('duplicate source+destination address+port: '
-                                 '%s vs. %s' % (path, seen[(src, dest)]))
+                raise InputError(u'duplicate source+destination address+port: '
+                                 u'%s vs. %s' % (path, seen[(src, dest)]))
             seen[(src, dest)] = path
             streams_info.append(_StreamInfo(
                 path, source=src, destination=dest, connection_hint=None,
@@ -165,6 +168,8 @@ def _path_pairs_input(path_pairs, sniff_direction=False,
     # We have pairs of input files, each corresponding to one TCP connection,
     # and possibly having a time hint indicating when the connection started.
     for (path1, path2, time_hint) in path_pairs:
+        path1 = decode_path(path1) if path1 else path1
+        path2 = decode_path(path2) if path2 else path2
         sequence = []           # Exchanges from this connection.
 
         # Some of the pairs may be one-sided, i.e. consisting of
@@ -355,9 +360,10 @@ def combined_input(paths):
 
 
 def parse_combined(path):
-    if path.endswith('.https'):
+    path = decode_path(path)
+    if path.endswith(u'.https'):
         scheme = u'https'
-    elif path.endswith('.noscheme'):
+    elif path.endswith(u'.noscheme'):
         scheme = None
     else:
         scheme = u'http'
@@ -366,20 +372,20 @@ def parse_combined(path):
         data = f.read()
     parts1 = data.split(b'======== BEGIN INBOUND STREAM ========\r\n', 1)
     if len(parts1) != 2:
-        raise InputError('%s: bad combined file: no inbound marker' % path)
+        raise InputError(u'%s: bad combined file: no inbound marker' % path)
     (preamble, rest) = parts1
     try:
         preamble = preamble.decode('utf-8')
     except UnicodeError as exc:     # pragma: no cover
-        six.raise_from(InputError('%s: invalid UTF-8 in preamble' % path), exc)
+        six.raise_from(InputError(u'%s: invalid UTF-8 in preamble' % path), exc)
     parts2 = rest.split(b'======== BEGIN OUTBOUND STREAM ========\r\n', 1)
     if len(parts2) != 2:            # pragma: no cover
-        raise InputError('%s: bad combined file: no outbound marker' % path)
+        raise InputError(u'%s: bad combined file: no outbound marker' % path)
     (inbound_data, outbound_data) = parts2
 
     inbound = Stream(io.BufferedReader(io.BytesIO(inbound_data)),
-                     name=decode_path(path) + u' (inbound)')
+                     name=path + u' (inbound)')
     outbound = Stream(io.BufferedReader(io.BytesIO(outbound_data)),
-                      name=decode_path(path) + u' (outbound)')
+                      name=path + u' (outbound)')
 
     return (inbound, outbound, scheme, preamble)
