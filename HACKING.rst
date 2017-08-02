@@ -30,10 +30,6 @@ but this is not enforced automatically for now.
 Versions of development tools (pytest, Pylint...)
 are pinned down to help make builds/QA reproducible.
 From time to time, they are manually upgraded (see the "Maintenance" section).
-Eventually I will use pip-sync for this,
-but right now it is unusable due to `pip-tools issue #206`__.
-
-__ https://github.com/nvie/pip-tools/issues/206
 
 
 Codebase overview and caveats
@@ -170,13 +166,16 @@ Adding a notice
 #. Write the actual checks logic.
    Usually it goes into one of the four big functions described above,
    but sometimes a better place is in ``httpolice.syntax`` (see e.g. no. 1015)
-   or somewhere else.
+   or in ``httpolice.header`` (see e.g. no. 1155).
 #. Run the tests again and make sure they pass.
 #. Check the report for your test cases
    to make sure the explanation looks good::
 
      $ httpolice -i combined -o html test/combined_data/1679* >/tmp/report.html
      $ open /tmp/report.html
+
+#. If necessary, mention the new feature in ``CHANGELOG.rst``
+   under the "Unreleased" heading.
 
 
 Releasing a new version
@@ -212,10 +211,18 @@ Releasing a new version
 
 #. Watch as Travis builds and uploads stuff to PyPI.
 
-#. If releasing a "stable" version,
-   check that Read the Docs has built it and updated the "stable" pointer.
-   (You may need to refresh the page to see it.)
-   If it hasn't, log in to readthedocs.org and force versions/builds manually.
+#. Check `builds on Read the Docs`__. They currently suffer from multiple
+   problems and need to be shepherded manually:
+
+   - sometimes RtD doesn't automatically rebuild 'stable' when a new release
+     is pushed to GitHub, so you have to go and enable it under *Versions*
+     and build it
+   - `RtD #2744`__: 'stable' is built from master instead of tag
+   - `RtD #3006`__: builds often fail without explanation
+
+   __ https://readthedocs.org/projects/httpolice/builds/
+   __ https://github.com/rtfd/readthedocs.org/issues/2744
+   __ https://github.com/rtfd/readthedocs.org/issues/3006
 
 #. Bump the version number in ``httpolice/__metadata__.py``
    (e.g. 0.12.0 → 0.13.0.dev1).
@@ -241,9 +248,7 @@ Maintenance
 
   #. Pin down new versions::
 
-       $ rm tools/requirements.txt
-       $ pip-compile tools/requirements.in
-       $ pip install -r tools/requirements.txt
+       $ pip-compile --upgrade tools/requirements.in
 
   #. Update other pinned versions:
 
@@ -260,6 +265,9 @@ Maintenance
      Maybe some Pylint overrides are no longer necessary, etc.
 
 - Look at Travis build logs and make sure nothing strange is going on there.
+
+- Check that the Python versions in PyPI trove classifiers are up to date.
+
 - Check links in notices::
 
     $ linkchecker --check-extern doc/_build/notices.html
