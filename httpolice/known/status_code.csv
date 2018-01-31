@@ -2,6 +2,7 @@ key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title,cache
 100,Continue,,,7231,6.2.1,,,,not_by_default
 101,Switching Protocols,,,7231,6.2.2,,,,not_by_default
 102,Processing,,,2518,,,,,
+103,Early Hints,,,8297,,,,,
 200,OK,,,7231,6.3.1,,,,by_default
 201,Created,,,7231,6.3.2,,,,not_by_default
 202,Accepted,,,7231,6.3.3,,,,not_by_default
