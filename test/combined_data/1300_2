@@ -1,0 +1,20 @@
+# This does look a bit ugly (the notice refers to a "quoted string" where
+# actually this is a comment), but not a big deal.
+
+======== BEGIN INBOUND STREAM ========
+PUT /articles/123/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: text/plain
+Content-Length: 16
+
+Hello world!
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 18
+Via: 1.1 foo (semicolons don't have special meaning in Via; so OK)
+
+Article updated.

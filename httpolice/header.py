@@ -19,10 +19,12 @@ import copy
 import operator
 import sys
 
+import six
+
 from httpolice import known
 from httpolice.known import HeaderRule, h
 from httpolice.parse import parse
-from httpolice.structure import Parametrized, Unavailable, okay
+from httpolice.structure import MultiDict, Parametrized, Unavailable, okay
 from httpolice.syntax.rfc7230 import quoted_string, token
 from httpolice.util.data import duplicates
 
@@ -147,11 +149,33 @@ class HeaderView(object):
                 if not isinstance(parsed, Unavailable):
                     parsed = self._process_parsed(entry, parsed)
                     self.message.annotations[(from_trailer, i)] = annotations
+                    self._check_quoted_delims(entry, parsed)
             values.append(parsed)
         return entries, values
 
     def _parse(self):
         raise NotImplementedError()
+
+    def _check_quoted_delims(self, entry, parsed):
+        # This would look cleaner somewhere in `httpolice.syntax` and/or
+        # `httpolice.parse`. In theory, we could even infer the need for these
+        # checks directly from the grammar. But that would require modest
+        # to severe refactoring (the more ambitious, the more severe),
+        # so we tuck it away here, easy and non-invasive.
+        comma, semicolon = known.header.bad_quoted_delims(self.name)
+        if comma or semicolon:
+            def check(v):
+                if isinstance(v, six.text_type):
+                    if comma and u',' in v:
+                        self.message.complain(1299, entry=entry)
+                    if semicolon and u';' in v:
+                        self.message.complain(1300, entry=entry)
+                elif isinstance(v, (list, tuple)):
+                    for subv in v:
+                        check(subv)
+                elif isinstance(v, MultiDict):
+                    check(v.sequence)
+            check(parsed)
 
     @property
     def total_entries(self):

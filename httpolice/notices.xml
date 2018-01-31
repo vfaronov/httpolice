@@ -2183,4 +2183,14 @@ One non-obvious thing is how references work
     <explain>This message’s <var ref="place"/> indicates that the body is at least <var ref="size"/> bytes long. HTTPolice does not attempt to process bodies longer than <var ref="max_size"/> bytes. The rest of the stream will not be processed either.</explain>
   </debug>
 
+  <comment id="1299">
+    <title>Quoted comma in <var ref="entry"/> might confuse a naive parser</title>
+    <explain>This message’s <var ref="entry"/> header contains a comma inside a quoted string. But experience shows that headers like <var ref="entry"/> are often parsed without regard for quoted strings—such a naive parser might interpret this comma as a separator between <var ref="entry"/> elements. If possible, avoiding this comma might help interoperability.</explain>
+  </comment>
+
+  <comment id="1300">
+    <title>Quoted semicolon in <var ref="entry"/> might confuse a naive parser</title>
+    <explain>This message’s <var ref="entry"/> header contains a semicolon inside a quoted string. But experience shows that headers like <var ref="entry"/> are often parsed without regard for quoted strings—such a naive parser might interpret this semicolon as a separator between <var ref="entry"/> parameters. If possible, avoiding this semicolon might help interoperability.</explain>
+  </comment>
+
 </notices>

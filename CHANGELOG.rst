@@ -2,6 +2,18 @@ History of changes
 ==================
 
 
+Unreleased
+~~~~~~~~~~
+
+Added
+-----
+- Checks for quoted commas and semicolons that might confuse a naive parser
+  (notices `1299`_, `1300`_).
+
+.. _1299: http://httpolice.readthedocs.io/page/notices.html#1299
+.. _1300: http://httpolice.readthedocs.io/page/notices.html#1300
+
+
 0.6.0 - 2017-08-02
 ~~~~~~~~~~~~~~~~~~
 

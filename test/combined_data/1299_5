@@ -1,0 +1,16 @@
+1299 1299
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+Via: 1.1 foo (what is this, some proxy I guess?)
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 14
+Via: 1.1 bar (yeah, definitely some sort of proxy)
+
+Hello world!

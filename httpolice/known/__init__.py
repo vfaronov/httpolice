@@ -216,6 +216,10 @@ class HeaderKnowledge(SyntaxKnowledge):
     def is_bad_for_trailer(self, key):
         return self.get(key).get('bad_for_trailer')
 
+    def bad_quoted_delims(self, key):
+        info = self.get(key)
+        return info.get('quoted_comma_bad'), info.get('quoted_semicolon_bad')
+
     def is_for_request(self, key):
         return self.get(key).get('for_request')
 
