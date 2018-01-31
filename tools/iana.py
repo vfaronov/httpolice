@@ -51,7 +51,7 @@ class Registry(object):
     key_order = []
     xmlns = {'iana': 'http://www.iana.org/assignments'}
     relative_url = None
-    registry_id = None
+    registry_ids = None
     cls = None
 
     def __init__(self, base_url='http://www.iana.org/assignments/'):
@@ -60,14 +60,15 @@ class Registry(object):
     def get_all(self):
         tree = self._get_xml(self.relative_url)
         entries = []
-        if self.registry_id:
-            xpath = '//iana:registry[@id="%s"]/iana:record' % self.registry_id
-        else:
-            xpath = '//iana:record'
-        for record in tree.findall(xpath, self.xmlns):
-            entry = self._from_record(record)
-            if entry:
-                entries.append(entry)
+        for registry_id in self.registry_ids or [None]:
+            if registry_id is None:
+                xpath = '//iana:record'
+            else:
+                xpath = '//iana:registry[@id="%s"]/iana:record' % registry_id
+            for record in tree.findall(xpath, self.xmlns):
+                entry = self._from_record(record)
+                if entry:
+                    entries.append(entry)
         return [(self.cls, entries)]
 
     def _get_xml(self, relative_url):
@@ -105,6 +106,7 @@ class HeaderRegistry(Registry):
 
     cls = FieldName
     relative_url = 'message-headers/message-headers.xml'
+    registry_ids = ['perm-headers', 'prov-headers']
 
     def _from_record(self, record):
         if record.find('iana:protocol', self.xmlns).text != 'http':
@@ -285,7 +287,7 @@ class AuthSchemeRegistry(Registry):
 
     cls = AuthScheme
     relative_url = 'http-authschemes/http-authschemes.xml'
-    registry_id = 'authschemes'
+    registry_ids = ['authschemes']
 
     def _from_record(self, record):
         return {
