@@ -35,7 +35,7 @@ setup(
     install_requires=[
         'singledispatch >= 3.4.0.3',
         'six >= 1.11.0',
-        'lxml >= 3.6.0',
+        'lxml >= 4.1.0',
         'bitstring >= 3.1.4',
         'dominate >= 2.2.0',
         'defusedxml >= 0.5.0',

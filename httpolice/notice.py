@@ -24,6 +24,10 @@ from httpolice import citation, known
 from httpolice.util.ordered_enum import OrderedEnum
 
 
+lookup = lxml.etree.ElementNamespaceClassLookup()
+ns = lookup.get_namespace(None)
+
+
 class Severity(OrderedEnum):
 
     """A notice's severity.
@@ -48,6 +52,9 @@ known_map = {name: cls for (cls, (_, name)) in known.classes.items()}
 # pylint: disable=property-on-old-class
 
 
+@ns('error')
+@ns('comment')
+@ns('debug')
 class Notice(lxml.etree.ElementBase):
 
     """An element that represents a single notice, as template."""
@@ -94,6 +101,7 @@ class Content(lxml.etree.ElementBase):
         return r
 
 
+@ns('explain')
 class Paragraph(Content):
 
     """A paragraph of explanation."""
@@ -101,6 +109,7 @@ class Paragraph(Content):
     pass
 
 
+@ns('title')
 class Title(Content):
 
     """A notice's title."""
@@ -108,6 +117,7 @@ class Title(Content):
     pass
 
 
+@ns('ref')
 class Ref(lxml.etree.ElementBase):
 
     """A reference to a piece of data, for highlights in HTML reports."""
@@ -115,6 +125,7 @@ class Ref(lxml.etree.ElementBase):
     reference = property(lambda self: self.get('to').split('.'))
 
 
+@ns('var')
 class Var(Ref):
 
     """A placeholder for a piece of data from a notice's context.
@@ -125,6 +136,7 @@ class Var(Ref):
     reference = property(lambda self: self.get('ref').split('.'))
 
 
+@ns('exception')
 class ExceptionDetails(lxml.etree.ElementBase):
 
     """A placeholder for details of the ``error`` key from the context."""
@@ -132,6 +144,7 @@ class ExceptionDetails(lxml.etree.ElementBase):
     pass
 
 
+@ns('cite')
 class Cite(Content):
 
     """A citation, with an optional quote."""
@@ -141,6 +154,7 @@ class Cite(Content):
         return citation.Citation(self.get('title'), self.get('url'))
 
 
+@ns('rfc')
 class CiteRFC(Cite):
 
     """A citation from an RFC, with an optional quote."""
@@ -162,22 +176,13 @@ class Known(Content):
         return known_map[self.tag](name)
 
 
+for tag in known_map:
+    ns[tag] = Known
+
+
 def _load_notices():
-    lookup = lxml.etree.ElementNamespaceClassLookup()
     parser = lxml.etree.XMLParser()
     parser.set_element_class_lookup(lookup)
-    ns = lookup.get_namespace(None)
-    for severity in Severity:
-        ns[severity.name] = Notice
-    ns['title'] = Title
-    ns['explain'] = Paragraph
-    ns['exception'] = ExceptionDetails
-    ns['var'] = Var
-    ns['ref'] = Ref
-    ns['cite'] = Cite
-    ns['rfc'] = CiteRFC
-    for tag in known_map:
-        ns[tag] = Known
     notices_xml = pkgutil.get_data('httpolice', 'notices.xml')
     root = lxml.etree.fromstring(notices_xml, parser)
     r = {}
