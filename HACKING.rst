@@ -211,18 +211,11 @@ Releasing a new version
 
 #. Watch as Travis builds and uploads stuff to PyPI.
 
-#. Check `builds on Read the Docs`__. They currently suffer from multiple
-   problems and need to be shepherded manually:
-
-   - sometimes RtD doesn't automatically rebuild 'stable' when a new release
-     is pushed to GitHub, so you have to go and enable it under *Versions*
-     and build it
-   - `RtD #2744`__: 'stable' is built from master instead of tag
-   - `RtD #3006`__: builds often fail without explanation
+#. Check `builds on Read the Docs`__. For example, sometimes RtD doesn't
+   automatically rebuild 'stable' when a new release is pushed to GitHub,
+   so you have to go and enable it under *Versions* and build it.
 
    __ https://readthedocs.org/projects/httpolice/builds/
-   __ https://github.com/rtfd/readthedocs.org/issues/2744
-   __ https://github.com/rtfd/readthedocs.org/issues/3006
 
 #. Bump the version number in ``httpolice/__metadata__.py``
    (e.g. 0.12.0 → 0.13.0.dev1).
