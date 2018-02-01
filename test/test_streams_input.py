@@ -225,6 +225,13 @@ def test_tcpflow_tls():
     assert [complaint.id for complaint in box.complaints] == [1279]
 
 
+def test_tcpflow_uwsgi_protocol():
+    [box] = load_from_tcpflow('uwsgi_protocol')
+    assert box.request is None
+    assert box.responses == []
+    assert [complaint.id for complaint in box.complaints] == [1279]
+
+
 def test_tcpick():
     exchanges = load_from_tcpick('httpbin')
 

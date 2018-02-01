@@ -13,6 +13,12 @@ Added
 .. _1299: http://httpolice.readthedocs.io/page/notices.html#1299
 .. _1300: http://httpolice.readthedocs.io/page/notices.html#1300
 
+Fixed
+-----
+- When `analyzing TCP streams`_, HTTPolice now uses a stricter heuristic
+  for detecting HTTP/1.x streams, producing fewer spurious `1006`_/`1009`_
+  notices.
+
 
 0.6.0 - 2017-08-02
 ~~~~~~~~~~~~~~~~~~

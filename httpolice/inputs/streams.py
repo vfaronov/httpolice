@@ -336,20 +336,15 @@ def _sniff_direction(path1, path2):                 # pragma: no cover
 
 
 def _sniff_outbound(path):
-    # An outbound HTTP/1.x stream always begins with an HTTP version
-    # (of the first response).
-    marker = b'HTTP/1.'
     with io.open(path, 'rb') as f:
-        return f.read(len(marker)) == marker
+        line = f.readline()
+    return re.match(br'HTTP/1\.[0-9] [0-9]{3} ', line) is not None
 
 
 def _sniff_inbound(path):
-    # An inbound HTTP/1.x stream always contains an HTTP version
-    # (of the first request) on the first line, but not at the beginning.
-    marker = b'HTTP/1.'
     with io.open(path, 'rb') as f:
         line = f.readline()
-    return marker in line and not line.startswith(marker)
+    return re.match(br'[^ ]+ [^ ]+ HTTP/1\.[0-9]$', line.rstrip()) is not None
 
 
 def combined_input(paths):
