@@ -2,15 +2,14 @@
 
 """Decoding content and transfer codings."""
 
-import gzip
-import io
 import zlib
 
 import brotli
 
 
 def decode_gzip(data):
-    return gzip.GzipFile(fileobj=io.BytesIO(data)).read()
+    # Just ``decompress(data, 16 + zlib.MAX_WBITS)`` doesn't work.
+    return zlib.decompressobj(16 + zlib.MAX_WBITS).decompress(data)
 
 
 def decode_deflate(data):

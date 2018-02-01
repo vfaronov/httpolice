@@ -15,6 +15,7 @@ Added
 
 Fixed
 -----
+- ``gzip``-encoded payloads are now decompressed more reliably.
 - When `analyzing TCP streams`_, HTTPolice now uses a stricter heuristic
   for detecting HTTP/1.x streams, producing fewer spurious `1006`_/`1009`_
   notices.
