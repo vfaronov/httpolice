@@ -502,6 +502,9 @@ def check_response_in_context(resp, req):
     if method == m.HEAD and resp.body:
         complain(1239)
 
+    if req.version == http10 and resp.headers.transfer_encoding.is_present:
+        complain(1306)
+
     if req.version == http11 and (not req.headers.host.is_okay or
                                   req.headers.host.total_entries > 1):
         if status.successful or status.redirection:
