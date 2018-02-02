@@ -2193,4 +2193,27 @@ One non-obvious thing is how references work
     <explain>This message’s <var ref="entry"/> header contains a semicolon inside a quoted string. But experience shows that headers like <var ref="entry"/> are often parsed without regard for quoted strings—such a naive parser might interpret this semicolon as a separator between <var ref="entry"/> parameters. If possible, avoiding this semicolon might help interoperability.</explain>
   </comment>
 
+  <comment id="1301">
+    <title><h>Cache-Control</h>: <cache>immutable</cache> probably needs <cache>max-age</cache></title>
+    <explain>“<h>Cache-Control</h>: <cache>immutable</cache>” is typically only useful with a large <cache>max-age</cache> or an <h>Expires</h> far in the future, because immutable applies only for as long as the response is considered fresh. Without explicit max-age or Expires, most caches will consider this response fresh only for a brief period or not at all.</explain>
+  </comment>
+
+  <comment id="1302">
+    <title><h>Cache-Control</h>: <cache>immutable</cache> may be ignored without TLS</title>
+    <rfc num="8246" section="3">
+      Clients SHOULD ignore the <cache>immutable</cache> extension from resources that
+      are not part of an authenticated context such as HTTPS.
+    </rfc>
+  </comment>
+
+  <comment id="1303">
+    <title><h>Cache-Control</h>: <cache>immutable</cache> may be ignored without response length</title>
+    <rfc num="8246" section="3">
+      Clients SHOULD ignore the <cache>immutable</cache> extension for resources that
+      do not provide a strong indication that the stored response size
+      is the correct response size such as responses delimited by
+      connection close.
+    </rfc>
+  </comment>
+
 </notices>

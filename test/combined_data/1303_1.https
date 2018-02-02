@@ -1,9 +1,7 @@
-# HTTP/1.0 responses can still have Content-Length, and clients use it,
-# and in fact, RFC 1945 requires it.
-1025
+1025 1303
 
 ======== BEGIN INBOUND STREAM ========
-GET / HTTP/1.1
+GET / HTTP/1.0
 Host: example.com
 User-Agent: demo
 
@@ -11,5 +9,7 @@ User-Agent: demo
 HTTP/1.0 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
+Cache-Control: immutable, max-age=3600
+Connection: close
 
 Hello world!

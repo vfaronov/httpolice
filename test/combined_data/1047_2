@@ -1,4 +1,5 @@
 # No. 1047 doesn't apply to HTTP/1.0 servers.
+1025
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1

@@ -1,5 +1,5 @@
 key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title,syntax_module,syntax_symbol,argument,argument_form,for_request,for_response
-immutable,,,,8246,,,,,,,,,,
+immutable,,,,8246,,,,,,,no,,False,True
 max-age,,,citation,7234,5.2,,,,rfc7234,delta_seconds,required,token,True,True
 max-stale,,,,7234,5.2.1.2,,,,rfc7234,delta_seconds,optional,token,True,False
 min-fresh,,,,7234,5.2.1.3,,,,rfc7234,delta_seconds,required,token,True,False

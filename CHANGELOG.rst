@@ -9,9 +9,14 @@ Added
 -----
 - Checks for quoted commas and semicolons that might confuse a naive parser
   (notices `1299`_, `1300`_).
+- Checks for `immutable responses`_ (notices `1301`_, `1302`_, `1303`_).
 
 .. _1299: http://httpolice.readthedocs.io/page/notices.html#1299
 .. _1300: http://httpolice.readthedocs.io/page/notices.html#1300
+.. _1301: http://httpolice.readthedocs.io/page/notices.html#1301
+.. _1302: http://httpolice.readthedocs.io/page/notices.html#1302
+.. _1303: http://httpolice.readthedocs.io/page/notices.html#1303
+.. _immutable responses: https://tools.ietf.org/html/rfc8246
 
 Fixed
 -----

@@ -183,6 +183,24 @@ class Response(message.Message):
         else:   # pragma: no cover
             return None
 
+    @derived_property
+    def delimited_by_close(self):
+        if self.headers.content_length.is_present or \
+                tc.chunked in self.headers.transfer_encoding or \
+                self.status.informational or \
+                self.status in [st.no_content, st.not_modified] or \
+                self.version == http2:
+            return False
+        if okay(self.request):
+            if self.request.method == m.HEAD:
+                return False
+            if self.request.method == m.CONNECT and self.status.successful:
+                return False
+            if self.version in [http10, http11]:
+                self.complain(1025)
+                return True
+        return None
+
 
 def check_responses(resps):
     for resp in resps:
@@ -224,6 +242,10 @@ def check_response_itself(resp):
             complain(1018)
         if headers.content_length.is_present:
             complain(1023)
+
+    if resp.delimited_by_close:
+        if resp.version == http11 and u'close' not in resp.headers.connection:
+            complain(1047)
 
     for hdr in headers:
         if known.header.is_for_response(hdr.name) == False:
@@ -349,6 +371,15 @@ def check_response_itself(resp):
         if headers.cache_control.must_revalidate:
             complain(1187)
 
+    if headers.cache_control.immutable:
+        if headers.expires.is_absent or headers.expires.value <= headers.date:
+            if not headers.cache_control.max_age:
+                complain(1301)
+        if resp.is_tls == False:
+            complain(1302)
+        if resp.delimited_by_close:
+            complain(1303)
+
     for direct1, direct2 in [(cache.public, cache.no_store),
                              (cache.private, cache.public),
                              (cache.private, cache.no_store),
@@ -461,15 +492,6 @@ def check_response_in_context(resp, req):
             complain(1024)
         if u'close' in resp.headers.connection:
             complain(1199)
-    elif method != m.HEAD and \
-            not status.informational and \
-            status not in [st.no_content, st.not_modified] and \
-            resp.headers.content_length.is_absent and \
-            tc.chunked not in resp.headers.transfer_encoding and \
-            resp.version == http11:
-        complain(1025)
-        if u'close' not in resp.headers.connection:
-            complain(1047)
 
     if method == m.HEAD and resp.body:
         complain(1239)
