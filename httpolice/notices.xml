@@ -1632,13 +1632,13 @@ One non-obvious thing is how references work
 
   <error id="1225">
     <title>Duplicate ‘<var ref="name"/>’ parameter in <var ref="place"/></title>
-    <explain>According to <rfc num="5988" sect="5"/>, the ‘<var ref="name"/>’ parameter must not occur more than once in a single link.</explain>
+    <explain>According to <rfc num="8288" sect="3"/>, the ‘<var ref="name"/>’ parameter must not occur more than once in a single link.</explain>
   </error>
 
   <comment id="1226">
     <title>Deprecated ‘rev’ parameter in <var ref="place"/></title>
-    <rfc num="5988" sect="5.3">
-      "rev" is deprecated by this
+    <rfc num="8288" sect="3.3">
+      rev is deprecated by this
    specification because it often confuses authors and readers; in most
    cases, using a separate relation type is preferable.
     </rfc>
@@ -2230,6 +2230,34 @@ One non-obvious thing is how references work
       A server MUST NOT send a
    response containing Transfer-Encoding unless the corresponding
    request indicates HTTP/1.1 (or later).
+    </rfc>
+  </error>
+
+  <comment id="1307">
+    <title>Unquoted ‘title’ parameter in <var ref="place"/> may cause problems</title>
+    <rfc num="8288" sect="3">
+      Previous definitions of the Link header did not equate the token and
+   quoted-string forms explicitly; the title parameter was always
+   quoted, and the hreflang parameter was always a token.  Senders
+   wishing to maximize interoperability will send them in those forms.
+    </rfc>
+  </comment>
+
+  <comment id="1308">
+    <title>Quoted ‘hreflang’ parameter in <var ref="place"/> may cause problems</title>
+    <rfc num="8288" sect="3">
+      Previous definitions of the Link header did not equate the token and
+   quoted-string forms explicitly; the title parameter was always
+   quoted, and the hreflang parameter was always a token.  Senders
+   wishing to maximize interoperability will send them in those forms.
+    </rfc>
+  </comment>
+
+  <error id="1309">
+    <title>Missing ‘rel’ parameter in <var ref="place"/></title>
+    <rfc num="8288" sect="3.3">
+      The rel parameter MUST be
+   present
     </rfc>
   </error>
 

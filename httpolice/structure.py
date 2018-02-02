@@ -394,7 +394,7 @@ class HSTSDirective(CaseInsensitive):
 
 class RelationType(CaseInsensitive):
 
-    """A registered link relation type (RFC 5988 Section 4)."""
+    """A registered link relation type (RFC 8288 Section 2.1)."""
 
     __slots__ = ()
 

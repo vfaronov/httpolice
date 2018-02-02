@@ -1,4 +1,4 @@
-1225
+1158 1158 1158
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
@@ -10,6 +10,8 @@ HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 14
-Link: <https://example.com/>;type="text/html";type="text/html"
+Link: <http://pub.example.com/editor/>; rel=edit-form; title*=Editor
+Link: <http://pub.example.com/docs/>; rel=help; type="text/html;charset=utf-8"
+Link: </index.20151214.txt>; rel="latest-version"; hreflang=en_US
 
 Hello world!

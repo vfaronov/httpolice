@@ -3,14 +3,13 @@
 from datetime import date, datetime, time
 
 from httpolice.citation import RFC
-from httpolice.known import media
 from httpolice.parse import (auto, can_complain, fill_names, literal, many,
                              maybe, maybe_str, named, octet, pivot, skip,
                              string1, string_times, subst)
 from httpolice.structure import (CaseInsensitive, Charset, ContentCoding,
                                  MediaType, MultiDict, Parametrized,
                                  ProductName, Unavailable, Versioned, okay)
-from httpolice.syntax.common import DIGIT, SP
+from httpolice.syntax.common import DIGIT, SP, check_media_type
 from httpolice.syntax.rfc3986 import URI_reference, absolute_URI
 from httpolice.syntax.rfc4647 import language_range
 from httpolice.syntax.rfc5646 import Language_Tag as language_tag
@@ -27,18 +26,6 @@ _MONTH_NAMES = [u'Jan', u'Feb', u'Mar', u'Apr', u'May', u'Jun', u'Jul', u'Aug',
                 u'Sep', u'Oct', u'Nov', u'Dec']
 
 
-_BAD_MEDIA_TYPES = {
-    MediaType(u'plain/text'): media.text_plain,
-    MediaType(u'text/json'): media.application_json,
-}
-
-@can_complain
-def _check_media_type(complain, mtype):
-    if mtype in _BAD_MEDIA_TYPES:
-        complain(1282, bad=mtype, good=_BAD_MEDIA_TYPES[mtype])
-    return mtype
-
-
 def parameter(exclude=None, name_cls=CaseInsensitive):
     return (
         (name_cls << token__excluding(exclude or [])) *
@@ -48,7 +35,7 @@ def parameter(exclude=None, name_cls=CaseInsensitive):
 type_ = token                                                           > pivot
 subtype = token                                                         > pivot
 media_type = Parametrized << (
-    (_check_media_type << (MediaType << type_ + '/' + subtype)) *
+    (check_media_type << (MediaType << type_ + '/' + subtype)) *
     (MultiDict << many(skip(OWS * ';' * OWS) * parameter())))           > pivot
 
 content_coding = ContentCoding << token                                 > pivot
@@ -195,7 +182,7 @@ def media_range(no_q=False):
         (
             literal('*/*') |
             type_ + '/' + '*' |
-            _check_media_type << (MediaType << type_ + '/' + subtype)
+            check_media_type << (MediaType << type_ + '/' + subtype)
         ) *
         (
             MultiDict << many(

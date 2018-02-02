@@ -18,6 +18,8 @@ Added
 -----
 - Checks for quoted commas and semicolons that might confuse a naive parser
   (notices `1299`_, `1300`_).
+- New checks for Link headers according to `RFC 8288`_ (notices `1307`_,
+  `1308`_, `1309`_).
 - Checks for `immutable responses`_ (notices `1301`_, `1302`_, `1303`_).
 - `Early hints`_ are now recognized (due to their idiosyncratic semantics,
   they avoid many checks that are applied to all other responses).
@@ -34,6 +36,10 @@ Added
 .. _1304: http://httpolice.readthedocs.io/page/notices.html#1304
 .. _1305: http://httpolice.readthedocs.io/page/notices.html#1305
 .. _1306: http://httpolice.readthedocs.io/page/notices.html#1306
+.. _1307: http://httpolice.readthedocs.io/page/notices.html#1307
+.. _1308: http://httpolice.readthedocs.io/page/notices.html#1308
+.. _1309: http://httpolice.readthedocs.io/page/notices.html#1309
+.. _RFC 8288: https://tools.ietf.org/html/rfc8288
 .. _immutable responses: https://tools.ietf.org/html/rfc8246
 .. _Early hints: https://tools.ietf.org/html/rfc8297
 

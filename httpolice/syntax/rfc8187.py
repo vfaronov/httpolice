@@ -3,8 +3,8 @@
 from httpolice.util.moves import unquote_to_bytes as pct_decode
 
 from httpolice.citation import RFC
-from httpolice.parse import (auto, can_complain, fill_names, maybe, named,
-                             pivot, skip, string, string1, string_excluding)
+from httpolice.parse import (auto, can_complain, fill_names, maybe, pivot,
+                             skip, string, string1)
 from httpolice.structure import CaseInsensitive, ExtValue
 from httpolice.syntax.common import ALPHA, DIGIT, HEXDIG
 from httpolice.syntax.rfc5646 import Language_Tag as language
@@ -14,12 +14,7 @@ from httpolice.util.text import force_bytes
 attr_char = (ALPHA | DIGIT |
              '!' | '#' | '$' | '&' | '+' | '-' | '.' |
              '^' | '_' | '`' | '|' | '~')                               > auto
-
-def parmname__excluding(exclude):
-    return (string_excluding(attr_char, [''] + exclude)
-            > named(u'parmname', RFC(8187), is_pivot=True))
-
-parmname = parmname__excluding([])
+parmname = string(attr_char)                                            > pivot
 
 # We don't need to special-case "UTF-8", simplify.
 mime_charsetc = (ALPHA | DIGIT |

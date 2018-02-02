@@ -1,4 +1,4 @@
-1225
+1309
 
 ======== BEGIN INBOUND STREAM ========
 GET / HTTP/1.1
@@ -10,6 +10,6 @@ HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 14
-Link: <https://example.com/>;type="text/html";type="text/html"
+Link: </hello.txt>
 
 Hello world!

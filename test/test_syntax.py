@@ -11,8 +11,8 @@ from httpolice.parse import (ParseError, empty, literal, many, named,
 from httpolice.structure import (ContentRange, ExtValue, LanguageTag,
                                  MultiDict, Parametrized, RangeSpecifier,
                                  Unavailable, Versioned)
-from httpolice.syntax import (rfc3986, rfc5988, rfc6266, rfc7230, rfc7231,
-                              rfc7233)
+from httpolice.syntax import (rfc3986, rfc6266, rfc7230, rfc7231, rfc7233,
+                              rfc8288)
 
 
 def parse(parser, text):
@@ -400,7 +400,7 @@ def test_content_range():
 
 
 def test_link():
-    p = rfc5988.Link
+    p = rfc8288.Link
     assert parse(
         p,
         b'<http://example.com/TheBook/chapter2>; rel="previous"; '
@@ -461,27 +461,26 @@ def test_link():
         ]
 
     assert parse(
-        p, b'</>; rel=foo; type=text/plain; rel=bar; type=text/html'
+        p, b'</>; rel=foo; type="text/plain"; rel=bar; type="text/html"'
     ) == [
             Parametrized(
                 u'/',
                 MultiDict([
                     (u'rel', [u'foo']),
                     (u'type', media.text_plain),
-                    (u'type', media.text_html),
                 ])
             ),
         ]
 
     assert parse(
         p,
-        b'</foo/bar?baz=qux#xyzzy>  ;  media = whatever man okay? ; '
+        b'</foo/bar?baz=qux#xyzzy>  ;  media = "whatever man okay?" ; '
         b'hreflang=en-US'
     ) == [
             Parametrized(
                 u'/foo/bar?baz=qux#xyzzy',
                 MultiDict([
-                    (u'media', u' whatever man okay?'),
+                    (u'media', u'whatever man okay?'),
                     (u'hreflang', LanguageTag(u'en-US')),
                 ])
             ),
@@ -500,8 +499,7 @@ def test_link():
             Parametrized(
                 u'urn:foo:bar:baz',
                 MultiDict([
-                    (u'myparam*',
-                     ExtValue(u'ISO-8859-1', u'en', b'whatever')),
+                    (u'myparam*', u"ISO-8859-1'en'whatever"),
                 ])
             ),
         ]
@@ -518,15 +516,12 @@ def test_link():
             ),
         ]
 
+    no_parse(p, b'</>; rel=foo; type=text/plain; rel=bar; type=text/html')
     no_parse(p, b'</>; anchor=/index.html')
     no_parse(p, u'<http://пример.рф/>; rel=next'.encode('utf-8'))
-    no_parse(p, b'</index.html>; title=Hello')
-    no_parse(p, b'</index.html>; type="text/html;charset=utf-8"')
     no_parse(p, b"</>; title * = UTF-8''Hello")
     no_parse(p, b'</index.html>;')
     no_parse(p, b'</index.html>; rel=next;')
-    no_parse(p, b'</index.html>; foo*=bar')
-    no_parse(p, b'</index.html>; hreflang="Hello world!"')
 
 
 def test_content_disposition():

@@ -609,16 +609,15 @@ def string_excluding(terminal, excluding):
     (case-insensitive).
 
     This is used where the grammar special-cases certain strings. For example,
-    consider RFC 5988. Strictly speaking, the string::
+    consider RFC 6266. Strictly speaking, the string::
 
-      hreflang="Hello world!"
+      filename*=qwertyuiop
 
-    matches the ``link-param`` rule, because it matches ``link-extension``.
-    But the spec obviously intends that an "hreflang" parameter must only have
-    a language tag as a value, as it is special-cased in the definition
-    of ``link-param``. Therefore, in our code for ``link-extension``, we
-    exclude "hreflang" and other special cases from the allowed values
-    of ``parmname``.
+    matches the ``disposition-param`` production, because it matches
+    ``disp-ext-param``. But the spec obviously intends that a "filename*"
+    parameter only be an ``ext-value``, as it is special-cased
+    in ``filename-param``. Therefore, in our code for ``disp-ext-param``, we
+    exclude "filename*" from the allowed parameter names.
 
     This only works when the excluded strings are relatively few and short.
 

@@ -90,7 +90,7 @@ Label,,,,4229,,,,,,,,,,,,,,,,,
 Last-Modified,,,,7232,2.2,,,,rfc7232,Last_Modified,True,,,,False,True,standard,,,True,single
 Link,,"Not sure if this makes any sense on requests.
 With the `anchor` parameter, perhaps.
-Leaving undefined for now.",,8288,3,,,,rfc5988,Link,,,True,True,,True,standard,False,False,,multi
+Leaving undefined for now.",,8288,3,,,,rfc8288,Link,,,True,True,,True,standard,False,False,,multi
 Location,,,,7231,7.1.2,,,,rfc7231,Location,,True,,,False,True,standard,,,,single
 Lock-Token,,,,4918,,,,,,,,,,,,,standard,,,,
 MIME-Version,,,,7231,,A.1,,,,,,,,,,,standard,False,False,,

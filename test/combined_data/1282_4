@@ -1,15 +1,14 @@
-1225
+1282
 
 ======== BEGIN INBOUND STREAM ========
-GET / HTTP/1.1
+OPTIONS /articles/123/ HTTP/1.1
 Host: example.com
 User-Agent: demo
 
 ======== BEGIN OUTBOUND STREAM ========
 HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
-Content-Type: text/plain
-Content-Length: 14
-Link: <https://example.com/>;type="text/html";type="text/html"
+Content-Length: 0
+Allow: GET, HEAD, PUT, DELETE, OPTIONS
+Link: </pricing.txt>;rel=payment, </api.txt>;rel=help;type="plain/text"
 
-Hello world!
