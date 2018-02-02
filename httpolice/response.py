@@ -203,7 +203,13 @@ class Response(message.Message):
 
 
 def check_responses(resps):
+    final = None
     for resp in resps:
+        if final is None:
+            if not resp.status.informational:
+                final = resp
+        else:
+            resp.complain(1304, previous=final)
         check_response(resp)
 
 

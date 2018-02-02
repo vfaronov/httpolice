@@ -2216,4 +2216,10 @@ One non-obvious thing is how references work
     </rfc>
   </comment>
 
+  <error id="1304">
+    <title><var ref="msg.status"/> response after <var ref="previous.status"/></title>
+    <explain>It appears like this <var ref="msg.status"/> response was preceded by a <var ref="previous.status"/> response to the same request. But a <var ref="previous.status"/> response can only be the final response to a request. See also <rfc num="7231" sect="6.2"/>.</explain>
+    <explain>This is more likely to be a bug in your HTTPolice integration than in the actual HTTP traffic being inspected. For example, responses to different requests may have been mixed up somehow.</explain>
+  </error>
+
 </notices>
