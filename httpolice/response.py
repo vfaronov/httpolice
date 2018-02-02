@@ -356,8 +356,6 @@ def check_response_itself(resp):
                 complain(1251)
             elif params.index(u'filename*') < params.index(u'filename'):
                 complain(1252)
-            if filename_ext.charset != u'UTF-8':
-                complain(1255)
 
     if headers.alt_svc.is_present:
         if version == http2:

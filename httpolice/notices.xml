@@ -1857,27 +1857,18 @@ One non-obvious thing is how references work
 
   <error id="1253">
     <title>Bad charset ‘<var ref="charset"/>’ in <var ref="place"/></title>
-    <rfc num="5987" sect="3.2.1">
-      Producers MUST use either the "UTF-8" ([RFC3629]) or the "ISO-8859-1"
-   ([ISO-8859-1]) character set.  Extension character sets (mime-
-   charset) are reserved for future use.
+    <rfc num="8187" sect="3.2.1">
+      Producers MUST use the "UTF-8" ([RFC3629]) character encoding.
+   Extension character encodings (mime-charset) are reserved for future
+   use.
     </rfc>
   </error>
 
   <error id="1254">
     <title>Bad <var ref="charset"/> value in <var ref="place"/></title>
-    <explain>This message’s <var ref="place"/> contains a <var ref="charset"/> encoded value in the form defined by <rfc num="5987"/>. But HTTPolice tried to decode it from <var ref="charset"/> and got the following error:</explain>
+    <explain>This message’s <var ref="place"/> contains a <var ref="charset"/> encoded value in the form defined by <rfc num="8187"/>. But HTTPolice tried to decode it from <var ref="charset"/> and got the following error:</explain>
     <exception/>
   </error>
-
-  <comment id="1255">
-    <title><h>Content-Disposition</h>: filename* should be in UTF-8</title>
-    <rfc num="6266" appendix="D">
-      Use UTF-8 as the encoding of the "filename*" parameter, when
-      present, because at least one existing implementation only
-      implements that encoding.
-    </rfc>
-  </comment>
 
   <error id="1256">
     <title>Bad encoding of protocol ID in <h>Alt-Svc</h></title>

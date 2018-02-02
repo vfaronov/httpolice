@@ -401,7 +401,7 @@ class RelationType(CaseInsensitive):
 
 class ExtValue(namedtuple('ExtValue', ('charset', 'language', 'value_bytes'))):
 
-    """An ``ext-value`` (RFC 5987)."""
+    """An ``ext-value`` (RFC 8187)."""
 
     __slots__ = ()
 

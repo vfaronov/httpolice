@@ -4,8 +4,8 @@ from httpolice.citation import RFC
 from httpolice.parse import auto, fill_names, literal, many, pivot, skip
 from httpolice.structure import CaseInsensitive, MultiDict, Parametrized
 from httpolice.syntax.rfc2616 import value
-from httpolice.syntax.rfc5987 import ext_value
 from httpolice.syntax.rfc7230 import OWS, token, token__excluding
+from httpolice.syntax.rfc8187 import ext_value
 
 
 # This has been slightly adapted to the rules of RFC 7230.

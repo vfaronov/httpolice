@@ -9,9 +9,9 @@ from httpolice.syntax.common import ALPHA, DIGIT, HTAB, SP, VCHAR
 from httpolice.syntax.rfc2616 import LOALPHA
 from httpolice.syntax.rfc3986 import URI, URI_reference as URI_Reference
 from httpolice.syntax.rfc5646 import Language_Tag
-from httpolice.syntax.rfc5987 import ext_value, parmname__excluding
 from httpolice.syntax.rfc6838 import subtype_name, type_name
 from httpolice.syntax.rfc7230 import OWS, comma_list, quoted_string
+from httpolice.syntax.rfc8187 import ext_value, parmname__excluding
 
 
 # RFC 5988 refers to HTML 4.01 for the ``MediaDesc`` rule,

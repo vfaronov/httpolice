@@ -5,6 +5,15 @@ History of changes
 Unreleased
 ~~~~~~~~~~
 
+Changed
+-------
+- As `RFC 8187`_ removes support for ISO-8859-1, notice `1253`_ (bad charset)
+  is now reported for ISO-8859-1 as well, and notice 1255 (ISO-8859-1
+  in Content-Disposition) has been removed.
+
+.. _RFC 8187: https://tools.ietf.org/html/rfc8187
+.. _1253: http://httpolice.readthedocs.io/page/notices.html#1253
+
 Added
 -----
 - Checks for quoted commas and semicolons that might confuse a naive parser

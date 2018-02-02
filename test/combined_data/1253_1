@@ -1,4 +1,4 @@
-1253 1255
+1253
 
 ======== BEGIN INBOUND STREAM ========
 GET /files/123/download/ HTTP/1.1

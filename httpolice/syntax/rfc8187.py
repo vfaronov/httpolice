@@ -17,11 +17,11 @@ attr_char = (ALPHA | DIGIT |
 
 def parmname__excluding(exclude):
     return (string_excluding(attr_char, [''] + exclude)
-            > named(u'parmname', RFC(5987), is_pivot=True))
+            > named(u'parmname', RFC(8187), is_pivot=True))
 
 parmname = parmname__excluding([])
 
-# We don't need to special-case "UTF-8" and "ISO-8859-1", simplify.
+# We don't need to special-case "UTF-8", simplify.
 mime_charsetc = (ALPHA | DIGIT |
                  '!' | '#' | '$' | '%' | '&' | '+' | '-' | '^' | '_' | '`' |
                  '{' | '}' | '~')                                       > auto
@@ -34,7 +34,7 @@ value_chars = pct_decode << (
 
 @can_complain
 def _check_ext_value(complain, val):
-    if val.charset in [u'UTF-8', u'ISO-8859-1']:
+    if val.charset == u'UTF-8':
         try:
             val.value_bytes.decode(val.charset)
         except UnicodeError as e:
@@ -49,4 +49,4 @@ ext_value = _check_ext_value << (
                  value_chars))                                          > pivot
 
 
-fill_names(globals(), RFC(5987))
+fill_names(globals(), RFC(8187))
