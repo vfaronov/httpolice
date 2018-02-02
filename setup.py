@@ -34,7 +34,7 @@ setup(
     # make sure you don't break ``tools/minimum_requires.sh``.
     install_requires=[
         'singledispatch >= 3.4.0.3',
-        'six >= 1.11.0',
+        'six >= 1.10.0',
         'lxml >= 4.1.0',
         'bitstring >= 3.1.4',
         'dominate >= 2.2.0',

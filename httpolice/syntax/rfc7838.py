@@ -3,8 +3,8 @@
 # pylint: disable=import-error
 # (for `six.moves`; can't fit on the same line due to interference from isort)
 
+from httpolice.util.moves import unquote_to_bytes as pct_decode
 from six.moves.urllib.parse import quote as pct_encode
-from six.moves.urllib.parse import unquote_to_bytes as pct_decode
 
 import six
 

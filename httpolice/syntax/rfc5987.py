@@ -1,9 +1,6 @@
 # -*- coding: utf-8; -*-
 
-# pylint: disable=import-error
-# (for `six.moves`; can't fit on the same line due to interference from isort)
-
-from six.moves.urllib.parse import unquote_to_bytes as pct_decode
+from httpolice.util.moves import unquote_to_bytes as pct_decode
 
 from httpolice.citation import RFC
 from httpolice.parse import (auto, can_complain, fill_names, maybe, named,
@@ -12,9 +9,6 @@ from httpolice.structure import CaseInsensitive, ExtValue
 from httpolice.syntax.common import ALPHA, DIGIT, HEXDIG
 from httpolice.syntax.rfc5646 import Language_Tag as language
 from httpolice.util.text import force_bytes
-
-
-# pylint: enable=import-error
 
 
 attr_char = (ALPHA | DIGIT |
