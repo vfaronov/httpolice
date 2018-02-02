@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pytest
 
-from httpolice.known import cc, media, rel, tc, unit
+from httpolice.known import cc, media, tc, unit
 import httpolice.parse
 from httpolice.parse import (ParseError, empty, literal, many, named,
                              recursive, skip, string, subst)
@@ -409,7 +409,7 @@ def test_link():
             Parametrized(
                 u'http://example.com/TheBook/chapter2',
                 MultiDict([
-                    (u'rel', [rel.previous]),
+                    (u'rel', [u'previous']),
                     (u'title', u'previous chapter'),
                 ])
             )
@@ -429,7 +429,7 @@ def test_link():
             Parametrized(
                 u'/TheBook/chapter2',
                 MultiDict([
-                    (u'rel', [rel.previous]),
+                    (u'rel', [u'previous']),
                     (u'title*',
                      ExtValue(u'UTF-8', u'de',
                               u'letztes Kapitel'.encode('utf-8'))),
@@ -438,7 +438,7 @@ def test_link():
             Parametrized(
                 u'/TheBook/chapter4',
                 MultiDict([
-                    (u'rel', [rel.next]),
+                    (u'rel', [u'next']),
                     (u'Title*',
                      ExtValue(u'UTF-8', u'de',
                               u'nächstes Kapitel'.encode('utf-8'))),

@@ -364,10 +364,6 @@ range_unit = Knowledge(structure.RangeUnit, 'range_unit')
 unit = range_unit.accessor
 
 
-relation_type = Knowledge(structure.RelationType, 'relation_type')
-rel = relation_type.accessor
-
-
 transfer_coding = Knowledge(structure.TransferCoding, 'transfer_coding')
 tc = transfer_coding.accessor
 

@@ -37,8 +37,8 @@ from httpolice.citation import RFC, Citation
 from httpolice.structure import (AltSvcParam, AuthScheme, CacheDirective,
                                  ContentCoding, FieldName, ForwardedParam,
                                  MediaType, Method, Preference, RangeUnit,
-                                 RelationType, StatusCode, TransferCoding,
-                                 UpgradeToken, WarnCode)
+                                 StatusCode, TransferCoding, UpgradeToken,
+                                 WarnCode)
 from httpolice.util.text import normalize_whitespace
 
 
@@ -293,19 +293,6 @@ class AuthSchemeRegistry(Registry):
         return {
             'key': AuthScheme(record.find('iana:value', self.xmlns).text),
             'citation': self.extract_citation(record),
-        }
-
-
-class RelationTypeRegistry(Registry):
-
-    cls = RelationType
-    relative_url = 'link-relations/link-relations.xml'
-
-    def _from_record(self, record):
-        return {
-            'key': RelationType(record.find('iana:value', self.xmlns).text),
-            'citation': 
-                self.extract_citation(record.find('iana:spec', self.xmlns)),
         }
 
 

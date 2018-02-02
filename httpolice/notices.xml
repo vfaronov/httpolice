@@ -1754,7 +1754,7 @@ One non-obvious thing is how references work
   </comment>
 
   <comment id="1243">
-    <title><st>451</st> response should have a <rel>blocked-by</rel> link</title>
+    <title><st>451</st> response should have a ‘blocked-by’ link</title>
     <rfc num="7725" sect="4">
       When an entity blocks access to a resource and returns status 451, it
    SHOULD include a "<h>Link</h>" HTTP header field [RFC5988] whose value is a

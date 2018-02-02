@@ -392,13 +392,6 @@ class HSTSDirective(CaseInsensitive):
     __slots__ = ()
 
 
-class RelationType(CaseInsensitive):
-
-    """A registered link relation type (RFC 8288 Section 2.1)."""
-
-    __slots__ = ()
-
-
 class ExtValue(namedtuple('ExtValue', ('charset', 'language', 'value_bytes'))):
 
     """An ``ext-value`` (RFC 8187)."""

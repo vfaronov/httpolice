@@ -8,8 +8,8 @@ import six
 
 from httpolice import known, message
 from httpolice.blackboard import derived_property
-from httpolice.known import (Cacheable, auth, cache, h, hsts, m, media, rel,
-                             st, tc, unit, upgrade, warn)
+from httpolice.known import (Cacheable, auth, cache, h, hsts, m, media, st, tc,
+                             unit, upgrade, warn)
 from httpolice.parse import parse
 from httpolice.structure import (EntityTag, StatusCode, http2, http10, http11,
                                  okay)
@@ -331,7 +331,7 @@ def check_response_itself(resp):
         complain(1162)
 
     if status == st.unavailable_for_legal_reasons:
-        if not any(rel.blocked_by in link.param.get(u'rel', [])
+        if not any(u'blocked-by' in link.param.get(u'rel', [])
                    for link in headers.link):
             complain(1243)
 

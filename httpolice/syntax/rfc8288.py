@@ -4,7 +4,7 @@ from httpolice.citation import RFC
 from httpolice.parse import (auto, can_complain, fill_names, literal, many,
                              mark, maybe, parse, pivot, skip, string, string1)
 from httpolice.structure import (CaseInsensitive, MediaType, MultiDict,
-                                 Parametrized, RelationType)
+                                 Parametrized)
 from httpolice.syntax.common import DIGIT, SP, check_media_type
 from httpolice.syntax.rfc2616 import LOALPHA
 from httpolice.syntax.rfc3986 import URI, URI_reference as URI_Reference
@@ -59,7 +59,7 @@ Link = comma_list(link_value)                                           > pivot
 
 anchor = URI_Reference                                                  > auto
 
-reg_rel_type = RelationType << (
+reg_rel_type = CaseInsensitive << (
     LOALPHA + string(LOALPHA | DIGIT | '.' | '-'))                      > auto
 ext_rel_type = URI                                                      > auto
 relation_type = reg_rel_type | ext_rel_type                             > pivot
