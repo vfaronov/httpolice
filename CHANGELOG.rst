@@ -10,6 +10,8 @@ Added
 - Checks for quoted commas and semicolons that might confuse a naive parser
   (notices `1299`_, `1300`_).
 - Checks for `immutable responses`_ (notices `1301`_, `1302`_, `1303`_).
+- `Early hints`_ are now recognized (due to their idiosyncratic semantics,
+  they avoid many checks that are applied to all other responses).
 - Check for no Transfer-Encoding in response to HTTP/1.0 (notice `1306`_).
 - Check for 100 (Continue) before switching protocols (notice `1305`_).
 - Check that the sequence of responses to a request makes sense
@@ -24,6 +26,7 @@ Added
 .. _1305: http://httpolice.readthedocs.io/page/notices.html#1305
 .. _1306: http://httpolice.readthedocs.io/page/notices.html#1306
 .. _immutable responses: https://tools.ietf.org/html/rfc8246
+.. _Early hints: https://tools.ietf.org/html/rfc8297
 
 Fixed
 -----

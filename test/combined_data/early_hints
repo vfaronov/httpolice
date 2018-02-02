@@ -1,0 +1,31 @@
+
+
+======== BEGIN INBOUND STREAM ========
+GET / HTTP/1.1
+Host: example.com
+User-Agent: demo
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 103 Early Hints
+Content-Type: text/html; charset=utf-8
+Link: </style.css>; rel=preload; as=style
+Link: </logo.png>; rel=preload; type="image/png"
+
+HTTP/1.1 200 OK
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 237
+Link: </style.css>; rel=preload; as=style
+Link: </logo.png>; rel=preload; type="image/png"
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hello world!</title>
+        <link rel=stylesheet href="/style.css">
+    </head>
+    <body>
+        <p>Hello world!</p>
+        <p><img src="/logo.png"></p>
+    </body>
+</html>

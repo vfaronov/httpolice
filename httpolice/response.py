@@ -102,7 +102,7 @@ class Response(message.Message):
     @derived_property
     def content_is_full(self):
         """Does this response carry a complete instance of its Content-Type?"""
-        if self.status == st.not_modified:
+        if self.status in [st.not_modified, st.early_hints]:
             return False
         if self.status == st.partial_content and \
                 self.headers.content_type != media.multipart_byteranges:
@@ -115,6 +115,9 @@ class Response(message.Message):
 
     @derived_property
     def from_cache(self):
+        if self.status == st.early_hints:
+            return False
+
         if self.headers.date.is_okay and self.headers.age.is_okay:
             date = self.headers.date.value
             age = timedelta(seconds=self.headers.age.value)
@@ -151,6 +154,9 @@ class Response(message.Message):
 
     @derived_property
     def stale(self):
+        if self.status == st.early_hints:
+            return False
+
         for code in [warn.response_is_stale, warn.revalidation_failed]:
             if code in self.headers.warning:
                 self.complain(1183, code=code)
@@ -171,6 +177,8 @@ class Response(message.Message):
 
     @derived_property
     def transformed_by_proxy(self):
+        if self.status == st.early_hints:
+            return None
         if self.status == st.non_authoritative_information:
             self.complain(1190)
             return True
@@ -240,15 +248,6 @@ def check_response_itself(resp):
     if not (100 <= status <= 599):
         complain(1167)
 
-    if status.informational and u'close' in headers.connection:
-        complain(1198)
-
-    if status.informational or status == st.no_content:
-        if headers.transfer_encoding.is_present:
-            complain(1018)
-        if headers.content_length.is_present:
-            complain(1023)
-
     if resp.delimited_by_close:
         if resp.version == http11 and u'close' not in resp.headers.connection:
             complain(1047)
@@ -256,9 +255,6 @@ def check_response_itself(resp):
     for hdr in headers:
         if known.header.is_for_response(hdr.name) == False:
             complain(1064, header=hdr)
-        elif known.header.is_representation_metadata(hdr.name) and \
-                status.informational:
-            complain(1052, header=hdr)
 
     if status == st.switching_protocols:
         if headers.upgrade.is_absent:
@@ -305,16 +301,6 @@ def check_response_itself(resp):
             urlparse(headers.location.value).fragment:
         complain(1111)
 
-    if headers.location.is_present and \
-            not status.redirection and status != st.created:
-        complain(1112)
-
-    if headers.retry_after.is_present and \
-            not status.redirection and \
-            status not in [st.payload_too_large, st.service_unavailable,
-                           st.too_many_requests]:
-        complain(1113)
-
     if headers.date < headers.last_modified.value:
         complain(1118)
 
@@ -328,10 +314,6 @@ def check_response_itself(resp):
                 continue
             elif known.header.is_representation_metadata(hdr.name):
                 complain(1127, header=hdr)
-
-    if headers.content_range.is_present and \
-            status not in [st.partial_content, st.range_not_satisfiable]:
-        complain(1147)
 
     if status == st.partial_content:
         if headers.content_type == media.multipart_byteranges:
@@ -347,6 +329,126 @@ def check_response_itself(resp):
 
     if u'no-cache' in headers.pragma:
         complain(1162)
+
+    if status == st.unavailable_for_legal_reasons:
+        if not any(rel.blocked_by in link.param.get(u'rel', [])
+                   for link in headers.link):
+            complain(1243)
+
+    if headers.content_disposition.is_okay:
+        params = headers.content_disposition.param
+        for name in params.duplicates():
+            complain(1247, param=name)
+
+        filename = params.get(u'filename')
+        if filename is not None:
+            if contains_percent_encodes(filename):
+                complain(1248)
+            if u'"' in filename or u'\\' in filename:
+                # These must have been backslash-escaped.
+                complain(1249)
+            if not is_ascii(filename):
+                complain(1250)
+
+        filename_ext = params.get(u'filename*')
+        if filename_ext is not None:
+            if filename is None:
+                complain(1251)
+            elif params.index(u'filename*') < params.index(u'filename'):
+                complain(1252)
+            if filename_ext.charset != u'UTF-8':
+                complain(1255)
+
+    if headers.alt_svc.is_present:
+        if version == http2:
+            complain(1258)
+        if status == st.misdirected_request:
+            complain(1260)
+
+    if headers.strict_transport_security.is_okay:
+        if hsts.max_age not in headers.strict_transport_security:
+            complain(1218)
+        if headers.strict_transport_security.max_age == 0 and \
+                headers.strict_transport_security.includesubdomains:
+            complain(1219)
+        for dupe in duplicates(d.item
+                               for d in headers.strict_transport_security):
+            complain(1220, directive=dupe)
+
+    for patch_type in headers.accept_patch:
+        if known.media_type.is_patch(patch_type.item) == False:
+            complain(1227, patch_type=patch_type.item)
+
+    for direct1, direct2 in [(cache.public, cache.no_store),
+                             (cache.private, cache.public),
+                             (cache.private, cache.no_store),
+                             (cache.must_revalidate,
+                              cache.stale_while_revalidate),
+                             (cache.must_revalidate, cache.stale_if_error)]:
+        if headers.cache_control[direct1] and headers.cache_control[direct2]:
+            complain(1193, directive1=direct1, directive2=direct2)
+
+    for direct1, direct2 in [(cache.max_age, cache.no_cache),
+                             (cache.max_age, cache.no_store),
+                             (cache.s_maxage, cache.private),
+                             (cache.s_maxage, cache.no_cache),
+                             (cache.s_maxage, cache.no_store)]:
+        if headers.cache_control[direct1] and \
+                headers.cache_control[direct2] in [True, []]:
+            complain(1238, directive1=direct1, directive2=direct2)
+
+    if headers.vary != u'*' and h.host in headers.vary:
+        complain(1235)
+
+    if status == st.unauthorized and headers.www_authenticate.is_absent:
+        complain(1194)
+
+    if status == st.proxy_authentication_required and \
+            headers.proxy_authenticate.is_absent:
+        complain(1195)
+
+    for hdr in [headers.www_authenticate, headers.proxy_authenticate]:
+        for challenge in hdr:
+            if challenge.item == auth.basic:
+                _check_basic_challenge(resp, hdr, challenge)
+            if challenge.item == auth.bearer:
+                _check_bearer_challenge(resp, hdr, challenge)
+
+    if status == st.early_hints:
+        # 103 (Early Hints) responses are weird in that the headers they carry
+        # do not apply to themselves (RFC 8297 Section 2) but only to the final
+        # response (and then only speculatively). For such responses, we limit
+        # ourselves to checks that do not rely on having a complete and
+        # self-consistent message header block.
+        return
+
+    if status.informational or status == st.no_content:
+        if headers.transfer_encoding.is_present:
+            complain(1018)
+        if headers.content_length.is_present:
+            complain(1023)
+
+    if status.informational and u'close' in headers.connection:
+        complain(1198)
+
+    for hdr in headers:
+        if known.header.is_representation_metadata(hdr.name) and \
+                status.informational:
+            complain(1052, header=hdr)
+
+    if headers.location.is_present and \
+            not status.redirection and status != st.created:
+        complain(1112)
+
+    if headers.retry_after.is_present and \
+            not status.redirection and \
+            status not in [st.payload_too_large, st.service_unavailable,
+                           st.too_many_requests]:
+        complain(1113)
+
+    if headers.content_range.is_present and \
+            status not in [st.partial_content, st.range_not_satisfiable]:
+        complain(1147)
 
     if resp.from_cache:
         if headers.age.is_absent:
@@ -386,96 +488,12 @@ def check_response_itself(resp):
         if resp.delimited_by_close:
             complain(1303)
 
-    for direct1, direct2 in [(cache.public, cache.no_store),
-                             (cache.private, cache.public),
-                             (cache.private, cache.no_store),
-                             (cache.must_revalidate,
-                              cache.stale_while_revalidate),
-                             (cache.must_revalidate, cache.stale_if_error)]:
-        if headers.cache_control[direct1] and headers.cache_control[direct2]:
-            complain(1193, directive1=direct1, directive2=direct2)
-
-    for direct1, direct2 in [(cache.max_age, cache.no_cache),
-                             (cache.max_age, cache.no_store),
-                             (cache.s_maxage, cache.private),
-                             (cache.s_maxage, cache.no_cache),
-                             (cache.s_maxage, cache.no_store)]:
-        if headers.cache_control[direct1] and \
-                headers.cache_control[direct2] in [True, []]:
-            complain(1238, directive1=direct1, directive2=direct2)
-
-    if headers.vary != u'*' and h.host in headers.vary:
-        complain(1235)
-
-    if status == st.unauthorized and headers.www_authenticate.is_absent:
-        complain(1194)
-
-    if status == st.proxy_authentication_required and \
-            headers.proxy_authenticate.is_absent:
-        complain(1195)
-
-    for hdr in [headers.www_authenticate, headers.proxy_authenticate]:
-        for challenge in hdr:
-            if challenge.item == auth.basic:
-                _check_basic_challenge(resp, hdr, challenge)
-            if challenge.item == auth.bearer:
-                _check_bearer_challenge(resp, hdr, challenge)
-
     if headers.allow.is_present and headers.accept_patch.is_present and \
             m.PATCH not in headers.allow:
         complain(1217)
 
-    if headers.strict_transport_security.is_okay:
-        if hsts.max_age not in headers.strict_transport_security:
-            complain(1218)
-        if headers.strict_transport_security.max_age == 0 and \
-                headers.strict_transport_security.includesubdomains:
-            complain(1219)
-        for dupe in duplicates(d.item
-                               for d in headers.strict_transport_security):
-            complain(1220, directive=dupe)
-
-    for patch_type in headers.accept_patch:
-        if known.media_type.is_patch(patch_type.item) == False:
-            complain(1227, patch_type=patch_type.item)
-
     if resp.transformed_by_proxy and headers.via.is_absent:
         complain(1046)
-
-    if status == st.unavailable_for_legal_reasons:
-        if not any(rel.blocked_by in link.param.get(u'rel', [])
-                   for link in headers.link):
-            complain(1243)
-
-    if headers.content_disposition.is_okay:
-        params = headers.content_disposition.param
-        for name in params.duplicates():
-            complain(1247, param=name)
-
-        filename = params.get(u'filename')
-        if filename is not None:
-            if contains_percent_encodes(filename):
-                complain(1248)
-            if u'"' in filename or u'\\' in filename:
-                # These must have been backslash-escaped.
-                complain(1249)
-            if not is_ascii(filename):
-                complain(1250)
-
-        filename_ext = params.get(u'filename*')
-        if filename_ext is not None:
-            if filename is None:
-                complain(1251)
-            elif params.index(u'filename*') < params.index(u'filename'):
-                complain(1252)
-            if filename_ext.charset != u'UTF-8':
-                complain(1255)
-
-    if headers.alt_svc.is_present:
-        if version == http2:
-            complain(1258)
-        if status == st.misdirected_request:
-            complain(1260)
 
 
 def check_response_in_context(resp, req):
@@ -748,10 +766,6 @@ def check_response_in_context(resp, req):
                 resp.headers.accept_patch.is_absent:
             complain(1215)
 
-    if method == m.OPTIONS and m.PATCH in resp.headers.allow and \
-            resp.headers.accept_patch.is_absent:
-        complain(1216)
-
     if resp.headers.strict_transport_security.is_present and \
             req.is_tls == False:
         complain(1221)
@@ -766,6 +780,18 @@ def check_response_in_context(resp, req):
             complain(1286, name=applied_pref.item,
                      value=(u'' if applied_pref.param is None
                             else u'=%s' % applied_pref.param))
+
+    if status == st.early_hints:
+        # 103 (Early Hints) responses are weird in that the headers they carry
+        # do not apply to themselves (RFC 8297 Section 2) but only to the final
+        # response (and then only speculatively). For such responses, we limit
+        # ourselves to checks that do not rely on having a complete and
+        # self-consistent message header block.
+        return
+
+    if method == m.OPTIONS and m.PATCH in resp.headers.allow and \
+            resp.headers.accept_patch.is_absent:
+        complain(1216)
 
     if resp.headers.preference_applied.is_present and \
             known.method.is_cacheable(method) and \

@@ -17,7 +17,7 @@ from httpolice import known
 from httpolice.blackboard import Blackboard, derived_property
 from httpolice.codings import decode_brotli, decode_deflate, decode_gzip
 from httpolice.header import HeadersView
-from httpolice.known import cc, h, media, tc, upgrade, warn
+from httpolice.known import cc, h, media, st, tc, upgrade, warn
 from httpolice.parse import parse
 from httpolice.structure import (FieldName, HeaderEntry, HTTPVersion,
                                  Unavailable, http2, http11, okay)
@@ -318,9 +318,6 @@ def check_message(msg):
             u'charset' in headers.content_type.param:
         complain(1280, header=headers.content_type)
 
-    if headers.upgrade.is_present and u'upgrade' not in headers.connection:
-        complain(1050)
-
     if headers.date > datetime.utcnow() + timedelta(seconds=10):
         complain(1109)
 
@@ -330,15 +327,32 @@ def check_message(msg):
         if okay(warning.date) and headers.date != warning.date:
             complain(1164, code=warning.code)
 
+    for pragma in headers.pragma:
+        if pragma != u'no-cache':
+            complain(1160, pragma=pragma.item)
+
+    for protocol in headers.upgrade:
+        if protocol.item == u'h2':
+            complain(1228)
+        if protocol.item == upgrade.h2c and msg.is_tls:
+            complain(1233)
+
+    if getattr(msg, 'status', None) == st.early_hints:
+        # 103 (Early Hints) responses are weird in that the headers they carry
+        # do not apply to themselves (RFC 8297 Section 2) but only to the final
+        # response (and then only speculatively). For such responses, we limit
+        # ourselves to checks that do not rely on having a complete and
+        # self-consistent message header block.
+        return
+
+    if headers.upgrade.is_present and u'upgrade' not in headers.connection:
+        complain(1050)
+
     if msg.transformed_by_proxy:
         if warn.transformation_applied not in headers.warning:
             complain(1191)
         if headers.cache_control.no_transform:
             complain(1192)
-
-    for pragma in headers.pragma:
-        if pragma != u'no-cache':
-            complain(1160, pragma=pragma.item)
 
     if version == http2:
         for hdr in headers:
@@ -346,9 +360,3 @@ def check_message(msg):
                 complain(1244, header=hdr)
             elif hdr.name == h.upgrade:
                 complain(1245)
-
-    for protocol in headers.upgrade:
-        if protocol.item == u'h2':
-            complain(1228)
-        if protocol.item == upgrade.h2c and msg.is_tls:
-            complain(1233)
