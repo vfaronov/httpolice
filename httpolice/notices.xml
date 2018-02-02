@@ -2222,4 +2222,15 @@ One non-obvious thing is how references work
     <explain>This is more likely to be a bug in your HTTPolice integration than in the actual HTTP traffic being inspected. For example, responses to different requests may have been mixed up somehow.</explain>
   </error>
 
+  <error id="1305">
+    <title>Expected <st>100</st> (Continue) before switching protocols</title>
+    <rfc num="7230" sect="6.7">
+      If a server receives both an <h ref="no">Upgrade</h> and an <h>Expect</h> header field with
+   the "100-continue" expectation (Section 5.1.1 of [RFC7231]), the
+   server MUST send a <st>100</st> (Continue) response before sending a <st>101</st>
+   (Switching Protocols) response.
+    </rfc>
+    <ref to="msg.request.headers.expect"/>
+  </error>
+
 </notices>

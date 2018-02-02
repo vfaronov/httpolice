@@ -2,6 +2,7 @@
 
 from httpolice import request, response
 from httpolice.blackboard import Blackboard
+from httpolice.known import st
 
 
 class Exchange(Blackboard):
@@ -57,6 +58,16 @@ def complaint_box(*args, **kwargs):
 
 def check_exchange(exch):
     """Run all checks on the exchange `exch`, modifying it in place."""
+    expect_100 = False
+
     if exch.request:
         request.check_request(exch.request)
+        expect_100 = exch.request.headers.expect == u'100-continue'
+
     response.check_responses(exch.responses)
+
+    for resp in exch.responses:
+        if resp.status == st.continue_:
+            expect_100 = False
+        if expect_100 and resp.status == st.switching_protocols:
+            resp.complain(1305)

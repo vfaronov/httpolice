@@ -10,6 +10,7 @@ Added
 - Checks for quoted commas and semicolons that might confuse a naive parser
   (notices `1299`_, `1300`_).
 - Checks for `immutable responses`_ (notices `1301`_, `1302`_, `1303`_).
+- Check for 100 (Continue) before switching protocols (notice `1305`_).
 - Check that the sequence of responses to a request makes sense
   (notice `1304`_).
 
@@ -19,6 +20,7 @@ Added
 .. _1302: http://httpolice.readthedocs.io/page/notices.html#1302
 .. _1303: http://httpolice.readthedocs.io/page/notices.html#1303
 .. _1304: http://httpolice.readthedocs.io/page/notices.html#1304
+.. _1305: http://httpolice.readthedocs.io/page/notices.html#1305
 .. _immutable responses: https://tools.ietf.org/html/rfc8246
 
 Fixed
