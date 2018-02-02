@@ -10,6 +10,6 @@ HTTP/1.1 200 OK
 Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 14
-Link: <https://example.com/>;type="text/html";type="text/html"
+Link: <https://example.com/>;rel=self;type="text/html";type="text/html"
 
 Hello world!
