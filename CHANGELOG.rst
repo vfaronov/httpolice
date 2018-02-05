@@ -49,6 +49,8 @@ Fixed
 - When `analyzing TCP streams`_, HTTPolice now uses a stricter heuristic
   for detecting HTTP/1.x streams, producing fewer spurious `1006`_/`1009`_
   notices.
+- Notice `1291`_ (Preference-Applied needs Vary) is no longer reported
+  on responses to POST.
 
 
 0.6.0 - 2017-08-02

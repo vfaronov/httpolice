@@ -791,8 +791,7 @@ def check_response_in_context(resp, req):
             resp.headers.accept_patch.is_absent:
         complain(1216)
 
-    if resp.headers.preference_applied.is_present and \
-            known.method.is_cacheable(method) and \
+    if resp.headers.preference_applied.is_present and method == m.GET and \
             resp.headers.vary != u'*' and h.prefer not in resp.headers.vary:
             # We could also look for ``Cache-Control: no-store`` etc.,
             # but the meaning of ``Vary`` is not limited to caching,

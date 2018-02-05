@@ -1,0 +1,22 @@
+# POST is cacheable in theory, but not in practice, so 1291 would not be
+# useful here.
+
+======== BEGIN INBOUND STREAM ========
+POST /articles/ HTTP/1.1
+Host: example.com
+User-Agent: demo
+Content-Type: text/plain
+Content-Length: 16
+Prefer: handling=strict
+
+Hello world!
+
+======== BEGIN OUTBOUND STREAM ========
+HTTP/1.1 201 Created
+Date: Thu, 31 Dec 2015 18:26:56 GMT
+Content-Type: text/plain
+Content-Length: 47
+Location: /articles/123/
+Preference-Applied: handling=strict
+
+Your article was posted under /articles/123/.
