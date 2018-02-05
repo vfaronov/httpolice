@@ -2047,15 +2047,16 @@ One non-obvious thing is how references work
 
   <comment id="1280">
     <title>‘charset’ parameter is undefined for <media>application/json</media></title>
-    <explain>The <media>application/json</media> media type does not have a ‘charset’ parameter. <rfc num="7159" sect="11">Adding one really has no effect on compliant recipients.</rfc></explain>
+    <explain>The <media>application/json</media> media type does not have a ‘charset’ parameter. <rfc num="8259" sect="11">Adding one really has no effect on compliant recipients.</rfc></explain>
     <ref to="header"/>
-    <explain>See also <rfc num="7159" sect="8.1"/>.</explain>
+    <explain>See also <rfc num="8259" sect="8.1"/>.</explain>
   </comment>
 
   <error id="1281">
-    <title>JSON can’t be encoded in <var ref="msg.guessed_charset"/></title>
-    <rfc num="7159" sect="8.1">
-      JSON text SHALL be encoded in UTF-8, UTF-16, or UTF-32.
+    <title><var ref="msg.guessed_charset"/> is a bad encoding for JSON</title>
+    <rfc num="8259" sect="8.1">
+      JSON text exchanged between systems that are not part of a closed
+   ecosystem MUST be encoded using UTF-8
     </rfc>
     <ref to="msg.headers.content_type"/>
     <ref to="msg.displayable_body"/>

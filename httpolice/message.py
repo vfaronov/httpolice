@@ -138,10 +138,7 @@ class Message(Blackboard):
                 self.complain(1038, error=e)
                 r = Unavailable(self.unicode_body)
             else:
-                if self.guessed_charset not in ['ascii', 'utf-8', 'utf-16',
-                                                'utf-16-le', 'utf-16-be',
-                                                'utf-32', 'utf-32-le',
-                                                'utf-32-be', None]:
+                if self.guessed_charset not in ['ascii', 'utf-8', None]:
                     self.complain(1281)
             return r
         else:
