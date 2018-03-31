@@ -25,6 +25,8 @@ You can get these streams with a tool called `tcpflow`__::
   $ cd dump/
 
   $ sudo tcpflow -T'%t-%A-%a-%B-%b-%#' port 80
+  reportfilename: ./report.xml
+  reportfilename: ./report.xml
   tcpflow: listening on wlp4s0
 
 __ https://en.wikipedia.org/wiki/Tcpdump

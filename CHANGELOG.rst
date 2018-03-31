@@ -7,11 +7,10 @@ Unreleased
 
 Changed
 -------
-- As `RFC 8259`_ removes support for UTF-16 and UTF-32, notice `1281`_ (bad
-  encoding for JSON) is now reported for those encodings as well.
-- As `RFC 8187`_ removes support for ISO-8859-1, notice `1253`_ (bad charset)
-  is now reported for ISO-8859-1 as well, and notice 1255 (ISO-8859-1
-  in Content-Disposition) has been removed.
+- Reflecting changes in `RFC 8187`_ and `RFC 8259`_,
+  notices `1253`_ (bad charset) and `1281`_ (bad encoding for JSON)
+  are now reported for all encodings other than UTF-8, and
+  notice 1255 (ISO-8859-1 in Content-Disposition) has been removed.
 
 .. _RFC 8259: https://tools.ietf.org/html/rfc8259
 .. _RFC 8187: https://tools.ietf.org/html/rfc8187
