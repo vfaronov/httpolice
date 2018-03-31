@@ -25,6 +25,7 @@ Added
 - Checks for `immutable responses`_ (notices `1301`_, `1302`_, `1303`_).
 - `Early hints`_ are now recognized (due to their idiosyncratic semantics,
   they avoid many checks that are applied to all other responses).
+- Checks for the `Accept-Post`_ header (notice `1310`_).
 - Check for no Transfer-Encoding in response to HTTP/1.0 (notice `1306`_).
 - Check for 100 (Continue) before switching protocols (notice `1305`_).
 - Check that the sequence of responses to a request makes sense
@@ -41,9 +42,11 @@ Added
 .. _1307: http://httpolice.readthedocs.io/page/notices.html#1307
 .. _1308: http://httpolice.readthedocs.io/page/notices.html#1308
 .. _1309: http://httpolice.readthedocs.io/page/notices.html#1309
+.. _1310: http://httpolice.readthedocs.io/page/notices.html#1310
 .. _RFC 8288: https://tools.ietf.org/html/rfc8288
 .. _immutable responses: https://tools.ietf.org/html/rfc8246
 .. _Early hints: https://tools.ietf.org/html/rfc8297
+.. _Accept-Post: https://www.w3.org/TR/ldp/#header-accept-post
 
 Fixed
 -----

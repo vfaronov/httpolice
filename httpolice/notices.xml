@@ -2262,4 +2262,9 @@ One non-obvious thing is how references work
     </rfc>
   </error>
 
+  <error id="1310">
+    <title><h>Accept-Post</h> implies “<h>Allow</h>: <m ref="no">POST</m>”</title>
+    <explain>This response’s <h>Accept-Post</h> header means that this resource supports the <m ref="no">POST</m> method, but it’s missing from the <h>Allow</h> header.</explain>
+  </error>
+
 </notices>

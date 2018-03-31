@@ -486,9 +486,11 @@ def check_response_itself(resp):
         if resp.delimited_by_close:
             complain(1303)
 
-    if headers.allow.is_present and headers.accept_patch.is_present and \
-            m.PATCH not in headers.allow:
-        complain(1217)
+    if headers.allow.is_present:
+        if headers.accept_patch.is_present and m.PATCH not in headers.allow:
+            complain(1217)
+        if headers.accept_post.is_present and m.POST not in headers.allow:
+            complain(1310)
 
     if resp.transformed_by_proxy and headers.via.is_absent:
         complain(1046)
