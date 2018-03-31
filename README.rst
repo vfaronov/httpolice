@@ -2,7 +2,7 @@ HTTPolice
 =========
 
 .. status:
-.. image:: https://img.shields.io/pypi/v/HTTPolice.svg?color=green
+.. image:: https://img.shields.io/pypi/v/HTTPolice.svg
    :target: https://pypi.python.org/pypi/HTTPolice
 .. image:: https://img.shields.io/pypi/pyversions/HTTPolice.svg?
    :target: https://pypi.python.org/pypi/HTTPolice

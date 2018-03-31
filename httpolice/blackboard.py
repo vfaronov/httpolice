@@ -12,6 +12,11 @@ class Complaint(namedtuple('Complaint', ('notice', 'context'))):
 
     __slots__ = ()
 
+    def __new__(cls, notice, context):
+        # This only exists here to clear the docstring that otherwise ends up
+        # in the Sphinx docs because of ``autoclass_content = 'both'``.
+        return tuple.__new__(cls, (notice, context))
+
     @property
     def id(self):
         """The notice's ID (an integer)."""

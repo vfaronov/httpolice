@@ -245,12 +245,6 @@ Maintenance
 
   #. Update other pinned versions:
 
-     - PyPy (in ``.travis.yml``);
-
-       - the latest version available on Travis can be guessed by taking
-         the URL used by Travis to download PyPy (from the build log)
-         and changing the version to see if the URL still resolves to 200 (OK).
-
      - Nu Html Checker (in ``tools/vnu.sh``);
      - ESLint (in ``tools/eslint.sh``).
 

@@ -2063,8 +2063,8 @@ One non-obvious thing is how references work
   </error>
 
   <error id="1282">
-    <title>Wrong media type ‘<var ref="bad"/>’ in <var ref="place"/></title>
-    <explain>There is no such media type ‘<var ref="bad"/>’. Probably ‘<var ref="good"/>’ was intended.</explain>
+    <title>Wrong media type <var ref="bad"/> in <var ref="place"/></title>
+    <explain>There is no such media type <var ref="bad"/>. Probably <var ref="good"/> was intended.</explain>
   </error>
 
   <comment id="1283">

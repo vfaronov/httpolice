@@ -8,8 +8,8 @@ General concepts
 Exchanges
 ---------
 HTTPolice takes HTTP *exchanges* (also known as *transactions*) as input.
-Every exchange can consist of 1 request and 1+ responses.
-Usually there is just 1 response,
+An exchange can consist of one request and one or more responses.
+Usually there is just one response,
 but sometimes there are `interim (1xx) responses`__ before the main one.
 
 __ https://tools.ietf.org/html/rfc7231#section-6.2

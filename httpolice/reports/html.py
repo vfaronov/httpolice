@@ -99,8 +99,7 @@ def list_notices(buf):
             H.a(u'HTTPolice', href=homepage, target='_self'),
             u' version ', version, u'.')
         H.p(u'See also the ',
-            H.a(u'HTTPolice manual', href=u'http://httpolice.readthedocs.io/',
-                target='_self'), u'.')
+            H.a(u'HTTPolice manual', href=u'index.html', target='_self'), u'.')
         placeholder = Placeholder()
         for id_ in sorted(notice.all_notices.keys()):
             _notice_to_html(notice.all_notices[id_], placeholder,

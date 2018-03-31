@@ -271,20 +271,20 @@ def check_response_itself(resp):
     if headers.location.is_absent:
         if status == st.moved_permanently:
             complain(1078)
-        if status == st.found:
+        elif status == st.found:
             complain(1079)
-        if status == st.see_other:
+        elif status == st.see_other:
             complain(1080)
-        if status == st.temporary_redirect:
+        elif status == st.temporary_redirect:
             complain(1084)
-        if status == st.permanent_redirect:
+        elif status == st.permanent_redirect:
             complain(1205)
 
     if status == st.use_proxy:
         complain(1082)
-    if status == 306:
+    elif status == 306:
         complain(1083)
-    if status == st.payment_required:
+    elif status == st.payment_required:
         complain(1088)
 
     if status == st.method_not_allowed and headers.allow.is_absent:
@@ -575,9 +575,9 @@ def check_response_in_context(resp, req):
     if known.method.is_safe(method):
         if status == st.created:
             complain(1072)
-        if status == st.accepted:
+        elif status == st.accepted:
             complain(1074)
-        if status == st.conflict:
+        elif status == st.conflict:
             complain(1095)
 
     if status == st.created and method == m.POST and \
@@ -624,7 +624,7 @@ def check_response_in_context(resp, req):
             # and it seems more helpful to report an error in this case
             # (after all, it can be silenced).
         elif req.headers.clearly(known.header.is_proactive_conneg) == \
-                set([h.accept_language]):
+                {h.accept_language}:
             complain(1117)
 
     if status == st.length_required and req.headers.content_length.is_okay:
@@ -691,12 +691,12 @@ def check_response_in_context(resp, req):
             # and it seems more helpful to report an error in this case
             # (after all, it can be silenced).
         elif req.headers.clearly(known.header.is_precondition) == \
-                set([h.if_modified_since]):
+                {h.if_modified_since}:
             if method not in [m.GET, m.HEAD]:
                 complain(1128)
         elif req.headers.clearly(known.header.is_precondition).issubset(
-                set([h.if_match, h.if_none_match,
-                     h.if_modified_since, h.if_unmodified_since, h.if_range])):
+                {h.if_match, h.if_none_match,
+                 h.if_modified_since, h.if_unmodified_since, h.if_range}):
             if method in [m.CONNECT, m.OPTIONS, m.TRACE]:
                 complain(1129)
 
@@ -810,7 +810,7 @@ def _check_basic_challenge(resp, hdr, challenge):
     for charset in challenge.param.getall(u'charset'):
         if charset.lower() != u'utf-8':
             resp.complain(1208, header=hdr, charset=charset)
-    for name in set(challenge.param) - set([u'charset', u'realm']):
+    for name in set(challenge.param) - {u'charset', u'realm'}:
         resp.complain(1207, header=hdr, param=name)
 
 

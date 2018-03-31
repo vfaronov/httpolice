@@ -109,13 +109,13 @@ def _parse_request_heading(stream, scheme=None):
         pieces = line.split(u' ')
         if len(pieces) != 3 or not HTTP_VERSION.match(pieces[2]):
             raise stream.error(beginning)
-    method_ = Method(pieces[0])
+    method = Method(pieces[0])
     target = pieces[1]
     version_ = HTTPVersion(pieces[2])
     entries = parse_header_fields(stream)
     with stream.parsing(HTTP_message):
         stream.readlineend()
-    req = Request(scheme, method_, target, version_, entries, body=None,
+    req = Request(scheme, method, target, version_, entries, body=None,
                   remark=u'from %s, offset %d' % (stream.name, beginning))
     stream.dump_complaints(req.complain, place=u'request heading')
     return req
@@ -126,18 +126,17 @@ def _process_content_length(msg, stream):
     if not okay(n):
         msg.body = Unavailable()
         stream.sane = False
+    elif n > MAX_BODY_SIZE:
+        msg.body = Unavailable()
+        stream.sane = False
+        msg.complain(1298, place=msg.headers.content_length, size=n,
+                     max_size=MAX_BODY_SIZE)
     else:
-        if n > MAX_BODY_SIZE:
+        try:
+            msg.body = stream.read(n)
+        except ParseError as exc:
             msg.body = Unavailable()
-            stream.sane = False
-            msg.complain(1298, place=msg.headers.content_length, size=n,
-                         max_size=MAX_BODY_SIZE)
-        else:
-            try:
-                msg.body = stream.read(n)
-            except ParseError as exc:
-                msg.body = Unavailable()
-                msg.complain(1004, error=exc)
+            msg.complain(1004, error=exc)
 
 
 def _parse_request_body(req, stream):
