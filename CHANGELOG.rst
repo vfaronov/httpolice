@@ -30,6 +30,7 @@ Added
 - Check for 100 (Continue) before switching protocols (notice `1305`_).
 - Check that the sequence of responses to a request makes sense
   (notice `1304`_).
+- Workarounds for problems in HAR files exported from `Insomnia`_.
 
 .. _1299: http://httpolice.readthedocs.io/page/notices.html#1299
 .. _1300: http://httpolice.readthedocs.io/page/notices.html#1300
@@ -47,6 +48,7 @@ Added
 .. _immutable responses: https://tools.ietf.org/html/rfc8246
 .. _Early hints: https://tools.ietf.org/html/rfc8297
 .. _Accept-Post: https://www.w3.org/TR/ldp/#header-accept-post
+.. _Insomnia: https://insomnia.rest/
 
 Fixed
 -----

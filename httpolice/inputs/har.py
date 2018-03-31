@@ -4,6 +4,7 @@ import base64
 import io
 import json
 from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
+import re
 
 import six
 
@@ -21,14 +22,6 @@ from httpolice.structure import (FieldName, StatusCode, Unavailable, http2,
 from httpolice.util.text import decode_path
 
 
-FIDDLER = [u'Fiddler']
-CHROME = [u'WebInspector']
-EDGE = [u'F12 Developer Tools']
-
-# Not sure if "Iceweasel" is actually used, but it won't hurt.
-FIREFOX = [u'Firefox', u'Iceweasel']
-
-
 def har_input(paths):
     for path in paths:
         # According to the spec, HAR files are UTF-8 with an optional BOM.
@@ -41,7 +34,7 @@ def har_input(paths):
                     InputError(u'%s: bad HAR file: %s' % (path, exc)),
                     exc)
             try:
-                creator = data['log']['creator']['name']
+                creator = CreatorInfo(data['log']['creator'])
                 for entry in data['log']['entries']:
                     yield _process_entry(entry, creator, path)
             except (TypeError, KeyError) as exc:
@@ -59,7 +52,7 @@ def _process_entry(data, creator, path):
 
 def _process_request(data, creator, path):
     (version, header_entries, pseudo_headers) = _process_message(data, creator)
-    if creator in CHROME and version == http11 and u':host' in pseudo_headers:
+    if creator.is_chrome and version == http11 and u':host' in pseudo_headers:
         # SPDY exported from Chrome.
         version = None
 
@@ -67,7 +60,7 @@ def _process_request(data, creator, path):
     # (which triggers notice 1244)
     # even though it does not actually send it
     # (this can be verified with SSLKEYLOGFILE + Wireshark).
-    if creator in FIREFOX and version == http2:
+    if creator.is_firefox and version == http2:
         header_entries = [
             (name, value)
             for (name, value) in header_entries
@@ -75,13 +68,26 @@ def _process_request(data, creator, path):
         ]
 
     method = data['method']
+    header_names = {name for (name, _) in header_entries}
 
     parsed = urlparse(data['url'])
     scheme = parsed.scheme
 
+    if creator.is_insomnia:
+        # https://github.com/getinsomnia/insomnia/issues/840
+        if h.host not in header_names:
+            header_entries.insert(0, (h.host, parsed.netloc))
+        if h.user_agent not in header_names:
+            # The actual version can probably be extracted from
+            ua_string = u'insomnia/%s' % creator.reconstruct_insomnia_version()
+            header_entries.append((h.user_agent, ua_string))
+        if h.accept not in header_names:
+            header_entries.append((h.accept, u'*/*'))
+        header_names = {name for (name, _) in header_entries}
+
     if method == m.CONNECT:
         target = parsed.netloc
-    elif any(name == h.host for (name, _) in header_entries):
+    elif h.host in header_names:
         # With HAR, we can't tell if the request was to a proxy or to a server.
         # So we force most requests into the "origin form" of the target,
         target = parsed.path
@@ -112,7 +118,7 @@ def _process_request(data, creator, path):
     if post and post.get('text'):
         text = post['text']
 
-        if creator in FIREFOX and \
+        if creator.is_firefox and \
                 post['mimeType'] == media.application_x_www_form_urlencoded \
                 and u'\r\n' in text:
             # Yes, Firefox actually outputs this stuff. Go figure.
@@ -126,7 +132,7 @@ def _process_request(data, creator, path):
                 header_entries.extend(more_entries)
                 text = actual_text
 
-        if creator in FIDDLER and method == m.CONNECT and u'Fiddler' in text:
+        if creator.is_fiddler and method == m.CONNECT and u'Fiddler' in text:
             # Fiddler's HAR export adds a body with debug information
             # to CONNECT requests.
             text = None
@@ -147,7 +153,7 @@ def _process_response(data, req, creator, path):
     status = StatusCode(data['status'])
     reason = data['statusText']
 
-    if creator in FIREFOX:
+    if creator.is_firefox:
         # Firefox joins all ``Set-Cookie`` response fields with newlines.
         # (It also joins other fields with commas,
         # but that is permitted by RFC 7230 Section 3.2.2.)
@@ -158,7 +164,7 @@ def _process_response(data, req, creator, path):
                           else [joined_value])
         ]
 
-    if creator in FIDDLER and req.method == m.CONNECT and status.successful:
+    if creator.is_fiddler and req.method == m.CONNECT and status.successful:
         # Fiddler's HAR export adds extra debug headers to CONNECT responses
         # after the tunnel is closed.
         header_entries = [(name, value)
@@ -178,11 +184,11 @@ def _process_response(data, req, creator, path):
     else:
         body = None
 
-    if version == http11 and creator in FIREFOX and \
+    if version == http11 and creator.is_firefox and \
             any(name == u'x-firefox-spdy' for (name, _) in header_entries):
         # Helps with SPDY in Firefox.
         version = None
-    if creator in CHROME and version != req.version:
+    if creator.is_chrome and version != req.version:
         # Helps with SPDY in Chrome.
         version = None
 
@@ -199,7 +205,7 @@ def _process_response(data, req, creator, path):
                 # But let's not try to guess.
                 pass
             else:
-                if creator in FIDDLER and req.method == m.CONNECT and \
+                if creator.is_fiddler and req.method == m.CONNECT and \
                         status.successful and b'Fiddler' in decoded_body:
                     # Fiddler's HAR export adds a body with debug information
                     # to CONNECT responses.
@@ -217,7 +223,9 @@ def _process_message(data, creator):
     header_entries = [(FieldName(d['name']), d['value'])
                       for d in data['headers']]
     pseudo_headers = pop_pseudo_headers(header_entries)
-    if creator in EDGE:         # Edge exports HTTP/2 messages as HTTP/1.1.
+    if creator.is_edge:         # Edge exports HTTP/2 messages as HTTP/1.1.
+        version = None
+    elif creator.is_insomnia:   # Insomnia's HAR export hardcodes HTTP/1.1.
         version = None
     elif data['httpVersion'] == u'HTTP/2.0':          # Used by Firefox.
         version = http2
@@ -226,3 +234,35 @@ def _process_message(data, creator):
     else:
         version = data['httpVersion']
     return (version, header_entries, pseudo_headers)
+
+
+class CreatorInfo(dict):
+
+    __slots__ = []
+
+    @property
+    def is_chrome(self):
+        return self['name'] == u'WebInspector'
+
+    @property
+    def is_firefox(self):
+        # Not sure if "Iceweasel" is actually used, but it won't hurt.
+        return self['name'] in [u'Firefox', u'Iceweasel']
+
+    @property
+    def is_edge(self):
+        return self['name'] == u'F12 Developer Tools'
+
+    @property
+    def is_fiddler(self):
+        return self['name'] == u'Fiddler'
+
+    @property
+    def is_insomnia(self):
+        return self['name'] == u'Insomnia REST Client'
+
+    def reconstruct_insomnia_version(self):
+        match = re.search(r'v([0-9]+\.[0-9]+\.[0-9]+)', self['version'])
+        if not match:               # pragma: no cover
+            return u'x.x.x'
+        return match.groups(1)

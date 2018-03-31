@@ -13,9 +13,9 @@ HTTPolice can analyze HAR files with the ``-i har`` option::
 
   $ httpolice -i har myfile.har
 
-However, please note that HAR support in major Web browsers is **erratic**.
-HTTPolice tries to do a reasonable job
-on files exported from Chrome, Firefox, and Edge,
+However, please note that HAR support in exporters is **erratic**.
+HTTPolice tries to do a reasonable job on files exported from
+major Web browsers and some other HTTP tools,
 but some information is simply lost.
 
 If HTTPolice fails on your HAR files,
