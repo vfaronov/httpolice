@@ -227,12 +227,12 @@ def _process_message(data, creator):
         version = None
     elif creator.is_insomnia:   # Insomnia's HAR export hardcodes HTTP/1.1.
         version = None
-    elif data['httpVersion'] == u'HTTP/2.0':          # Used by Firefox.
-        version = http2
     elif data['httpVersion'] == u'unknown':           # Used by Chrome.
         version = None
     else:
-        version = data['httpVersion']
+        version = data['httpVersion'].upper()
+        if version == u'HTTP/2.0':          # Used by Firefox, Chrome, ...
+            version = http2
     return (version, header_entries, pseudo_headers)
 
 

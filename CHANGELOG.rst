@@ -30,7 +30,7 @@ Added
 - Check for 100 (Continue) before switching protocols (notice `1305`_).
 - Check that the sequence of responses to a request makes sense
   (notice `1304`_).
-- Workarounds for problems in HAR files exported from `Insomnia`_.
+- HAR files exported from Chrome and `Insomnia`_ are handled slightly better.
 
 .. _1299: http://httpolice.readthedocs.io/page/notices.html#1299
 .. _1300: http://httpolice.readthedocs.io/page/notices.html#1300
