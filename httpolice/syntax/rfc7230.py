@@ -72,18 +72,16 @@ BWS = _bad_whitespace << OWS                                            > auto
 
 @can_complain
 def _collect_elements(complain, xs):
-    if xs is None:
-        xs = []
     r = [elem for elem in xs if elem is not None]
-    if len(r) != len(xs):
+    if len(r) != len(xs) and len(xs) > 1:
         complain(1151)
     return r
 
 def comma_list(element):
-    return _collect_elements << maybe(
-        (subst([None, None]) << literal(',') |
-         (lambda x: [x]) << group(element)) +
-        many(skip(OWS * ',') * maybe(skip(OWS) * element))
+    # RFC Errata ID: 5257
+    return _collect_elements << (
+        maybe(group(element) * skip(OWS)) %
+        many(skip(literal(',') * OWS) * maybe(group(element) * skip(OWS)))
     ) > named(u'#rule', RFC(7230, section=u'7'))
 
 def comma_list1(element):

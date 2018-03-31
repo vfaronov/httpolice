@@ -50,12 +50,18 @@ Added
 
 Fixed
 -----
+- Headers like `Allow`_ and `Accept`_ are now parsed more correctly
+  (`RFC Errata 5257`_).
 - ``gzip``-encoded payloads are now decompressed more reliably.
 - When `analyzing TCP streams`_, HTTPolice now uses a stricter heuristic
   for detecting HTTP/1.x streams, producing fewer spurious `1006`_/`1009`_
   notices.
 - Notice `1291`_ (Preference-Applied needs Vary) is no longer reported
   on responses to POST.
+
+.. _Allow: https://tools.ietf.org/html/rfc7231#section-7.4.1
+.. _Accept: https://tools.ietf.org/html/rfc7231#section-5.3.2
+.. _RFC Errata 5257: https://www.rfc-editor.org/errata/eid5257
 
 
 0.6.0 - 2017-08-02
