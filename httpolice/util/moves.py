@@ -13,3 +13,8 @@ try:        # pragma: no cover
     from urllib.parse import unquote_to_bytes
 except ImportError:                       # Python 2; pragma: no cover
     from urllib import unquote as unquote_to_bytes
+
+try:        # pragma: no cover
+    from functools import singledispatch
+except ImportError:              # Python 2 backport; pragma: no cover
+    from singledispatch import singledispatch
