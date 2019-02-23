@@ -5,7 +5,7 @@ import pkgutil
 import dominate
 import dominate.tags as H
 from dominate.util import text as text_node
-from singledispatch import singledispatch
+
 import six
 
 from httpolice import known, message, notice, structure
@@ -16,6 +16,7 @@ from httpolice.reports.common import (expand_error, expand_piece,
                                       find_reason_phrase, resolve_reference)
 from httpolice.structure import Unavailable
 from httpolice.util.text import nicely_join, printable
+from httpolice.util.moves import singledispatch
 
 
 ###############################################################################

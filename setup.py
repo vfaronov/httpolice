@@ -33,7 +33,6 @@ setup(
     # NB: when updating these fields,
     # make sure you don't break ``tools/minimum_requires.sh``.
     install_requires=[
-        'singledispatch >= 3.4.0.3',
         'six >= 1.10.0',
         'lxml >= 4.1.0',
         'bitstring >= 3.1.4',
@@ -44,6 +43,7 @@ setup(
     extras_require={
         ':python_version == "2.7"': [
             'enum34 >= 1.1.6',
+            'singledispatch >= 3.4.0.3',
         ],
     },
 

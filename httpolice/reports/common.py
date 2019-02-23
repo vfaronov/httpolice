@@ -1,6 +1,5 @@
 # -*- coding: utf-8; -*-
 
-from singledispatch import singledispatch
 import six
 
 from httpolice import known, notice
@@ -8,6 +7,7 @@ from httpolice.header import HeaderView
 from httpolice.parse import ParseError, Symbol
 from httpolice.structure import HeaderEntry, Parametrized
 from httpolice.util.text import format_chars
+from httpolice.util.moves import singledispatch
 
 
 def resolve_reference(ctx, path):
