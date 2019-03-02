@@ -11,5 +11,5 @@ twine
 # (you can see them in the generated page footers).
 # This will have to be checked and synchronized from time to time.
 # Not sure if good idea.
-Sphinx==1.5.3
-alabaster==0.7.10
+Sphinx==1.8.4
+alabaster==0.7.12
