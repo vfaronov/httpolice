@@ -1,12 +1,11 @@
 # -*- coding: utf-8; -*-
 
-import six
+from functools import singledispatch
 
 from httpolice import known, notice
 from httpolice.header import HeaderView
 from httpolice.parse import ParseError, Symbol
 from httpolice.structure import HeaderEntry, Parametrized
-from httpolice.util.moves import singledispatch
 from httpolice.util.text import format_chars
 
 
@@ -20,7 +19,7 @@ def resolve_reference(ctx, path):
 
 @singledispatch
 def expand_piece(piece):
-    return six.text_type(piece)
+    return str(piece)
 
 @expand_piece.register(notice.Content)
 def expand_elem(elem):
@@ -28,10 +27,9 @@ def expand_elem(elem):
 
 @expand_piece.register(Symbol)
 def expand_symbol(sym):
-    if sym.citation:
-        return [sym.name, u' (', sym.citation, u')']
-    else:
+    if not sym.citation:
         return [sym.name]
+    return [sym.name, u' (', sym.citation, u')']
 
 @expand_piece.register(Parametrized)
 def expand_parametrized(x):

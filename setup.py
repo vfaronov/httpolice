@@ -29,23 +29,17 @@ setup(
     author='Vasiliy Faronov',
     author_email='vfaronov@gmail.com',
     license='MIT',
+    python_requires='>= 3.4',
 
     # NB: when updating these fields,
     # make sure you don't break ``tools/minimum_requires.sh``.
     install_requires=[
-        'six >= 1.10.0',
         'lxml >= 4.1.0',
         'bitstring >= 3.1.4',
         'dominate >= 2.2.0',
         'defusedxml >= 0.5.0',
         'brotlipy >= 0.5.1',
     ],
-    extras_require={
-        ':python_version == "2.7"': [
-            'enum34 >= 1.1.6',
-            'singledispatch >= 3.4.0.3',
-        ],
-    },
 
     packages=[
         'httpolice',
@@ -68,12 +62,12 @@ setup(
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Internet :: WWW/HTTP',

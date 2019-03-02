@@ -1,13 +1,11 @@
 # -*- coding: utf-8; -*-
 
 import codecs
-
-import six
+from functools import singledispatch
 
 from httpolice import notice
 from httpolice.reports.common import (expand_piece, find_reason_phrase,
                                       resolve_reference)
-from httpolice.util.moves import singledispatch
 from httpolice.util.text import (detypographize, ellipsize, printable,
                                  write_if_any)
 
@@ -68,7 +66,7 @@ def _write_complaint_line(complaint, f):
 def _piece_to_text(piece, ctx):
     return _piece_to_text(expand_piece(piece), ctx)
 
-@_piece_to_text.register(six.text_type)
+@_piece_to_text.register(str)
 def _text_to_text(text, _):
     return printable(text)
 

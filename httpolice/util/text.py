@@ -5,8 +5,6 @@ import re
 import string
 import sys
 
-import six
-
 
 CHAR_NAMES = {
     b'\t': u'tab',
@@ -61,10 +59,7 @@ def _char_ranges(chars, as_hex=False):
             min_ = max_ = point
     if min_ is not None:
         intervals.append((min_, max_))
-    if as_hex:
-        show = lambda point: u'%#04x' % point
-    else:
-        show = six.unichr
+    show = (lambda point: u'%#04x' % point) if as_hex else chr
     return [
         (u'%s' % show(p1)) if p1 == p2 else (u'%s–%s' % (show(p1), show(p2)))
         for (p1, p2) in intervals]
@@ -111,20 +106,13 @@ def format_chars(chars):
 def force_unicode(x, encoding='iso-8859-1'):
     if isinstance(x, bytes):
         return x.decode(encoding)
-    else:
-        return six.text_type(x)
+    return str(x)
 
 
 def force_bytes(x, encoding='iso-8859-1'):
     if isinstance(x, bytes):
         return x
-    else:
-        return x.encode(encoding, 'replace')
-
-
-def stdio_as_bytes(f):
-    # Accommodate Python 2 vs. 3 difference.
-    return f.buffer if hasattr(f, 'buffer') else f
+    return x.encode(encoding, 'replace')
 
 
 class WriteIfAny(io.StringIO):
@@ -133,10 +121,10 @@ class WriteIfAny(io.StringIO):
     >>> import sys
     >>> with write_if_any(u'foo\\n', sys.stdout) as buf:
     ...     pass
-    ... 
+    ...
     >>> with write_if_any(u'foo\\n', sys.stdout) as buf:
     ...     n = buf.write(u'bar\\n')
-    ... 
+    ...
     foo
     bar
     """
@@ -167,11 +155,10 @@ def ellipsize(s, max_length=60):
     >>> print(ellipsize(u'lorem ipsum dolor sit amet', 20))
     lorem ipsum dolor...
     """
-    if len(s) > max_length:
-        ellipsis = u'...'
-        return s[:(max_length - len(ellipsis))] + ellipsis
-    else:
+    if len(s) <= max_length:
         return s
+    ellipsis = u'...'
+    return s[:(max_length - len(ellipsis))] + ellipsis
 
 
 def detypographize(s):
@@ -226,9 +213,9 @@ def normalize_whitespace(s):
     return re.sub(u'\\s+', u' ', s)
 
 
-class MockStdio(object):
+class MockStdio:
 
-    """Suitable as a mock stdout/stderr for tests under both Python 2 and 3."""
+    """Suitable as a mock stdout/stderr for tests."""
 
     def __init__(self):
         self.buffer = io.BytesIO()

@@ -3,8 +3,8 @@ Installation
 
 .. highlight:: console
 
-HTTPolice is a Python package that requires `Python`__ 2.7 or 3.4+.
-`PyPy`__ is also supported (reasonably recent versions; 5.3.1 is OK).
+HTTPolice is a Python package that requires `Python`__ 3.4+.
+`PyPy`__ is also supported.
 
 __ https://www.python.org/
 __ http://pypy.org/

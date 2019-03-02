@@ -2,6 +2,12 @@ History of changes
 ==================
 
 
+Unreleased
+~~~~~~~~~~
+- Dropped Python 2 support. If you need it, use the older versions.
+- HTTPolice no longer requires `six` nor `singledispatch`.
+
+
 0.7.0 - 2018-03-31
 ~~~~~~~~~~~~~~~~~~
 

@@ -16,13 +16,11 @@ import io
 import os
 import pkgutil
 
-import six
-
 from httpolice import structure
 from httpolice.citation import Citation, RFC
 
 
-class Knowledge(object):
+class Knowledge:
 
     """Manages the data for one class from :mod:`httpolice.structure`."""
 
@@ -70,15 +68,15 @@ class Knowledge(object):
 
     @classmethod
     def name_from_raw(cls, key, raw):
-        name = key if isinstance(key, six.text_type) else raw['title']
+        name = key if isinstance(key, str) else raw['title']
         name = (name.
-                replace(u'-', u' ').replace(u' ', u'_').replace(u'/', u'_').
-                replace(u'+', u'_').replace(u'.', u'_').
+                replace('-', ' ').replace(' ', '_').replace('/', '_').
+                replace('+', '_').replace('.', '_').
                 lower())
         # Python keywords can't be used as identifiers.
-        if name in [u'continue', u'for', u'from', u'return']:
-            name = name + u'_'
-        return str(name)            # Identifier is a native string.
+        if name in ['continue', 'for', 'from', 'return']:
+            name = name + '_'
+        return name
 
     def process(self, raw):
         processed = {}
@@ -125,7 +123,7 @@ class Knowledge(object):
             if hasattr(value, 'name'):                      # Enum
                 raw[field] = value.name
             elif value is not None:
-                raw[field] = six.text_type(value)
+                raw[field] = str(value)
         return raw
 
     def dump(self, new):                                    # pragma: no cover
@@ -138,7 +136,7 @@ class Knowledge(object):
                 writer.writerow(self.unprocess(processed, orig_raw))
 
 
-class KnowledgeAccessor(object):
+class KnowledgeAccessor:
 
     """
     For example, ``h.accept`` returns ``FieldName(u'Accept')``.
@@ -389,6 +387,7 @@ def get(obj):
     for cls, (knowledge, _) in classes.items():
         if isinstance(obj, cls):
             return knowledge.get(obj)
+    return None     # pragma: no cover
 
 
 def citation(obj):

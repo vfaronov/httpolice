@@ -7,10 +7,9 @@ Quickstart
 Installation
 ------------
 
-HTTPolice is a Python package that can be installed with pip
-(on Python 2.7 or 3.4+)::
+HTTPolice is a Python package that can be installed with pip (on Python 3.4+)::
 
-  $ pip install HTTPolice
+  $ pip3 install HTTPolice
 
 If you’re not familiar with pip, check the manual’s :doc:`install` section.
 

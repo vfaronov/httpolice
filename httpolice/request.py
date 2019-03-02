@@ -3,11 +3,8 @@
 import base64
 import fnmatch
 import itertools
-from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 import string
-
-import six
+from urllib.parse import parse_qs, urlparse
 
 from httpolice import known, message
 from httpolice.blackboard import derived_property
@@ -19,7 +16,7 @@ from httpolice.syntax import rfc7230
 from httpolice.syntax.common import CTL
 from httpolice.syntax.rfc7230 import (absolute_form, asterisk_form,
                                       authority_form, origin_form)
-from httpolice.util.data import duplicates
+from httpolice.util.data import duplicates, iterbytes
 from httpolice.util.text import force_unicode
 
 
@@ -32,7 +29,6 @@ class Request(message.Message):
 
     def __init__(self, scheme, method, target, version, header_entries,
                  body, trailer_entries=None, remark=None):
-        # pylint: disable=redefined-outer-name
         """
         :param scheme:
             The scheme of the request URI, as a Unicode string
@@ -128,11 +124,10 @@ class Request(message.Message):
             symbol = normal_target
         r = parse(self.target, symbol, self.complain, 1045,
                   place=u'request target')
-        if okay(r):
-            (symbol, _) = r
-            return symbol
-        else:
+        if not okay(r):
             return r
+        (symbol, _) = r
+        return symbol
 
     @derived_property
     def effective_uri(self):
@@ -165,7 +160,7 @@ class Request(message.Message):
     def is_tls(self):
         if self.scheme == u'http':
             return False
-        elif self.scheme == u'https':
+        if self.scheme == u'https':
             return True
         return None
 
@@ -180,8 +175,7 @@ class Request(message.Message):
             if self.target_form is absolute_form:
                 self.complain(1236)
                 return True
-            else:
-                return False
+            return False
         return None
 
     @derived_property
@@ -235,7 +229,7 @@ def check_request(req):
             headers.transfer_encoding.is_absent):
         complain(1021)
 
-    if (known.method.defines_body(method) == False) and (body == b'') and \
+    if known.method.defines_body(method) is False and (body == b'') and \
             headers.content_length.is_present:
         complain(1022)
 
@@ -255,10 +249,10 @@ def check_request(req):
         complain(1032)
 
     for hdr in headers:
-        if known.header.is_for_request(hdr.name) == False:
+        if known.header.is_for_request(hdr.name) is False:
             complain(1063, header=hdr)
         elif known.header.is_representation_metadata(hdr.name) and \
-                req.has_body == False:
+                req.has_body is False:
             complain(1053, header=hdr)
 
     if body:
@@ -274,14 +268,14 @@ def check_request(req):
     if method == m.OPTIONS and body and headers.content_type.is_absent:
         complain(1062)
 
-    if headers.expect == u'100-continue' and req.has_body == False:
+    if headers.expect == u'100-continue' and req.has_body is False:
         complain(1066)
 
     if headers.max_forwards.is_present and method not in [m.OPTIONS, m.TRACE]:
         complain(1067)
 
     if headers.referer.is_okay:
-        if req.is_tls == False:
+        if req.is_tls is False:
             parsed = urlparse(headers.referer.value)
             if parsed.scheme == u'https':
                 complain(1068)
@@ -325,7 +319,7 @@ def check_request(req):
         complain(1135)
 
     for direct in headers.cache_control:
-        if known.cache_directive.is_for_request(direct.item) == False:
+        if known.cache_directive.is_for_request(direct.item) is False:
             complain(1152, directive=direct.item)
         if direct == cache.no_cache and direct.param is not None:
             complain(1159, directive=direct.item)
@@ -337,7 +331,7 @@ def check_request(req):
         if 100 <= warning.code <= 199:
             complain(1165, code=warning.code)
 
-    if known.method.is_cacheable(method) == False:
+    if known.method.is_cacheable(method) is False:
         for direct in headers.cache_control:
             if direct.item in [cache.max_age, cache.max_stale, cache.min_fresh,
                                cache.no_cache, cache.no_store,
@@ -362,7 +356,7 @@ def check_request(req):
                 complain(1274, header=hdr)
 
     if method == m.PATCH and headers.content_type.is_okay:
-        if known.media_type.is_patch(headers.content_type.item) == False:
+        if known.media_type.is_patch(headers.content_type.item) is False:
             complain(1213)
 
     for protocol in headers.upgrade:
@@ -381,13 +375,13 @@ def check_request(req):
 
     if u'access_token' in req.query_params:
         complain(1270)
-        if req.is_tls == False:
+        if req.is_tls is False:
             complain(1271, where=req.target)
         if not headers.cache_control.no_store:
             complain(1272)
 
     if okay(req.url_encoded_data) and u'access_token' in req.url_encoded_data:
-        if req.is_tls == False:
+        if req.is_tls is False:
             complain(1271, where=req.displayable_body)
 
     for hdr in [headers.accept, headers.accept_charset,
@@ -416,7 +410,7 @@ def check_request(req):
 
 
 def _check_basic_auth(req, hdr, credentials):
-    if isinstance(credentials, six.text_type):   # ``token68`` form
+    if isinstance(credentials, str):   # ``token68`` form
         try:
             credentials = base64.b64decode(credentials)
         except Exception as e:
@@ -427,17 +421,17 @@ def _check_basic_auth(req, hdr, credentials):
             # it must be ASCII-compatible, so we don't need to know it.
             if b':' not in credentials:
                 req.complain(1211, header=hdr)
-            for c in six.iterbytes(credentials):
-                if CTL.match(six.int2byte(c)):
-                    req.complain(1212, header=hdr, char=hex(c))
+            for c in iterbytes(credentials):
+                if CTL.match(c):
+                    req.complain(1212, header=hdr, char=hex(ord(c)))
     else:
         req.complain(1209, header=hdr)
 
 
 def _check_bearer_auth(req, hdr, credentials):
-    if req.is_tls == False:
+    if req.is_tls is False:
         req.complain(1261, header=hdr)
-    if not isinstance(credentials, six.text_type):      # not ``token68`` form
+    if not isinstance(credentials, str):      # not ``token68`` form
         req.complain(1262, header=hdr)
 
 

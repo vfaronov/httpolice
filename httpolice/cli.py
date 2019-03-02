@@ -11,7 +11,6 @@ import httpolice
 from httpolice import inputs, reports
 from httpolice.exchange import check_exchange
 from httpolice.notice import Severity
-from httpolice.util.text import stdio_as_bytes
 
 
 def parse_args(argv):
@@ -52,8 +51,7 @@ def run_cli(args, stdout, stderr):
             yield exch
 
     try:
-        # We can't use stdout opened as text (as in Python 3)
-        # because it may not be UTF-8 (especially on Windows).
+        # Can't use stdout as text because it may not be UTF-8 (on Windows).
         # Our HTML reports are meant for redirection
         # and are always UTF-8, which is declared in ``meta``.
         # As for text reports, they are mostly ASCII,
@@ -61,7 +59,7 @@ def run_cli(args, stdout, stderr):
         # (perhaps from pieces of input data),
         # we don't want to trip over Unicode errors.
         # So we encode all text into UTF-8 and write directly as bytes.
-        report(generate_exchanges(), stdio_as_bytes(stdout))
+        report(generate_exchanges(), stdout.buffer)
     except (EnvironmentError, inputs.InputError) as exc:
         if args.full_traceback:
             traceback.print_exc(file=stderr)

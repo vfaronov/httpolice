@@ -42,10 +42,8 @@ to render ``text/xml`` as a link to the RFC, using :mod:`httpolice.known`.
 
 from collections import OrderedDict
 import operator
-from six.moves import range
 
 from bitstring import BitArray, Bits
-import six
 
 from httpolice.structure import Unavailable
 from httpolice.util.text import format_chars
@@ -126,11 +124,9 @@ def parse(data, symbol, complain=None, fail_notice_id=None,
         for (notice_id, context) in complaints:
             context = dict(extra_context, **context)
             complain(notice_id, **context)
-    if annotate_classes:
-        return (r, _splice_annotations(data, annotations))
-    else:
+    if not annotate_classes:
         return r
-
+    return (r, _splice_annotations(data, annotations))
 
 _memo = OrderedDict()
 
@@ -179,7 +175,7 @@ class ParseError(Exception):
 # Combinators to construct a grammar suitable for the Earley algorithm.
 
 
-class Symbol(object):
+class Symbol:
 
     """A symbol of the grammar (either terminal or nonterminal)."""
 
@@ -244,10 +240,9 @@ class Symbol(object):
         for `foo`.
 
         """
-        if self._is_ephemeral is None:
-            return (self.name is None)
-        else:
+        if self._is_ephemeral is not None:
             return self._is_ephemeral
+        return (self.name is None)
 
     def group(self):
         raise NotImplementedError
@@ -285,7 +280,7 @@ class Symbol(object):
     def __rlshift__(self, func):
         """``func << sym`` wraps the result of parsing `sym` with `func`."""
         if isinstance(func, type) and not (func is int or func is float or
-                                           func is six.text_type):
+                                           func is str):
             # If a string is wrapped in a class, this often means that we want
             # to annotate this string. But for that to work, the string must be
             # the result of parsing an entire grammar symbol (that's how
@@ -317,7 +312,7 @@ class Terminal(Symbol):
         self.bits = bits if bits is not None else Bits(256)
 
     def chars(self):
-        return [six.int2byte(i) for (i, v) in enumerate(self.bits) if v]
+        return [bytes((i,)) for (i, v) in enumerate(self.bits) if v]
 
     def match(self, char):
         return self.bits[ord(char)]
@@ -338,8 +333,7 @@ class Terminal(Symbol):
         other = as_symbol(other)
         if isinstance(other, Terminal):
             return Terminal(bits=self.bits | other.bits)
-        else:
-            return super(Terminal, self).__or__(other)
+        return super(Terminal, self).__or__(other)
 
     def __sub__(self, other):
         other = as_symbol(other)
@@ -372,14 +366,12 @@ class Nonterminal(Symbol):
     def as_rule(self):
         if self.is_ephemeral and len(self.rules) == 1:
             return self.rules[0]
-        else:
-            return Rule((self,))
+        return Rule((self,))
 
     def as_rules(self):
         if self.is_ephemeral:
             return self.rules
-        else:
-            return [self.as_rule()]
+        return [self.as_rule()]
 
     def as_nonterminal(self):
         return self
@@ -407,8 +399,7 @@ class SimpleNonterminal(Nonterminal):
     def group(self):
         if self.is_ephemeral:
             return SimpleNonterminal(rules=self.rules, is_ephemeral=False)
-        else:
-            return self
+        return self
 
     def set_rules_from(self, other):
         self._rules = other.rules
@@ -448,7 +439,7 @@ class RepeatedNonterminal(Nonterminal):
         return self._rules
 
 
-class Rule(object):
+class Rule:
 
     """A rule according to which a nonterminal can be parsed.
 
@@ -496,14 +487,11 @@ class Rule(object):
                 r = func(complain, *nodes)
             else:
                 r = func(*nodes)
-            if r is _SKIP:
-                return ()
-            else:
-                return (r,)
+            return (r,) if r is not _SKIP else ()
         return Rule(self.symbols, wrapper_action)
 
 
-class _Skip(object):
+class _Skip:
 
     def __repr__(self):
         return '_SKIP'
@@ -530,13 +518,11 @@ def literal(s, case_sensitive=False):
     if len(s) == 1:
         if case_sensitive:
             return octet(ord(s))
-        else:
-            return octet(ord(s.lower())) | octet(ord(s.upper()))
-    else:
-        r = empty
-        for c in s:
-            r = r * literal(c, case_sensitive)
-        return _join_args << r
+        return octet(ord(s.lower())) | octet(ord(s.upper()))
+    r = empty
+    for c in s:
+        r = r * literal(c, case_sensitive)
+    return _join_args << r
 
 def as_symbol(x):
     return x if isinstance(x, Symbol) else literal(x)
@@ -573,18 +559,16 @@ def times(min_, max_, inner):
     inner = as_symbol(inner)
     if min_ == 0:
         return RepeatedNonterminal(max_count=max_, inner=inner)
-    else:
-        min_rule = empty
-        for _ in range(min_):
-            min_rule = min_rule * group(inner)
-        min_rule = _as_list << min_rule
-        if max_ == min_:
-            return min_rule
-        else:
-            rest_rule = RepeatedNonterminal(max_count=(None if max_ is None
-                                                       else max_ - min_),
-                                            inner=inner)
-            return min_rule + rest_rule
+    min_rule = empty
+    for _ in range(min_):
+        min_rule = min_rule * group(inner)
+    min_rule = _as_list << min_rule
+    if max_ == min_:
+        return min_rule
+    rest_rule = RepeatedNonterminal(max_count=(None if max_ is None
+                                               else max_ - min_),
+                                    inner=inner)
+    return min_rule + rest_rule
 
 def string_times(min_, max_, inner):
     return u''.join << times(min_, max_, inner)
@@ -637,7 +621,7 @@ def string_excluding(terminal, excluding):
     return r
 
 
-class _AutoName(object):
+class _AutoName:
 
     def __repr__(self):
         return '_AUTO'
@@ -711,6 +695,7 @@ def can_complain(func):
 # These are written in a sort of low-level, non-idiomatic Python
 # to make them less terribly inefficient.
 # To compensate for this, they are heavily commented.
+# pylint: disable=len-as-condition
 
 
 def _add_item(items, items_idx, items_set, symbol, rule, pos, start):
@@ -801,7 +786,6 @@ def _inner_parse(data, target_symbol, annotate_classes):
             if j == len(items):
                 break
 
-    # pylint: disable=undefined-loop-variable
     if i == length:             # Successfully parsed up to the end of stream.
         results = _find_results(data, target_symbol, chart, i,
                                 [], annotate_classes)

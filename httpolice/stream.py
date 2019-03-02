@@ -3,7 +3,7 @@
 from httpolice.parse import ParseError
 
 
-class Stream(object):
+class Stream:
 
     """
     Wraps a file to enable easier reading in terms that are convenient

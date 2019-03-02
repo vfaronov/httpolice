@@ -10,3 +10,12 @@ def duplicates(xs):
     """
     counter = collections.Counter(xs)
     return [x for (x, count) in counter.items() if count > 1]
+
+
+def iterbytes(bs):
+    """
+    >>> list(iterbytes(b'hello'))
+    [b'h', b'e', b'l', b'l', b'o']
+    """
+    for b in bs:
+        yield bytes((b,))

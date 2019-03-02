@@ -1,6 +1,6 @@
 # -*- coding: utf-8; -*-
 
-from httpolice.util.moves import unquote_to_bytes as pct_decode
+from urllib.parse import unquote_to_bytes as pct_decode
 
 from httpolice.citation import RFC
 from httpolice.parse import (auto, can_complain, fill_names, maybe, pivot,

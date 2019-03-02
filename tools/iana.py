@@ -12,9 +12,6 @@ compare them with those in :mod:`httpolice.known`, and dump updates
 back into CSV files. Then just use your favorite ``git difftool -d``
 to check that the updates make sense, and ``git commit`` them.
 
-Doesn't work under Python 2 because trying to marry CSV, Unicode, and newlines
-across Python 2 and 3 is too much for me.
-
 This only updates existing entries and adds new ones. Entries that are present
 in HTTPolice but not registered with IANA are not touched (there are too many
 ``X-`` headers that we need to know).
@@ -26,9 +23,8 @@ with a comma-separated list of "processed" fields to skip, such as
 """
 
 import re
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
-from six.moves.urllib.request import Request  # pylint: disable=import-error
-from six.moves.urllib.request import urlopen  # pylint: disable=import-error
+from urllib.parse import urljoin
+from urllib.request import Request, urlopen
 
 import lxml.etree
 
@@ -46,7 +42,7 @@ def yes_no(s):
     return {'yes': True, 'no': False}[s]
 
 
-class Registry(object):
+class Registry:
 
     key_order = []
     xmlns = {'iana': 'http://www.iana.org/assignments'}
@@ -87,15 +83,14 @@ class Registry(object):
                 match = re.search(
                     r'RFC(\d+), (Section|Appendix) ([A-Z0-9]+(\.[0-9]+)*)',
                     xref.text or '')
-                if match:
-                    num = int(match.group(1))
-                    kw = match.group(2).lower()
-                    sect = match.group(3)
-                    return RFC(num, **{kw: sect})
-                else:
+                if not match:
                     num = int(xref.get('data')[3:])
                     return RFC(num)
-            elif xref.get('type') == 'uri':
+                num = int(match.group(1))
+                kw = match.group(2).lower()
+                sect = match.group(3)
+                return RFC(num, **{kw: sect})
+            if xref.get('type') == 'uri':
                 title = normalize_whitespace(xref.text) if xref.text else None
                 url = xref.get('data')
                 return Citation(title, url)

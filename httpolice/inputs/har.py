@@ -3,10 +3,8 @@
 import base64
 import io
 import json
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 import re
-
-import six
+from urllib.parse import urlparse
 
 from httpolice import framing1
 from httpolice.exchange import Exchange
@@ -30,18 +28,14 @@ def har_input(paths):
             try:
                 data = json.load(f)
             except ValueError as exc:
-                six.raise_from(
-                    InputError(u'%s: bad HAR file: %s' % (path, exc)),
-                    exc)
+                raise InputError('%s: bad HAR file: %s' % (path, exc)) from exc
             try:
                 creator = CreatorInfo(data['log']['creator'])
                 for entry in data['log']['entries']:
                     yield _process_entry(entry, creator, path)
             except (TypeError, KeyError) as exc:
-                six.raise_from(
-                    InputError(u'%s: cannot understand HAR file: %r' %
-                               (path, exc)),
-                    exc)
+                raise InputError('%s: cannot understand HAR file: %r' %
+                                 (path, exc)) from exc
 
 
 def _process_entry(data, creator, path):

@@ -1,25 +1,47 @@
-[MASTER]
-
-# Do not remember and compare with previous results. That's just noise.
-persistent=no
-
-
 [MESSAGES CONTROL]
 
-# - No factoring and code style checks for now. Maybe later.
-# - Don't tell me that I've locally disabled/enabled a check. That's the point!
-disable=R,C,locally-disabled,locally-enabled
+disable=
+    # Pylint doesn't seem to understand that `derived_property` is a property.
+    comparison-with-callable,
 
+    # Various stylistic checks that are too much of a hassle.
+    blacklisted-name,
+    invalid-name,
+    missing-docstring,
+    superfluous-parens,
+    bad-whitespace,
+    bad-continuation,
+    no-self-use,
+    too-many-lines,
+    too-many-star-expressions,
+    too-many-function-args,
+    too-many-args,
+    too-many-format-args,
+    too-many-ancestors,
+    too-many-instance-attributes,
+    too-many-public-methods,
+    too-many-return-statements,
+    too-many-branches,
+    too-many-arguments,
+    too-many-locals,
+    too-many-statements,
+    too-many-boolean-expressions,
+    too-many-nested-blocks,
+    too-few-args,
+    too-few-format-args,
+    too-few-public-methods,
 
-[VARIABLES]
-
-# Local names that start with an underscore do not count as unused variables.
-dummy-variables-rgx=_
+enable=
+    raw-checker-failed,
+    bad-inline-option,
+    file-ignored,
+    useless-suppression,
+    deprecated-pragma,
 
 
 [EXCEPTIONS]
 
-# `Exception` is not "too general" to be caught.
+# Catching `Exception` is a perfectly good idea in many cases.
 overgeneral-exceptions=
 
 

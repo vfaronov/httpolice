@@ -1,10 +1,7 @@
 # -*- coding: utf-8; -*-
 
 from datetime import datetime, timedelta
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
-
-import six
+from urllib.parse import urljoin, urlparse
 
 from httpolice import known, message
 from httpolice.blackboard import derived_property
@@ -147,7 +144,7 @@ class Response(message.Message):
             return False
         if self.headers.cache_control.max_age:
             return False
-        elif self.headers.cache_control.is_absent:
+        if self.headers.cache_control.is_absent:
             self.complain(1178)
             return True
         return None
@@ -186,10 +183,9 @@ class Response(message.Message):
 
     @derived_property
     def is_tls(self):
-        if okay(self.request):
-            return self.request.is_tls
-        else:   # pragma: no cover
+        if not okay(self.request):  # pragma: no cover
             return None
+        return self.request.is_tls
 
     @derived_property
     def delimited_by_close(self):
@@ -253,7 +249,7 @@ def check_response_itself(resp):
             complain(1047)
 
     for hdr in headers:
-        if known.header.is_for_response(hdr.name) == False:
+        if known.header.is_for_response(hdr.name) is False:
             complain(1064, header=hdr)
 
     if status == st.switching_protocols:
@@ -324,7 +320,7 @@ def check_response_itself(resp):
             complain(1138)
 
     for direct in headers.cache_control:
-        if known.cache_directive.is_for_response(direct.item) == False:
+        if known.cache_directive.is_for_response(direct.item) is False:
             complain(1153, directive=direct.item)
 
     if u'no-cache' in headers.pragma:
@@ -374,7 +370,7 @@ def check_response_itself(resp):
             complain(1220, directive=dupe)
 
     for patch_type in headers.accept_patch:
-        if known.media_type.is_patch(patch_type.item) == False:
+        if known.media_type.is_patch(patch_type.item) is False:
             complain(1227, patch_type=patch_type.item)
 
     for direct1, direct2 in [(cache.public, cache.no_store),
@@ -481,7 +477,7 @@ def check_response_itself(resp):
         if headers.expires.is_absent or headers.expires.value <= headers.date:
             if not headers.cache_control.max_age:
                 complain(1301)
-        if resp.is_tls == False:
+        if resp.is_tls is False:
             complain(1302)
         if resp.delimited_by_close:
             complain(1303)
@@ -528,7 +524,7 @@ def check_response_in_context(resp, req):
         if status.successful or status.redirection:
             complain(1033)
 
-    if resp.transformed_by_proxy and req.is_to_proxy == False:
+    if resp.transformed_by_proxy and req.is_to_proxy is False:
         complain(1237)
 
     if req.is_to_proxy and status.successful and resp.headers.via.is_absent:
@@ -732,7 +728,7 @@ def check_response_in_context(resp, req):
             complain(1150)
 
     if resp.from_cache:
-        if known.method.is_cacheable(method) == False:
+        if known.method.is_cacheable(method) is False:
             complain(1172)
         if resp.headers.age > req.headers.cache_control.max_age:
             complain(1170)
@@ -759,15 +755,15 @@ def check_response_in_context(resp, req):
 
     if method == m.PATCH:
         if status.successful and req.headers.content_type.is_okay and \
-                known.media_type.is_patch(req.headers.content_type.item) == \
-                    False:
+                known.media_type.is_patch(req.headers.content_type.item) \
+                is False:
             complain(1214)
         if status == st.unsupported_media_type and \
                 resp.headers.accept_patch.is_absent:
             complain(1215)
 
     if resp.headers.strict_transport_security.is_present and \
-            req.is_tls == False:
+            req.is_tls is False:
         complain(1221)
 
     if status == st.misdirected_request and \
@@ -802,7 +798,7 @@ def check_response_in_context(resp, req):
 
 
 def _check_basic_challenge(resp, hdr, challenge):
-    if isinstance(challenge.param, six.text_type):      # ``token68`` form
+    if isinstance(challenge.param, str):      # ``token68`` form
         resp.complain(1273, header=hdr)
         return
     if u'realm' not in challenge.param:
@@ -830,7 +826,7 @@ def _check_bearer_challenge(resp, hdr, challenge):
     req = resp.request
     request_has_token = None
     if req:
-        if req.is_tls == False:
+        if req.is_tls is False:
             resp.complain(1263)
 
         # Did the request contain a bearer token in one of the defined forms?
@@ -848,7 +844,7 @@ def _check_bearer_challenge(resp, hdr, challenge):
 
     params = challenge.param
 
-    if isinstance(params, six.text_type) or not params:
+    if isinstance(params, str) or not params:
         # ``token68`` form or no parameters at all.
         resp.complain(1264)
         return

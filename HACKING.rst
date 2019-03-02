@@ -5,8 +5,8 @@ Development environment
 ~~~~~~~~~~~~~~~~~~~~~~~
 Set up::
 
-  $ virtualenv /path/to/env
-  $ source /path/to/env/bin/activate
+  $ python3 -m venv /path/to/env
+  $ . /path/to/env/bin/activate
   $ pip install -e .
   $ pip install -r tools/requirements.txt
   $ pip install ...    # any extra tools you like to have

@@ -19,8 +19,6 @@ import copy
 import operator
 import sys
 
-import six
-
 from httpolice import known
 from httpolice.known import HeaderRule, h
 from httpolice.parse import parse
@@ -29,7 +27,7 @@ from httpolice.syntax.rfc7230 import quoted_string, token
 from httpolice.util.data import duplicates
 
 
-class HeadersView(object):
+class HeadersView:
 
     """Wraps all headers of a single message, exposing them as attributes."""
 
@@ -40,7 +38,7 @@ class HeadersView(object):
         assert view_cls.name not in cls.special_cases
         cls.special_cases[view_cls.name] = view_cls
         return view_cls
-        
+
     def __init__(self, message):
         self._message = message
         self._cache = {}
@@ -100,7 +98,7 @@ class HeadersView(object):
         return set(name for name in self.names if predicate(name))
 
 
-class HeaderView(object):
+class HeaderView:
 
     """Wraps all headers with a particular name in a given message.
 
@@ -165,7 +163,7 @@ class HeaderView(object):
         comma, semicolon = known.header.bad_quoted_delims(self.name)
         if comma or semicolon:
             def check(v):
-                if isinstance(v, six.text_type):
+                if isinstance(v, str):
                     if comma and u',' in v:
                         self.message.complain(1299, entry=entry)
                     if semicolon and u';' in v:
@@ -222,7 +220,6 @@ class HeaderView(object):
         # ignoring its parameters.
         # This is handled by :meth:`Parametrized.__eq__`,
         # but it's only invoked when the `Parametrized` is on the left side.
-        # pylint: disable=not-an-iterable
         return any(val == other for val in self)
 
     def _compare(self, other, op):
@@ -246,8 +243,7 @@ class HeaderView(object):
 
         if isinstance(other, HeaderView):
             return NotImplemented
-        else:
-            return self.is_okay and okay(other) and op(self.value, other)
+        return self.is_okay and okay(other) and op(self.value, other)
 
     def __lt__(self, other):
         return self._compare(other, operator.lt)
@@ -328,7 +324,6 @@ class MultiHeaderView(HeaderView):
         self._entries = entries
 
     def __iter__(self):
-        # pylint: disable=not-an-iterable
         return iter(v for v in self.value if okay(v))
 
 

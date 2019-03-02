@@ -105,9 +105,7 @@ time_of_day = _to_time << (hour * skip(':') *
 def _to_datetime(dow, d, t):
     if not okay(d) or not okay(t):
         return (dow, Unavailable(u'%s %s' % (d, t)))
-    else:
-        return (dow, datetime(d.year, d.month, d.day,
-                              t.hour, t.minute, t.second))
+    return (dow, datetime(d.year, d.month, d.day, t.hour, t.minute, t.second))
 
 GMT = octet(0x47) * octet(0x4D) * octet(0x54)                           > auto
 IMF_fixdate = _to_datetime << (day_name * skip(',' * SP) *
@@ -166,10 +164,7 @@ obs_date = (_obsolete_date << rfc850_date |
 def _check_day_of_week(complain, r):
     (claimed_dow, r) = r
     if okay(r) and r.weekday() != claimed_dow:
-        # Don't use `strftime` here because it raises `ValueError`
-        # on years < 1900 in Python 2.7. (Of course, year < 1900
-        # in ``Date`` is pathological, but that's no excuse to crash).
-        complain(1108, date=u'%04d-%02d-%02d' % (r.year, r.month, r.day),
+        complain(1108, date=r.strftime('%Y-%m-%d'),
                  claimed=_DAY_NAMES[claimed_dow],
                  actual=_DAY_NAMES[r.weekday()])
     return r

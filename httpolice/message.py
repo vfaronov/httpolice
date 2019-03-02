@@ -2,16 +2,15 @@
 
 import codecs
 from datetime import datetime, timedelta
+from email import message_from_bytes as parse_email_message
 import email.errors
-from httpolice.util.moves import message_from_bytes as parse_email_message
 import json
-from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
+from urllib.parse import parse_qs
 import xml.etree.ElementTree
 
 from bitstring import Bits
 import defusedxml
 import defusedxml.ElementTree
-import six
 
 from httpolice import known
 from httpolice.blackboard import Blackboard, derived_property
@@ -22,6 +21,7 @@ from httpolice.parse import parse
 from httpolice.structure import (FieldName, HeaderEntry, HTTPVersion,
                                  Unavailable, http2, http11, okay)
 from httpolice.syntax import rfc7230
+from httpolice.util.data import iterbytes
 from httpolice.util.text import force_unicode, format_chars, printable
 
 
@@ -30,7 +30,7 @@ from httpolice.util.text import force_unicode, format_chars, printable
 # as the exhaustive list of bytes that can be output
 # by a "conformant" URL encoder.
 
-URL_ENCODED_GOOD_BYTES = Bits(
+URL_ENCODED_GOOD_CHARS = Bits(
     1 if (x in [0x25, 0x26, 0x2A, 0x2B, 0x2D, 0x2E, 0x5F] or
           0x30 <= x < 0x40 or 0x41 <= x < 0x5B or 0x61 <= x < 0x7B) else 0
     for x in range(256)
@@ -141,8 +141,7 @@ class Message(Blackboard):
                 if self.guessed_charset not in ['ascii', 'utf-8', None]:
                     self.complain(1281)
             return r
-        else:
-            return None
+        return None
 
     @derived_property
     def xml_data(self):
@@ -180,27 +179,23 @@ class Message(Blackboard):
                     self.complain(1139)
                 elif isinstance(d, email.errors.StartBoundaryNotFoundDefect):
                     self.complain(1140)
-            if parsed.is_multipart():
-                return parsed
-            else:
+            if not parsed.is_multipart():
                 return Unavailable(self.decoded_body)
-        else:
-            return None
+            return parsed
+        return None
 
     @derived_property
     def url_encoded_data(self):
         if self.headers.content_type == \
                 media.application_x_www_form_urlencoded and \
                 okay(self.decoded_body) and self.content_is_full:
-            for byte in six.iterbytes(self.decoded_body):
-                if not URL_ENCODED_GOOD_BYTES[byte]:
-                    char = six.int2byte(byte)
+            for char in iterbytes(self.decoded_body):
+                if not URL_ENCODED_GOOD_CHARS[ord(char)]:
                     self.complain(1040, char=format_chars([char]))
                     return Unavailable(self.decoded_body)
             # pylint: disable=no-member
             return parse_qs(self.decoded_body.decode('ascii'))
-        else:
-            return None
+        return None
 
     @derived_property
     def displayable_body(self):

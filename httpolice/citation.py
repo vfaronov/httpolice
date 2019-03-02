@@ -1,10 +1,6 @@
 # -*- coding: utf-8; -*-
 
-import six
-
-
-@six.python_2_unicode_compatible
-class Citation(object):
+class Citation:
 
     """A reference to a relevant document."""
 
@@ -42,8 +38,8 @@ class RFC(Citation):
     def __init__(self, num, section=None, appendix=None, errata=None):
         assert bool(section) + bool(appendix) + bool(errata) <= 1
         self.num = num = int(num)
-        self.section = section = six.text_type(section) if section else None
-        self.appendix = appendix = six.text_type(appendix) if appendix else None
+        self.section = section = str(section) if section else None
+        self.appendix = appendix = str(appendix) if appendix else None
         self.errata = errata = int(errata) if errata else None
         title = u'RFC %d' % num         # no-break space
         if errata:

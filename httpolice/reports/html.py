@@ -1,12 +1,11 @@
 # -*- coding: utf-8; -*-
 
+from functools import singledispatch
 import pkgutil
 
 import dominate
 import dominate.tags as H
 from dominate.util import text as text_node
-
-import six
 
 from httpolice import known, message, notice, structure
 from httpolice.__metadata__ import homepage, version
@@ -15,7 +14,6 @@ from httpolice.header import HeaderView
 from httpolice.reports.common import (expand_error, expand_piece,
                                       find_reason_phrase, resolve_reference)
 from httpolice.structure import Unavailable
-from httpolice.util.moves import singledispatch
 from httpolice.util.text import nicely_join, printable
 
 
@@ -67,7 +65,7 @@ def html_report(exchanges, buf):
     buf.write(epilogue.encode('utf-8'))
 
 
-class Placeholder(object):
+class Placeholder:
 
     """A magical placeholder used for rendering the notices list."""
 
@@ -135,7 +133,7 @@ def _generate_exchange_divs(exchanges):
 
         # Some exchanges are "complaint boxes", carrying only a complaint.
         # If the user silences that complaint, we end up with an empty box.
-        if len(div) != 0:
+        if len(div) != 0:   # pylint: disable=len-as-condition
             yield div
 
 
@@ -242,7 +240,7 @@ def _anonymize_id(id_):
 
 @singledispatch
 def _reference_ids(obj):
-    return [six.text_type(_anonymize_id(id(obj)))]
+    return [str(_anonymize_id(id(obj)))]
 
 @_reference_ids.register(list)
 def _list_reference_ids(xs):
@@ -266,7 +264,7 @@ def _referring_to(obj):
 
 def _magic_references(elem, ctx):
     """Find "magical" references from an element in a notice.
-    
+
     See the comment in ``httpolice/notices.xml``.
     """
     if elem.get('ref') == u'no':
@@ -298,7 +296,7 @@ def _magic_references(elem, ctx):
 
 def _render_known(obj):
     """Render an instance of one of the :data:`httpolice.known.classes`."""
-    text = printable(six.text_type(obj))
+    text = printable(str(obj))
     cite = known.citation(obj)
     if cite:
         with H.a(text, href=cite.url):
@@ -306,17 +304,17 @@ def _render_known(obj):
             if title:
                 H.attr(title=title)
     else:
-        return text_node(text)
+        text_node(text)
 
 
 def _notice_to_html(the_notice, ctx, with_anchor=False):
-    anchor = {'id': six.text_type(the_notice.id)} if with_anchor else {}
+    anchor = {'id': str(the_notice.id)} if with_anchor else {}
     with H.div(_class=u'notice %s' % the_notice.severity.name, **anchor):
         with H.h3():
             # See above regarding spaces.
             H.abbr(the_notice.severity_short, _class=u'severity',
                    title=the_notice.severity.name)
-            H.span(six.text_type(the_notice.id), _class=u'ident')
+            H.span(str(the_notice.id), _class=u'ident')
             with H.span(__pretty=False):
                 _piece_to_html(the_notice.title, ctx)
         for piece in the_notice.explanation:
@@ -327,7 +325,7 @@ def _notice_to_html(the_notice, ctx, with_anchor=False):
 def _piece_to_html(piece, ctx):
     _piece_to_html(expand_piece(piece), ctx)
 
-@_piece_to_html.register(six.text_type)
+@_piece_to_html.register(str)
 def _text_to_html(text, _):
     text_node(printable(text))
 

@@ -31,7 +31,7 @@ class Complaint(namedtuple('Complaint', ('notice', 'context'))):
         return self.notice.severity
 
 
-class Blackboard(object):
+class Blackboard:
 
     """Shared state that various parts of the code can "write upon".
 

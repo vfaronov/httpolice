@@ -124,9 +124,9 @@ def test_cache_control():
     assert headers.cache_control[u'qux'] == u'xyzzy 123'
 
     assert cache.no_transform in headers.cache_control
-    assert headers.cache_control.no_transform == True
+    assert headers.cache_control.no_transform is True
 
-    assert headers.cache_control[u'abcde'] == True
+    assert headers.cache_control[u'abcde'] is True
 
     assert headers.cache_control.no_cache is None
 

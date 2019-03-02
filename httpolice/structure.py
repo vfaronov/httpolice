@@ -4,8 +4,6 @@
 
 from collections import namedtuple
 
-import six
-
 from httpolice.util.text import force_bytes, force_unicode
 
 
@@ -13,8 +11,7 @@ from httpolice.util.text import force_bytes, force_unicode
 # Commonly useful structures
 
 
-@six.python_2_unicode_compatible
-class Unavailable(object):
+class Unavailable:
 
     """A wrapper for a value that has no useful representation in context.
 
@@ -39,8 +36,7 @@ class Unavailable(object):
     def __str__(self):                                  # pragma: no cover
         if self.inner is None:
             return u'(?)'
-        else:
-            return force_unicode(self.inner)
+        return force_unicode(self.inner)
 
     def __eq__(self, other):
         # It's questionable whether an `Unavailable` should ever compare equal
@@ -68,20 +64,18 @@ class Parametrized(namedtuple('Parametrized', ('item', 'param'))):
     def __eq__(self, other):
         if isinstance(other, tuple):
             return super(Parametrized, self).__eq__(other)
-        else:
-            return self.item == other
+        return self.item == other
 
     def __ne__(self, other):
         if isinstance(other, tuple):
             return super(Parametrized, self).__ne__(other)
-        else:
-            return self.item != other
+        return self.item != other
 
     def __hash__(self):     # pragma: no cover
         return hash(self.item)
 
 
-class MultiDict(object):
+class MultiDict:
 
     """A bunch of key-value pairs where keys are not unique."""
 
@@ -138,7 +132,6 @@ class MultiDict(object):
         return [k for k, _ in self.sequence].index(name)
 
 
-@six.python_2_unicode_compatible
 class Versioned(namedtuple('Versioned', ('item', 'version'))):
 
     """Anything that consists of some "item" + a version of that item."""
@@ -146,21 +139,17 @@ class Versioned(namedtuple('Versioned', ('item', 'version'))):
     __slots__ = ()
 
     def __str__(self):
-        if self.version:
-            return u'%s/%s' % self
-        else:
-            return six.text_type(self.item)
+        return (u'%s/%s' % self) if self.version else str(self.item)
 
 
-class ProtocolString(six.text_type):
+class ProtocolString(str):
 
     """Base class for various constant strings used in HTTP."""
 
     __slots__ = ()
 
     def __repr__(self):
-        return '%s(%s)' % (self.__class__.__name__,
-                           six.text_type.__repr__(self))
+        return '%s(%s)' % (self.__class__.__name__, str.__repr__(self))
 
 
 class CaseInsensitive(ProtocolString):
@@ -168,7 +157,7 @@ class CaseInsensitive(ProtocolString):
     __slots__ = ()
 
     def __eq__(self, other):
-        if isinstance(other, six.text_type):
+        if isinstance(other, str):
             return self.lower() == other.lower()
         return NotImplemented
 
@@ -362,8 +351,7 @@ class WarningValue(namedtuple('WarningValue',
     def __eq__(self, other):
         if isinstance(other, tuple):
             return super(WarningValue, self).__eq__(other)
-        else:
-            return self.code == other
+        return self.code == other
 
     def __ne__(self, other):        # pragma: no cover
         return not (self == other)

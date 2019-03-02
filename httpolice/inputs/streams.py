@@ -7,8 +7,6 @@ import itertools
 import os
 import re
 
-import six
-
 from httpolice.exchange import complaint_box
 from httpolice.framing1 import parse_streams
 from httpolice.inputs.common import InputError
@@ -284,7 +282,7 @@ def _rearrange_by_time(sequences):
         (time, exchange) = position[i]
         if exchange is None:
             # Start iterating over this sequence.
-            exchange = next(sequences[i][0])
+            exchange = next(sequences[i][0], None)
             new_time = _exchange_time(exchange, time)
             if time is None or new_time > time:
                 # So this sequence actually starts at a later time than
@@ -317,22 +315,20 @@ def _exchange_time(exchange, hint):
             if resp.headers.age.is_okay:
                 return (resp.headers.date.value +
                         timedelta(seconds=resp.headers.age.value))
-            else:
-                return resp.headers.date.value
+            return resp.headers.date.value
     return hint
 
 
 def _sniff_direction(path1, path2):                 # pragma: no cover
     if path1 and _sniff_outbound(path1):
         return (path2, path1)
-    elif path2 and _sniff_outbound(path2):
+    if path2 and _sniff_outbound(path2):
         return (path1, path2)
-    elif path1 and _sniff_inbound(path1):
+    if path1 and _sniff_inbound(path1):
         return (path1, path2)
-    elif path2 and _sniff_inbound(path2):
+    if path2 and _sniff_inbound(path2):
         return (path2, path1)
-    else:
-        return None
+    return None
 
 
 def _sniff_outbound(path):
@@ -372,7 +368,7 @@ def parse_combined(path):
     try:
         preamble = preamble.decode('utf-8')
     except UnicodeError as exc:     # pragma: no cover
-        six.raise_from(InputError(u'%s: invalid UTF-8 in preamble' % path), exc)
+        raise InputError(u'%s: invalid UTF-8 in preamble' % path) from exc
     parts2 = rest.split(b'======== BEGIN OUTBOUND STREAM ========\r\n', 1)
     if len(parts2) != 2:            # pragma: no cover
         raise InputError(u'%s: bad combined file: no outbound marker' % path)

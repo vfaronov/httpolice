@@ -2,8 +2,6 @@
 
 """Functions that may be useful for integrating with HTTPolice."""
 
-import six
-
 from httpolice.util.text import force_bytes, force_unicode
 
 
@@ -67,6 +65,6 @@ def _header_name_from_cgi(cgi_name):
 
 
 def _header_value_from_cgi(value):
-    if not isinstance(value, (six.text_type, bytes)):
+    if not isinstance(value, (str, bytes)):
         value = str(value)
     return force_bytes(value)

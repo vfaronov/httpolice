@@ -13,11 +13,11 @@ Inputs (and thus results) are deterministic within a given combination of:
 (so, if you add a new header, you can suddenly discover unrelated bugs).
 """
 
+import io
 import random
 import string
 
 import pytest
-import six
 
 from httpolice import Exchange, Request, Response, check_exchange, known
 from httpolice.reports import html_report, text_report
@@ -60,7 +60,7 @@ def make_token():
                    for _ in range(random.randint(1, 10))).encode('ascii')
 
 def make_garbage():
-    return b''.join(six.int2byte(random.randint(0, 255))
+    return b''.join(bytes((random.randint(0, 255),))
                     for _ in range(10, 100))
 
 def make_exchange():
@@ -94,5 +94,5 @@ def test_fuzz(i):
     random.setstate(orig_state)
 
     check_exchange(exch)
-    text_report([exch], six.BytesIO())
-    html_report([exch], six.BytesIO())
+    text_report([exch], io.BytesIO())
+    html_report([exch], io.BytesIO())

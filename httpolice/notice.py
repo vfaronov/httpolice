@@ -18,7 +18,6 @@ import copy
 import pkgutil
 
 import lxml.etree
-import six
 
 from httpolice import citation, known
 from httpolice.util.ordered_enum import OrderedEnum
@@ -32,7 +31,7 @@ class Severity(OrderedEnum):
 
     """A notice's severity.
 
-    This is a Python 3.4 style enumeration
+    This is a standard Python enumeration
     with the additional feature that its members are ordered:
 
     >>> Severity.comment < Severity.error
@@ -47,9 +46,6 @@ class Severity(OrderedEnum):
 
 
 known_map = {name: cls for (cls, (_, name)) in known.classes.items()}
-
-
-# pylint: disable=property-on-old-class
 
 
 @ns('error')
@@ -93,9 +89,9 @@ class Content(lxml.etree.ElementBase):
         # Strip spaces from the first and last text children.
         # Useful for quotes.
         if r:
-            if isinstance(r[0], (six.text_type, bytes)):
+            if isinstance(r[0], (str, bytes)):
                 r[0] = r[0].lstrip()
-            if isinstance(r[-1], (six.text_type, bytes)):
+            if isinstance(r[-1], (str, bytes)):
                 r[-1] = r[-1].rstrip()
 
         return r
@@ -106,15 +102,11 @@ class Paragraph(Content):
 
     """A paragraph of explanation."""
 
-    pass
-
 
 @ns('title')
 class Title(Content):
 
     """A notice's title."""
-
-    pass
 
 
 @ns('ref')
@@ -140,8 +132,6 @@ class Var(Ref):
 class ExceptionDetails(lxml.etree.ElementBase):
 
     """A placeholder for details of the ``error`` key from the context."""
-
-    pass
 
 
 @ns('cite')

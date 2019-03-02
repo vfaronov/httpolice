@@ -268,7 +268,7 @@ def _decode_transfer_coding(msg, coding):
         # The outermost chunked has already been peeled off at this point.
         msg.complain(1002)
         msg.body = Unavailable(msg.body)
-    elif coding == tc.gzip or coding == tc.x_gzip:
+    elif coding in [tc.gzip, tc.x_gzip]:
         try:
             msg.body = decode_gzip(msg.body)
         except Exception as e:
@@ -307,13 +307,12 @@ def _parse_chunk(stream, data):
                 raise stream.error(pos)
         if size == 0:
             return False
-        elif size + current_size > MAX_BODY_SIZE:
+        if size + current_size > MAX_BODY_SIZE:
             stream.sane = False
             raise BodyTooLongError(size + current_size, MAX_BODY_SIZE)
-        else:
-            data.append(stream.read(size))
-            stream.readlineend()
-            return True
+        data.append(stream.read(size))
+        stream.readlineend()
+        return True
 
 
 def _parse_chunked(msg, stream):

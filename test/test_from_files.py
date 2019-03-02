@@ -14,7 +14,6 @@ import os
 import re
 
 import pytest
-import six
 
 from httpolice.exchange import check_exchange
 from httpolice.inputs.har import har_input
@@ -50,14 +49,14 @@ def test_from_file(input_from_file):    # pylint: disable=redefined-outer-name
     for exch in exchanges:
         check_exchange(exch)
 
-    buf = six.BytesIO()
+    buf = io.BytesIO()
     text_report(exchanges, buf)
     actual = sorted(int(ln[2:6])
                     for ln in buf.getvalue().decode('utf-8').splitlines()
                     if not ln.startswith(u'----'))
     assert expected == actual
 
-    buf = six.BytesIO()
+    buf = io.BytesIO()
     html_report(exchanges, buf)
     # Check that the report does not contain strings that look like default
     # Python object reprs, meaning that we failed to render something.
