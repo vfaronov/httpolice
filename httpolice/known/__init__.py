@@ -366,7 +366,14 @@ transfer_coding = Knowledge(structure.TransferCoding, 'transfer_coding')
 tc = transfer_coding.accessor
 
 
-upgrade_token = Knowledge(structure.UpgradeToken, 'upgrade_token')
+class UpgradeTokenKnowledge(Knowledge):
+
+    @classmethod
+    def name_from_raw(cls, key, raw):
+        # Can't use the parent logic because `websocket` vs. `WebSocket`.
+        return key
+
+upgrade_token = UpgradeTokenKnowledge(structure.UpgradeToken, 'upgrade_token')
 upgrade = upgrade_token.accessor
 
 

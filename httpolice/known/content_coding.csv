@@ -9,3 +9,4 @@ identity,,,,7231,5.3.4,,,
 pack200-gzip,,,,,,,http://www.jcp.org/en/jsr/detail?id=200,JSR 200: Network Transfer Format for Java
 x-compress,,,,7230,4.2.1,,,
 x-gzip,,,,7230,4.2.3,,,
+zstd,,,,8478,,,,

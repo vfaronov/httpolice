@@ -48,6 +48,7 @@ so let's not check it for now.",,7232,4.1,,,,
 422,Unprocessable Entity,,,4918,11.2,,,,not_by_default
 423,Locked,,,4918,11.3,,,,not_by_default
 424,Failed Dependency,,,4918,11.4,,,,not_by_default
+425,Too Early,,,8470,,,,,
 426,Upgrade Required,,,7231,6.5.15,,,,not_by_default
 428,Precondition Required,,,6585,3,,,,not_at_all
 429,Too Many Requests,,,6585,4,,,,not_at_all

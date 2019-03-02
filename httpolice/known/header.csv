@@ -1,6 +1,7 @@
 key,title,comment,no_sync,rfc,rfc_section,rfc_appendix,cite_url,cite_title,syntax_module,syntax_symbol,bad_for_connection,bad_for_trailer,quoted_comma_bad,quoted_semicolon_bad,for_request,for_response,iana_status,precondition,proactive_conneg,representation_metadata,rule
 A-IM,,,,4229,,,,,,,,,,,,,,,,,
 ALPN,,,,7639,2,,,,,,,,,,,,standard,,,,
+AMP-Cache-Transform,,,,,,,https://github.com/ampproject/amphtml/blob/master/spec/amp-cache-transform.md,,,,,,,,,,,,,,
 Accept,,,,7231,5.3.2,,,,rfc7231,Accept,,,True,True,True,False,standard,False,True,,multi
 Accept-Additions,,,,4229,,,,,,,,,,,,,,,,,
 Accept-Charset,,,,7231,5.3.3,,,,rfc7231,Accept_Charset,,,,,True,False,standard,False,True,,multi
@@ -67,6 +68,7 @@ Differential-ID,,,,4229,,,,,,,,,,,,,,,,,
 Digest,,,,4229,,,,,,,,,,,,,,,,,
 EDIINT-Features,,,,6017,,,,,,,,,,,,,,,,,
 ETag,,,,7232,2.3,,,,rfc7232,ETag,True,,,,False,True,standard,,,True,single
+Early-Data,,,,8470,,,,,,,,,,,,,standard,,,,
 Expect,,,,7231,5.1.1,,,,rfc7231,Expect,,True,,,True,False,standard,False,False,,single
 Expires,,,,7234,5.3,,,,rfc7234,Expires,True,True,,,False,True,standard,,,,single
 Ext,,,,4229,,,,,,,,,,,,,,,,,
@@ -85,6 +87,7 @@ If-None-Match,,,,7232,3.2,,,,rfc7232,If_None_Match,,True,,,True,False,standard,T
 If-Range,,,,7233,3.2,,,,rfc7233,If_Range,,True,,,True,False,standard,False,False,,single
 If-Schedule-Tag-Match,,,,6638,8.3,,,,,,,True,,,,,standard,True,,,
 If-Unmodified-Since,,,,7232,3.4,,,,rfc7232,If_Unmodified_Since,,True,,,True,False,standard,True,False,,single
+Include-Referred-Token-Binding-ID,,,,8473,,,,,,,,,,,,,standard,,,,
 Keep-Alive,,,,4229,,,,,,,,,,,,,,,,,
 Label,,,,4229,,,,,,,,,,,,,,,,,
 Last-Modified,,,,7232,2.2,,,,rfc7232,Last_Modified,True,,,,False,True,standard,,,True,single
@@ -141,6 +144,7 @@ SLUG,,,,5023,,,,,,,,,,,,,standard,,,,
 Safe,,,,4229,,,,,,,,,,,,,,,,,
 Schedule-Reply,,,,6638,,,,,,,,,,,,,standard,,,,
 Schedule-Tag,,,,6638,,,,,,,,,,,,,standard,,,,
+Sec-Token-Binding,,,,8473,,,,,,,,,,,,,standard,,,,
 Sec-WebSocket-Accept,,,,6455,,,,,,,,,,,,,standard,,,,
 Sec-WebSocket-Extensions,,,,6455,,,,,,,,,,,,,standard,,,,
 Sec-WebSocket-Key,,,,6455,,,,,,,,,,,,,standard,,,,
@@ -162,8 +166,11 @@ TCN,,,,4229,,,,,,,,,,,,,,,,,
 TE,,,,7230,4.3,,,,rfc7230,TE,,True,True,True,True,False,standard,False,False,,multi
 TTL,,,,8030,5.2,,,,,,,,,,,,standard,,,,
 Timeout,,,,4918,,,,,,,,,,,,,standard,,,,
+Timing-Allow-Origin,,,,,,,https://www.w3.org/TR/resource-timing-1/#timing-allow-origin,,,,,,,,,,,,,,
 Title,,,,4229,,,,,,,,,,,,,,,,,
 Topic,,,,8030,5.4,,,,,,,,,,,,standard,,,,
+Traceparent,,,,,,,https://www.w3.org/TR/trace-context/#traceparent-field,,,,,,,,,,,,,,
+Tracestate,,,,,,,https://www.w3.org/TR/trace-context/#tracestate-field,,,,,,,,,,,,,,
 Trailer,,,,7230,4.4,,,,rfc7230,Trailer,,True,,,,,standard,False,False,,multi
 Transfer-Encoding,,,,7230,3.3.1,,,,rfc7230,Transfer_Encoding,,True,True,True,True,True,standard,False,False,,multi
 UA-Color,,,,4229,,,,,,,,,,,,,,,,,
