@@ -14,7 +14,7 @@ Changed
 
 .. _RFC 8259: https://tools.ietf.org/html/rfc8259
 .. _RFC 8187: https://tools.ietf.org/html/rfc8187
-.. _1253: http://httpolice.readthedocs.io/page/notices.html#1253
+.. _1253: https://httpolice.readthedocs.io/page/notices.html#1253
 
 Added
 -----
@@ -32,18 +32,18 @@ Added
   (notice `1304`_).
 - HAR files exported from Chrome and `Insomnia`_ are handled slightly better.
 
-.. _1299: http://httpolice.readthedocs.io/page/notices.html#1299
-.. _1300: http://httpolice.readthedocs.io/page/notices.html#1300
-.. _1301: http://httpolice.readthedocs.io/page/notices.html#1301
-.. _1302: http://httpolice.readthedocs.io/page/notices.html#1302
-.. _1303: http://httpolice.readthedocs.io/page/notices.html#1303
-.. _1304: http://httpolice.readthedocs.io/page/notices.html#1304
-.. _1305: http://httpolice.readthedocs.io/page/notices.html#1305
-.. _1306: http://httpolice.readthedocs.io/page/notices.html#1306
-.. _1307: http://httpolice.readthedocs.io/page/notices.html#1307
-.. _1308: http://httpolice.readthedocs.io/page/notices.html#1308
-.. _1309: http://httpolice.readthedocs.io/page/notices.html#1309
-.. _1310: http://httpolice.readthedocs.io/page/notices.html#1310
+.. _1299: https://httpolice.readthedocs.io/page/notices.html#1299
+.. _1300: https://httpolice.readthedocs.io/page/notices.html#1300
+.. _1301: https://httpolice.readthedocs.io/page/notices.html#1301
+.. _1302: https://httpolice.readthedocs.io/page/notices.html#1302
+.. _1303: https://httpolice.readthedocs.io/page/notices.html#1303
+.. _1304: https://httpolice.readthedocs.io/page/notices.html#1304
+.. _1305: https://httpolice.readthedocs.io/page/notices.html#1305
+.. _1306: https://httpolice.readthedocs.io/page/notices.html#1306
+.. _1307: https://httpolice.readthedocs.io/page/notices.html#1307
+.. _1308: https://httpolice.readthedocs.io/page/notices.html#1308
+.. _1309: https://httpolice.readthedocs.io/page/notices.html#1309
+.. _1310: https://httpolice.readthedocs.io/page/notices.html#1310
 .. _RFC 8288: https://tools.ietf.org/html/rfc8288
 .. _immutable responses: https://tools.ietf.org/html/rfc8246
 .. _Early hints: https://tools.ietf.org/html/rfc8297
@@ -94,12 +94,12 @@ Fixed
 
 .. _Forwarded: https://tools.ietf.org/html/rfc7239
 .. _chunk extensions: https://tools.ietf.org/html/rfc7230#section-4.1.1
-.. _1009: http://httpolice.readthedocs.io/page/notices.html#1009
-.. _1298: http://httpolice.readthedocs.io/page/notices.html#1298
-.. _1158: http://httpolice.readthedocs.io/page/notices.html#1158
-.. _1296: http://httpolice.readthedocs.io/page/notices.html#1296
-.. _1297: http://httpolice.readthedocs.io/page/notices.html#1297
-.. _1013: http://httpolice.readthedocs.io/page/notices.html#1013
+.. _1009: https://httpolice.readthedocs.io/page/notices.html#1009
+.. _1298: https://httpolice.readthedocs.io/page/notices.html#1298
+.. _1158: https://httpolice.readthedocs.io/page/notices.html#1158
+.. _1296: https://httpolice.readthedocs.io/page/notices.html#1296
+.. _1297: https://httpolice.readthedocs.io/page/notices.html#1297
+.. _1013: https://httpolice.readthedocs.io/page/notices.html#1013
 
 
 0.5.2 - 2017-03-24
@@ -120,7 +120,7 @@ Fixed
 
 .. _httpolice-devtool:
    https://chrome.google.com/webstore/detail/httpolice-devtool/hnlnhebgfcfemjaphgbeokdnfpgbnhgn
-.. _hpoliced: https://pypi.python.org/pypi/hpoliced
+.. _hpoliced: https://pypi.org/project/hpoliced/
 
 
 0.5.0 - 2017-03-12
@@ -141,16 +141,16 @@ Added
 - Check for 202 (Accepted) responses with no body (notice `1284`_).
 - HTML reports have been optimized to load slightly faster in browsers.
 
-.. _1283: http://httpolice.readthedocs.io/page/notices.html#1283
-.. _1284: http://httpolice.readthedocs.io/page/notices.html#1284
+.. _1283: https://httpolice.readthedocs.io/page/notices.html#1283
+.. _1284: https://httpolice.readthedocs.io/page/notices.html#1284
 .. _Prefer: https://tools.ietf.org/html/rfc7240
-.. _1285: http://httpolice.readthedocs.io/page/notices.html#1285
-.. _1291: http://httpolice.readthedocs.io/page/notices.html#1291
-.. _1292: http://httpolice.readthedocs.io/page/notices.html#1292
-.. _1293: http://httpolice.readthedocs.io/page/notices.html#1293
-.. _1294: http://httpolice.readthedocs.io/page/notices.html#1294
-.. _1295: http://httpolice.readthedocs.io/page/notices.html#1295
-.. _analyzing TCP streams: http://httpolice.readthedocs.io/page/streams.html
+.. _1285: https://httpolice.readthedocs.io/page/notices.html#1285
+.. _1291: https://httpolice.readthedocs.io/page/notices.html#1291
+.. _1292: https://httpolice.readthedocs.io/page/notices.html#1292
+.. _1293: https://httpolice.readthedocs.io/page/notices.html#1293
+.. _1294: https://httpolice.readthedocs.io/page/notices.html#1294
+.. _1295: https://httpolice.readthedocs.io/page/notices.html#1295
+.. _analyzing TCP streams: https://httpolice.readthedocs.io/page/streams.html
 
 Changed
 -------
@@ -162,14 +162,14 @@ Fixed
 -----
 - Notice `1021`_ is no longer reported on HTTP/2 requests.
 
-.. _1021: http://httpolice.readthedocs.io/page/notices.html#1021
+.. _1021: https://httpolice.readthedocs.io/page/notices.html#1021
 
 Meanwhile
 ---------
 - `mitmproxy integration`_ has new features for interactive use.
 
 .. _mitmproxy integration:
-   http://mitmproxy-httpolice.readthedocs.io/
+   https://mitmproxy-httpolice.readthedocs.io/
 
 
 0.4.0 - 2017-01-14
@@ -184,9 +184,9 @@ Added
   currently ``plain/text`` and ``text/json`` (notice `1282`_).
 
 .. _brotli: https://tools.ietf.org/html/rfc7932
-.. _1280: http://httpolice.readthedocs.io/page/notices.html#1280
-.. _1281: http://httpolice.readthedocs.io/page/notices.html#1281
-.. _1282: http://httpolice.readthedocs.io/page/notices.html#1282
+.. _1280: https://httpolice.readthedocs.io/page/notices.html#1280
+.. _1281: https://httpolice.readthedocs.io/page/notices.html#1281
+.. _1282: https://httpolice.readthedocs.io/page/notices.html#1282
 
 Removed
 -------
@@ -200,7 +200,7 @@ Removed
 - Notice 1275 ("XML with entity declarations") has been removed
   for the same reason.
 
-.. _defusedxml: https://pypi.python.org/pypi/defusedxml/
+.. _defusedxml: https://pypi.org/project/defusedxml/
 
 Other
 -----
@@ -237,15 +237,15 @@ Added
 - Check for obsolete 'X-' prefix in experimental headers (notice `1277`_).
 - Notice `1093`_ recognizes a few more product names as client libraries.
 
-.. _HTML reports: http://httpolice.readthedocs.io/page/reports.html
-.. _Fiddler: http://www.telerik.com/fiddler
+.. _HTML reports: https://httpolice.readthedocs.io/page/reports.html
+.. _Fiddler: https://www.telerik.com/fiddler
 .. _PyPy: http://pypy.org/
-.. _Python API: http://httpolice.readthedocs.io/page/api.html
-.. _1006: http://httpolice.readthedocs.io/page/notices.html#1006
-.. _1093: http://httpolice.readthedocs.io/page/notices.html#1093
-.. _1274: http://httpolice.readthedocs.io/page/notices.html#1274
-.. _1276: http://httpolice.readthedocs.io/page/notices.html#1276
-.. _1277: http://httpolice.readthedocs.io/page/notices.html#1277
+.. _Python API: https://httpolice.readthedocs.io/page/api.html
+.. _1006: https://httpolice.readthedocs.io/page/notices.html#1006
+.. _1093: https://httpolice.readthedocs.io/page/notices.html#1093
+.. _1274: https://httpolice.readthedocs.io/page/notices.html#1274
+.. _1276: https://httpolice.readthedocs.io/page/notices.html#1276
+.. _1277: https://httpolice.readthedocs.io/page/notices.html#1277
 
 Changed
 -------
@@ -255,7 +255,7 @@ Changed
   If you parse these reports, you may need to adjust.
 - Styles in HTML reports have been tweaked to make them more readable.
 
-.. _Text reports: http://httpolice.readthedocs.io/page/reports.html
+.. _Text reports: https://httpolice.readthedocs.io/page/reports.html
 
 Deprecated
 ----------
@@ -264,7 +264,7 @@ Deprecated
   have been replaced with a single ``httpolice.Severity`` enumeration,
   and will be removed in the next release.
 
-.. _Python API: http://httpolice.readthedocs.io/page/api.html
+.. _Python API: https://httpolice.readthedocs.io/page/api.html
 
 Fixed
 -----
@@ -274,9 +274,9 @@ Fixed
 - Notices `1053`_ and `1066`_ are no longer reported
   on requests with bodies of length 0.
 
-.. _tcpick and tcpflow input: http://httpolice.readthedocs.io/page/streams.html
-.. _1053: http://httpolice.readthedocs.io/page/notices.html#1053
-.. _1066: http://httpolice.readthedocs.io/page/notices.html#1066
+.. _tcpick and tcpflow input: https://httpolice.readthedocs.io/page/streams.html
+.. _1053: https://httpolice.readthedocs.io/page/notices.html#1053
+.. _1066: https://httpolice.readthedocs.io/page/notices.html#1066
 
 
 0.2.0 - 2016-05-08
@@ -294,10 +294,10 @@ Added
 - `Stale controls`_ are now recognized.
 - Checks for status code `451 (Unavailable For Legal Reasons)`_.
 
-.. _Django integration: http://django-httpolice.readthedocs.io/
-.. _silenced: http://httpolice.readthedocs.io/page/concepts.html#silence
-.. _bearer tokens: http://tools.ietf.org/html/rfc6750
-.. _Content-Disposition: http://tools.ietf.org/html/rfc6266
+.. _Django integration: https://django-httpolice.readthedocs.io/
+.. _silenced: https://httpolice.readthedocs.io/page/concepts.html#silence
+.. _bearer tokens: https://tools.ietf.org/html/rfc6750
+.. _Content-Disposition: https://tools.ietf.org/html/rfc6266
 .. _RFC 5987: https://tools.ietf.org/html/rfc5987
 .. _alternative services: https://tools.ietf.org/html/rfc7838
 .. _prohibited in HTTP/2: https://tools.ietf.org/html/rfc7540#section-8.1.2.2
@@ -314,8 +314,8 @@ Fixed
 - Notice `1108`_ doesn't crash in non-English locales.
 - Notices such as `1038`_ are not reported on responses to HEAD.
 
-.. _1108: http://httpolice.readthedocs.io/page/notices.html#1108
-.. _1038: http://httpolice.readthedocs.io/page/notices.html#1038
+.. _1108: https://httpolice.readthedocs.io/page/notices.html#1108
+.. _1038: https://httpolice.readthedocs.io/page/notices.html#1038
 
 
 0.1.0 - 2016-04-25

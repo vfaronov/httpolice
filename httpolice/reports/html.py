@@ -15,8 +15,8 @@ from httpolice.header import HeaderView
 from httpolice.reports.common import (expand_error, expand_piece,
                                       find_reason_phrase, resolve_reference)
 from httpolice.structure import Unavailable
-from httpolice.util.text import nicely_join, printable
 from httpolice.util.moves import singledispatch
+from httpolice.util.text import nicely_join, printable
 
 
 ###############################################################################

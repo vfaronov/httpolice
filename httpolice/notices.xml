@@ -2101,6 +2101,7 @@ One non-obvious thing is how references work
   <error id="1287">
     <title><var ref="msg.method"/> request cannot <h>Prefer</h>: <prefer>respond-async</prefer></title>
     <explain>The whole point of a <var ref="msg.method"/> request is to retrieve information from the server. It’s impossible to respond asynchronously to such a request: the response would not contain the requested information.</explain>
+    <explain>If the intention was to submit a task that would eventually send the results somewhere, this submission itself should probably be a <m>POST</m>.</explain>
   </error>
 
   <error id="1288">

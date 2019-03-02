@@ -80,7 +80,7 @@ you can use the ``-s`` option to specify notice IDs to silence::
 Integration methods have similar mechanisms.
 For example, `mitmproxy integration`__ has the ``httpolice_silence`` option.
 
-__ http://mitmproxy-httpolice.readthedocs.io/
+__ https://mitmproxy-httpolice.readthedocs.io/
 
 Silencing locally
 ~~~~~~~~~~~~~~~~~

@@ -818,7 +818,7 @@ def _check_bearer_challenge(resp, hdr, challenge):
     # The ``Bearer`` authentication scheme is actually defined
     # for proxies as well as for servers (RFC 6750 Section 1).
     # Squid even seems to support it:
-    # http://wiki.squid-cache.org/Features/BearerAuthentication .
+    # https://wiki.squid-cache.org/Features/BearerAuthentication .
     # However, generalizing these checks to proxies is kind of a pain,
     # so for now we only handle the ``WWW-Authenticate`` series.
     # If this is ever extended to proxies, the notices must be adjusted.

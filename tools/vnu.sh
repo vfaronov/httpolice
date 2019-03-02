@@ -5,7 +5,7 @@
 # in order to pin down the version of the checker
 # and thus ensure reproducibility.
 #
-# __ http://validator.github.io/validator/
+# __ https://validator.github.io/validator/
 
 set -e
 

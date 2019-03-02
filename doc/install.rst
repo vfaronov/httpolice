@@ -14,7 +14,7 @@ If you’re not familiar with pip,
 you may need to install it `manually`__ or `from your OS distribution`__.
 
 __ https://pip.pypa.io/
-__ https://pypi.python.org/pypi/HTTPolice
+__ https://pypi.org/project/HTTPolice/
 __ https://pip.pypa.io/page/installing/
 __ https://packaging.python.org/guides/installing-using-linux-tools/
 
@@ -70,6 +70,6 @@ For example::
   C:\Users\Vasiliy\...\Python36>Scripts\pip install brotlipy==0.7.0
   C:\Users\Vasiliy\...\Python36>Scripts\pip install HTTPolice
 
-__ https://pypi.python.org/pypi
-__ https://pypi.python.org/pypi/lxml
-__ https://pypi.python.org/pypi/brotlipy
+__ https://pypi.org/
+__ https://pypi.org/project/lxml/
+__ https://pypi.org/project/brotlipy/

@@ -43,6 +43,6 @@ Integration packages
 - `Django integration`__
 - `Chrome extension`__ (third-party)
 
-__ http://mitmproxy-httpolice.readthedocs.io/
-__ http://django-httpolice.readthedocs.io/
+__ https://mitmproxy-httpolice.readthedocs.io/
+__ https://django-httpolice.readthedocs.io/
 __ https://chrome.google.com/webstore/detail/httpolice-devtool/hnlnhebgfcfemjaphgbeokdnfpgbnhgn

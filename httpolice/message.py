@@ -156,7 +156,7 @@ class Message(Blackboard):
             except defusedxml.EntitiesForbidden:
                 self.complain(1275)
                 return Unavailable(self.decoded_body)
-            # http://bugs.python.org/issue29896
+            # https://bugs.python.org/issue29896
             except (xml.etree.ElementTree.ParseError, UnicodeError) as e:
                 self.complain(1039, error=e)
                 return Unavailable(self.decoded_body)

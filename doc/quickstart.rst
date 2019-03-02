@@ -110,8 +110,8 @@ __ https://docs.mitmproxy.org/stable/overview-installation/#installation-on-linu
    (Fiddler’s `HAR 1.2 export`__ can get your data into HTTPolice).
 
    __ https://docs.microsoft.com/en-us/windows/wsl/about
-   __ http://www.telerik.com/fiddler
-   __ http://docs.telerik.com/fiddler/KnowledgeBase/ImportExportFormats
+   __ https://www.telerik.com/fiddler
+   __ https://docs.telerik.com/fiddler/KnowledgeBase/ImportExportFormats
 
 The following command will start mitmproxy as a reverse proxy
 in front of your API on port 8080, with HTTPolice integration::

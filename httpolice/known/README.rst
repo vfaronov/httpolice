@@ -75,7 +75,7 @@ Syntax-related fields
     You can set this to ``True`` if the presence of this header in a trailer
     should trigger notice 1026.
 
-``quoted_string_bad``, ``quoted_semicolon_bad``
+``quoted_comma_bad``, ``quoted_semicolon_bad``
     Set these to ``True`` if the presence of a comma or semicolon in this
     header's parsed representation should trigger notices 1299 or 1300,
     respectively. This only works if the header is parsed by its

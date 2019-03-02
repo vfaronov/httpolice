@@ -166,9 +166,9 @@ html_theme_options = {
           ('List of all notices', 'notices.html'),
           ('Example report', 'showcase.html'),
           ('mitmproxy integration',
-           'http://mitmproxy-httpolice.readthedocs.io/'),
+           'https://mitmproxy-httpolice.readthedocs.io/'),
           ('Django integration',
-           'http://django-httpolice.readthedocs.io/'),
+           'https://django-httpolice.readthedocs.io/'),
      ]),
 }
 
