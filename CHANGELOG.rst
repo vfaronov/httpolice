@@ -5,7 +5,13 @@ History of changes
 Unreleased
 ~~~~~~~~~~
 - Dropped Python 2 support. If you need it, use the older versions.
-- HTTPolice no longer requires `six` nor `singledispatch`.
+- HTTPolice now requires `Google's Brotli`_ instead of `brotlipy`_,
+  and no longer requires `six`_ nor `singledispatch`_.
+
+.. _Google's Brotli: https://pypi.org/project/Brotli/
+.. _brotlipy: https://pypi.org/project/brotlipy/
+.. _six: https://pypi.org/project/six/
+.. _singledispatch: https://pypi.org/project/singledispatch/
 
 
 0.7.0 - 2018-03-31

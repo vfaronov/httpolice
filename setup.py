@@ -38,7 +38,7 @@ setup(
         'bitstring >= 3.1.4',
         'dominate >= 2.2.0',
         'defusedxml >= 0.5.0',
-        'brotlipy >= 0.5.1',
+        'Brotli >= 1.0.1',
     ],
 
     packages=[
