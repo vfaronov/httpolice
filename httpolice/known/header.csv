@@ -22,7 +22,7 @@ Access-Control-Request-Headers,,,citation,,,,https://www.w3.org/TR/cors/#access-
 Access-Control-Request-Method,,,citation,,,,https://www.w3.org/TR/cors/#access-control-request-method-request-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,,,
 Age,,,,7234,5.1,,,,rfc7234,Age,True,True,,,False,True,standard,,,,single
 Allow,,,,7231,7.4.1,,,,rfc7231,Allow,,,,,False,True,standard,,,,multi
-Alt-Svc,,,,7838,3,,,,rfc7838,Alt_Svc,,,True,True,False,True,standard,,,,special
+Alt-Svc,,No quoted_comma_bad because e.g. Google's servers often produce it.,,7838,3,,,,rfc7838,Alt_Svc,,,,,False,True,standard,,,,special
 Alt-Used,,,,7838,5,,,,rfc7838,Alt_Used,,True,,,True,False,standard,False,False,,single
 Alternates,,,,4229,,,,,,,,,,,,,,,,,
 Apply-To-Redirect-Ref,,,,4437,,,,,,,,,,,,,,,,,

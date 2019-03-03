@@ -7,6 +7,7 @@ Unreleased
 - Dropped Python 2 support. If you need it, use the older versions.
 - HTTPolice now requires `Google's Brotli`_ instead of `brotlipy`_,
   and no longer requires `six`_ nor `singledispatch`_.
+- Notices `1299`_ and `1300`_ are no longer reported on ``Alt-Svc``.
 
 .. _Google's Brotli: https://pypi.org/project/Brotli/
 .. _brotlipy: https://pypi.org/project/brotlipy/
