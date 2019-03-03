@@ -2,8 +2,8 @@ History of changes
 ==================
 
 
-Unreleased
-~~~~~~~~~~
+0.8.0 - 2019-03-03
+~~~~~~~~~~~~~~~~~~
 - Dropped Python 2 support. If you need it, use the older versions.
 - HTTPolice no longer requires `six`_ nor `singledispatch`_.
 - HTTPolice now pulls in `Google’s Brotli`_ instead of `brotlipy`_,
