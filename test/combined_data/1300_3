@@ -15,6 +15,6 @@ Date: Thu, 31 Dec 2015 18:26:56 GMT
 Content-Type: text/plain
 Content-Length: 47
 Location: /articles/123/
-Alt-Svc: h2c=":8000"; ma=3600; test="foo; bar"
+Accept-Patch: text/x-diff;features="context;unified"
 
 Your article was posted under /articles/123/.

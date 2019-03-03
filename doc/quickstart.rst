@@ -94,7 +94,7 @@ Let’s say curl is special enough::
 How do you get this into HTTPolice?
 
 One way is to use `mitmproxy`__, an advanced tool for inspecting HTTP traffic.
-Install it in a Python 3.5+ environment with HTTPolice integration::
+Install it in a Python 3.6+ environment with HTTPolice integration::
 
   $ pip3 install mitmproxy-HTTPolice
 
