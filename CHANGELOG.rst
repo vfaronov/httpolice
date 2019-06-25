@@ -4,6 +4,7 @@ History of changes
 
 Unreleased
 ~~~~~~~~~~
+- Notice `1277`_ is no longer reported on ``X-Real-IP``.
 - Notice `1282`_ is now reported on ``application/text``.
 
 
