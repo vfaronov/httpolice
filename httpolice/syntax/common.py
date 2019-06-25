@@ -18,6 +18,7 @@ VCHAR = octet_range(0x21, 0x7E)                                         > auto
 
 
 _BAD_MEDIA_TYPES = {
+    MediaType(u'application/text'): media.text_plain,
     MediaType(u'plain/text'): media.text_plain,
     MediaType(u'text/json'): media.application_json,
 }

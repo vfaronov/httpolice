@@ -2,6 +2,11 @@ History of changes
 ==================
 
 
+Unreleased
+~~~~~~~~~~
+- Notice `1282`_ is now reported on ``application/text``.
+
+
 0.8.0 - 2019-03-03
 ~~~~~~~~~~~~~~~~~~
 - Dropped Python 2 support. If you need it, use the older versions.
