@@ -13,13 +13,14 @@ Accept-Patch,,,,5789,3.1,,,,rfc5789,Accept_Patch,,,True,True,False,True,,,,,mult
 Accept-Post,,,,,,,https://www.w3.org/TR/ldp/#header-accept-post,W3C Linked Data Platform 1.0,w3c_ldp,Accept_Post,,,True,True,False,True,standard,,,,multi
 Accept-Ranges,,,,7233,2.3,,,,rfc7233,Accept_Ranges,,,,,False,True,standard,,,,multi
 Access-Control,,,,,,,http://www.w3.org/2006/appformats/,W3C Web Application Formats Working Group,,,,,,,,,deprecated,,,,
-Access-Control-Allow-Credentials,,,citation,,,,https://www.w3.org/TR/cors/#access-control-allow-credentials-response-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,,,
-Access-Control-Allow-Headers,,,citation,,,,https://www.w3.org/TR/cors/#access-control-allow-headers-response-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,,,
-Access-Control-Allow-Methods,,,citation,,,,https://www.w3.org/TR/cors/#access-control-allow-methods-response-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,,,
-Access-Control-Allow-Origin,,,citation,,,,https://www.w3.org/TR/cors/#access-control-allow-origin-response-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,,,
-Access-Control-Max-Age,,,citation,,,,https://www.w3.org/TR/cors/#access-control-max-age-response-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,,,
-Access-Control-Request-Headers,,,citation,,,,https://www.w3.org/TR/cors/#access-control-request-headers-request-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,,,
-Access-Control-Request-Method,,,citation,,,,https://www.w3.org/TR/cors/#access-control-request-method-request-header,W3C Cross-Origin Resource Sharing,,,,,,,,,,,,,
+Access-Control-Allow-Credentials,,,citation,,,,https://fetch.spec.whatwg.org/#http-access-control-allow-credentials,WHATWG Fetch,whatwg_fetch,Access_Control_Allow_Credentials,True,True,,,False,True,,,,,single
+Access-Control-Allow-Headers,,,citation,,,,https://fetch.spec.whatwg.org/#http-access-control-allow-headers,WHATWG Fetch,whatwg_fetch,Access_Control_Allow_Headers,True,True,,,False,True,,,,,multi
+Access-Control-Allow-Methods,,,citation,,,,https://fetch.spec.whatwg.org/#http-access-control-allow-methods,WHATWG Fetch,whatwg_fetch,Access_Control_Allow_Methods,True,True,,,False,True,,,,,multi
+Access-Control-Allow-Origin,,,citation,,,,https://fetch.spec.whatwg.org/#http-access-control-allow-origin,WHATWG Fetch,whatwg_fetch,Access_Control_Allow_Origin,True,True,,,False,True,,,,,single
+Access-Control-Expose-Headers,,,,,,,https://fetch.spec.whatwg.org/#http-access-control-expose-headers,WHATWG Fetch,whatwg_fetch,Access_Control_Expose_Headers,True,True,,,False,True,,,,,multi
+Access-Control-Max-Age,,,citation,,,,https://fetch.spec.whatwg.org/#http-access-control-max-age,WHATWG Fetch,whatwg_fetch,Access_Control_Max_Age,True,True,,,False,True,,,,,single
+Access-Control-Request-Headers,,,citation,,,,https://fetch.spec.whatwg.org/#http-access-control-request-headers,WHATWG Fetch,whatwg_fetch,Access_Control_Request_Headers,True,True,,,True,False,,,,,multi
+Access-Control-Request-Method,,,citation,,,,https://fetch.spec.whatwg.org/#http-access-control-request-method,WHATWG Fetch,whatwg_fetch,Access_Control_Request_Method,True,True,,,True,False,,,,,single
 Age,,,,7234,5.1,,,,rfc7234,Age,True,True,,,False,True,standard,,,,single
 Allow,,,,7231,7.4.1,,,,rfc7231,Allow,,,,,False,True,standard,,,,multi
 Alt-Svc,,No quoted_comma_bad because e.g. Google's servers often produce it.,,7838,3,,,,rfc7838,Alt_Svc,,,,,False,True,standard,,,,special
@@ -56,6 +57,7 @@ Content-Version,,,,4229,,,,,,,,,,,,,,,,,
 Cookie,,,,6265,,,,,,,,,,,,,standard,False,False,,
 Cookie2,,,,2965,,,,,,,,,,,,,obsoleted,,,,
 Cost,,,,4229,,,,,,,,,,,,,,,,,
+Cross-Origin-Resource-Policy,,,,,,,https://fetch.spec.whatwg.org/#http-cross-origin-resource-policy,WHATWG Fetch,whatwg_fetch,Cross_Origin_Resource_Policy,True,,,,False,True,,,,,single
 DASL,,,,5323,,,,,,,,,,,,,standard,,,,
 DAV,,,,4918,,,,,,,,,,,,,standard,,,,
 Date,,,,7231,7.1.1.2,,,,rfc7231,Date,,True,,,True,True,standard,False,False,,single
@@ -110,7 +112,10 @@ Opt,,,,4229,,,,,,,,,,,,,,,,,
 Optional,,,,4229,,,,,,,,,,,,,,,,,
 Optional-WWW-Authenticate,,,,8053,3,,,,,,,,,,,,experimental,,,,
 Ordering-Type,,,,4229,,,,,,,,,,,,,standard,,,,
-Origin,,,,6454,,,,,,,,,,,,,standard,False,False,,
+Origin,,"Disregard the IANA registration and consider
+WHATWG as authoritative instead of RFC 6454,
+given that implementors (Web browsers)
+care about the former, and the two differ greatly.",citation,,,,https://fetch.spec.whatwg.org/#http-origin,WHATWG Fetch,whatwg_fetch,Origin,True,True,,,True,False,standard,False,False,,single
 Overwrite,,,,4918,,,,,,,,,,,,,standard,True,,,
 P3P,,,,4229,,,,,,,,,,,,,,,,,
 PEP,,,,4229,,,,,,,,,,,,,,,,,
@@ -199,7 +204,7 @@ X-CSRF-Token,,,,,,,,,,,,,,,,,,,,,
 X-CSRFToken,,,,,,,,,,,,,,,,,,,,,
 X-Content-Duration,,,,,,,,,,,,,,,,,,,,,
 X-Content-Security-Policy,,,,,,,,,,,,,,,,,,,,,
-X-Content-Type-Options,,,,,,,https://fetch.spec.whatwg.org/#x-content-type-options-header,,,,,,,,,,standard,,,,
+X-Content-Type-Options,,,,,,,https://fetch.spec.whatwg.org/#x-content-type-options-header,WHATWG Fetch,whatwg_fetch,X_Content_Type_Options,True,True,,,False,True,standard,,,,single
 X-Device-Accept,,,,,,,http://www.w3.org/2005/MWI/BPWG/,W3C Mobile Web Best Practices Working Group,,,,,,,,,,,,,
 X-Device-Accept-Charset,,,,,,,http://www.w3.org/2005/MWI/BPWG/,W3C Mobile Web Best Practices Working Group,,,,,,,,,,,,,
 X-Device-Accept-Encoding,,,,,,,http://www.w3.org/2005/MWI/BPWG/,W3C Mobile Web Best Practices Working Group,,,,,,,,,,,,,

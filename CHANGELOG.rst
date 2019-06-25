@@ -4,8 +4,12 @@ History of changes
 
 Unreleased
 ~~~~~~~~~~
+- Basic checks for most of the headers defined by `WHATWG Fetch`_,
+  such as ``Access-Control-Allow-Origin``.
 - Notice `1277`_ is no longer reported on ``X-Real-IP``.
 - Notice `1282`_ is now reported on ``application/text``.
+
+.. _WHATWG Fetch: https://fetch.spec.whatwg.org/
 
 
 0.8.0 - 2019-03-03
