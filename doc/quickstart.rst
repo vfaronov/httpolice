@@ -36,24 +36,22 @@ __ https://h2o.examp1e.net/
 Then feed this HAR file to HTTPolice::
 
   $ httpolice -i har /path/to/file.har
-  ------------ request: GET /search/searchindex.js
-  C 1032 Host should be the first header
-  ------------ request: GET /analytics.js
+  ------------ request: GET /
   ------------ response: 200 OK
-  C 1299 Quoted comma in Alt-Svc might confuse a naive parser
-  C 1035 Deprecated media type text/javascript
-  C 1258 HTTP/2 should use ALTSVC frame instead of Alt-Svc header
-  D 1168 Age header implies response from cache
-  E 1173 Response to "Cache-Control: no-cache" can't be served from cache
-  ------------ request: GET /repos/h2o/h2o?callback=callback
+  E 1000 Syntax error in Server header
+  E 1013 Multiple Date headers are forbidden
+  ------------ request: GET /assets/searchstyle.css
+  E 1029 TE header requires "Connection: TE"
+  ------------ request: GET /search/jquery-1.9.1.min.js
+  E 1029 TE header requires "Connection: TE"
+  ------------ request: GET /search/oktavia-jquery-ui.js
+  E 1029 TE header requires "Connection: TE"
+  ------------ request: GET /search/oktavia-english-search.js
   ------------ response: 200 OK
+  E 1000 Syntax error in Server header
+  E 1013 Multiple Date headers are forbidden
   C 1277 Obsolete 'X-' prefix in headers
-  ------------ request: GET /r/collect?v=1&_v=j66&a=1028424992&t=pageview&_s=1...
-  ------------ response: 200 OK
-  E 1108 Wrong day of week in Expires
-  C 1299 Quoted comma in Alt-Svc might confuse a naive parser
-  C 1162 Pragma: no-cache is for requests
-  C 1258 HTTP/2 should use ALTSVC frame instead of Alt-Svc header
+  [...and so on...]
 
 
 Better reports
@@ -145,7 +143,7 @@ __ https://www.djangoproject.com/
 
 ::
 
-  $ pip install Django-HTTPolice
+  $ pip3 install Django-HTTPolice
 
 .. highlight:: py
 
@@ -177,7 +175,6 @@ Now let’s run the tests and see what’s broken::
       raise ProtocolError(exchange)
   django_httpolice.common.ProtocolError: HTTPolice found problems in this response:
   ------------ request: GET /api/v1/words/?query=er
-  C 1070 No User-Agent header
   ------------ response: 200 OK
   E 1038 Bad JSON body
 
