@@ -17,9 +17,7 @@ Run tests::
 
 Run Pylint::
 
-  $ tools/pylint_all.sh -j 2
-  $ # ... or selectively:
-  $ pylint httpolice/response.py
+  $ pylint *.py **/*.py
 
 The delivery pipeline (Travis CI) enforces various other checks;
 if you want to run them locally before pushing to GitHub, see ``.travis.yml``.

@@ -16,7 +16,6 @@
 from collections import OrderedDict
 import io
 import shutil
-import sys
 import os
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -30,7 +29,7 @@ import httpolice
 import httpolice.inputs
 import httpolice.reports.html
 
-# XXX: POSSIBLY KIND OF A HACK
+# CAUTION: POSSIBLY KIND OF A HACK
 
 # We have two special documentation pages:
 # ``notices.html`` with the list of all notices, and
@@ -91,7 +90,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'HTTPolice'
-copyright = '2016, Vasiliy Faronov'
+copyright = '2016, Vasiliy Faronov'     # pylint: disable=redefined-builtin
 author = 'Vasiliy Faronov'
 
 # The version info for the project you're documenting, acts as replacement for

@@ -30,7 +30,7 @@ script:
 
     # Basic stuff.
     - python setup.py check --strict --restructuredtext
-    - tools/pylint_all.sh -j 2 --reports=no --score=no
+    - pylint -j 2 --reports=no --score=no *.py **/*.py
     - pytest
 
     # Although the main docs (``doc/``) are processed by Read the Docs,
