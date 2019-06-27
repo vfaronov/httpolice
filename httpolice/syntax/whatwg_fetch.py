@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 from httpolice.citation import Citation
 from httpolice.parse import (auto, case_sens, fill_names, literal, maybe_str,
                              pivot)

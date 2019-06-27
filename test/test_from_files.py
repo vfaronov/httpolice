@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 """File-based test suite.
 
 Treat every file in ``combined_data/`` and ``har_data/`` as a test case.

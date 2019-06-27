@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 from httpolice.citation import RFC
 from httpolice.known import media
 from httpolice.parse import auto, can_complain, fill_names, octet, octet_range

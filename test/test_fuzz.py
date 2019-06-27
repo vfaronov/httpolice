@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 """Fuzz testing.
 
 Generate random, very wrong inputs, and run them through HTTPolice.

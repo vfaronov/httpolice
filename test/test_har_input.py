@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 import os
 
 from httpolice.inputs.har import har_input

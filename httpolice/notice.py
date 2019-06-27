@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 """Access to the HTTPolice notices base.
 
 Notices are written and stored in XML (``notices.xml``).

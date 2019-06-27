@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 """The command-line interface to HTTPolice."""
 
 import argparse

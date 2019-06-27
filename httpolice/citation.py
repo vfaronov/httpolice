@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 class Citation:
 
     """A reference to a relevant document."""

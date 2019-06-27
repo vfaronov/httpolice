@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 """Input formats for HTTPolice (mainly for the command-line tool).
 
 Every input format is implemented as a function with the following interface:

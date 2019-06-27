@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 from httpolice import Exchange, Request, Response, check_exchange
 
 

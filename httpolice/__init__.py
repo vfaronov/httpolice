@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 from httpolice import helpers
 from httpolice.__metadata__ import version as __version__
 from httpolice.blackboard import Complaint

@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 from httpolice import request, response
 from httpolice.blackboard import Blackboard
 from httpolice.known import st

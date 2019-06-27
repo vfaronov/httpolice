@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 from urllib.parse import unquote_to_bytes as pct_decode
 
 from httpolice.citation import RFC

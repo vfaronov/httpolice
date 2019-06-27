@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 import codecs
 from datetime import datetime, timedelta
 from email import message_from_bytes as parse_email_message

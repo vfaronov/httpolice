@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 """Classes for representing various elements of the protocol."""
 
 from collections import namedtuple

@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 """Functions that may be useful for integrating with HTTPolice."""
 
 from httpolice.util.text import force_bytes, force_unicode

@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 from httpolice.citation import RFC
 from httpolice.parse import auto, fill_names, string_times
 from httpolice.syntax.common import ALPHA, DIGIT

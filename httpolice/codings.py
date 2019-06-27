@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 """Decoding content and transfer codings."""
 
 import zlib

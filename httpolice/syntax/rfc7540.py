@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 from httpolice.citation import RFC
 from httpolice.parse import fill_names, pivot
 from httpolice.syntax.rfc7235 import token68

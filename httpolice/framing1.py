@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 """Parse HTTP/1.x message framing according to RFC 7230."""
 
 import re

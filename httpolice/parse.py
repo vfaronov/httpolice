@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 """A library of parser combinators based on the Earley algorithm.
 
 This is used mainly for parsing header values (see :mod:`httpolice.header`).

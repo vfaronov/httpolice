@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 """Wrappers over raw HTTP headers.
 
 HTTPolice works with headers on two levels.

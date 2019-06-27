@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8; -*-
-
 """Tool to synchronize :mod:`httpolice.known` with IANA registries.
 
 Simply run::

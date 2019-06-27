@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 """Load, query, and update tabular data for various protocol elements.
 
 In this module, the term "key" means the actual name or number in question,
