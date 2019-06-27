@@ -20,13 +20,13 @@ See `example report`__.
 __ https://httpolice.readthedocs.io/page/showcase.html
 
 As a command-line tool, it can read `HAR files`__ or raw HTTP/1.x TCP streams.
-It can integrate with `mitmproxy`__ for TLS-encrypted and HTTP/2 traffic.
+It can `integrate with mitmproxy`__ for TLS-encrypted and HTTP/2 traffic.
 Or you can use it as a Python (3.4+) library.
-There is a `Django`__ integration package and a third-party `Chrome extension`__.
+There is a `Django integration`__ package and a third-party `Chrome extension`__.
 
 __ https://en.wikipedia.org/wiki/.har
-__ https://mitmproxy.org/
-__ https://www.djangoproject.com/
+__ https://github.com/vfaronov/mitmproxy-httpolice
+__ https://github.com/vfaronov/django-httpolice
 __ https://chrome.google.com/webstore/detail/httpolice-devtool/hnlnhebgfcfemjaphgbeokdnfpgbnhgn
 
 Start with the `quickstart`__.

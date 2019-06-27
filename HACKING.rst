@@ -224,11 +224,32 @@ Releasing a new version
 Maintenance
 ~~~~~~~~~~~
 
-- Watch for new versions of related software
-  and make sure they are compatible with HTTPolice:
+- Run a fresh Travis build, look at its logs and make sure everything's right.
 
-  - main dependencies (``install_requires``);
-  - sources of input data (tcpflow, major Web browsers, Fiddler).
+- Watch for new versions of Python:
+
+  - make sure HTTPolice works with them
+  - add them to Travis config
+  - update PyPI trove classifiers
+
+- Watch for new versions of libraries and make sure HTTPolice works with them.
+
+- Watch for new versions of software HTTPolice integrates with:
+
+  - tcpflow
+
+  - HAR exporters
+
+    - major Web browsers
+    - Fiddler
+
+  - mitmproxy
+
+  - Django
+
+- Test HTML reports in current versions of major Web browsers.
+
+- Watch for new RFCs and RFC errata that may affect HTTPolice rules.
 
 - Update development dependencies:
 
@@ -240,10 +261,6 @@ Maintenance
 
   #. Check that everything is OK with the new versions.
      Maybe some Pylint overrides are no longer necessary, etc.
-
-- Look at Travis build logs and make sure nothing strange is going on there.
-
-- Check that the Python versions in PyPI trove classifiers are up to date.
 
 - Check links in notices::
 
