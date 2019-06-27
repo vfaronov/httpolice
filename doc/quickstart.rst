@@ -40,17 +40,13 @@ Then feed this HAR file to HTTPolice::
   ------------ response: 200 OK
   E 1000 Syntax error in Server header
   E 1013 Multiple Date headers are forbidden
-  ------------ request: GET /assets/searchstyle.css
-  E 1029 TE header requires "Connection: TE"
-  ------------ request: GET /search/jquery-1.9.1.min.js
-  E 1029 TE header requires "Connection: TE"
-  ------------ request: GET /search/oktavia-jquery-ui.js
-  E 1029 TE header requires "Connection: TE"
   ------------ request: GET /search/oktavia-english-search.js
   ------------ response: 200 OK
   E 1000 Syntax error in Server header
   E 1013 Multiple Date headers are forbidden
   C 1277 Obsolete 'X-' prefix in headers
+  ------------ request: GET /assets/8mbps100msec-nginx195-h2o150.png
+  C 1276 Accept: */* is as good as image/webp
   [...and so on...]
 
 

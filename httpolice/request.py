@@ -236,12 +236,10 @@ def check_request(req):
     if tc.chunked in headers.te:
         complain(1028)
 
-    if version == http2:
-        if headers.te and headers.te != [u'trailers']:
-            complain(1244, header=headers.te)
-    else:
-        if headers.te and u'TE' not in headers.connection:
-            complain(1029)
+    if version == http2 and headers.te and headers.te != [u'trailers']:
+        complain(1244, header=headers.te)
+    if version == http11 and headers.te and u'TE' not in headers.connection:
+        complain(1029)
 
     if version == http11 and headers.host.is_absent:
         complain(1031)

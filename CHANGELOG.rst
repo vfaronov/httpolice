@@ -4,13 +4,25 @@ History of changes
 
 Unreleased
 ~~~~~~~~~~
+
+Added
+-----
 - Basic checks for most of the headers defined by `WHATWG Fetch`_,
   such as ``Access-Control-Allow-Origin``.
-- Notice `1276`_ is now a comment, not an error.
-- Notice `1277`_ is no longer reported on ``X-Real-IP``.
+- Updated workarounds for HAR files exported from Chrome and Firefox.
+  More checks are now skipped on such files, which means
+  fewer false positives due to missing or mangled data.
 - Notice `1282`_ is now reported on ``application/text``.
 
+Fixed
+-----
+- Notice `1276`_ is now a comment, not an error.
+- Notice `1277`_ is no longer reported on ``X-Real-IP``.
+- Notice `1029`_ (``TE`` requires ``Connection: TE``)
+  is now only reported on HTTP/1.1 requests.
+
 .. _WHATWG Fetch: https://fetch.spec.whatwg.org/
+.. _1029: https://httpolice.readthedocs.io/page/notices.html#1029
 
 
 0.8.0 - 2019-03-03
