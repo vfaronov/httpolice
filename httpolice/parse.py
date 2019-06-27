@@ -524,6 +524,9 @@ def literal(s, case_sensitive=False):
         r = r * literal(c, case_sensitive)
     return _join_args << r
 
+def case_sens(s):   # shortcut for RFC 7405's "%s"
+    return literal(s, case_sensitive=True)
+
 def as_symbol(x):
     return x if isinstance(x, Symbol) else literal(x)
 

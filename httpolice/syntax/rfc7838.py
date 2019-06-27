@@ -3,8 +3,8 @@
 from urllib.parse import quote as pct_encode, unquote_to_bytes as pct_decode
 
 from httpolice.citation import RFC
-from httpolice.parse import (can_complain, fill_names, literal, many,
-                             maybe_str, parse, pivot, skip, subst)
+from httpolice.parse import (can_complain, case_sens, fill_names, literal,
+                             many, maybe_str, parse, pivot, skip, subst)
 from httpolice.structure import AltSvcParam, MultiDict, Parametrized
 from httpolice.syntax.rfc7230 import (OWS, comma_list1, port, quoted_string,
                                       tchar, token, uri_host)
@@ -16,7 +16,7 @@ from httpolice.util.text import force_bytes, force_unicode
 # pylint: enable=import-error
 
 
-clear = literal('clear', case_sensitive=True)                           > pivot
+clear = case_sens('clear')                                              > pivot
 
 @can_complain
 def _check_protocol_id(complain, encoded_id):
