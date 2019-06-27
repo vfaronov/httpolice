@@ -24,9 +24,6 @@ Run Pylint::
 The delivery pipeline (Travis CI) enforces various other checks;
 if you want to run them locally before pushing to GitHub, see ``.travis.yml``.
 
-Use isort if you like -- there's an ``.isort.cfg`` with the right options --
-but this is not enforced automatically for now.
-
 Versions of development tools (pytest, Pylint...)
 are pinned down to help make builds/QA reproducible.
 From time to time, they are manually upgraded (see the "Maintenance" section).

@@ -7,7 +7,6 @@ include HACKING.rst
 include httpolice/known/README.rst
 
 include .coveragerc
-include .isort.cfg
 include pylintrc
 include pytest.ini
 include .eslintrc.js
