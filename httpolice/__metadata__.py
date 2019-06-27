@@ -1,2 +1,2 @@
-version = '0.9.0.dev1'
+version = '0.9.0'
 homepage = 'https://github.com/vfaronov/httpolice'
