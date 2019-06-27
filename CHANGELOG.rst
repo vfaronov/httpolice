@@ -6,6 +6,7 @@ Unreleased
 ~~~~~~~~~~
 - Basic checks for most of the headers defined by `WHATWG Fetch`_,
   such as ``Access-Control-Allow-Origin``.
+- Notice `1276`_ is now a comment, not an error.
 - Notice `1277`_ is no longer reported on ``X-Real-IP``.
 - Notice `1282`_ is now reported on ``application/text``.
 

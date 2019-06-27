@@ -2015,13 +2015,14 @@ One non-obvious thing is how references work
     <ref to="msg.displayable_body"/>
   </comment>
 
-  <error id="1276">
+  <comment id="1276">
     <title><var ref="header"/>: <var ref="wildcard"/> is as good as <var ref="value"/></title>
     <explain>The <var ref="header"/> header is not an ordered list. Whether <var ref="wildcard"/> comes before or after <var ref="value"/>, does not affect its priority. Only explicit quality values (q=) count.</explain>
     <explain>In other words, this request says that any <var ref="wildcard"/> is as acceptable as <var ref="value"/>.</explain>
-    <explain>To make <var ref="wildcard"/> a fallback, it should have a lower quality value, for example: <var ref="wildcard"/>;q=0.1</explain>
+    <explain>If <var ref="wildcard"/> is intended to be a fallback, it should have a lower quality value, for example: <var ref="wildcard"/>;q=0.1</explain>
     <explain>See <rfc num="7231" sect="5.3.1"/>.</explain>
-  </error>
+    <!-- This is a comment, not an error, because e.g. Chrome, when fetching images, sends "Accept: image/webp,*/*", which makes perfect sense as "give me whatever you got, and btw I can do webp, too". -->
+  </comment>
 
   <comment id="1277">
     <title>Obsolete ‘X-’ prefix in headers</title>
