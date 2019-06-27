@@ -240,11 +240,6 @@ Maintenance
 
        $ pip-compile --upgrade tools/requirements.in
 
-  #. Update other pinned versions:
-
-     - Nu Html Checker (in ``tools/vnu.sh``);
-     - ESLint (in ``tools/eslint.sh``).
-
   #. Check that everything is OK with the new versions.
      Maybe some Pylint overrides are no longer necessary, etc.
 

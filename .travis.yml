@@ -2,11 +2,6 @@ language: python
 dist: xenial
 sudo: false
 
-addons:
-    apt:
-        packages:
-            - xmlstarlet
-
 matrix:
     include:
         - python: "3.4"
@@ -26,8 +21,6 @@ install:
     - if [ "$REQUIRES" = minimum ]; then tools/minimum_requires.sh; fi
     - pip install -e .
     - pip install -r tools/requirements.txt
-    - tools/vnu.sh install
-    - tools/eslint.sh install
 
 cache: pip
 
@@ -41,14 +34,10 @@ script:
     - pytest
 
     # Although the main docs (``doc/``) are processed by Read the Docs,
-    # we want to check that they are building OK, and validate the resulting
-    # HTML report. But first, make sure that the included API example works.
+    # we want to check that they are building OK.
+    # Also, make sure that the included API example works.
     - python doc/api_example.py && grep -q 1194 report.html
     - sphinx-build -W doc/ doc/_build/
-    - tools/vnu.sh run doc/_build/showcase.html
-    - tools/vnu.sh run doc/_build/notices.html
-    - tools/css_validator.sh httpolice/reports/html.css
-    - tools/eslint.sh run httpolice/reports/html.js
 
     # Check the assorted reStructuredText documents at the top of the repo.
     - tools/check_rst.sh
